@@ -246,10 +246,10 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic C — AI 요약
 
-| Method | Endpoint                              | 설명         | 인증 | 관련 페이지 |
-| ------ | ------------------------------------- | ------------ | ---- | ----------- |
-| GET    | `/contents/{contentId}/summary`       | `/home/[id]` |
-| POST   | `/contents/{contentId}/summary/retry` | `/home/[id]` |
+| Method | Endpoint                              | 설명 | 인증         | 관련 페이지 |
+| ------ | ------------------------------------- | ---- | ------------ | ----------- |
+| GET    | `/contents/{contentId}/summary`       | O    | `/home/[id]` |
+| POST   | `/contents/{contentId}/summary/retry` | O    | `/home/[id]` |
 
 ### Epic D — 질문/커뮤니티
 
@@ -272,18 +272,18 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic E — 학습 히스토리
 
-| Method | Endpoint            | 설명                    | 인증 | 담당       |
-| ------ | ------------------- | ----------------------- | ---- | ---------- |
-| GET    | `/history`          | 학습 히스토리 조회      | O    | `/profile` |
-| GET    | `/history/activity` | 활동 내역 (좋아요 포함) | O    | `/profile` |
+| Method | Endpoint            | 설명                    | 인증 | 관련 페이지 |
+| ------ | ------------------- | ----------------------- | ---- | ----------- |
+| GET    | `/history`          | 학습 히스토리 조회      | O    | `/profile`  |
+| GET    | `/history/activity` | 활동 내역 (좋아요 포함) | O    | `/profile`  |
 
 ### Epic F — 주간 리포트
 
-| Method | Endpoint                     | 설명           | 인증 | 담당      |
-| ------ | ---------------------------- | -------------- | ---- | --------- |
-| GET    | `/reports/weekly`            | 이번 주 리포트 | O    | `/report` |
-| GET    | `/reports/weekly/{reportId}` | 특정 주 리포트 | O    | `/report` |
-| POST   | `/reports/weekly/share`      | 공유 링크 생성 | O    | `/report` |
+| Method | Endpoint                     | 설명           | 인증 | 관련 페이지 |
+| ------ | ---------------------------- | -------------- | ---- | ----------- |
+| GET    | `/reports/weekly`            | 이번 주 리포트 | O    | `/report`   |
+| GET    | `/reports/weekly/{reportId}` | 특정 주 리포트 | O    | `/report`   |
+| POST   | `/reports/weekly/share`      | 공유 링크 생성 | O    | `/report`   |
 
 ---
 
@@ -386,6 +386,8 @@ test("사용자는 성공적으로 로그인할 수 있다", async ({ page }) =>
 - Claude Code 사용 시 AI 생성 코드도 **PR 올린 사람이 책임**짐
 - PR에 AI 사용 여부 반드시 기록
 
+---
+
 ## 13. 참고 문서
 
 | 문서                                  | 내용                |
@@ -394,6 +396,8 @@ test("사용자는 성공적으로 로그인할 수 있다", async ({ page }) =>
 | `.env.example`                        | 환경변수 목록       |
 | `.github/PULL_REQUEST_TEMPLATE.md`    | PR 작성 양식        |
 | Confluence ADR                        | 기술 결정 기록      |
+
+---
 
 ## 14. CI/CD 자동화 구조
 
