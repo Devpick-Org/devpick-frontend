@@ -2,9 +2,19 @@ import axios, {
   AxiosError,
   InternalAxiosRequestConfig,
 } from "axios";
-import { useAuthStore } from "@/store/auth.store";
+// TODO(DP-191): Zustand auth store 연동 — store/ 머지 후 아래 주석 해제
+// import { useAuthStore } from "@/store/auth.store";
 import type { ApiErrorResponse, ApiResponse } from "@/types/api";
 import type { TokenResponse } from "@/types/auth";
+
+/** 임시 auth store 인터페이스 — DP-191 머지 후 제거 */
+const useAuthStore = {
+  getState: () => ({
+    accessToken: null as string | null,
+    setToken: (_token: string) => {},
+    clearAuth: () => {},
+  }),
+};
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.devpick.kr/v1";
