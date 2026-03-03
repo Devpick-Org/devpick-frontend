@@ -16,7 +16,7 @@
 
 - 프론트엔드 담당: **홍보민**
 - MVP 데드라인: **2026-04-13**
-- 현재 스프린트: Sprint 0 (2/24 ~ 3/2) — 환경 세팅 및 라우팅 구조 설계
+- 현재 스프린트: Sprint 1 (3/3 ~ 3/16) — 회원/프로필 화면 개발 및 콘텐츠 피드 개발
 
 ### 시스템 구조 (4개 서버)
 
@@ -48,38 +48,60 @@
 
 ---
 
-## 3. 폴더 구조 (App Router + FSD 변형)
+## 3. 폴더 구조 (App Router + Route Group)
 
 ```
 ├── app/
-│ ┣ community/           # 커뮤니티 피드 (질문/게시글 목록)
-│ ┃ ┣ write/             # 커뮤니티 글쓰기 및 AI 질문 개선
+│ ┣ (auth)/              # Route Group — GNB 없는 레이아웃 (로그인)
+│ ┃ ┗ page.tsx           # / (로그인 페이지)
+│ ┣ (main)/              # Route Group — GNB 있는 레이아웃
+│ ┃ ┣ layout.tsx         # GNB + QueryClientProvider
+│ ┃ ┣ home/              # 맞춤형 아티클 피드 (메인)
+│ ┃ ┃ ┣ [id]/            # 아티클 상세 및 AI 요약 뷰어
+│ ┃ ┃ ┃ ┗ page.tsx
 │ ┃ ┃ ┗ page.tsx
-│ ┃ ┣ [id]/              # 게시글 상세 및 AI/유저 답변
+│ ┃ ┣ community/         # 커뮤니티 피드 (질문/게시글 목록)
+│ ┃ ┃ ┣ write/           # 커뮤니티 글쓰기 및 AI 질문 개선
+│ ┃ ┃ ┃ ┗ page.tsx
+│ ┃ ┃ ┣ [id]/            # 게시글 상세 및 AI/유저 답변
+│ ┃ ┃ ┃ ┗ page.tsx
 │ ┃ ┃ ┗ page.tsx
-│ ┃ ┗ page.tsx
-│ ┣ home/                # 맞춤형 아티클 피드 (메인)
-│ ┃ ┣ [id]/              # 아티클 상세 및 AI 요약 뷰어
+│ ┃ ┣ onboarding/        # 초기 사용자 성향 파악 온보딩
 │ ┃ ┃ ┗ page.tsx
-│ ┃ ┗ page.tsx
-│ ┣ onboarding/          # 초기 사용자 성향 파악 온보딩
-│ ┃ ┗ page.tsx
-│ ┣ profile/             # 내 프로필, 스크랩, 활동 내역
-│ ┃ ┗ page.tsx
-│ ┣ report/              # 주간 학습 분석 리포트 대시보드
-│ ┃ ┗ page.tsx
-│ ┣ favicon.ico         # 파비콘
-│ ┣ globals.css         # 전역 스타일 및 Tailwind CSS 설정
-│ ┣ layout.tsx          # Root Layout (GNB, Footer, Provider 등 공통 레이아웃)
-│ ┗ page.tsx            # 메인 랜딩 (로그인 페이지)
-├── components/           # 공통 UI 컴포넌트 (버튼, 인풋, 모달 등)
-├── lib/                  # 유틸리티 함수 (포맷팅, tailwind merge 등)
-├── hooks/                # 공통 Custom Hooks
-├── types/                # TypeScript 전역 타입 정의 (DTO 등)
-└── public/               # 정적 에셋 (이미지, 폰트)
+│ ┃ ┣ profile/           # 내 프로필, 스크랩, 활동 내역
+│ ┃ ┃ ┗ page.tsx
+│ ┃ ┗ report/            # 주간 학습 분석 리포트 대시보드
+│ ┃   ┗ page.tsx
+│ ┣ favicon.ico          # 파비콘
+│ ┣ globals.css          # 전역 스타일 및 Tailwind CSS 설정
+│ ┗ layout.tsx           # Root Layout (HTML shell — html, body 태그만)
+├── components/
+│ ┣ ui/                  # 재사용 프리미티브 (Button, Input, Card, Modal, Badge)
+│ ┣ layout/              # GNB, Footer 등 레이아웃 컴포넌트
+│ ┗ providers.tsx        # QueryClientProvider 등 클라이언트 Provider 래퍼
+├── lib/
+│ ┣ api/                 # API 클라이언트 (DP-190)
+│ ┃ ┣ client.ts          # Axios 인스턴스 + 인터셉터
+│ ┃ ┗ endpoints/         # 도메인별 API 함수
+│ ┃   ┣ auth.ts
+│ ┃   ┣ contents.ts
+│ ┃   ┣ posts.ts
+│ ┃   ┣ users.ts
+│ ┃   ┗ reports.ts
+│ ┗ utils.ts             # cn(), formatDate(), formatRelativeTime()
+├── store/               # Zustand 전역 상태 (DP-191)
+│ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated)
+│ ┗ ui.store.ts          # UI 상태 (Toast 큐)
+├── hooks/               # 공통 Custom Hooks
+├── types/               # TypeScript 전역 타입 정의
+│ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
+│ ┗ auth.ts              # User, LoginRequest, SignupRequest, TokenResponse
+└── public/              # 정적 에셋 (이미지, 폰트)
 ```
 
----
+> **Route Group 규칙**: 괄호로 묶인 폴더명 `(auth)`, `(main)` 은 URL에 영향을 주지 않음.
+> - `(auth)`: GNB 없음 (로그인 등 인증 전 화면)
+> - `(main)`: GNB + QueryClientProvider 포함 (인증 후 메인 화면)
 
 ## 4. 자주 쓰는 커맨드
 
