@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Heart, MessageCircle, Bookmark, Share2, BadgeCheck } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -66,101 +67,6 @@ const TAG_COLORS: Record<string, string> = {
 
 function getTagColor(tag: string) {
   return TAG_COLORS[tag] ?? "border-primary/20 bg-primary/5 text-primary/80";
-}
-
-function HeartIcon({
-  className,
-  filled,
-}: {
-  className?: string;
-  filled?: boolean;
-}) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-    </svg>
-  );
-}
-
-function MessageIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-    </svg>
-  );
-}
-
-function BookmarkIcon({
-  className,
-  filled,
-}: {
-  className?: string;
-  filled?: boolean;
-}) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-    </svg>
-  );
-}
-
-function ShareIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-      <polyline points="16 6 12 2 8 6" />
-      <line x1="12" x2="12" y1="2" y2="15" />
-    </svg>
-  );
-}
-
-function CheckBadgeIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
-  );
 }
 
 export function CommunityCard({
@@ -263,7 +169,7 @@ export function CommunityCard({
             )}
             aria-label={isLiked ? "좋아요 취소" : "좋아요"}
           >
-            <HeartIcon className="h-4 w-4" filled={isLiked} />
+            <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
             <span className="text-xs font-medium">{likeCount}</span>
           </button>
           <button
@@ -274,7 +180,7 @@ export function CommunityCard({
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
             aria-label="댓글"
           >
-            <MessageIcon className="h-4 w-4" />
+            <MessageCircle className="h-4 w-4" />
             <span className="text-xs font-medium">{post.comments}</span>
           </button>
           <button
@@ -287,7 +193,7 @@ export function CommunityCard({
             )}
             aria-label={isBookmarked ? "북마크 해제" : "북마크"}
           >
-            <BookmarkIcon className="h-4 w-4" filled={isBookmarked} />
+            <Bookmark className="h-4 w-4" fill={isBookmarked ? "currentColor" : "none"} />
           </button>
           <button
             onClick={(e) => {
@@ -297,7 +203,7 @@ export function CommunityCard({
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
             aria-label="공유"
           >
-            <ShareIcon className="h-4 w-4" />
+            <Share2 className="h-4 w-4" />
           </button>
         </div>
 
@@ -306,7 +212,7 @@ export function CommunityCard({
           <div className="border-t border-border/50 px-5 pb-5 pt-3">
             <div className="rounded-xl bg-muted/50 p-4">
               <div className="mb-2 flex items-center gap-2">
-                <CheckBadgeIcon className="h-4 w-4 text-primary" />
+                <BadgeCheck className="h-4 w-4 text-primary" />
                 <Badge
                   variant="secondary"
                   className="border border-primary/20 bg-primary/10 px-2 py-0 text-[10px] font-semibold text-primary"

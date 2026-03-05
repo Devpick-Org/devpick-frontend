@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -46,86 +47,6 @@ function getTagColor(tag: string) {
   return TAG_COLORS[tag] ?? "border-primary/20 bg-primary/5 text-primary/80";
 }
 
-function BookmarkIcon({
-  className,
-  filled,
-}: {
-  className?: string;
-  filled?: boolean;
-}) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
-    </svg>
-  );
-}
-
-function HeartIcon({
-  className,
-  filled,
-}: {
-  className?: string;
-  filled?: boolean;
-}) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-    </svg>
-  );
-}
-
-function ShareIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-      <polyline points="16 6 12 2 8 6" />
-      <line x1="12" x2="12" y1="2" y2="15" />
-    </svg>
-  );
-}
-
-function ExternalLinkIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M15 3h6v6" />
-      <path d="M10 14 21 3" />
-      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-    </svg>
-  );
-}
-
 export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
   const [isScrapped, setIsScrapped] = useState(item.isScrapped ?? false);
   const [isLiked, setIsLiked] = useState(item.isLiked ?? false);
@@ -166,7 +87,7 @@ export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
         <div className="flex flex-1 flex-col">
           {/* Source & time */}
           <div className="mb-2 flex items-center gap-2">
-            <ExternalLinkIcon className="h-3.5 w-3.5 text-muted-foreground" />
+            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs font-medium text-muted-foreground">
               {item.source}
             </span>
@@ -214,7 +135,7 @@ export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
               )}
               aria-label={isLiked ? "좋아요 취소" : "좋아요"}
             >
-              <HeartIcon className="h-4 w-4" filled={isLiked} />
+              <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
             </button>
             <button
               onClick={handleScrap}
@@ -226,14 +147,14 @@ export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
               )}
               aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
             >
-              <BookmarkIcon className="h-4 w-4" filled={isScrapped} />
+              <Bookmark className="h-4 w-4" fill={isScrapped ? "currentColor" : "none"} />
             </button>
             <button
               onClick={handleShare}
               className="relative rounded-lg p-1.5 text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-secondary"
               aria-label="공유"
             >
-              <ShareIcon className="h-4 w-4" />
+              <Share2 className="h-4 w-4" />
               {isShareTooltip && (
                 <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background">
                   복사됨!

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ChevronDown, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -27,57 +28,6 @@ function DevPickLogo({ className }: { className?: string }) {
     >
       <polyline points="16 18 22 12 16 6" />
       <polyline points="8 6 2 12 8 18" />
-    </svg>
-  );
-}
-
-function ChevronDownIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
-function UserIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function LogOutIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" x2="9" y1="12" y2="12" />
     </svg>
   );
 }
@@ -153,7 +103,7 @@ export function TopNav() {
                       </Badge>
                     )}
                   </div>
-                  <ChevronDownIcon className="hidden h-3.5 w-3.5 text-muted-foreground sm:block" />
+                  <ChevronDown className="hidden h-3.5 w-3.5 text-muted-foreground sm:block" />
                 </>
               ) : (
                 <>
@@ -169,7 +119,7 @@ export function TopNav() {
           <DropdownMenuContent align="end" className="w-48 bg-card border-border">
             <DropdownMenuItem asChild>
               <Link href="/profile" className="gap-2 text-foreground">
-                <UserIcon className="h-4 w-4 text-muted-foreground" />
+                <User className="h-4 w-4 text-muted-foreground" />
                 내 프로필
               </Link>
             </DropdownMenuItem>
@@ -178,7 +128,7 @@ export function TopNav() {
               className="gap-2 text-foreground cursor-pointer"
               onSelect={() => handleLogout()}
             >
-              <LogOutIcon className="h-4 w-4 text-muted-foreground" />
+              <LogOut className="h-4 w-4 text-muted-foreground" />
               로그아웃
             </DropdownMenuItem>
           </DropdownMenuContent>
