@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,20 +64,27 @@ export function TopNav() {
     <header className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
       <div className="flex h-16 items-center justify-between px-4 lg:px-8">
         {/* Left: Logo */}
-        <Link href="/home" className="flex items-center gap-2.5 shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
-            <DevPickLogo className="h-4 w-4 text-primary" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            DevPick
-          </span>
-        </Link>
+        <Button asChild variant="ghost" className="h-auto gap-2.5 px-2 py-1.5 hover:bg-transparent">
+          <Link href="/home">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
+              <DevPickLogo className="h-4 w-4 text-primary" />
+            </div>
+            <span className="text-lg font-bold tracking-tight text-foreground">
+              DevPick
+            </span>
+          </Link>
+        </Button>
 
-        {/* Right: User Profile */}
+        {/* Right: User Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
-              className="flex shrink-0 items-center gap-2.5 rounded-xl border border-border bg-secondary/50 px-3 py-1.5 transition-colors hover:bg-secondary"
+            {/*
+             * Button variant="outline"을 베이스로 사용.
+             * 기존 bg-secondary/50 hover:bg-secondary 스타일을 className으로 오버라이드.
+             */}
+            <Button
+              variant="outline"
+              className="h-auto gap-2.5 rounded-xl border-border bg-secondary/50 px-3 py-1.5 hover:bg-secondary"
               aria-label="User menu"
             >
               {showUser ? (
@@ -114,21 +122,18 @@ export function TopNav() {
                   </div>
                 </>
               )}
-            </button>
+            </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 bg-card border-border">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem asChild>
-              <Link href="/profile" className="gap-2 text-foreground">
-                <User className="h-4 w-4 text-muted-foreground" />
+              <Link href="/profile">
+                <User />
                 내 프로필
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem
-              className="gap-2 text-foreground cursor-pointer"
-              onSelect={() => handleLogout()}
-            >
-              <LogOut className="h-4 w-4 text-muted-foreground" />
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={handleLogout}>
+              <LogOut />
               로그아웃
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Users, TrendingUp, type LucideIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
@@ -27,19 +28,22 @@ export function Sidebar() {
               pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
             return (
-              <Link
+              <Button
                 key={item.href}
-                href={item.href}
+                asChild
+                variant="ghost"
                 className={cn(
-                  "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200",
+                  "w-full h-auto justify-start gap-3 rounded-xl px-4 py-2.5 text-sm font-medium",
                   isActive
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
               >
-                <Icon className="h-[18px] w-[18px] shrink-0" />
-                {item.label}
-              </Link>
+                <Link href={item.href}>
+                  <Icon className="h-[18px] w-[18px] shrink-0" />
+                  {item.label}
+                </Link>
+              </Button>
             );
           })}
         </nav>
@@ -55,19 +59,22 @@ export function Sidebar() {
             pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
           return (
-            <Link
+            <Button
               key={item.href}
-              href={item.href}
+              asChild
+              variant="ghost"
               className={cn(
-                "flex flex-col items-center gap-1 px-4 py-2.5 text-xs font-medium transition-colors duration-200",
+                "h-auto flex-col gap-1 rounded-none px-4 py-2.5 text-xs font-medium",
                 isActive
-                  ? "text-primary"
+                  ? "text-primary hover:text-primary"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <Icon className="h-5 w-5" />
-              {item.label}
-            </Link>
+              <Link href={item.href}>
+                <Icon className="h-5 w-5" />
+                {item.label}
+              </Link>
+            </Button>
           );
         })}
       </nav>
