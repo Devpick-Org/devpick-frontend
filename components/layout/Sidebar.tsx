@@ -28,22 +28,20 @@ export function Sidebar() {
               pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
             return (
-              <Button
+              <Link
                 key={item.href}
-                asChild
-                variant="ghost"
+                href={item.href}
                 className={cn(
-                  "w-full h-auto justify-start gap-3 rounded-xl px-4 py-2.5 text-sm font-medium",
+                  // Button 없이 직접 Link에 스타일 적용
+                  "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-primary/10 text-primary hover:bg-primary/10 hover:text-primary"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    ? "bg-primary/10 text-primary" // 활성화일 때만 파란색 기운
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground", // 평소엔 은은한 회색 호버
                 )}
               >
-                <Link href={item.href}>
-                  <Icon className="h-[18px] w-[18px] shrink-0" />
-                  {item.label}
-                </Link>
-              </Button>
+                <Icon className="h-[18px] w-[18px] shrink-0" />
+                {item.label}
+              </Link>
             );
           })}
         </nav>
@@ -59,22 +57,19 @@ export function Sidebar() {
             pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
           return (
-            <Button
+            <Link
               key={item.href}
-              asChild
-              variant="ghost"
+              href={item.href}
               className={cn(
-                "h-auto flex-col gap-1 rounded-none px-4 py-2.5 text-xs font-medium",
+                "flex flex-col items-center gap-1 px-4 py-2.5 text-xs font-medium transition-colors duration-200",
                 isActive
-                  ? "text-primary hover:text-primary"
+                  ? "text-primary"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <Link href={item.href}>
-                <Icon className="h-5 w-5" />
-                {item.label}
-              </Link>
-            </Button>
+              <Icon className="h-5 w-5" />
+              {item.label}
+            </Link>
           );
         })}
       </nav>

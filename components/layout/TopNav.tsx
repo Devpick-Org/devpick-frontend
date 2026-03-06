@@ -53,7 +53,9 @@ export function TopNav() {
   const showUser = mounted && user !== null;
   const displayName = user?.nickname ?? "Guest";
   const displayInitial = displayName.charAt(0).toUpperCase();
-  const displayLevel = user?.level ? (LEVEL_LABELS[user.level] ?? user.level) : null;
+  const displayLevel = user?.level
+    ? (LEVEL_LABELS[user.level] ?? user.level)
+    : null;
 
   const handleLogout = () => {
     clearAuth();
@@ -64,16 +66,14 @@ export function TopNav() {
     <header className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
       <div className="flex h-16 items-center justify-between px-4 lg:px-8">
         {/* Left: Logo */}
-        <Button asChild variant="ghost" className="h-auto gap-2.5 px-2 py-1.5 hover:bg-transparent">
-          <Link href="/home">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
-              <DevPickLogo className="h-4 w-4 text-primary" />
-            </div>
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              DevPick
-            </span>
-          </Link>
-        </Button>
+        <Link href="/home" className="flex items-center gap-2.5 shrink-0">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
+            <DevPickLogo className="h-4.5 w-4.5 text-primary" />
+          </div>
+          <span className="text-lg font-bold tracking-tight text-foreground">
+            DevPick
+          </span>
+        </Link>
 
         {/* Right: User Profile Dropdown */}
         <DropdownMenu>
@@ -127,8 +127,7 @@ export function TopNav() {
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem asChild>
               <Link href="/profile">
-                <User />
-                내 프로필
+                <User />내 프로필
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
