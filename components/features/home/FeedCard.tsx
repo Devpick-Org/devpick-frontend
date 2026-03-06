@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export interface FeedCardItem {
@@ -82,103 +84,124 @@ export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
 
   return (
     <Link href={`/home/${item.id}`} className="block">
-      <article className="group relative flex cursor-pointer items-stretch rounded-2xl border border-border bg-card p-5 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-        {/* Left: Text content */}
-        <div className="flex flex-1 flex-col">
-          {/* Source & time */}
-          <div className="mb-2 flex items-center gap-2">
-            <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">
-              {item.source}
-            </span>
-            <span className="text-xs text-muted-foreground/50">/</span>
-            <span className="text-xs text-muted-foreground/70">
-              {item.timeAgo}
-            </span>
-          </div>
+      {/*
+       * Card가 제공하는 것: border, bg-card, rounded-xl, text-card-foreground
+       * !p-0: Card 기본 py-6 제거 (내부 div에서 직접 패딩 처리)
+       * gap-0: Card 기본 gap-6 제거
+       * shadow-none: Card 기본 shadow-sm 제거 (hover shadow는 직접 제어)
+       * rounded-2xl: rounded-xl 오버라이드
+       */}
+      <Card className="group relative !p-0 gap-0 rounded-2xl shadow-none transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+        <div className="flex cursor-pointer items-stretch p-5">
+          {/* Left: Text content */}
+          <div className="flex flex-1 flex-col">
+            {/* Source & time */}
+            <div className="mb-2 flex items-center gap-2">
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">
+                {item.source}
+              </span>
+              <span className="text-xs text-muted-foreground/50">/</span>
+              <span className="text-xs text-muted-foreground/70">
+                {item.timeAgo}
+              </span>
+            </div>
 
-          {/* Title */}
-          <h3 className="mb-1.5 line-clamp-2 text-base font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
-            {item.title}
-          </h3>
+            {/* Title */}
+            <h3 className="mb-1.5 line-clamp-2 text-base font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
+              {item.title}
+            </h3>
 
-          {/* Summary */}
-          <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-            {item.summary}
-          </p>
+            {/* Summary */}
+            <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+              {item.summary}
+            </p>
 
-          {/* Tags */}
-          <div className="mb-3 flex flex-wrap gap-1.5">
-            {item.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
+            {/* Tags */}
+            <div className="mb-3 flex flex-wrap gap-1.5">
+              {item.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className={cn(
+                    "rounded-md px-2 py-0.5 text-[11px] font-medium",
+                    getTagColor(tag),
+                  )}
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Action buttons */}
+            <div className="mt-auto flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={handleLike}
                 className={cn(
-                  "rounded-md px-2 py-0.5 text-[11px] font-medium",
-                  getTagColor(tag),
+                  "rounded-lg duration-200",
+                  isLiked
+                    ? "text-red-500 hover:bg-transparent hover:text-red-400"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
+                aria-label={isLiked ? "좋아요 취소" : "좋아요"}
               >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-
-          {/* Action buttons */}
-          <div className="mt-auto flex items-center gap-1">
-            <button
-              onClick={handleLike}
-              className={cn(
-                "relative rounded-lg p-1.5 transition-all duration-200",
-                isLiked
-                  ? "text-red-500 hover:text-red-400"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary",
-              )}
-              aria-label={isLiked ? "좋아요 취소" : "좋아요"}
-            >
-              <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
-            </button>
-            <button
-              onClick={handleScrap}
-              className={cn(
-                "relative rounded-lg p-1.5 transition-all duration-200",
-                isScrapped
-                  ? "text-primary hover:text-primary/80"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary",
-              )}
-              aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
-            >
-              <Bookmark className="h-4 w-4" fill={isScrapped ? "currentColor" : "none"} />
-            </button>
-            <button
-              onClick={handleShare}
-              className="relative rounded-lg p-1.5 text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-secondary"
-              aria-label="공유"
-            >
-              <Share2 className="h-4 w-4" />
-              {isShareTooltip && (
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background">
-                  복사됨!
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Right: Thumbnail */}
-        {item.imageUrl && (
-          <div className="ml-5 hidden shrink-0 sm:block">
-            <div className="relative h-[120px] w-[120px] overflow-hidden rounded-xl bg-secondary">
-              <Image
-                src={item.imageUrl}
-                alt={item.title}
-                fill
-                className="object-cover"
-                sizes="120px"
-              />
+                <Heart
+                  className="h-4 w-4"
+                  fill={isLiked ? "currentColor" : "none"}
+                />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={handleScrap}
+                className={cn(
+                  "rounded-lg duration-200",
+                  isScrapped
+                    ? "text-primary hover:bg-transparent hover:text-primary/80"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                )}
+                aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
+              >
+                <Bookmark
+                  className="h-4 w-4"
+                  fill={isScrapped ? "currentColor" : "none"}
+                />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={handleShare}
+                className="relative rounded-lg duration-200 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                aria-label="공유"
+              >
+                <Share2 className="h-4 w-4" />
+                {isShareTooltip && (
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background">
+                    복사됨!
+                  </span>
+                )}
+              </Button>
             </div>
           </div>
-        )}
-      </article>
+
+          {/* Right: Thumbnail */}
+          {item.imageUrl && (
+            <div className="ml-5 hidden shrink-0 sm:block">
+              <div className="relative h-[120px] w-[120px] overflow-hidden rounded-xl bg-secondary">
+                <Image
+                  src={item.imageUrl}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                  sizes="120px"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
     </Link>
   );
 }

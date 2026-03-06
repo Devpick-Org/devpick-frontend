@@ -2,9 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Heart, MessageCircle, Bookmark, Share2, BadgeCheck } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Bookmark,
+  Share2,
+  BadgeCheck,
+} from "lucide-react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export interface CommunityAuthor {
@@ -99,7 +107,14 @@ export function CommunityCard({
 
   return (
     <Link href={`/community/${post.id}`} className="block">
-      <article className="group rounded-2xl border border-border bg-card transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+      {/*
+       * Card가 제공하는 것: border, bg-card, rounded-xl, text-card-foreground
+       * !py-0: Card 기본 py-6 제거 (각 섹션에서 직접 패딩 처리)
+       * gap-0: Card 기본 gap-6 제거
+       * shadow-none: hover shadow 직접 제어
+       * rounded-2xl: rounded-xl 오버라이드
+       */}
+      <Card className="group !py-0 gap-0 rounded-2xl shadow-none transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         {/* Author info */}
         <div className="flex items-center gap-3 px-5 pt-5 pb-3">
           <Avatar className="h-9 w-9 ring-1 ring-primary/20">
@@ -124,20 +139,20 @@ export function CommunityCard({
             >
               {post.level}
             </Badge>
-            <span className="text-xs text-muted-foreground">{post.timeAgo}</span>
+            <span className="text-xs text-muted-foreground">
+              {post.timeAgo}
+            </span>
           </div>
         </div>
 
-        {/* Title & Body */}
-        <div className="px-5 pb-3">
+        {/* Title & Body & Tags */}
+        <CardContent className="!px-5 pb-3 pt-0">
           <h3 className="mb-2 text-base font-bold leading-snug text-foreground transition-colors group-hover:text-primary md:text-lg">
             {post.title}
           </h3>
           <p className="mb-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
             {post.body}
           </p>
-
-          {/* Tags */}
           <div className="flex flex-wrap gap-1.5">
             {post.tags.map((tag) => (
               <Badge
@@ -152,60 +167,81 @@ export function CommunityCard({
               </Badge>
             ))}
           </div>
-        </div>
+        </CardContent>
 
         {/* Action buttons */}
-        <div
-          className="flex items-center gap-4 px-5 py-3"
+        <CardFooter
+          className="!px-5 py-3 gap-4"
           onClick={(e) => e.preventDefault()}
         >
-          <button
+          {/* 좋아요 - 아이콘 + 카운트 */}
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleLike}
             className={cn(
-              "flex items-center gap-1.5 text-sm transition-colors duration-200",
+              "h-auto gap-1.5 px-1.5 py-1 duration-200",
               isLiked
-                ? "text-red-500"
-                : "text-muted-foreground hover:text-foreground",
+                ? "text-red-500 hover:bg-transparent hover:text-red-400"
+                : "text-muted-foreground hover:bg-transparent hover:text-foreground",
             )}
             aria-label={isLiked ? "좋아요 취소" : "좋아요"}
           >
-            <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
+            <Heart
+              className="h-4 w-4"
+              fill={isLiked ? "currentColor" : "none"}
+            />
             <span className="text-xs font-medium">{likeCount}</span>
-          </button>
-          <button
+          </Button>
+
+          {/* 댓글 - 아이콘 + 카운트 */}
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
             }}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
+            className="h-auto gap-1.5 px-1.5 py-1 text-muted-foreground hover:bg-transparent hover:text-foreground duration-200"
             aria-label="댓글"
           >
             <MessageCircle className="h-4 w-4" />
             <span className="text-xs font-medium">{post.comments}</span>
-          </button>
-          <button
+          </Button>
+
+          {/* 북마크 - 아이콘 전용 */}
+          <Button
+            variant="ghost"
+            size="icon-sm"
             onClick={handleBookmark}
             className={cn(
-              "flex items-center gap-1.5 text-sm transition-colors duration-200",
+              "rounded-md duration-200",
               isBookmarked
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground",
+                ? "text-primary hover:bg-transparent hover:text-primary/80"
+                : "text-muted-foreground hover:bg-transparent hover:text-foreground",
             )}
             aria-label={isBookmarked ? "북마크 해제" : "북마크"}
           >
-            <Bookmark className="h-4 w-4" fill={isBookmarked ? "currentColor" : "none"} />
-          </button>
-          <button
+            <Bookmark
+              className="h-4 w-4"
+              fill={isBookmarked ? "currentColor" : "none"}
+            />
+          </Button>
+
+          {/* 공유 - 아이콘 전용 */}
+          <Button
+            variant="ghost"
+            size="icon-sm"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
             }}
-            className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
+            className="rounded-md text-muted-foreground hover:bg-transparent hover:text-foreground duration-200"
             aria-label="공유"
           >
             <Share2 className="h-4 w-4" />
-          </button>
-        </div>
+          </Button>
+        </CardFooter>
 
         {/* Best Answer Preview */}
         {post.bestAnswer && (
@@ -229,7 +265,7 @@ export function CommunityCard({
             </div>
           </div>
         )}
-      </article>
+      </Card>
     </Link>
   );
 }
