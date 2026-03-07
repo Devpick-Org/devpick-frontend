@@ -1,4 +1,6 @@
 import { Providers } from "@/components/providers";
+import { TopNav } from "@/components/layout/TopNav";
+import { Sidebar } from "@/components/layout/Sidebar";
 
 export default function MainLayout({
   children,
@@ -7,9 +9,12 @@ export default function MainLayout({
 }) {
   return (
     <Providers>
-      {/* TODO: GNB 컴포넌트 (DP-192) */}
-      <main>{children}</main>
-      {/* TODO: Footer 컴포넌트 (DP-192) */}
+      <TopNav />
+      <Sidebar />
+      {/* pt-16: TopNav 고정 높이 보정 | md:pl-[220px]: 데스크탑 사이드바 보정 | pb-16 md:pb-0: 모바일 하단 탭 보정 */}
+      <main className="pt-16 md:pl-[220px] pb-16 md:pb-0">
+        {children}
+      </main>
     </Providers>
   );
 }
