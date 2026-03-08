@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { CheckIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,12 +10,21 @@ import { mockAuthEndpoints } from "@/lib/api/endpoints/auth"
 const TIMER_DURATION = 180 // 3분
 
 interface EmailSectionProps {
+  email: string
+  emailError: string
+  onEmailChange: (value: string) => void
+  /** 닉네임 유효 AND 이메일 형식 유효 시 true — 인증번호 발송 버튼 활성화 조건 */
+  canSendCode: boolean
   onVerified: (email: string) => void
-  onEmailChange: () => void
 }
 
-export function EmailSection({ onVerified, onEmailChange }: EmailSectionProps) {
-  const [email, setEmail] = useState("")
+export function EmailSection({
+  email,
+  emailError,
+  onEmailChange,
+  canSendCode,
+  onVerified,
+}: EmailSectionProps) {
   const [isCodeSent, setIsCodeSent] = useState(false)
   const [isSendingCode, setIsSendingCode] = useState(false)
   const [verificationCode, setVerificationCode] = useState("")
@@ -24,6 +33,20 @@ export function EmailSection({ onVerified, onEmailChange }: EmailSectionProps) {
   const [verificationError, setVerificationError] = useState(false)
   const [timerSeconds, setTimerSeconds] = useState(TIMER_DURATION)
 
+  // 이메일이 바뀌면 인증 관련 상태를 초기화
+  const prevEmailRef = useRef(email)
+  useEffect(() => {
+    if (prevEmailRef.current !== email) {
+      setIsCodeSent(false)
+      setIsEmailVerified(false)
+      setVerificationCode("")
+      setVerificationError(false)
+      setTimerSeconds(TIMER_DURATION)
+      prevEmailRef.current = email
+    }
+  }, [email])
+
+  // 카운트다운 타이머
   useEffect(() => {
     if (!isCodeSent || isEmailVerified || timerSeconds <= 0) return
     const interval = setInterval(() => setTimerSeconds((prev) => prev - 1), 1000)
@@ -36,19 +59,7 @@ export function EmailSection({ onVerified, onEmailChange }: EmailSectionProps) {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }, [])
 
-  const handleEmailChange = (value: string) => {
-    setEmail(value)
-    if (isCodeSent || isEmailVerified) {
-      setIsCodeSent(false)
-      setIsEmailVerified(false)
-      setVerificationCode("")
-      setVerificationError(false)
-      onEmailChange()
-    }
-  }
-
   const handleSendCode = async () => {
-    if (!email) return
     setIsSendingCode(true)
     setVerificationError(false)
     try {
@@ -86,16 +97,15 @@ export function EmailSection({ onVerified, onEmailChange }: EmailSectionProps) {
             type="email"
             placeholder="name@example.com"
             value={email}
-            onChange={(e) => handleEmailChange(e.target.value)}
+            onChange={(e) => onEmailChange(e.target.value)}
             disabled={isEmailVerified}
-            required
             className="h-11 flex-1 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary disabled:opacity-60"
           />
           <Button
             type="button"
             variant="secondary"
             onClick={handleSendCode}
-            disabled={!email || isSendingCode || isEmailVerified}
+            disabled={!canSendCode || isSendingCode || isEmailVerified}
             className="h-11 shrink-0 border border-border bg-secondary text-foreground hover:bg-secondary/80 hover:border-primary/40 transition-all duration-200 disabled:opacity-50"
           >
             {isSendingCode ? (
@@ -107,6 +117,7 @@ export function EmailSection({ onVerified, onEmailChange }: EmailSectionProps) {
             )}
           </Button>
         </div>
+        {emailError && <p className="text-sm text-destructive">{emailError}</p>}
       </div>
 
       {/* 인증번호 입력 — 코드 발송 후 표시 */}
