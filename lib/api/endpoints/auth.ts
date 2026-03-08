@@ -50,4 +50,16 @@ export const mockAuthEndpoints = {
     new Promise((resolve) => {
       setTimeout(resolve, 800);
     }),
+
+  login: (email: string, password: string): Promise<void> =>
+    new Promise((resolve, reject) => {
+      console.log("🔥 [Mock API] 로그인 요청 데이터:", { email, password });
+      setTimeout(() => {
+        if (email === "test@example.com" && password === "Test1234!") {
+          resolve();
+        } else {
+          reject(new Error("이메일 또는 비밀번호가 일치하지 않습니다."));
+        }
+      }, 800);
+    }),
 };
