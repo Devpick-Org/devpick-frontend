@@ -76,8 +76,23 @@
 │ ┣ globals.css          # 전역 스타일 및 Tailwind CSS 설정
 │ ┗ layout.tsx           # Root Layout (HTML shell — html, body 태그만)
 ├── components/
-│ ┣ ui/                  # 재사용 프리미티브 (Button, Input, Card, Modal, Badge)
-│ ┣ layout/              # GNB, Footer 등 레이아웃 컴포넌트
+│ ┣ ui/                  # 재사용 프리미티브 (shadcn/ui 기반)
+│ ┃ ┣ avatar.tsx
+│ ┃ ┣ badge.tsx
+│ ┃ ┣ button.tsx
+│ ┃ ┣ card.tsx
+│ ┃ ┣ dialog.tsx
+│ ┃ ┣ dropdown-menu.tsx
+│ ┃ ┣ input.tsx
+│ ┃ ┗ skeleton.tsx
+│ ┣ layout/              # GNB, 사이드바 등 레이아웃 컴포넌트
+│ ┃ ┣ Sidebar.tsx
+│ ┃ ┗ TopNav.tsx
+│ ┣ features/            # 도메인별 기능 컴포넌트
+│ ┃ ┣ home/
+│ ┃ ┃ ┗ FeedCard.tsx
+│ ┃ ┗ community/
+│ ┃   ┗ CommunityCard.tsx
 │ ┗ providers.tsx        # QueryClientProvider 등 클라이언트 Provider 래퍼
 ├── lib/
 │ ┣ api/                 # API 클라이언트 (DP-190)
@@ -243,17 +258,56 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic A — 회원/프로필
 
-| Method | Endpoint        | 설명                    | 인증 | 관련 페이지               |
-| ------ | --------------- | ----------------------- | ---- | ------------------------- |
-| POST   | `/auth/signup`  | 이메일 회원가입         | X    | `/` (로그인)              |
-| POST   | `/auth/login`   | 이메일 로그인           | X    | `/` (로그인)              |
-| POST   | `/auth/logout`  | 로그아웃                | O    | Global (GNB)              |
-| POST   | `/auth/refresh` | Access Token 재발급     | X    | Axios Interceptor         |
-| GET    | `/auth/github`  | GitHub 소셜 로그인      | X    | `/` (로그인)              |
-| GET    | `/auth/google`  | Google 소셜 로그인      | X    | `/` (로그인)              |
-| GET    | `/users/me`     | 내 프로필 조회          | O    | `/profile`, `/onboarding` |
-| PUT    | `/users/me`     | 내 프로필 수정          | O    | `/profile`, `/onboarding` |
-| DELETE | `/users/me`     | 회원 탈퇴 (soft delete) | O    | `/profile`                |
+| Method | Endpoint        | 설명                    | 인증 | 관련 페이지               | 응답코드 |
+| ------ | --------------- | ----------------------- | ---- |---------|------------------------- |
+| POST   | `/auth/signup`  | 이메일 회원가입         | X    | `/` (로그인/회원가입)              | 201 |
+| POST   | `/auth/login`   | 이메일 로그인           | X    | `/` (로그인)              |200 |
+| POST   | `/auth/logout`  | 로그아웃                | O    | Global (GNB)              |200 |
+| POST   | `/auth/refresh` | Access Token 재발급     | X    | Axios Interceptor         |200 |
+| GET    | `/auth/github/callback`  | GitHub 소셜 로그인 콜백      | X    | `/` (로그인)              |200 |
+| GET    | `/auth/google/callback`  | Google 소셜 로그인 콜백      | X    | `/` (로그인)              |200 |
+| GET    | `/users/me`     | 내 프로필 조회          | O    | `/profile`, `/onboarding` |200 |
+| PUT    | `/users/me`     | 내 프로필 수정 (닉네임/이미지/태그/직무/레벨)          | O    | `/profile`, `/onboarding` |200 |
+| DELETE | `/users/me`     | 회원 탈퇴 (soft delete) | O    | `/profile`                |204 |
+| POST | `/auth/email/send` | 이메일 인증 코드 발송 | X | `/` (회원가입) |200 |
+| POST | `/auth/email/verify` | 인증 코드 검증 | X | `/` (회원가입) |200 |
+
+#### Epic A 상세 명세 (요청/응답 및 주요 플로우)
+
+**1. 이메일 인증 (`POST /auth/email/send`, `POST /auth/email/verify`)**
+- 발송 요청: `{"email": "..."}`
+- 검증 요청: `{"email": "...", "code": "..."}` (code: 6자리 숫자 등)
+- 플로우: 회원가입 진행 전 반드시 이메일로 인증 코드를 발송하고 검증을 완료해야 함. 검증 성공 후에만 `/auth/signup`을 호출할 수 있음.
+
+**2. 이메일 회원가입 (`POST /auth/signup`)**
+- 요청: `{"email": "...", "password": "...", "nickname": "..."}` (닉네임: 2~20자, 비밀번호: 8~20자, 영문+숫자+특수문자 필수)
+- 응답(201): `{"success": true, "data": {"userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
+
+**3. 이메일 로그인 (`POST /auth/login`)**
+- 요청: `{"email": "...", "password": "..."}`
+- 응답(200): `{"success": true, "data": {"accessToken": "...", "refreshToken": "...", "userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
+
+**4. 로그아웃 (`POST /auth/logout`)**
+- 요청: Header에 `Authorization: Bearer {access_token}` 포함
+- 플로우: 응답 성공(200) 시 클라이언트는 로컬에서 Access/Refresh Token을 모두 폐기해야 함.
+
+**5. 토큰 재발급 (`POST /auth/refresh`)**
+- 요청: `{"refreshToken": "..."}` (인증 헤더 불필요)
+- 응답(200): `{"success": true, "data": {"accessToken": "(새 토큰)", "refreshToken": "(새 토큰)"}}`
+- 에러(401): `AUTH_INVALID_REFRESH_TOKEN` (유효하지 않거나 만료된 토큰)
+- **중요 플로우 (Token Rotation)**: 재발급 시 기존 Refresh Token이 폐기되고 새 쌍이 발급됨. 클라이언트는 무조건 새 토큰으로 교체해야 함.
+
+**6. 프로필 조회 및 수정 (`GET/PUT /users/me`)**
+- `PUT` 요청 (선택적 필드): `{"nickname": "...", "profileImage": "...", "job": "BACKEND", "level": "MIDDLE", "tags": ["Spring", "Docker"]}`
+- 제약사항: `job` (FRONTEND|BACKEND|FULLSTACK), `level` (BEGINNER|JUNIOR|MIDDLE|SENIOR), `nickname` (2~20자)
+
+**7. 소셜 로그인 흐름 (GitHub: `DP-183`, Google: `DP-184`)**
+1. 프론트가 소셜 인가 URL로 리다이렉트
+2. 사용자가 로그인 및 권한 허용
+3. 소셜 플랫폼이 프론트의 콜백 URL(`GET /auth/{provider}/callback?code={code}`)로 리다이렉트
+4. 백엔드가 code를 탈취하여 JWT 발급 후 프론트에 반환 (신규 유저는 자동 회원가입 처리)
+- 에러(400): `AUTH_014` (이메일 미공개 설정 등)
+- 에러(502): `AUTH_013` (API 호출 실패)
 
 ### Epic B — 콘텐츠 피드
 
@@ -375,7 +429,7 @@ import { test, expect } from "@playwright/test";
 
 test("사용자는 성공적으로 로그인할 수 있다", async ({ page }) => {
   // given
-  await page.goto("/login");
+  await page.goto("/");
 
   // when
   await page.fill('input[name="email"]', "test@devpick.kr");
