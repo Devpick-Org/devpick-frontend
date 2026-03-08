@@ -43,7 +43,7 @@ export function AuthContainer() {
   }
 
   return (
-    <div className="w-full max-w-md">
+    <div className="mx-auto w-full max-w-[448px]">
       <DevPickLogo />
 
       <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-primary/5 transition-all duration-300">
