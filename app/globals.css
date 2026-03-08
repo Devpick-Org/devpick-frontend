@@ -127,11 +127,14 @@
 
 /* 3. 기본 레이어 적용 */
 @layer base {
+  html {
+    /* 스크롤바 영역을 항상 강제로 확보해서 흔들림 원천 차단 */
+    overflow-y: scroll;
+  }
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
-    scrollbar-gutter: stable;
   }
 }
