@@ -35,17 +35,12 @@ export const authEndpoints = {
 export const mockAuthEndpoints = {
   sendEmailCode: (_email: string): Promise<void> =>
     new Promise((resolve) => {
-      console.log("[Mock API] 이메일 인증번호 발송 요청:", _email);
       setTimeout(resolve, 1000);
     }),
 
   /** 인증번호 "123456"만 성공 */
   verifyEmailCode: (_email: string, code: string): Promise<void> =>
     new Promise((resolve, reject) => {
-      console.log(
-        `[Mock API] 인증번호 확인 요청: 이메일(${_email}), 입력한 코드(${code})`,
-      );
-
       setTimeout(() => {
         code === "123456" ? resolve() : reject(new Error("CODE_MISMATCH"));
       }, 800);
@@ -53,7 +48,6 @@ export const mockAuthEndpoints = {
 
   signup: (_data: SignupRequest): Promise<void> =>
     new Promise((resolve) => {
-      console.log("[Mock API] 최종 회원가입 요청 데이터:", _data);
       setTimeout(resolve, 800);
     }),
 };
