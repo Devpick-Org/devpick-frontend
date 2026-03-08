@@ -95,7 +95,7 @@ export function SignupForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* 닉네임 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <Label htmlFor="signup-nickname" className="text-foreground">{"닉네임"}</Label>
         <Input
           id="signup-nickname"
@@ -105,7 +105,7 @@ export function SignupForm() {
           onChange={(e) => handleNicknameChange(e.target.value)}
           className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
         />
-        {nicknameError && <p className="text-sm text-destructive">{nicknameError}</p>}
+        <p className="h-5 text-sm text-destructive">{nicknameError}</p>
       </div>
 
       {/* 이메일 인증 — canSendCode로 발송 버튼 제어 */}
@@ -118,7 +118,7 @@ export function SignupForm() {
       />
 
       {/* 비밀번호 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <Label htmlFor="signup-password" className="text-foreground">{"비밀번호"}</Label>
         <Input
           id="signup-password"
@@ -128,11 +128,11 @@ export function SignupForm() {
           onChange={(e) => handlePasswordChange(e.target.value)}
           className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
         />
-        {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
+        <p className="h-5 text-sm text-destructive">{passwordError}</p>
       </div>
 
       {/* 비밀번호 확인 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <Label htmlFor="signup-confirm" className="text-foreground">{"비밀번호 확인"}</Label>
         <Input
           id="signup-confirm"
@@ -142,7 +142,7 @@ export function SignupForm() {
           onChange={(e) => handleConfirmPasswordChange(e.target.value)}
           className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
         />
-        {confirmPasswordError && <p className="text-sm text-destructive">{confirmPasswordError}</p>}
+        <p className="h-5 text-sm text-destructive">{confirmPasswordError}</p>
       </div>
 
       <Button

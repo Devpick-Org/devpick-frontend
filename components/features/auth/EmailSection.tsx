@@ -89,7 +89,7 @@ export function EmailSection({
   return (
     <div className="flex flex-col gap-4">
       {/* 이메일 입력 + 인증번호 발송 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         <Label htmlFor="signup-email" className="text-foreground">{"이메일"}</Label>
         <div className="flex gap-2">
           <Input
@@ -117,12 +117,12 @@ export function EmailSection({
             )}
           </Button>
         </div>
-        {emailError && <p className="text-sm text-destructive">{emailError}</p>}
+        <p className="h-5 text-sm text-destructive">{emailError}</p>
       </div>
 
       {/* 인증번호 입력 — 코드 발송 후 표시 */}
       {isCodeSent && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <Label htmlFor="verification-code" className="text-foreground">{"인증번호"}</Label>
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -178,14 +178,14 @@ export function EmailSection({
             </Button>
           </div>
 
-          <div className="mt-1">
-            {verificationError && (
-              <p className="text-sm text-destructive">{"인증번호가 일치하지 않습니다."}</p>
-            )}
-            {isEmailVerified && (
-              <p className="text-sm text-emerald-500">{"이메일 인증이 완료되었습니다."}</p>
-            )}
-          </div>
+          {/* 에러/성공 메시지가 같은 슬롯을 공유해 레이아웃 이동 방지 */}
+          <p className={`h-5 text-sm ${isEmailVerified ? "text-emerald-500" : "text-destructive"}`}>
+            {verificationError
+              ? "인증번호가 일치하지 않습니다."
+              : isEmailVerified
+                ? "이메일 인증이 완료되었습니다."
+                : ""}
+          </p>
         </div>
       )}
     </div>
