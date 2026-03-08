@@ -46,7 +46,7 @@ export function AuthContainer() {
     <div className="w-full max-w-md">
       <DevPickLogo />
 
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-primary/5">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-primary/5 transition-all duration-300">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 grid w-full grid-cols-2 bg-secondary">
             <TabsTrigger value="login" className="text-sm font-medium">{"로그인"}</TabsTrigger>
