@@ -33,13 +33,14 @@ function DevPickLogo() {
 export function AuthContainer() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<string>("login")
-  const [isSocialLoading, setIsSocialLoading] = useState(false)
+  const [loadingProvider, setLoadingProvider] = useState<string | null>(null)
 
   const handleSocialLogin = async (provider: "github" | "google") => {
-    setIsSocialLoading(true)
+    setLoadingProvider(provider)
     await new Promise((resolve) => setTimeout(resolve, 800))
-    router.push(activeTab === "signup" ? "/onboarding" : "/home")
-    setIsSocialLoading(false)
+    // TODO: 백엔드 API 연동 후, 응답의 isNewUser 여부에 따라 /onboarding 또는 /home으로 분기 처리
+    router.push("/home")
+    setLoadingProvider(null)
   }
 
   return (
@@ -54,7 +55,7 @@ export function AuthContainer() {
           </TabsList>
 
           <TabsContent value="login">
-            <LoginForm isLoading={isSocialLoading} />
+            <LoginForm isLoading={!!loadingProvider} />
           </TabsContent>
 
           <TabsContent value="signup">
@@ -72,7 +73,7 @@ export function AuthContainer() {
           </div>
         </div>
 
-        <SocialAuthButtons disabled={isSocialLoading} onSocialLogin={handleSocialLogin} />
+        <SocialAuthButtons loadingProvider={loadingProvider} onSocialLogin={handleSocialLogin} />
       </div>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
