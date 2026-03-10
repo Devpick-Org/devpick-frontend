@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { mockAuthEndpoints } from "@/lib/api/endpoints/auth"
+import { useAuthStore } from "@/store/auth.store"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/
@@ -16,6 +17,7 @@ interface LoginFormProps {
 
 export function LoginForm({ isLoading }: LoginFormProps) {
   const router = useRouter()
+  const setAuth = useAuthStore((s) => s.setAuth)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [emailError, setEmailError] = useState("")
@@ -58,6 +60,8 @@ export function LoginForm({ isLoading }: LoginFormProps) {
     setIsSubmitting(true)
     try {
       await mockAuthEndpoints.login(email, password)
+      const user = { userId: "1", email, nickname: "테스트유저" }
+      setAuth(user, "mock-access-token", "mock-refresh-token")
       router.push("/home")
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : "로그인 중 오류가 발생했습니다.")

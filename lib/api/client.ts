@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/store/auth.store";
+import { tokenManager } from "@/lib/auth/tokenManager";
 import type { ApiErrorResponse, ApiResponse } from "@/types/api";
 import type { AuthResponse } from "@/types/auth";
 
@@ -28,7 +29,7 @@ const refreshClient = axios.create({
 // ─── Request Interceptor ───────────────────────────────────────────────────
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().accessToken;
+    const token = tokenManager.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -82,17 +83,22 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } =
-        await refreshClient.post<ApiResponse<AuthResponse>>("/auth/refresh");
-      const newToken = data.data.accessToken;
+      const refreshToken = tokenManager.getRefreshToken();
+      const { data } = await refreshClient.post<ApiResponse<AuthResponse>>(
+        "/auth/refresh",
+        { refreshToken },
+      );
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+        data.data;
 
-      useAuthStore.getState().setToken(newToken);
-      processQueue(null, newToken);
+      tokenManager.setTokens(newAccessToken, newRefreshToken);
+      processQueue(null, newAccessToken);
 
-      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
       return apiClient(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError as AxiosError, null);
+      tokenManager.clearTokens();
       useAuthStore.getState().clearAuth();
       return Promise.reject(refreshError);
     } finally {

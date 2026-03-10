@@ -65,7 +65,7 @@ export const mockAuthEndpoints = {
 
   login: (email: string, password: string): Promise<void> =>
     new Promise((resolve, reject) => {
-      console.log("🔥 [Mock API] 로그인 요청 데이터:", { email, password });
+      // console.log("[Mock API] 로그인 요청 데이터:", { email, password });
       setTimeout(() => {
         if (email === "test@example.com" && password === "Test1234!") {
           resolve();
