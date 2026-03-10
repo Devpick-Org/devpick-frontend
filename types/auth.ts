@@ -21,4 +21,8 @@ export interface SignupRequest {
 
 export interface TokenResponse {
   accessToken: string;
+  refreshToken: string;
+  userId: string;
+  email: string;
+  nickname: string;
 }
