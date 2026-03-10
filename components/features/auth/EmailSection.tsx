@@ -117,7 +117,7 @@ export function EmailSection({
             )}
           </Button>
         </div>
-        <p className="h-5 text-sm text-destructive">{emailError}</p>
+        <p className="h-5 text-sm text-red-500">{emailError}</p>
       </div>
 
       {/* 인증번호 입력 — 코드 발송 후 표시 */}
@@ -142,14 +142,14 @@ export function EmailSection({
               {!isEmailVerified && timerSeconds > 0 && (
                 <span
                   className={`absolute right-3 top-1/2 -translate-y-1/2 text-sm font-mono ${
-                    timerSeconds <= 30 ? "text-destructive" : "text-muted-foreground"
+                    timerSeconds <= 30 ? "text-red-500" : "text-muted-foreground"
                   }`}
                 >
                   {formatTime(timerSeconds)}
                 </span>
               )}
               {!isEmailVerified && timerSeconds === 0 && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-destructive">
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-red-500">
                   {"만료됨"}
                 </span>
               )}
@@ -179,7 +179,7 @@ export function EmailSection({
           </div>
 
           {/* 에러/성공 메시지가 같은 슬롯을 공유해 레이아웃 이동 방지 */}
-          <p className={`h-5 text-sm ${isEmailVerified ? "text-emerald-500" : "text-destructive"}`}>
+          <p className={`h-5 text-sm ${isEmailVerified ? "text-emerald-500" : "text-red-500"}`}>
             {verificationError
               ? "인증번호가 일치하지 않습니다."
               : isEmailVerified

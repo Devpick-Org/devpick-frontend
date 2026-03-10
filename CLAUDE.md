@@ -52,10 +52,10 @@
 
 ```
 ├── app/
-│ ┣ (auth)/              # Route Group — GNB 없는 레이아웃 (로그인)
-│ ┃ ┗ page.tsx           # / (로그인 페이지)
+│ ┣ (auth)/              # Route Group — GNB 없는 레이아웃 (로그인/회원가입)
+│ ┃ ┗ page.tsx           # / (로그인·회원가입 통합 페이지)
 │ ┣ (main)/              # Route Group — GNB 있는 레이아웃
-│ ┃ ┣ layout.tsx         # GNB + QueryClientProvider
+│ ┃ ┣ layout.tsx         # TopNav + Sidebar + QueryClientProvider
 │ ┃ ┣ home/              # 맞춤형 아티클 피드 (메인)
 │ ┃ ┃ ┣ [id]/            # 아티클 상세 및 AI 요약 뷰어
 │ ┃ ┃ ┃ ┗ page.tsx
@@ -73,26 +73,34 @@
 │ ┃ ┗ report/            # 주간 학습 분석 리포트 대시보드
 │ ┃   ┗ page.tsx
 │ ┣ favicon.ico          # 파비콘
-│ ┣ globals.css          # 전역 스타일 및 Tailwind CSS 설정
+│ ┣ globals.css          # 전역 스타일 및 Tailwind CSS 설정 (@theme 토큰)
 │ ┗ layout.tsx           # Root Layout (HTML shell — html, body 태그만)
 ├── components/
 │ ┣ ui/                  # 재사용 프리미티브 (shadcn/ui 기반)
-│ ┃ ┣ avatar.tsx
-│ ┃ ┣ badge.tsx
+│ ┃ ┣ avatar.tsx         # Avatar + AvatarImage + AvatarFallback
+│ ┃ ┣ badge.tsx          # Badge (variant: default/secondary/outline/destructive)
 │ ┃ ┣ button.tsx
 │ ┃ ┣ card.tsx
 │ ┃ ┣ dialog.tsx
-│ ┃ ┣ dropdown-menu.tsx
+│ ┃ ┣ dropdown-menu.tsx  # 자체 구현 (radix 미사용)
 │ ┃ ┣ input.tsx
-│ ┃ ┗ skeleton.tsx
+│ ┃ ┣ label.tsx
+│ ┃ ┣ skeleton.tsx
+│ ┃ ┗ tabs.tsx
 │ ┣ layout/              # GNB, 사이드바 등 레이아웃 컴포넌트
-│ ┃ ┣ Sidebar.tsx
-│ ┃ ┗ TopNav.tsx
+│ ┃ ┣ Sidebar.tsx        # 데스크탑 사이드바 + 모바일 하단 탭바
+│ ┃ ┗ TopNav.tsx         # 상단 GNB, useAuthStore 연동, 로그아웃
 │ ┣ features/            # 도메인별 기능 컴포넌트
+│ ┃ ┣ auth/              # 인증 화면 컴포넌트 (DP-193)
+│ ┃ ┃ ┣ AuthContainer.tsx    # 로그인/회원가입 탭 전환 래퍼
+│ ┃ ┃ ┣ EmailSection.tsx     # 이메일 인증 코드 발송·검증 UI
+│ ┃ ┃ ┣ LoginForm.tsx        # 로그인 폼 (react-hook-form + zod)
+│ ┃ ┃ ┣ SignupForm.tsx       # 회원가입 폼 (react-hook-form + zod)
+│ ┃ ┃ ┗ SocialAuthButtons.tsx # GitHub / Google 소셜 로그인 버튼
 │ ┃ ┣ home/
-│ ┃ ┃ ┗ FeedCard.tsx
+│ ┃ ┃ ┗ FeedCard.tsx         # 피드 카드 (FeedCardItem interface)
 │ ┃ ┗ community/
-│ ┃   ┗ CommunityCard.tsx
+│ ┃   ┗ CommunityCard.tsx    # 커뮤니티 카드 (CommunityPost interface)
 │ ┗ providers.tsx        # QueryClientProvider 등 클라이언트 Provider 래퍼
 ├── lib/
 │ ┣ api/                 # API 클라이언트 (DP-190)
@@ -107,7 +115,7 @@
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated)
 │ ┗ ui.store.ts          # UI 상태 (Toast 큐)
-├── hooks/               # 공통 Custom Hooks
+├── hooks/               # 공통 Custom Hooks (미구현)
 ├── types/               # TypeScript 전역 타입 정의
 │ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
 │ ┗ auth.ts              # User, LoginRequest, SignupRequest, TokenResponse

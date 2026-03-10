@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  userId: string;
   email: string;
   nickname: string;
   profileImageUrl?: string;
@@ -19,6 +19,10 @@ export interface SignupRequest {
   nickname: string;
 }
 
-export interface TokenResponse {
+export interface AuthResponse {
   accessToken: string;
+  refreshToken: string;
+  userId: string;
+  email: string;
+  nickname: string;
 }

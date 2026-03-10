@@ -1,10 +1,8 @@
-import axios, {
-  AxiosError,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/store/auth.store";
+import { tokenManager } from "@/lib/auth/tokenManager";
 import type { ApiErrorResponse, ApiResponse } from "@/types/api";
-import type { TokenResponse } from "@/types/auth";
+import type { AuthResponse } from "@/types/auth";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.devpick.kr/v1";
@@ -31,13 +29,13 @@ const refreshClient = axios.create({
 // ─── Request Interceptor ───────────────────────────────────────────────────
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = useAuthStore.getState().accessToken;
+    const token = tokenManager.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error: AxiosError) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error),
 );
 
 // ─── Response Interceptor ─────────────────────────────────────────────────
@@ -85,22 +83,26 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } = await refreshClient.post<ApiResponse<TokenResponse>>(
-        "/auth/refresh"
+      const refreshToken = tokenManager.getRefreshToken();
+      const { data } = await refreshClient.post<ApiResponse<AuthResponse>>(
+        "/auth/refresh",
+        { refreshToken },
       );
-      const newToken = data.data.accessToken;
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+        data.data;
 
-      useAuthStore.getState().setToken(newToken);
-      processQueue(null, newToken);
+      tokenManager.setTokens(newAccessToken, newRefreshToken);
+      processQueue(null, newAccessToken);
 
-      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
       return apiClient(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError as AxiosError, null);
+      tokenManager.clearTokens();
       useAuthStore.getState().clearAuth();
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
     }
-  }
+  },
 );

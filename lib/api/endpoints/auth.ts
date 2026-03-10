@@ -3,18 +3,30 @@ import type { ApiResponse } from "@/types/api";
 import type {
   LoginRequest,
   SignupRequest,
-  TokenResponse,
+  AuthResponse,
   User,
 } from "@/types/auth";
 
 export const authEndpoints = {
   /** POST /auth/signup — 이메일 회원가입 */
   signup: (data: SignupRequest) =>
-    apiClient.post<ApiResponse<TokenResponse>>("/auth/signup", data),
+    apiClient.post<ApiResponse<AuthResponse>>("/auth/signup", data),
 
   /** POST /auth/login — 이메일 로그인 */
   login: (data: LoginRequest) =>
-    apiClient.post<ApiResponse<TokenResponse>>("/auth/login", data),
+    apiClient.post<ApiResponse<AuthResponse>>("/auth/login", data),
+
+  /** GET /auth/google/callback — Google 소셜 로그인 콜백 */
+  googleSocialLogin: (code: string) =>
+    apiClient.get<ApiResponse<AuthResponse>>("/auth/google/callback", {
+      params: { code },
+    }),
+
+  /** GET /auth/github/callback — GitHub 소셜 로그인 콜백 */
+  githubSocialLogin: (code: string) =>
+    apiClient.get<ApiResponse<AuthResponse>>("/auth/github/callback", {
+      params: { code },
+    }),
 
   /** POST /auth/logout — 로그아웃 */
   logout: () => apiClient.post<ApiResponse<null>>("/auth/logout"),
@@ -42,12 +54,28 @@ export const mockAuthEndpoints = {
   verifyEmailCode: (_email: string, code: string): Promise<void> =>
     new Promise((resolve, reject) => {
       setTimeout(() => {
-        code === "123456" ? resolve() : reject(new Error("CODE_MISMATCH"));
+        if (code === "123456") {
+          resolve();
+        } else {
+          reject(new Error("CODE_MISMATCH"));
+        }
       }, 800);
     }),
 
   signup: (_data: SignupRequest): Promise<void> =>
     new Promise((resolve) => {
       setTimeout(resolve, 800);
+    }),
+
+  login: (email: string, password: string): Promise<void> =>
+    new Promise((resolve, reject) => {
+      // console.log("[Mock API] 로그인 요청 데이터:", { email, password });
+      setTimeout(() => {
+        if (email === "test@example.com" && password === "Test1234!") {
+          resolve();
+        } else {
+          reject(new Error("이메일 또는 비밀번호가 일치하지 않습니다."));
+        }
+      }, 800);
     }),
 };

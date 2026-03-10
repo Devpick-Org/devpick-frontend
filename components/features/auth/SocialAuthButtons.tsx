@@ -34,32 +34,52 @@ function GoogleIcon({ className }: { className?: string }) {
 }
 
 interface SocialAuthButtonsProps {
-  disabled?: boolean
+  loadingProvider?: string | null
   onSocialLogin: (provider: "github" | "google") => void
 }
 
-export function SocialAuthButtons({ disabled, onSocialLogin }: SocialAuthButtonsProps) {
+export function SocialAuthButtons({ loadingProvider, onSocialLogin }: SocialAuthButtonsProps) {
+  const isDisabled = !!loadingProvider
+
   return (
     <div className="flex flex-col gap-3">
       <Button
         type="button"
         variant="outline"
-        disabled={disabled}
+        disabled={isDisabled}
         onClick={() => onSocialLogin("github")}
         className="h-11 w-full border-border bg-secondary text-foreground hover:bg-secondary/80 hover:border-primary/40 transition-all duration-200"
       >
-        <GitHubIcon className="mr-2 h-5 w-5" />
-        {"GitHub로 시작하기"}
+        {loadingProvider === "github" ? (
+          <span className="flex items-center gap-2">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+            {"로그인 중..."}
+          </span>
+        ) : (
+          <>
+            <GitHubIcon className="mr-2 h-5 w-5" />
+            {"GitHub로 시작하기"}
+          </>
+        )}
       </Button>
       <Button
         type="button"
         variant="outline"
-        disabled={disabled}
+        disabled={isDisabled}
         onClick={() => onSocialLogin("google")}
         className="h-11 w-full border-border bg-secondary text-foreground hover:bg-secondary/80 hover:border-primary/40 transition-all duration-200"
       >
-        <GoogleIcon className="mr-2 h-5 w-5" />
-        {"Google로 시작하기"}
+        {loadingProvider === "google" ? (
+          <span className="flex items-center gap-2">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+            {"로그인 중..."}
+          </span>
+        ) : (
+          <>
+            <GoogleIcon className="mr-2 h-5 w-5" />
+            {"Google로 시작하기"}
+          </>
+        )}
       </Button>
     </div>
   )
