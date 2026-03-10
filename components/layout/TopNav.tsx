@@ -47,6 +47,7 @@ export function TopNav() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -132,8 +133,7 @@ export function TopNav() {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem asChild>
                   <Link href="/profile">
-                    <User />
-                    내 프로필
+                    <User />내 프로필
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
