@@ -72,6 +72,9 @@
 │ ┃ ┃ ┗ page.tsx
 │ ┃ ┗ report/            # 주간 학습 분석 리포트 대시보드
 │ ┃   ┗ page.tsx
+│ ┣ auth/                # 소셜 로그인 콜백 (Route Group 밖 — URL: /auth/callback)
+│ ┃ ┗ callback/
+│ ┃   ┗ page.tsx         # OAuth 코드 수신 → 토큰 교환 후 /home 리다이렉트
 │ ┣ favicon.ico          # 파비콘
 │ ┣ globals.css          # 전역 스타일 및 Tailwind CSS 설정 (@theme 토큰)
 │ ┗ layout.tsx           # Root Layout (HTML shell — html, body 태그만)
@@ -91,8 +94,10 @@
 │ ┃ ┣ Sidebar.tsx        # 데스크탑 사이드바 + 모바일 하단 탭바
 │ ┃ ┗ TopNav.tsx         # 상단 GNB, useAuthStore 연동, 로그아웃
 │ ┣ features/            # 도메인별 기능 컴포넌트
-│ ┃ ┣ auth/              # 인증 화면 컴포넌트 (DP-193)
+│ ┃ ┣ auth/              # 인증 화면 컴포넌트
+│ ┃ ┃ ┣ AuthCallbackPage.tsx  # 소셜 로그인 콜백 처리 (code → 토큰 저장 → 리다이렉트)
 │ ┃ ┃ ┣ AuthContainer.tsx    # 로그인/회원가입 탭 전환 래퍼
+│ ┃ ┃ ┣ AuthInitializer.tsx  # 앱 마운트 시 토큰 복원 및 인증 상태 초기화
 │ ┃ ┃ ┣ EmailSection.tsx     # 이메일 인증 코드 발송·검증 UI
 │ ┃ ┃ ┣ LoginForm.tsx        # 로그인 폼 (react-hook-form + zod)
 │ ┃ ┃ ┣ SignupForm.tsx       # 회원가입 폼 (react-hook-form + zod)
@@ -111,11 +116,15 @@
 │ ┃   ┣ posts.ts
 │ ┃   ┣ users.ts
 │ ┃   ┗ reports.ts
+│ ┣ auth/                # 토큰 저장 전략 (Strategy Pattern)
+│ ┃ ┣ TokenStrategy.ts       # 토큰 저장 전략 인터페이스 정의
+│ ┃ ┣ CookieStrategy.ts      # Cookie 기반 토큰 저장 구현체
+│ ┃ ┣ SessionStorageStrategy.ts # SessionStorage 기반 토큰 저장 구현체
+│ ┃ ┗ tokenManager.ts        # 전략 선택 및 토큰 CRUD 관리자
 │ ┗ utils.ts             # cn(), formatDate(), formatRelativeTime()
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated)
 │ ┗ ui.store.ts          # UI 상태 (Toast 큐)
-├── hooks/               # 공통 Custom Hooks (미구현)
 ├── types/               # TypeScript 전역 타입 정의
 │ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
 │ ┗ auth.ts              # User, LoginRequest, SignupRequest, TokenResponse
@@ -126,6 +135,7 @@
 >
 > - `(auth)`: GNB 없음 (로그인 등 인증 전 화면)
 > - `(main)`: GNB + QueryClientProvider 포함 (인증 후 메인 화면)
+> - `auth/callback`: Route Group 밖에 위치 — URL `/auth/callback`으로 직접 접근 가능한 소셜 로그인 OAuth 콜백 전용 라우트
 
 ## 4. 자주 쓰는 커맨드
 
@@ -266,54 +276,112 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic A — 회원/프로필
 
-| Method | Endpoint        | 설명                    | 인증 | 관련 페이지               | 응답코드 |
-| ------ | --------------- | ----------------------- | ---- |---------|------------------------- |
-| POST   | `/auth/signup`  | 이메일 회원가입         | X    | `/` (로그인/회원가입)              | 201 |
-| POST   | `/auth/login`   | 이메일 로그인           | X    | `/` (로그인)              |200 |
-| POST   | `/auth/logout`  | 로그아웃                | O    | Global (GNB)              |200 |
-| POST   | `/auth/refresh` | Access Token 재발급     | X    | Axios Interceptor         |200 |
-| GET    | `/auth/github/callback`  | GitHub 소셜 로그인 콜백      | X    | `/` (로그인)              |200 |
-| GET    | `/auth/google/callback`  | Google 소셜 로그인 콜백      | X    | `/` (로그인)              |200 |
-| GET    | `/users/me`     | 내 프로필 조회          | O    | `/profile`, `/onboarding` |200 |
-| PUT    | `/users/me`     | 내 프로필 수정 (닉네임/이미지/태그/직무/레벨)          | O    | `/profile`, `/onboarding` |200 |
-| DELETE | `/users/me`     | 회원 탈퇴 (soft delete) | O    | `/profile`                |204 |
-| POST | `/auth/email/send` | 이메일 인증 코드 발송 | X | `/` (회원가입) |200 |
-| POST | `/auth/email/verify` | 인증 코드 검증 | X | `/` (회원가입) |200 |
+| Method | Endpoint                | 설명                                          | 인증 | 관련 페이지               | 응답코드 |
+| ------ | ----------------------- | --------------------------------------------- | ---- | ------------------------- | -------- |
+| POST   | `/auth/signup`          | 이메일 회원가입                               | X    | `/` (로그인/회원가입)     | 201      |
+| POST   | `/auth/login`           | 이메일 로그인                                 | X    | `/` (로그인)              | 200      |
+| POST   | `/auth/logout`          | 로그아웃                                      | O    | Global (GNB)              | 200      |
+| POST   | `/auth/refresh`         | Access Token 재발급                           | X    | Axios Interceptor         | 200      |
+| GET    | `/auth/github/callback` | GitHub 소셜 로그인 콜백                       | X    | `/` (로그인)              | 200      |
+| GET    | `/auth/google/callback` | Google 소셜 로그인 콜백                       | X    | `/` (로그인)              | 200      |
+| GET    | `/users/me`             | 내 프로필 조회                                | O    | `/profile`, `/onboarding` | 200      |
+| PUT    | `/users/me`             | 내 프로필 수정 (닉네임/이미지/태그/직무/레벨) | O    | `/profile`, `/onboarding` | 200      |
+| DELETE | `/users/me`             | 회원 탈퇴 (soft delete)                       | O    | `/profile`                | 204      |
+| POST   | `/auth/email/send`      | 이메일 인증 코드 발송                         | X    | `/` (회원가입)            | 200      |
+| POST   | `/auth/email/verify`    | 인증 코드 검증                                | X    | `/` (회원가입)            | 200      |
 
 #### Epic A 상세 명세 (요청/응답 및 주요 플로우)
 
 **1. 이메일 인증 (`POST /auth/email/send`, `POST /auth/email/verify`)**
+
 - 발송 요청: `{"email": "..."}`
 - 검증 요청: `{"email": "...", "code": "..."}` (code: 6자리 숫자 등)
 - 플로우: 회원가입 진행 전 반드시 이메일로 인증 코드를 발송하고 검증을 완료해야 함. 검증 성공 후에만 `/auth/signup`을 호출할 수 있음.
 
 **2. 이메일 회원가입 (`POST /auth/signup`)**
+
 - 요청: `{"email": "...", "password": "...", "nickname": "..."}` (닉네임: 2~20자, 비밀번호: 8~20자, 영문+숫자+특수문자 필수)
 - 응답(201): `{"success": true, "data": {"userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
 
 **3. 이메일 로그인 (`POST /auth/login`)**
+
 - 요청: `{"email": "...", "password": "..."}`
 - 응답(200): `{"success": true, "data": {"accessToken": "...", "refreshToken": "...", "userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
 
 **4. 로그아웃 (`POST /auth/logout`)**
+
 - 요청: Header에 `Authorization: Bearer {access_token}` 포함
 - 플로우: 응답 성공(200) 시 클라이언트는 로컬에서 Access/Refresh Token을 모두 폐기해야 함.
 
 **5. 토큰 재발급 (`POST /auth/refresh`)**
+
 - 요청: `{"refreshToken": "..."}` (인증 헤더 불필요)
 - 응답(200): `{"success": true, "data": {"accessToken": "(새 토큰)", "refreshToken": "(새 토큰)"}}`
 - 에러(401): `AUTH_INVALID_REFRESH_TOKEN` (유효하지 않거나 만료된 토큰)
 - **중요 플로우 (Token Rotation)**: 재발급 시 기존 Refresh Token이 폐기되고 새 쌍이 발급됨. 클라이언트는 무조건 새 토큰으로 교체해야 함.
 
 **6. 프로필 조회 및 수정 (`GET/PUT /users/me`)**
+
 - `PUT` 요청 (선택적 필드): `{"nickname": "...", "profileImage": "...", "job": "BACKEND", "level": "MIDDLE", "tags": ["Spring", "Docker"]}`
 - 제약사항: `job` (FRONTEND|BACKEND|FULLSTACK), `level` (BEGINNER|JUNIOR|MIDDLE|SENIOR), `nickname` (2~20자)
 
+**_ GET /users/me 응답 예시 _**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "uuid-1234",
+    "email": "hong@devpick.kr",
+    "nickname": "홍근",
+    "profileImage": "https://...",
+    "job": "BACKEND",
+    "level": "JUNIOR",
+    "tags": ["Spring", "Java"],
+    "createdAt": "2026-02-24T09:00:00"
+  },
+  "message": "요청이 성공했습니다"
+}
+```
+
+**_ PUT /users/me 요청 예시 _**
+
+```json
+{
+  "nickname": "홍근2",
+  "profileImage": "https://...",
+  "job": "BACKEND",
+  "level": "MIDDLE",
+  "tags": ["Spring", "Docker"]
+}
+```
+
+**_ PUT /users/me 응답 예시 _**
+
+```json
+{
+  "success": true,
+  "data": {
+    "userId": "uuid-1234",
+    "email": "hong@devpick.kr",
+    "nickname": "홍근2",
+    "profileImage": "https://...",
+    "job": "BACKEND",
+    "level": "MIDDLE",
+    "tags": ["Spring", "Docker"],
+    "createdAt": "2026-02-24T09:00:00"
+  },
+  "message": "요청이 성공했습니다"
+}
+```
+
 **7. 소셜 로그인 흐름 (GitHub: `DP-183`, Google: `DP-184`)**
+
 1. 프론트가 소셜 인가 URL로 리다이렉트
 2. 사용자가 로그인 및 권한 허용
 3. 소셜 플랫폼이 프론트의 콜백 URL(`GET /auth/{provider}/callback?code={code}`)로 리다이렉트
 4. 백엔드가 code를 탈취하여 JWT 발급 후 프론트에 반환 (신규 유저는 자동 회원가입 처리)
+
 - 에러(400): `AUTH_014` (이메일 미공개 설정 등)
 - 에러(502): `AUTH_013` (API 호출 실패)
 

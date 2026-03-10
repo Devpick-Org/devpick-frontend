@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,7 +51,6 @@ export function TopNav() {
     setMounted(true);
   }, []);
 
-  const showUser = mounted && user !== null;
   const displayName = user?.nickname ?? "Guest";
   const displayInitial = displayName.charAt(0).toUpperCase();
   const displayLevel = user?.level
@@ -76,68 +75,76 @@ export function TopNav() {
           </span>
         </Link>
 
-        {/* Right: User Profile Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            {/*
-             * Button variant="outline"을 베이스로 사용.
-             * 기존 bg-secondary/50 hover:bg-secondary 스타일을 className으로 오버라이드.
-             */}
-            <Button
-              variant="outline"
-              className="h-auto gap-2.5 rounded-xl border-border bg-secondary/50 px-3 py-1.5 hover:bg-secondary"
-              aria-label="User menu"
-            >
-              {showUser ? (
-                <>
-                  <Avatar className="h-7 w-7 ring-1 ring-primary/20">
-                    <AvatarImage
-                      src={user?.profileImageUrl ?? ""}
-                      alt={`${displayName} avatar`}
-                    />
-                    <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">
-                      {displayInitial}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="hidden items-center gap-1.5 sm:flex">
-                    <span className="text-sm font-medium text-foreground">
-                      {displayName}
-                    </span>
-                    {displayLevel && (
-                      <Badge
-                        variant="secondary"
-                        className="border border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary"
-                      >
-                        {displayLevel}
-                      </Badge>
-                    )}
-                  </div>
-                  <ChevronDown className="hidden h-3.5 w-3.5 text-muted-foreground sm:block" />
-                </>
-              ) : (
-                <>
-                  <div className="h-7 w-7 animate-pulse rounded-full bg-muted" />
-                  <div className="hidden items-center gap-1.5 sm:flex">
-                    <div className="h-4 w-14 animate-pulse rounded bg-muted" />
-                    <div className="h-4 w-10 animate-pulse rounded bg-muted" />
-                  </div>
-                </>
-              )}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem asChild>
-              <Link href="/profile">
-                <User />내 프로필
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={handleLogout}>
-              <LogOut />
-              로그아웃
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/*
+         * Right: User area
+         * 래퍼 <div>는 서버/클라이언트 동일하게 유지 → DOM 트리 불일치 방지
+         * mounted 이전: Skeleton (Radix IDs 생성 없음)
+         * mounted 이후: DropdownMenu (클라이언트 전용)
+         */}
+        <div className="flex items-center">
+          {!mounted ? (
+            <Skeleton className="h-9 w-9 rounded-full" />
+          ) : (
+            <DropdownMenu>
+              {/*
+               * asChild 제거 — DropdownMenuTrigger 자체를 직접 스타일링
+               * asChild + Button 중첩 시 Radix Slot이 ref를 잃어 <button><button> 중첩 발생 가능
+               */}
+              <DropdownMenuTrigger
+                className="flex h-auto items-center gap-2.5 rounded-xl border border-border bg-secondary/50 px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                aria-label="User menu"
+              >
+                {user ? (
+                  <>
+                    <Avatar className="h-7 w-7 ring-1 ring-primary/20">
+                      <AvatarImage
+                        src={user.profileImageUrl ?? ""}
+                        alt={`${displayName} avatar`}
+                      />
+                      <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">
+                        {displayInitial}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="hidden items-center gap-1.5 sm:flex">
+                      <span className="text-sm font-medium text-foreground">
+                        {displayName}
+                      </span>
+                      {displayLevel && (
+                        <Badge
+                          variant="secondary"
+                          className="border border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary"
+                        >
+                          {displayLevel}
+                        </Badge>
+                      )}
+                    </div>
+                    <ChevronDown className="hidden h-3.5 w-3.5 text-muted-foreground sm:block" />
+                  </>
+                ) : (
+                  <>
+                    <div className="h-7 w-7 rounded-full bg-muted" />
+                    <div className="hidden items-center gap-1.5 sm:flex">
+                      <div className="h-4 w-14 rounded bg-muted" />
+                      <div className="h-4 w-10 rounded bg-muted" />
+                    </div>
+                  </>
+                )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <User />내 프로필
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout}>
+                  <LogOut />
+                  로그아웃
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
     </header>
   );

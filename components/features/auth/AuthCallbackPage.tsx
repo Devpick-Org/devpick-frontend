@@ -12,16 +12,16 @@ function CallbackHandler() {
     const code = searchParams.get("code");
     const error = searchParams.get("error");
 
-    console.log({ code, error });
+    // console.log({ code, error });
 
     if (error) {
-      console.error("소셜 로그인 에러:", error);
+      // console.error("소셜 로그인 에러:", error);
       router.replace("/");
       return;
     }
 
     if (!code) {
-      console.error("인가 코드가 없습니다.");
+      // console.error("인가 코드가 없습니다.");
       router.replace("/");
       return;
     }

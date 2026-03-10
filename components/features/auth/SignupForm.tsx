@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EmailSection } from "./EmailSection";
 import { mockAuthEndpoints } from "@/lib/api/endpoints/auth";
+import { useAuthStore } from "@/store/auth.store";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/;
@@ -27,6 +28,7 @@ function validatePassword(value: string): string {
 
 export function SignupForm() {
   const router = useRouter();
+  const updateUser = useAuthStore((s) => s.updateUser);
 
   const [nickname, setNickname] = useState("");
   const [nicknameError, setNicknameError] = useState("");
@@ -101,6 +103,7 @@ export function SignupForm() {
         password,
         nickname,
       });
+      updateUser({ nickname });
       router.push("/onboarding");
     } finally {
       setIsSubmitting(false);
