@@ -1,10 +1,7 @@
-import axios, {
-  AxiosError,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/store/auth.store";
 import type { ApiErrorResponse, ApiResponse } from "@/types/api";
-import type { TokenResponse } from "@/types/auth";
+import type { AuthResponse } from "@/types/auth";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.devpick.kr/v1";
@@ -37,7 +34,7 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error: AxiosError) => Promise.reject(error)
+  (error: AxiosError) => Promise.reject(error),
 );
 
 // ─── Response Interceptor ─────────────────────────────────────────────────
@@ -85,9 +82,8 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } = await refreshClient.post<ApiResponse<TokenResponse>>(
-        "/auth/refresh"
-      );
+      const { data } =
+        await refreshClient.post<ApiResponse<AuthResponse>>("/auth/refresh");
       const newToken = data.data.accessToken;
 
       useAuthStore.getState().setToken(newToken);
@@ -102,5 +98,5 @@ apiClient.interceptors.response.use(
     } finally {
       isRefreshing = false;
     }
-  }
+  },
 );

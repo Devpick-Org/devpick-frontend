@@ -3,18 +3,18 @@ import type { ApiResponse } from "@/types/api";
 import type {
   LoginRequest,
   SignupRequest,
-  TokenResponse,
+  AuthResponse,
   User,
 } from "@/types/auth";
 
 export const authEndpoints = {
   /** POST /auth/signup — 이메일 회원가입 */
   signup: (data: SignupRequest) =>
-    apiClient.post<ApiResponse<TokenResponse>>("/auth/signup", data),
+    apiClient.post<ApiResponse<AuthResponse>>("/auth/signup", data),
 
   /** POST /auth/login — 이메일 로그인 */
   login: (data: LoginRequest) =>
-    apiClient.post<ApiResponse<TokenResponse>>("/auth/login", data),
+    apiClient.post<ApiResponse<AuthResponse>>("/auth/login", data),
 
   /** POST /auth/logout — 로그아웃 */
   logout: () => apiClient.post<ApiResponse<null>>("/auth/logout"),
