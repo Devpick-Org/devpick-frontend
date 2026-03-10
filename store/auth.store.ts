@@ -9,6 +9,7 @@ interface AuthStore {
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
   clearAuth: () => void;
   initAuth: (user: User) => void;
+  updateUser: (data: Partial<User>) => void;
 }
 
 /**
@@ -46,4 +47,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   initAuth: (user) => set({ user, isAuthenticated: true }),
+
+  updateUser: (data) =>
+    set((state) => ({
+      user: state.user
+        ? { ...state.user, ...data }
+        : { userId: "", email: "", nickname: "", ...data },
+      isAuthenticated: true,
+    })),
 }));
