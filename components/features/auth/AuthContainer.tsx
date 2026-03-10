@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { LoginForm } from "./LoginForm"
-import { SignupForm } from "./SignupForm"
-import { SocialAuthButtons } from "./SocialAuthButtons"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LoginForm } from "./LoginForm";
+import { SignupForm } from "./SignupForm";
+import { SocialAuthButtons } from "./SocialAuthButtons";
 
 function DevPickLogo() {
   return (
@@ -24,24 +24,28 @@ function DevPickLogo() {
           <polyline points="8 6 2 12 8 18" />
         </svg>
       </div>
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">DevPick</h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">{"개발자를 위한 맞춤형 학습 플랫폼"}</p>
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">
+        DevPick
+      </h1>
+      <p className="mt-1.5 text-sm text-muted-foreground">
+        {"개발자를 위한 맞춤형 학습 플랫폼"}
+      </p>
     </div>
-  )
+  );
 }
 
 export function AuthContainer() {
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState<string>("login")
-  const [loadingProvider, setLoadingProvider] = useState<string | null>(null)
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<string>("login");
+  const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
   const handleSocialLogin = async (provider: "github" | "google") => {
-    setLoadingProvider(provider)
-    await new Promise((resolve) => setTimeout(resolve, 800))
-    // TODO: 백엔드 API 연동 후, 응답의 isNewUser 여부에 따라 /onboarding 또는 /home으로 분기 처리
-    router.push("/home")
-    setLoadingProvider(null)
-  }
+    setLoadingProvider(provider);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    // TODO: 백엔드 API 연동 후, 응답 여부에 따라 /onboarding 또는 /home으로 분기 처리
+    router.push("/home");
+    setLoadingProvider(null);
+  };
 
   return (
     <div className="mx-auto w-full max-w-[448px]">
@@ -50,8 +54,12 @@ export function AuthContainer() {
       <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-primary/5 transition-all duration-300">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 grid w-full grid-cols-2 bg-secondary">
-            <TabsTrigger value="login" className="text-sm font-medium">{"로그인"}</TabsTrigger>
-            <TabsTrigger value="signup" className="text-sm font-medium">{"회원가입"}</TabsTrigger>
+            <TabsTrigger value="login" className="text-sm font-medium">
+              {"로그인"}
+            </TabsTrigger>
+            <TabsTrigger value="signup" className="text-sm font-medium">
+              {"회원가입"}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="login">
@@ -73,20 +81,29 @@ export function AuthContainer() {
           </div>
         </div>
 
-        <SocialAuthButtons loadingProvider={loadingProvider} onSocialLogin={handleSocialLogin} />
+        <SocialAuthButtons
+          loadingProvider={loadingProvider}
+          onSocialLogin={handleSocialLogin}
+        />
       </div>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
         {"계속 진행하면 DevPick의 "}
-        <button type="button" className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
+        <button
+          type="button"
+          className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+        >
           {"서비스 이용약관"}
         </button>
         {" 및 "}
-        <button type="button" className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors">
+        <button
+          type="button"
+          className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+        >
           {"개인정보 처리방침"}
         </button>
         {"에 동의하는 것으로 간주됩니다."}
       </p>
     </div>
-  )
+  );
 }
