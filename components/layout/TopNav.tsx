@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   DropdownMenu,
@@ -75,15 +74,23 @@ export function TopNav() {
           </span>
         </Link>
 
-        {/* Right: User Profile Dropdown — SSR 단계에서는 Skeleton으로 대체 (Radix UI ID 불일치 방지) */}
-        {!mounted ? (
-          <Skeleton className="h-10 w-10 rounded-full" />
-        ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="h-auto gap-2.5 rounded-xl border-border bg-secondary/50 px-3 py-1.5 hover:bg-secondary"
+        {/*
+         * Right: User area
+         * 래퍼 <div>는 서버/클라이언트 동일하게 유지 → DOM 트리 불일치 방지
+         * mounted 이전: Skeleton (Radix IDs 생성 없음)
+         * mounted 이후: DropdownMenu (클라이언트 전용)
+         */}
+        <div className="flex items-center">
+          {!mounted ? (
+            <Skeleton className="h-9 w-9 rounded-full" />
+          ) : (
+            <DropdownMenu>
+              {/*
+               * asChild 제거 — DropdownMenuTrigger 자체를 직접 스타일링
+               * asChild + Button 중첩 시 Radix Slot이 ref를 잃어 <button><button> 중첩 발생 가능
+               */}
+              <DropdownMenuTrigger
+                className="flex h-auto items-center gap-2.5 rounded-xl border border-border bg-secondary/50 px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                 aria-label="User menu"
               >
                 {user ? (
@@ -121,22 +128,23 @@ export function TopNav() {
                     </div>
                   </>
                 )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link href="/profile">
-                  <User />내 프로필
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={handleLogout}>
-                <LogOut />
-                로그아웃
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">
+                    <User />
+                    내 프로필
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout}>
+                  <LogOut />
+                  로그아웃
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
     </header>
   );

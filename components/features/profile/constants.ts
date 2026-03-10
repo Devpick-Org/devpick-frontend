@@ -14,6 +14,13 @@ export const LEVELS: { id: LevelId; label: string; sub: string }[] = [
   { id: "SENIOR", label: "시니어", sub: "5년차 이상" },
 ];
 
+export const LEVEL_COLORS: Record<LevelId, string> = {
+  BEGINNER: "bg-emerald-500/30 text-emerald-400",
+  JUNIOR: "bg-blue-500/30 text-blue-400",
+  MIDDLE: "bg-amber-500/30 text-amber-400",
+  SENIOR: "bg-violet-500/30 text-red-400",
+};
+
 export const SUGGESTED_TAGS: string[] = [
   // 프론트엔드
   "React",
