@@ -54,7 +54,11 @@ export const mockAuthEndpoints = {
   verifyEmailCode: (_email: string, code: string): Promise<void> =>
     new Promise((resolve, reject) => {
       setTimeout(() => {
-        code === "123456" ? resolve() : reject(new Error("CODE_MISMATCH"));
+        if (code === "123456") {
+          resolve();
+        } else {
+          reject(new Error("CODE_MISMATCH"));
+        }
       }, 800);
     }),
 
