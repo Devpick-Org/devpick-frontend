@@ -16,6 +16,18 @@ export const authEndpoints = {
   login: (data: LoginRequest) =>
     apiClient.post<ApiResponse<AuthResponse>>("/auth/login", data),
 
+  /** GET /auth/google/callback — Google 소셜 로그인 콜백 */
+  googleSocialLogin: (code: string) =>
+    apiClient.get<ApiResponse<AuthResponse>>("/auth/google/callback", {
+      params: { code },
+    }),
+
+  /** GET /auth/github/callback — GitHub 소셜 로그인 콜백 */
+  githubSocialLogin: (code: string) =>
+    apiClient.get<ApiResponse<AuthResponse>>("/auth/github/callback", {
+      params: { code },
+    }),
+
   /** POST /auth/logout — 로그아웃 */
   logout: () => apiClient.post<ApiResponse<null>>("/auth/logout"),
 
