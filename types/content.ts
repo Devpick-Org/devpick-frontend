@@ -12,6 +12,13 @@ export interface Content {
   isLiked: boolean;
 }
 
+export interface ContentDetail extends Content {
+  originalContent?: string;
+  isOriginalVisible: boolean;
+  licenseType?: string;
+  sourceName: string;
+}
+
 export interface ContentFeedData {
   contents: Content[];
   page: number;
@@ -21,3 +28,4 @@ export interface ContentFeedData {
 }
 
 export type ContentFeedResponse = ApiResponse<ContentFeedData>;
+export type ContentDetailResponse = ApiResponse<ContentDetail>;

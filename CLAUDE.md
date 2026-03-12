@@ -104,8 +104,10 @@
 │ ┃ ┃ ┣ SignupForm.tsx       # 회원가입 폼 (react-hook-form + zod)
 │ ┃ ┃ ┗ SocialAuthButtons.tsx # GitHub / Google 소셜 로그인 버튼
 │ ┃ ┣ home/
+│ ┃ ┃ ┣ ContentDetail.tsx    # 글 상세 뷰어 (본문 렌더링 + 좋아요/스크랩/공유)
 │ ┃ ┃ ┣ FeedCard.tsx         # 피드 카드 (FeedCardItem interface)
-│ ┃ ┃ ┗ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
+│ ┃ ┃ ┣ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
+│ ┃ ┃ ┗ RecommendedContents.tsx # 추천 콘텐츠 사이드바 (items 배열 수신)
 │ ┃ ┣ community/
 │ ┃ ┃ ┗ CommunityCard.tsx    # 커뮤니티 카드 (CommunityPost interface)
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
@@ -139,7 +141,7 @@
 ├── types/               # TypeScript 전역 타입 정의
 │ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
 │ ┣ auth.ts              # User, LoginRequest, SignupRequest, TokenResponse
-│ ┗ content.ts           # Content, FeedItem 등 콘텐츠 관련 타입
+│ ┗ content.ts           # Content, ContentDetail, ContentFeedData 등 콘텐츠 타입
 └── public/              # 정적 에셋 (이미지, 폰트)
 ```
 

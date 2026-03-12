@@ -1,5 +1,70 @@
 import { apiClient } from "../client";
-import { Content, ContentFeedResponse } from "@/types/content";
+import {
+  Content,
+  ContentDetail,
+  ContentDetailResponse,
+  ContentFeedResponse,
+} from "@/types/content";
+
+const SOURCE_MAP: Record<string, string> = {
+  "velog.io": "Velog",
+  "blog.naver.com": "Naver Blog",
+  "techblog.naver.com": "Naver D2",
+  "techblog.kakao.com": "Kakao Tech",
+  "techblog.woowahan.com": "우아한형제들",
+};
+
+function resolveSourceName(url: string): string {
+  try {
+    const hostname = new URL(url).hostname;
+    return SOURCE_MAP[hostname] ?? hostname;
+  } catch {
+    return url;
+  }
+}
+
+const MOCK_ORIGINAL_CONTENT = `## 들어가며
+
+현대 소프트웨어 개발에서 이 개념은 점점 더 중요해지고 있습니다. 이 글에서는 핵심 원리부터 실전 활용법까지 단계적으로 살펴보겠습니다.
+
+## 기본 개념 이해
+
+가장 먼저 짚어야 할 것은 **기본 원리**입니다. 많은 개발자들이 표면적인 사용법만 익히고 넘어가다 보면 예상치 못한 버그를 만나게 됩니다.
+
+핵심 포인트는 다음과 같습니다.
+
+- 실행 순서와 타이밍을 정확히 이해해야 합니다
+- 의존성과 사이드 이펙트를 명확히 구분하세요
+- 메모리 누수 방지를 위한 클린업을 빠뜨리지 마세요
+
+## 주요 패턴과 안티패턴
+
+실무에서 자주 마주치는 패턴들을 정리해봤습니다.
+
+### 올바른 패턴
+
+1. 관심사를 명확히 분리하여 단일 책임 원칙을 지키세요
+2. 재사용 가능한 추상화로 중복 코드를 줄이세요
+3. 에러 처리를 항상 명시적으로 작성하세요
+
+### 피해야 할 안티패턴
+
+의존성을 무분별하게 늘리는 것은 **가장 흔한 실수** 중 하나입니다. 불필요한 의존성은 코드 복잡도를 높이고 테스트를 어렵게 만듭니다.
+
+또한 암묵적인 전역 상태에 의존하면 컴포넌트 간 결합도가 높아져 유지보수가 어려워집니다.
+
+## 실전 적용 체크리스트
+
+코드 리뷰 전 반드시 확인해야 할 사항들입니다.
+
+- 타입 안전성이 보장되는가?
+- 에러 케이스가 모두 처리되는가?
+- 불필요한 렌더링이나 재계산이 없는가?
+- 테스트 코드가 동작을 충분히 커버하는가?
+
+## 마치며
+
+이 개념을 완전히 이해하면 복잡한 로직도 명확하게 표현할 수 있습니다. 공식 문서와 함께 직접 코드를 작성해보며 익혀두세요.`;
 
 const MOCK_CONTENTS: Content[] = [
   {
@@ -271,10 +336,42 @@ export const contentsEndpoints = {
     });
   },
 
-  /** GET /contents/:contentId — 글 상세 (contentId: number) */
-  getContentById: () => {
-    throw new Error("Not implemented");
-    return apiClient.get("/contents/0");
+  /** GET /contents/:contentId — 글 상세 */
+  getContentById: (id: string): Promise<ContentDetailResponse> => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const base = MOCK_CONTENTS.find((c) => c.id === id);
+        if (!base) {
+          reject(new Error("콘텐츠를 찾을 수 없습니다"));
+          return;
+        }
+        const detail: ContentDetail = {
+          ...base,
+          originalContent: MOCK_ORIGINAL_CONTENT,
+          isOriginalVisible: true,
+          licenseType: "CC BY",
+          sourceName: resolveSourceName(base.canonicalUrl),
+        };
+        resolve({
+          success: true,
+          data: detail,
+          message: "요청이 성공했습니다",
+        });
+      }, 800);
+    });
+  },
+
+  /** 추천 콘텐츠 — 현재 글 제외 3개 (mock) */
+  getRecommendedContents: (currentId: string): Promise<Content[]> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const items = MOCK_CONTENTS.filter((c) => c.id !== currentId).slice(
+          0,
+          3,
+        );
+        resolve(items);
+      }, 600);
+    });
   },
 
   /** GET /contents/search — 글 검색 (query: string) */
