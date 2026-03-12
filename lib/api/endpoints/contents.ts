@@ -278,9 +278,57 @@ export const contentsEndpoints = {
   },
 
   /** GET /contents/search — 글 검색 (query: string) */
-  searchContents: () => {
-    throw new Error("Not implemented");
-    return apiClient.get("/contents/search");
+  // searchContents: () => {
+  //   throw new Error("Not implemented");
+  //   return apiClient.get("/contents/search");
+  // },
+  searchContents: (params: {
+    query: string;
+    tags?: string[];
+    page: number;
+    size: number;
+  }): Promise<ContentFeedResponse> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const normalizedQuery = params.query.trim().toLowerCase();
+
+        const filteredContents = MOCK_CONTENTS.filter((content) => {
+          const matchesQuery =
+            normalizedQuery.length === 0 ||
+            content.title.toLowerCase().includes(normalizedQuery) ||
+            content.preview.toLowerCase().includes(normalizedQuery) ||
+            content.author.toLowerCase().includes(normalizedQuery) ||
+            content.tags.some((tag) =>
+              tag.toLowerCase().includes(normalizedQuery),
+            );
+
+          const matchesTags =
+            !params.tags ||
+            params.tags.length === 0 ||
+            params.tags.some((selectedTag) =>
+              content.tags.includes(selectedTag),
+            );
+
+          return matchesQuery && matchesTags;
+        });
+
+        const start = params.page * params.size;
+        const end = start + params.size;
+        const pagedContents = filteredContents.slice(start, end);
+
+        resolve({
+          success: true,
+          data: {
+            contents: pagedContents,
+            page: params.page,
+            size: params.size,
+            totalElements: filteredContents.length,
+            totalPages: Math.ceil(filteredContents.length / params.size),
+          },
+          message: "검색 결과를 불러왔습니다",
+        });
+      }, 1000);
+    });
   },
 
   /** POST /contents/:contentId/scrap — 스크랩 (contentId: number) */

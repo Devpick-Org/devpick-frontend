@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import {
@@ -30,6 +30,7 @@ function WaveIcon({ className }: { className?: string }) {
 export default function HomePage() {
   const user = useAuthStore((s) => s.user);
   const nickname = user?.nickname ?? "김데브";
+  const [searchQuery, setSearchQuery] = useState("");
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const {
@@ -40,13 +41,24 @@ export default function HomePage() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["contents"],
+    queryKey: ["contents", searchQuery],
     initialPageParam: 0,
-    queryFn: ({ pageParam }) =>
-      contentsEndpoints.getContents({
+    queryFn: ({ pageParam }) => {
+      if (searchQuery.trim()) {
+        // 검색어 있으면 검색 피드
+        return contentsEndpoints.searchContents({
+          query: searchQuery,
+          page: pageParam,
+          size: PAGE_SIZE,
+        });
+      }
+
+      return contentsEndpoints.getContents({
+        // 검색어 없으면 일반 피드
         page: pageParam,
         size: PAGE_SIZE,
-      }),
+      });
+    },
     getNextPageParam: (lastPage) => {
       const currentPage = lastPage.data.page;
       const totalPages = lastPage.data.totalPages;
@@ -98,7 +110,7 @@ export default function HomePage() {
 
       {/* Search */}
       <div className="mb-6">
-        <FeedSearch />
+        <FeedSearch onSearch={setSearchQuery} />
       </div>
 
       {/* Feed list */}
