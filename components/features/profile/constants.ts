@@ -15,10 +15,10 @@ export const LEVELS: { id: LevelId; label: string; sub: string }[] = [
 ];
 
 export const LEVEL_COLORS: Record<LevelId, string> = {
-  BEGINNER: "bg-emerald-500/30 text-emerald-400",
-  JUNIOR: "bg-blue-500/30 text-blue-400",
-  MIDDLE: "bg-amber-500/30 text-amber-400",
-  SENIOR: "bg-violet-500/30 text-red-400",
+  BEGINNER: "bg-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+  JUNIOR: "bg-blue-500/30 bg-blue-500/10 text-blue-400",
+  MIDDLE: "bg-amber-500/30 bg-amber-500/10 text-amber-400",
+  SENIOR: "bg-red-500/30 bg-red-500/10 text-red-400",
 };
 
 export const SUGGESTED_TAGS: string[] = [

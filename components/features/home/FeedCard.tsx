@@ -2,31 +2,44 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import type { Content } from "@/types/content";
 
-export interface FeedCardItem {
-  id: string | number;
-  title: string;
-  summary: string;
-  source: string;
-  timeAgo: string;
-  tags: string[];
-  imageUrl?: string;
-  isScrapped?: boolean;
-  isLiked?: boolean;
-  likeCount?: number;
+// ─── 유틸 ────────────────────────────────────────────────────────────────────
+
+const SOURCE_MAP: Record<string, string> = {
+  "velog.io": "Velog",
+  "blog.naver.com": "Naver Blog",
+  "techblog.naver.com": "Naver D2",
+  "techblog.kakao.com": "Kakao Tech",
+  "techblog.woowahan.com": "우아한형제들",
+};
+
+function getSourceName(url: string): string {
+  try {
+    const hostname = new URL(url).hostname;
+    return SOURCE_MAP[hostname] ?? hostname;
+  } catch {
+    return url;
+  }
 }
 
-interface FeedCardProps {
-  item: FeedCardItem;
-  onLike?: (id: FeedCardItem["id"], liked: boolean) => void;
-  onScrap?: (id: FeedCardItem["id"], scrapped: boolean) => void;
+function formatRelativeTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const min = Math.floor(diff / 60_000);
+  if (min < 60) return `${min}분 전`;
+  const hour = Math.floor(min / 60);
+  if (hour < 24) return `${hour}시간 전`;
+  const day = Math.floor(hour / 24);
+  if (day < 30) return `${day}일 전`;
+  return `${Math.floor(day / 30)}달 전`;
 }
+
+// ─── 태그 색상 ────────────────────────────────────────────────────────────────
 
 const TAG_COLORS: Record<string, string> = {
   React: "border-blue-500/30 bg-blue-500/10 text-blue-400",
@@ -49,25 +62,27 @@ function getTagColor(tag: string) {
   return TAG_COLORS[tag] ?? "border-primary/20 bg-primary/5 text-primary/80";
 }
 
-export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
-  const [isScrapped, setIsScrapped] = useState(item.isScrapped ?? false);
-  const [isLiked, setIsLiked] = useState(item.isLiked ?? false);
+// ─── FeedCard ─────────────────────────────────────────────────────────────────
+
+interface FeedCardProps {
+  content: Content;
+}
+
+export function FeedCard({ content }: FeedCardProps) {
+  const [isScrapped, setIsScrapped] = useState(content.isScrapped);
+  const [isLiked, setIsLiked] = useState(content.isLiked);
   const [isShareTooltip, setIsShareTooltip] = useState(false);
 
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const next = !isLiked;
-    setIsLiked(next);
-    onLike?.(item.id, next);
+    setIsLiked((prev) => !prev);
   };
 
   const handleScrap = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const next = !isScrapped;
-    setIsScrapped(next);
-    onScrap?.(item.id, next);
+    setIsScrapped((prev) => !prev);
   };
 
   const handleShare = (e: React.MouseEvent) => {
@@ -76,50 +91,42 @@ export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
     setIsShareTooltip(true);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(
-        `${window.location.origin}/home/${item.id}`,
+        `${window.location.origin}/home/${content.id}`,
       );
     }
     setTimeout(() => setIsShareTooltip(false), 1500);
   };
 
   return (
-    <Link href={`/home/${item.id}`} className="block">
-      {/*
-       * Card가 제공하는 것: border, bg-card, rounded-xl, text-card-foreground
-       * !p-0: Card 기본 py-6 제거 (내부 div에서 직접 패딩 처리)
-       * gap-0: Card 기본 gap-6 제거
-       * shadow-none: Card 기본 shadow-sm 제거 (hover shadow는 직접 제어)
-       * rounded-2xl: rounded-xl 오버라이드
-       */}
+    <Link href={`/home/${content.id}`} className="block">
       <Card className="group relative !p-0 gap-0 rounded-2xl shadow-none transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <div className="flex cursor-pointer items-stretch p-5">
-          {/* Left: Text content */}
           <div className="flex flex-1 flex-col">
             {/* Source & time */}
             <div className="mb-2 flex items-center gap-2">
               <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-xs font-medium text-muted-foreground">
-                {item.source}
+                {getSourceName(content.canonicalUrl)}
               </span>
               <span className="text-xs text-muted-foreground/50">/</span>
               <span className="text-xs text-muted-foreground/70">
-                {item.timeAgo}
+                {formatRelativeTime(content.publishedAt)}
               </span>
             </div>
 
             {/* Title */}
             <h3 className="mb-1.5 line-clamp-2 text-base font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
-              {item.title}
+              {content.title}
             </h3>
 
-            {/* Summary */}
+            {/* Preview */}
             <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-              {item.summary}
+              {content.preview}
             </p>
 
             {/* Tags */}
             <div className="mb-3 flex flex-wrap gap-1.5">
-              {item.tags.map((tag) => (
+              {content.tags.map((tag) => (
                 <Badge
                   key={tag}
                   variant="outline"
@@ -135,45 +142,33 @@ export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
 
             {/* Action buttons */}
             <div className="mt-auto flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon-sm"
+              <button
                 onClick={handleLike}
                 className={cn(
-                  "rounded-lg duration-200",
+                  "relative rounded-lg p-1.5 transition-all duration-200",
                   isLiked
-                    ? "text-red-500 hover:bg-transparent hover:text-red-400"
+                    ? "text-red-500 hover:text-red-400"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
                 aria-label={isLiked ? "좋아요 취소" : "좋아요"}
               >
-                <Heart
-                  className="h-4 w-4"
-                  fill={isLiked ? "currentColor" : "none"}
-                />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
+                <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
+              </button>
+              <button
                 onClick={handleScrap}
                 className={cn(
-                  "rounded-lg duration-200",
+                  "relative rounded-lg p-1.5 transition-all duration-200",
                   isScrapped
-                    ? "text-primary hover:bg-transparent hover:text-primary/80"
+                    ? "text-primary hover:text-primary/80"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                 )}
                 aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
               >
-                <Bookmark
-                  className="h-4 w-4"
-                  fill={isScrapped ? "currentColor" : "none"}
-                />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
+                <Bookmark className="h-4 w-4" fill={isScrapped ? "currentColor" : "none"} />
+              </button>
+              <button
                 onClick={handleShare}
-                className="relative rounded-lg duration-200 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                className="relative rounded-lg p-1.5 text-muted-foreground transition-all duration-200 hover:bg-secondary hover:text-foreground"
                 aria-label="공유"
               >
                 <Share2 className="h-4 w-4" />
@@ -182,26 +177,46 @@ export function FeedCard({ item, onLike, onScrap }: FeedCardProps) {
                     복사됨!
                   </span>
                 )}
-              </Button>
+              </button>
             </div>
           </div>
-
-          {/* Right: Thumbnail */}
-          {item.imageUrl && (
-            <div className="ml-5 hidden shrink-0 sm:block">
-              <div className="relative h-[120px] w-[120px] overflow-hidden rounded-xl bg-secondary">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.title}
-                  fill
-                  className="object-cover"
-                  sizes="120px"
-                />
-              </div>
-            </div>
-          )}
         </div>
       </Card>
     </Link>
+  );
+}
+
+// ─── FeedCardSkeleton ─────────────────────────────────────────────────────────
+
+export function FeedCardSkeleton() {
+  return (
+    <Card className="!p-0 gap-0 rounded-2xl shadow-none">
+      <div className="flex flex-col p-5 gap-3">
+        {/* Source & time */}
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3.5 w-3.5 rounded" />
+          <Skeleton className="h-3 w-16 rounded" />
+          <Skeleton className="h-3 w-12 rounded" />
+        </div>
+        {/* Title */}
+        <Skeleton className="h-5 w-4/5 rounded" />
+        <Skeleton className="h-5 w-3/5 rounded" />
+        {/* Preview */}
+        <Skeleton className="h-4 w-full rounded" />
+        <Skeleton className="h-4 w-2/3 rounded" />
+        {/* Tags */}
+        <div className="flex gap-1.5">
+          <Skeleton className="h-5 w-14 rounded-md" />
+          <Skeleton className="h-5 w-16 rounded-md" />
+          <Skeleton className="h-5 w-12 rounded-md" />
+        </div>
+        {/* Actions */}
+        <div className="flex gap-1">
+          <Skeleton className="h-7 w-7 rounded-lg" />
+          <Skeleton className="h-7 w-7 rounded-lg" />
+          <Skeleton className="h-7 w-7 rounded-lg" />
+        </div>
+      </div>
+    </Card>
   );
 }

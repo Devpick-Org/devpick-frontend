@@ -85,7 +85,7 @@ export function TopNav() {
           {!mounted ? (
             <Skeleton className="h-9 w-9 rounded-full" />
           ) : (
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               {/*
                * asChild 제거 — DropdownMenuTrigger 자체를 직접 스타일링
                * asChild + Button 중첩 시 Radix Slot이 ref를 잃어 <button><button> 중첩 발생 가능
