@@ -28,7 +28,8 @@ const MOCK_CONTENTS: Content[] = [
   },
   {
     id: "content-003",
-    title: "Next.js 16 App Router: 서버 컴포넌트와 클라이언트 컴포넌트 경계 설계",
+    title:
+      "Next.js 16 App Router: 서버 컴포넌트와 클라이언트 컴포넌트 경계 설계",
     author: "박민준",
     preview:
       "App Router에서는 'use client' 지시문을 기준으로 렌더링 경계가 나뉩니다. 서버 컴포넌트에서 데이터를 패칭하고 클라이언트 컴포넌트로 직렬화 가능한 props만 내려주는 패턴을 알아봅니다.",
@@ -252,14 +253,17 @@ export const contentsEndpoints = {
   }): Promise<ContentFeedResponse> => {
     return new Promise((resolve) => {
       setTimeout(() => {
+        const start = params.page * params.size;
+        const end = start + params.size;
+        const pagedContents = MOCK_CONTENTS.slice(start, end);
         resolve({
           success: true,
           data: {
-            contents: MOCK_CONTENTS,
+            contents: pagedContents,
             page: params.page,
             size: params.size,
-            totalElements: 100,
-            totalPages: 5,
+            totalElements: MOCK_CONTENTS.length,
+            totalPages: Math.ceil(MOCK_CONTENTS.length / params.size),
           },
           message: "피드를 불러왔습니다",
         });
