@@ -10,7 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import type { ContentDetail as ContentDetailType } from "@/types/content";
 
 // ─── 태그 색상 ────────────────────────────────────────────────────────────────
@@ -34,15 +34,6 @@ const TAG_COLORS: Record<string, string> = {
 
 function getTagColor(tag: string) {
   return TAG_COLORS[tag] ?? "border-primary/20 bg-primary/5 text-primary/80";
-}
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
 }
 
 // ─── 마크다운 렌더러 ───────────────────────────────────────────────────────────

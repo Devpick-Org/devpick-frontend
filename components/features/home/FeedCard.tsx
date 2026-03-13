@@ -6,7 +6,7 @@ import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import type { Content } from "@/types/content";
 
 // ─── 유틸 ────────────────────────────────────────────────────────────────────
@@ -26,17 +26,6 @@ function getSourceName(url: string): string {
   } catch {
     return url;
   }
-}
-
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const min = Math.floor(diff / 60_000);
-  if (min < 60) return `${min}분 전`;
-  const hour = Math.floor(min / 60);
-  if (hour < 24) return `${hour}시간 전`;
-  const day = Math.floor(hour / 24);
-  if (day < 30) return `${day}일 전`;
-  return `${Math.floor(day / 30)}달 전`;
 }
 
 // ─── 태그 색상 ────────────────────────────────────────────────────────────────
@@ -110,7 +99,7 @@ export function FeedCard({ content }: FeedCardProps) {
               </span>
               <span className="text-xs text-muted-foreground/50">/</span>
               <span className="text-xs text-muted-foreground/70">
-                {formatRelativeTime(content.publishedAt)}
+                {formatDate(content.publishedAt)}
               </span>
             </div>
 

@@ -505,10 +505,13 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic C — AI 요약
 
-| Method | Endpoint                              | 설명 | 인증         | 관련 페이지 |
-| ------ | ------------------------------------- | ---- | ------------ | ----------- |
-| GET    | `/contents/{contentId}/summary`       | O    | `/home/[id]` |
-| POST   | `/contents/{contentId}/summary/retry` | O    | `/home/[id]` |
+> AI 요약 UI는 `_v0-reference.tsx` 레이아웃을 참고하되,
+> 데이터 구조는 API 응답 필드를 기준으로 사용한다.
+
+| Method | Endpoint                              | 설명 | 인증         | 관련 페이지 | 응답코드 |
+| ------ | ------------------------------------- | ---- | ------------ | ----------- | -------- |
+| GET    | `/contents/{contentId}/summary`       | O    | `/home/[id]` | 200         |
+| POST   | `/contents/{contentId}/summary/retry` | O    | `/home/[id]` | 200         |
 
 ### Epic D — 질문/커뮤니티
 
