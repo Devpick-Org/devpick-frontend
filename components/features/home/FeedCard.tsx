@@ -11,25 +11,6 @@ import { cn, formatDate } from "@/lib/utils";
 import { useContentStore } from "@/store/content.store";
 import type { Content } from "@/types/content";
 
-// ─── 유틸 ────────────────────────────────────────────────────────────────────
-
-const SOURCE_MAP: Record<string, string> = {
-  "velog.io": "Velog",
-  "blog.naver.com": "Naver Blog",
-  "techblog.naver.com": "Naver D2",
-  "techblog.kakao.com": "Kakao Tech",
-  "techblog.woowahan.com": "우아한형제들",
-};
-
-function getSourceName(url: string): string {
-  try {
-    const hostname = new URL(url).hostname;
-    return SOURCE_MAP[hostname] ?? hostname;
-  } catch {
-    return url;
-  }
-}
-
 // ─── 태그 색상 ────────────────────────────────────────────────────────────────
 
 const TAG_COLORS: Record<string, string> = {
@@ -99,12 +80,17 @@ export function FeedCard({ content }: FeedCardProps) {
     <Link href={`/home/${content.id}`} className="block">
       <Card className="group relative !p-0 gap-0 rounded-2xl shadow-none transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <div className="flex cursor-pointer items-stretch p-5">
-          <div className={cn("flex flex-1 flex-col", content.thumbnailUrl && "sm:pr-5")}>
+          <div
+            className={cn(
+              "flex flex-1 flex-col",
+              content.thumbnailUrl && "sm:pr-5",
+            )}
+          >
             {/* Source & time */}
             <div className="mb-2 flex items-center gap-2">
               <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-xs font-medium text-muted-foreground">
-                {getSourceName(content.canonicalUrl)}
+                {content.sourceName}
               </span>
               <span className="text-xs text-muted-foreground/50">/</span>
               <span className="text-xs text-muted-foreground/70">
@@ -150,7 +136,10 @@ export function FeedCard({ content }: FeedCardProps) {
                 )}
                 aria-label={isLiked ? "좋아요 취소" : "좋아요"}
               >
-                <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
+                <Heart
+                  className="h-4 w-4"
+                  fill={isLiked ? "currentColor" : "none"}
+                />
               </button>
               <button
                 onClick={handleScrap}
@@ -162,7 +151,10 @@ export function FeedCard({ content }: FeedCardProps) {
                 )}
                 aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
               >
-                <Bookmark className="h-4 w-4" fill={isScrapped ? "currentColor" : "none"} />
+                <Bookmark
+                  className="h-4 w-4"
+                  fill={isScrapped ? "currentColor" : "none"}
+                />
               </button>
               <button
                 onClick={handleShare}

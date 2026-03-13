@@ -43,7 +43,7 @@ export function RecommendedContents({ items }: RecommendedContentsProps) {
                     {item.title}
                   </p>
                   <span className="text-xs text-muted-foreground">
-                    {item.author}
+                    {item.sourceName}
                   </span>
                 </div>
               </div>

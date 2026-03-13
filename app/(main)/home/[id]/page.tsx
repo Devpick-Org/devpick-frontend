@@ -16,7 +16,7 @@ export default async function Page({ params }: Props) {
   try {
     [content, recommended] = await Promise.all([
       contentsEndpoints.getContentById(id).then((res) => res.data),
-      contentsEndpoints.getRecommendedContents(id),
+      contentsEndpoints.getContentRecommendations(id).then((res) => res.data.contents),
     ]);
   } catch {
     // getContentById가 reject하면 content는 null 유지

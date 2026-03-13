@@ -2,13 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  Heart,
-  Bookmark,
-  Share2,
-  ExternalLink,
-} from "lucide-react";
+import { ArrowLeft, Heart, Bookmark, Share2, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatDate } from "@/lib/utils";
 import { useContentStore } from "@/store/content.store";
@@ -142,7 +136,10 @@ function ContentRenderer({ content }: { content: string }) {
       elements.push(
         <ol key={key++} className="my-4 ml-6 list-decimal space-y-2">
           {listItems.map((item, idx) => (
-            <li key={idx} className="text-base leading-relaxed text-foreground/85">
+            <li
+              key={idx}
+              className="text-base leading-relaxed text-foreground/85"
+            >
               <InlineMarkdown text={item} />
             </li>
           ))}
@@ -160,7 +157,10 @@ function ContentRenderer({ content }: { content: string }) {
       elements.push(
         <ul key={key++} className="my-4 ml-6 list-disc space-y-2">
           {listItems.map((item, idx) => (
-            <li key={idx} className="text-base leading-relaxed text-foreground/85">
+            <li
+              key={idx}
+              className="text-base leading-relaxed text-foreground/85"
+            >
               <InlineMarkdown text={item} />
             </li>
           ))}
@@ -280,9 +280,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
 
         {/* 메타 정보 */}
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-muted-foreground">
-          <span className="font-medium">{content.author}</span>
-          <span className="text-border">·</span>
-          <span>{content.sourceName}</span>
+          <span className="font-medium">{content.sourceName}</span>
           <span className="text-border">·</span>
           <span>{formatDate(content.publishedAt)}</span>
           {content.licenseType && (
