@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn, formatDate } from "@/lib/utils";
+import { useContentStore } from "@/store/content.store";
 import type { ContentDetail as ContentDetailType } from "@/types/content";
 
 // ─── 태그 색상 ────────────────────────────────────────────────────────────────
@@ -191,9 +192,16 @@ interface ContentDetailProps {
 }
 
 export function ContentDetail({ content }: ContentDetailProps) {
-  const [isLiked, setIsLiked] = useState(content.isLiked);
-  const [isScrapped, setIsScrapped] = useState(content.isScrapped);
+  const { init, toggleLike, toggleScrap, interactions } = useContentStore();
   const [isShareTooltip, setIsShareTooltip] = useState(false);
+
+  useEffect(() => {
+    init(content.id, content.isLiked, content.isScrapped);
+  }, [content.id, content.isLiked, content.isScrapped, init]);
+
+  const interaction = interactions[content.id];
+  const isLiked = interaction?.isLiked ?? content.isLiked;
+  const isScrapped = interaction?.isScrapped ?? content.isScrapped;
 
   const handleShare = useCallback(() => {
     setIsShareTooltip(true);
@@ -226,7 +234,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
           </h1>
           <div className="flex shrink-0 items-center gap-1">
             <button
-              onClick={() => setIsLiked((p) => !p)}
+              onClick={() => toggleLike(content.id)}
               className={cn(
                 "rounded-lg p-2 transition-all duration-200",
                 isLiked
@@ -241,7 +249,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
               />
             </button>
             <button
-              onClick={() => setIsScrapped((p) => !p)}
+              onClick={() => toggleScrap(content.id)}
               className={cn(
                 "rounded-lg p-2 transition-all duration-200",
                 isScrapped

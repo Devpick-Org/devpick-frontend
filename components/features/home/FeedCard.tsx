@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatDate } from "@/lib/utils";
+import { useContentStore } from "@/store/content.store";
 import type { Content } from "@/types/content";
 
 // ─── 유틸 ────────────────────────────────────────────────────────────────────
@@ -59,20 +60,27 @@ interface FeedCardProps {
 }
 
 export function FeedCard({ content }: FeedCardProps) {
-  const [isScrapped, setIsScrapped] = useState(content.isScrapped);
-  const [isLiked, setIsLiked] = useState(content.isLiked);
+  const { init, toggleLike, toggleScrap, interactions } = useContentStore();
   const [isShareTooltip, setIsShareTooltip] = useState(false);
+
+  useEffect(() => {
+    init(content.id, content.isLiked, content.isScrapped);
+  }, [content.id, content.isLiked, content.isScrapped, init]);
+
+  const interaction = interactions[content.id];
+  const isLiked = interaction?.isLiked ?? content.isLiked;
+  const isScrapped = interaction?.isScrapped ?? content.isScrapped;
 
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsLiked((prev) => !prev);
+    toggleLike(content.id);
   };
 
   const handleScrap = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsScrapped((prev) => !prev);
+    toggleScrap(content.id);
   };
 
   const handleShare = (e: React.MouseEvent) => {
