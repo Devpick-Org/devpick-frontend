@@ -23,6 +23,90 @@ function resolveSourceName(url: string): string {
   }
 }
 
+const MOCK_ORIGINAL_CONTENT_WITH_CODE = `## 들어가며
+
+React의 \`useEffect\`는 컴포넌트가 렌더링된 이후 사이드 이펙트를 처리하는 훅입니다. 하지만 의존성 배열을 잘못 관리하면 무한 루프, stale closure 같은 버그가 발생합니다. 이 글에서는 올바른 사용법과 흔한 실수를 코드로 살펴봅니다.
+
+## 기본 구조
+
+\`useEffect\`는 세 가지 형태로 사용됩니다.
+
+\`\`\`tsx
+// 1. 의존성 배열 없음 — 매 렌더링마다 실행
+useEffect(() => {
+  console.log("렌더링 후 항상 실행");
+});
+
+// 2. 빈 배열 — 마운트 시 1회만 실행
+useEffect(() => {
+  console.log("마운트 시 1회 실행");
+}, []);
+
+// 3. 의존성 지정 — 해당 값이 바뀔 때만 실행
+useEffect(() => {
+  console.log("count가 바뀔 때 실행:", count);
+}, [count]);
+\`\`\`
+
+## stale closure 문제
+
+의존성 배열에서 값을 빠뜨리면 클로저가 오래된 값을 참조하는 문제가 발생합니다.
+
+\`\`\`tsx
+// ❌ 잘못된 예: count가 의존성 배열에 없어서 항상 0을 출력
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      console.log("현재 count:", count); // 항상 0
+    }, 1000);
+    return () => clearInterval(id);
+  }, []); // count 누락
+
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
+}
+\`\`\`
+
+올바르게 고치려면 \`count\`를 의존성에 추가하거나, 함수형 업데이트를 사용합니다.
+
+\`\`\`tsx
+// ✅ 함수형 업데이트로 stale closure 회피
+useEffect(() => {
+  const id = setInterval(() => {
+    setCount(prev => prev + 1); // prev는 항상 최신값
+  }, 1000);
+  return () => clearInterval(id);
+}, []); // 의존성 없이도 안전
+\`\`\`
+
+## 클린업 함수
+
+비동기 요청이나 구독을 등록할 때는 반드시 클린업을 작성해야 합니다.
+
+\`\`\`tsx
+useEffect(() => {
+  let cancelled = false;
+
+  async function fetchUser() {
+    const data = await getUser(userId);
+    if (!cancelled) {
+      setUser(data); // 언마운트 후 setState 방지
+    }
+  }
+
+  fetchUser();
+
+  return () => {
+    cancelled = true;
+  };
+}, [userId]);
+\`\`\`
+
+## 마치며
+
+\`useEffect\`의 의존성 배열은 "이 값이 바뀌면 다시 실행해 달라"는 선언이지, 임의로 비워두거나 채우는 용도가 아닙니다. **eslint-plugin-react-hooks**의 \`exhaustive-deps\` 규칙을 활성화하면 누락된 의존성을 자동으로 잡아줍니다.`;
+
 const MOCK_ORIGINAL_CONTENT = `## 들어가며
 
 현대 소프트웨어 개발에서 이 개념은 점점 더 중요해지고 있습니다. 이 글에서는 핵심 원리부터 실전 활용법까지 단계적으로 살펴보겠습니다.
@@ -347,7 +431,10 @@ export const contentsEndpoints = {
         }
         const detail: ContentDetail = {
           ...base,
-          originalContent: MOCK_ORIGINAL_CONTENT,
+          originalContent:
+            id === "content-001"
+              ? MOCK_ORIGINAL_CONTENT_WITH_CODE
+              : MOCK_ORIGINAL_CONTENT,
           isOriginalVisible: true,
           licenseType: "CC BY",
           sourceName: resolveSourceName(base.canonicalUrl),
