@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { mockAuthEndpoints } from "@/lib/api/endpoints/auth"
+import { authEndpoints } from "@/lib/api/endpoints/auth"
 import { useAuthStore } from "@/store/auth.store"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -59,12 +59,14 @@ export function LoginForm({ isLoading }: LoginFormProps) {
 
     setIsSubmitting(true)
     try {
-      await mockAuthEndpoints.login(email, password)
-      const user = { userId: "1", email, nickname: "테스트유저" }
-      setAuth(user, "mock-access-token")
+      const response = await authEndpoints.login({ email, password })
+      const { accessToken, userId, nickname } = response.data.data
+      setAuth({ userId, email, nickname }, accessToken)
       router.push("/home")
     } catch (err) {
-      setAuthError(err instanceof Error ? err.message : "로그인 중 오류가 발생했습니다.")
+      const apiError = (err as { response?: { data?: { error?: { message?: string } } } })
+        ?.response?.data?.error?.message
+      setAuthError(apiError ?? (err instanceof Error ? err.message : "로그인 중 오류가 발생했습니다."))
     } finally {
       setIsSubmitting(false)
     }

@@ -351,7 +351,7 @@ DP-{티켓번호}: {작업 내용}
 **2. 이메일 회원가입 (`POST /auth/signup`)**
 
 - 요청: `{"email": "...", "password": "...", "nickname": "..."}` (닉네임: 2~20자, 비밀번호: 8~20자, 영문+숫자+특수문자 필수)
-- 응답(201): `{"success": true, "data": {"userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
+- 응답(201):`{"success": true, "data": {"userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
 
 **3. 이메일 로그인 (`POST /auth/login`)**
 
@@ -376,7 +376,7 @@ DP-{티켓번호}: {작업 내용}
 - 브라우저가 HttpOnly Cookie(refreshToken)를 자동 첨부
 - `fetch` 사용 시 `credentials: 'include'`
 - `axios` 사용 시 `withCredentials: true`
-- 응답(200): `{"success": true, "data": {"accessToken": "(새 토큰)"}, "message": "요청이 성공했습니다"}`
+- 응답(200): `{"success": true, "data": {"accessToken": "eyJhbGci...(새 토큰)"}, "message": "요청이 성공했습니다"}`
 - 에러(401): `AUTH_003` (유효하지 않은 리프레시 토큰)
 
 **중요 플로우 (Token Rotation)**
@@ -439,6 +439,11 @@ DP-{티켓번호}: {작업 내용}
   "message": "요청이 성공했습니다"
 }
 ```
+
+**회원 탈퇴**
+
+- DELETE /users/me
+- 응답: 204 No Content
 
 **7. 소셜 로그인 흐름 (GitHub: `DP-183`, Google: `DP-184`)**
 

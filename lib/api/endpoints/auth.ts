@@ -44,6 +44,9 @@ export const authEndpoints = {
   /** GET /users/me — 내 프로필 조회 */
   getMe: () => apiClient.get<ApiResponse<User>>("/users/me"),
 
+  /** DELETE /users/me — 회원 탈퇴 */
+  deleteMe: () => apiClient.delete<ApiResponse<null>>("/users/me"),
+
   /** POST /auth/email/send — 이메일 인증 코드 발송 */
   sendEmailCode: (email: string) =>
     apiClient.post<ApiResponse<null>>("/auth/email/send", { email }),
@@ -51,40 +54,4 @@ export const authEndpoints = {
   /** POST /auth/email/verify — 인증 코드 검증 */
   verifyEmailCode: (email: string, code: string) =>
     apiClient.post<ApiResponse<null>>("/auth/email/verify", { email, code }),
-};
-
-/** Mock: setTimeout 기반 시뮬레이션 (백엔드 연동 전 사용) */
-export const mockAuthEndpoints = {
-  sendEmailCode: (_email: string): Promise<void> =>
-    new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    }),
-
-  /** 인증번호 "123456"만 성공 */
-  verifyEmailCode: (_email: string, code: string): Promise<void> =>
-    new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (code === "123456") {
-          resolve();
-        } else {
-          reject(new Error("CODE_MISMATCH"));
-        }
-      }, 800);
-    }),
-
-  signup: (_data: SignupRequest): Promise<void> =>
-    new Promise((resolve) => {
-      setTimeout(resolve, 800);
-    }),
-
-  login: (email: string, password: string): Promise<void> =>
-    new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (email === "test@example.com" && password === "Test1234!") {
-          resolve();
-        } else {
-          reject(new Error("이메일 또는 비밀번호가 일치하지 않습니다."));
-        }
-      }, 800);
-    }),
 };

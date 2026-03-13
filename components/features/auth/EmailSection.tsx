@@ -5,7 +5,7 @@ import { CheckIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { mockAuthEndpoints } from "@/lib/api/endpoints/auth"
+import { authEndpoints } from "@/lib/api/endpoints/auth"
 
 const TIMER_DURATION = 180 // 3분
 
@@ -63,7 +63,7 @@ export function EmailSection({
     setIsSendingCode(true)
     setVerificationError(false)
     try {
-      await mockAuthEndpoints.sendEmailCode(email)
+      await authEndpoints.sendEmailCode(email)
       setIsCodeSent(true)
       setTimerSeconds(TIMER_DURATION)
     } finally {
@@ -76,7 +76,7 @@ export function EmailSection({
     setIsVerifying(true)
     setVerificationError(false)
     try {
-      await mockAuthEndpoints.verifyEmailCode(email, verificationCode)
+      await authEndpoints.verifyEmailCode(email, verificationCode)
       setIsEmailVerified(true)
       onVerified(email)
     } catch {

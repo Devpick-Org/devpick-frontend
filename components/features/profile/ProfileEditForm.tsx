@@ -28,6 +28,8 @@ import {
   type LevelId,
 } from "@/components/features/profile/constants";
 import { useAuthStore } from "@/store/auth.store";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
+import { usersEndpoints } from "@/lib/api/endpoints/users";
 
 /* ── Icons ── */
 
@@ -155,9 +157,7 @@ export function ProfileEditForm() {
   const [selectedLevel, setSelectedLevel] = useState<LevelId | null>(
     (user?.level as LevelId) ?? null,
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>(
-    user?.tags ?? [],
-  );
+  const [selectedTags, setSelectedTags] = useState<string[]>(user?.tags ?? []);
   const [tagSearch, setTagSearch] = useState("");
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -169,7 +169,13 @@ export function ProfileEditForm() {
     if (user?.level) setSelectedLevel(user.level as LevelId);
     if (user?.tags && user.tags.length > 0) setSelectedTags([...user.tags]);
     if (user?.profileImageUrl) setAvatarPreview(user.profileImageUrl);
-  }, [user?.nickname, user?.jobType, user?.level, user?.tags, user?.profileImageUrl]);
+  }, [
+    user?.nickname,
+    user?.jobType,
+    user?.level,
+    user?.tags,
+    user?.profileImageUrl,
+  ]);
 
   const filteredTags = useMemo(() => {
     if (!tagSearch.trim()) return SUGGESTED_TAGS;
@@ -197,27 +203,45 @@ export function ProfileEditForm() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    try {
-      await new Promise((r) => setTimeout(r, 800));
 
-      updateUser({
+    try {
+      const { data } = await usersEndpoints.updateMe({
         nickname: nickname.trim(),
-        jobType: selectedRole ?? undefined,
+        job: selectedRole ?? undefined,
         level: selectedLevel ?? undefined,
         tags: selectedTags,
-        profileImageUrl: avatarPreview ?? undefined,
+        profileImage: avatarPreview ?? undefined,
+      });
+
+      const updatedUser = data.data;
+
+      updateUser({
+        nickname: updatedUser.nickname,
+        jobType: updatedUser.job ?? undefined,
+        level: updatedUser.level ?? undefined,
+        tags: updatedUser.tags ?? [],
+        profileImageUrl: updatedUser.profileImage ?? undefined,
       });
 
       toast.success("프로필이 저장되었습니다.");
+    } catch (error) {
+      console.error(error);
+      toast.error("프로필 저장 중 오류가 발생했습니다.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleDeleteAccount = () => {
-    clearAuth();
-    toast.success("계정이 삭제되었습니다.");
-    router.push("/");
+  const handleDeleteAccount = async () => {
+    try {
+      await authEndpoints.deleteMe();
+      clearAuth();
+      toast.success("계정이 삭제되었습니다.");
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+      toast.error("계정 삭제 중 오류가 발생했습니다.");
+    }
   };
 
   const currentRole = JOB_ROLES.find((r) => r.id === selectedRole);
