@@ -104,7 +104,10 @@
 │ ┃ ┃ ┣ SignupForm.tsx       # 회원가입 폼 (react-hook-form + zod)
 │ ┃ ┃ ┗ SocialAuthButtons.tsx # GitHub / Google 소셜 로그인 버튼
 │ ┃ ┣ home/
-│ ┃ ┃ ┗ FeedCard.tsx         # 피드 카드 (FeedCardItem interface)
+│ ┃ ┃ ┣ ContentDetail.tsx    # 글 상세 뷰어 (본문 렌더링 + 좋아요/스크랩/공유)
+│ ┃ ┃ ┣ FeedCard.tsx         # 피드 카드 (FeedCardItem interface)
+│ ┃ ┃ ┣ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
+│ ┃ ┃ ┗ RecommendedContents.tsx # 추천 콘텐츠 사이드바 (items 배열 수신)
 │ ┃ ┣ community/
 │ ┃ ┃ ┗ CommunityCard.tsx    # 커뮤니티 카드 (CommunityPost interface)
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
@@ -137,7 +140,8 @@
 │ ┗ ui.store.ts          # UI 상태 (Toast 큐)
 ├── types/               # TypeScript 전역 타입 정의
 │ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
-│ ┗ auth.ts              # User, LoginRequest, SignupRequest, TokenResponse
+│ ┣ auth.ts              # User, LoginRequest, SignupRequest, TokenResponse
+│ ┗ content.ts           # Content, ContentDetail, ContentFeedData 등 콘텐츠 타입
 └── public/              # 정적 에셋 (이미지, 폰트)
 ```
 
@@ -399,15 +403,16 @@ DP-{티켓번호}: {작업 내용}
 
 > **⚠️ [중요] 현재 백엔드 API 명세는 확정되었으나, 실제 크롤링 데이터가 준비되지 않아 연동을 대기 중인 상태입니다. 프론트엔드 작업 시 실제 API 호출(`fetch` 등) 대신, 이 명세를 기반으로 한 Mock Data와 가짜 비동기 함수(delay)를 사용하여 무한 스크롤 및 UI 연동을 먼저 진행합니다.**
 
-| Method | Endpoint                      | 설명        | 인증 | 관련 페이지           | 응답코드 |
-| ------ | ----------------------------- | ----------- | ---- | --------------------- | -------- |
-| GET    | `/contents`                   | 개인화 피드 | O    | `/home`               | 200      |
-| GET    | `/contents/{contentId}`       | 글 상세     | O    | `/home/[id]`          | 200      |
-| GET    | `/contents/search`            | 글 검색     | O    | `/home`               | 200      |
-| POST   | `/contents/{contentId}/scrap` | 스크랩      | O    | `/home`, `/home/[id]` | 201      |
-| DELETE | `/contents/{contentId}/scrap` | 스크랩 취소 | O    | `/home`, `/home/[id]` | 204      |
-| POST   | `/contents/{contentId}/like`  | 좋아요      | O    | `/home`, `/home/[id]` | 201      |
-| DELETE | `/contents/{contentId}/like`  | 좋아요 취소 | O    | `/home`, `/home/[id]` | 204      |
+| Method | Endpoint                                | 설명                | 인증 | 관련 페이지           | 응답코드 |
+| ------ | --------------------------------------- | ------------------- | ---- | --------------------- | -------- |
+| GET    | `/contents`                             | 개인화 피드         | O    | `/home`               | 200      |
+| GET    | `/contents/{contentId}`                 | 글 상세             | O    | `/home/[id]`          | 200      |
+| GET    | `/contents/{contentId}/recommendations` | 글 상세 추천 콘텐츠 | O    | `/home/[id]`          | 200      |
+| GET    | `/contents/search`                      | 글 검색             | O    | `/home`               | 200      |
+| POST   | `/contents/{contentId}/scrap`           | 스크랩              | O    | `/home`, `/home/[id]` | 201      |
+| DELETE | `/contents/{contentId}/scrap`           | 스크랩 취소         | O    | `/home`, `/home/[id]` | 204      |
+| POST   | `/contents/{contentId}/like`            | 좋아요              | O    | `/home`, `/home/[id]` | 201      |
+| DELETE | `/contents/{contentId}/like`            | 좋아요 취소         | O    | `/home`, `/home/[id]` | 204      |
 
 #### [참고] 콘텐츠 피드 API 요청/응답 구조
 
@@ -425,7 +430,9 @@ DP-{티켓번호}: {작업 내용}
         "id": "uuid-5678",
         "title": "React useEffect 완전 정복",
         "author": "홍근",
+        "sourceName": "Velog",
         "preview": "useEffect는 컴포넌트가 렌더링된 후...",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
         "canonicalUrl": "[https://velog.io/@hong/](https://velog.io/@hong/)...",
         "tags": ["React", "Frontend"],
         "publishedAt": "2026-02-24T09:00:00",
@@ -453,7 +460,9 @@ DP-{티켓번호}: {작업 내용}
     "id": "uuid-5678",
     "title": "React useEffect 완전 정복",
     "author": "홍근",
+    "sourceName": "Velog",
     "preview": "useEffect는 컴포넌트가 렌더링된 후...",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
     "canonicalUrl": "[https://velog.io/@hong/](https://velog.io/@hong/)...",
     "originalContent": "전체 본문...",
     "isOriginalVisible": true,
@@ -468,7 +477,44 @@ DP-{티켓번호}: {작업 내용}
 }
 ```
 
-**3. GET /contents/search (글 검색)**
+**3. GET /contents/{contentId}/recommendations (글 상세 추천 콘텐츠)**
+
+- 요청: `GET /contents/{contentId}/recommendations?size=5`
+- 응답 (200 OK):
+
+```json
+{
+  "success": true,
+  "data": {
+    "contents": [
+      {
+        "id": "uuid-9012",
+        "title": "Next.js App Router 데이터 패칭 전략",
+        "author": "김개발",
+        "sourceName": "Velog",
+        "preview": "App Router에서는 서버 컴포넌트에서 데이터를 패칭하고...",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+        "canonicalUrl": "https://velog.io/@dev/nextjs-app-router-data-fetching",
+        "tags": ["Next.js", "React", "Frontend"],
+        "publishedAt": "2026-03-10T12:30:00",
+        "isScrapped": false,
+        "isLiked": true
+      }
+    ],
+    "page": 0,
+    "size": 0,
+    "totalElements": 0,
+    "totalPages": 0
+  },
+  "error": {
+    "code": "string",
+    "message": "string",
+    "detail": {}
+  }
+}
+```
+
+**4. GET /contents/search (글 검색)**
 
 - 요청: `GET /contents/search?query=useEffect&tags=React&tags=Frontend&page=0&size=20`
 - 응답 (200 OK):
@@ -482,7 +528,9 @@ DP-{티켓번호}: {작업 내용}
         "id": "uuid-5678",
         "title": "React useEffect 완전 정복",
         "author": "홍근",
+        "sourceName": "Velog",
         "preview": "useEffect는 컴포넌트가 렌더링된 후...",
+        "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
         "canonicalUrl": "[https://velog.io/@hong/](https://velog.io/@hong/)...",
         "tags": ["React", "Frontend"],
         "publishedAt": "2026-02-24T09:00:00",
@@ -501,10 +549,13 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic C — AI 요약
 
-| Method | Endpoint                              | 설명 | 인증         | 관련 페이지 |
-| ------ | ------------------------------------- | ---- | ------------ | ----------- |
-| GET    | `/contents/{contentId}/summary`       | O    | `/home/[id]` |
-| POST   | `/contents/{contentId}/summary/retry` | O    | `/home/[id]` |
+> AI 요약 UI는 `_v0-reference.tsx` 레이아웃을 참고하되,
+> 데이터 구조는 API 응답 필드를 기준으로 사용한다.
+
+| Method | Endpoint                              | 설명 | 인증         | 관련 페이지 | 응답코드 |
+| ------ | ------------------------------------- | ---- | ------------ | ----------- | -------- |
+| GET    | `/contents/{contentId}/summary`       | O    | `/home/[id]` | 200         |
+| POST   | `/contents/{contentId}/summary/retry` | O    | `/home/[id]` | 200         |
 
 ### Epic D — 질문/커뮤니티
 

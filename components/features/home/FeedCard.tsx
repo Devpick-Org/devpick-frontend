@@ -1,43 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
+import { useContentStore } from "@/store/content.store";
 import type { Content } from "@/types/content";
-
-// ─── 유틸 ────────────────────────────────────────────────────────────────────
-
-const SOURCE_MAP: Record<string, string> = {
-  "velog.io": "Velog",
-  "blog.naver.com": "Naver Blog",
-  "techblog.naver.com": "Naver D2",
-  "techblog.kakao.com": "Kakao Tech",
-  "techblog.woowahan.com": "우아한형제들",
-};
-
-function getSourceName(url: string): string {
-  try {
-    const hostname = new URL(url).hostname;
-    return SOURCE_MAP[hostname] ?? hostname;
-  } catch {
-    return url;
-  }
-}
-
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const min = Math.floor(diff / 60_000);
-  if (min < 60) return `${min}분 전`;
-  const hour = Math.floor(min / 60);
-  if (hour < 24) return `${hour}시간 전`;
-  const day = Math.floor(hour / 24);
-  if (day < 30) return `${day}일 전`;
-  return `${Math.floor(day / 30)}달 전`;
-}
 
 // ─── 태그 색상 ────────────────────────────────────────────────────────────────
 
@@ -69,20 +41,27 @@ interface FeedCardProps {
 }
 
 export function FeedCard({ content }: FeedCardProps) {
-  const [isScrapped, setIsScrapped] = useState(content.isScrapped);
-  const [isLiked, setIsLiked] = useState(content.isLiked);
+  const { init, toggleLike, toggleScrap, interactions } = useContentStore();
   const [isShareTooltip, setIsShareTooltip] = useState(false);
+
+  useEffect(() => {
+    init(content.id, content.isLiked, content.isScrapped);
+  }, [content.id, content.isLiked, content.isScrapped, init]);
+
+  const interaction = interactions[content.id];
+  const isLiked = interaction?.isLiked ?? content.isLiked;
+  const isScrapped = interaction?.isScrapped ?? content.isScrapped;
 
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsLiked((prev) => !prev);
+    toggleLike(content.id);
   };
 
   const handleScrap = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsScrapped((prev) => !prev);
+    toggleScrap(content.id);
   };
 
   const handleShare = (e: React.MouseEvent) => {
@@ -101,16 +80,21 @@ export function FeedCard({ content }: FeedCardProps) {
     <Link href={`/home/${content.id}`} className="block">
       <Card className="group relative !p-0 gap-0 rounded-2xl shadow-none transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <div className="flex cursor-pointer items-stretch p-5">
-          <div className="flex flex-1 flex-col">
+          <div
+            className={cn(
+              "flex flex-1 flex-col",
+              content.thumbnailUrl && "sm:pr-5",
+            )}
+          >
             {/* Source & time */}
             <div className="mb-2 flex items-center gap-2">
               <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="text-xs font-medium text-muted-foreground">
-                {getSourceName(content.canonicalUrl)}
+                {content.sourceName}
               </span>
               <span className="text-xs text-muted-foreground/50">/</span>
               <span className="text-xs text-muted-foreground/70">
-                {formatRelativeTime(content.publishedAt)}
+                {formatDate(content.publishedAt)}
               </span>
             </div>
 
@@ -152,7 +136,10 @@ export function FeedCard({ content }: FeedCardProps) {
                 )}
                 aria-label={isLiked ? "좋아요 취소" : "좋아요"}
               >
-                <Heart className="h-4 w-4" fill={isLiked ? "currentColor" : "none"} />
+                <Heart
+                  className="h-4 w-4"
+                  fill={isLiked ? "currentColor" : "none"}
+                />
               </button>
               <button
                 onClick={handleScrap}
@@ -164,7 +151,10 @@ export function FeedCard({ content }: FeedCardProps) {
                 )}
                 aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
               >
-                <Bookmark className="h-4 w-4" fill={isScrapped ? "currentColor" : "none"} />
+                <Bookmark
+                  className="h-4 w-4"
+                  fill={isScrapped ? "currentColor" : "none"}
+                />
               </button>
               <button
                 onClick={handleShare}
@@ -180,6 +170,21 @@ export function FeedCard({ content }: FeedCardProps) {
               </button>
             </div>
           </div>
+
+          {/* 썸네일 — sm 이상에서만 노출, 없으면 렌더링 안 함 */}
+          {content.thumbnailUrl && (
+            <div className="ml-auto hidden shrink-0 self-center sm:block">
+              <div className="relative h-[112px] w-[112px] overflow-hidden rounded-xl bg-secondary">
+                <Image
+                  src={content.thumbnailUrl}
+                  alt={content.title}
+                  fill
+                  className="object-cover"
+                  sizes="112px"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </Card>
     </Link>

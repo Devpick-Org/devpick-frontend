@@ -4,12 +4,20 @@ export interface Content {
   id: string;
   title: string;
   author: string;
+  sourceName: string;
   preview: string;
+  thumbnailUrl: string | null;
   canonicalUrl: string;
   tags: string[];
   publishedAt: string;
   isScrapped: boolean;
   isLiked: boolean;
+}
+
+export interface ContentDetail extends Content {
+  originalContent?: string;
+  isOriginalVisible: boolean;
+  licenseType?: string;
 }
 
 export interface ContentFeedData {
@@ -21,3 +29,5 @@ export interface ContentFeedData {
 }
 
 export type ContentFeedResponse = ApiResponse<ContentFeedData>;
+export type ContentDetailResponse = ApiResponse<ContentDetail>;
+export type ContentRecommendationsResponse = ApiResponse<ContentFeedData>;
