@@ -10,6 +10,8 @@ export interface Content {
   publishedAt: string;
   isScrapped: boolean;
   isLiked: boolean;
+  /** @mock API 확정 전 임시 필드 — 실제 응답 스키마와 다를 수 있음 */
+  thumbnailUrl?: string;
 }
 
 export interface ContentDetail extends Content {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -90,7 +91,7 @@ export function FeedCard({ content }: FeedCardProps) {
     <Link href={`/home/${content.id}`} className="block">
       <Card className="group relative !p-0 gap-0 rounded-2xl shadow-none transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
         <div className="flex cursor-pointer items-stretch p-5">
-          <div className="flex flex-1 flex-col">
+          <div className={cn("flex flex-1 flex-col", content.thumbnailUrl && "sm:pr-5")}>
             {/* Source & time */}
             <div className="mb-2 flex items-center gap-2">
               <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
@@ -169,6 +170,21 @@ export function FeedCard({ content }: FeedCardProps) {
               </button>
             </div>
           </div>
+
+          {/* 썸네일 — sm 이상에서만 노출, 없으면 렌더링 안 함 */}
+          {content.thumbnailUrl && (
+            <div className="ml-auto hidden shrink-0 self-center sm:block">
+              <div className="relative h-[112px] w-[112px] overflow-hidden rounded-xl bg-secondary">
+                <Image
+                  src={content.thumbnailUrl}
+                  alt={content.title}
+                  fill
+                  className="object-cover"
+                  sizes="112px"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </Card>
     </Link>

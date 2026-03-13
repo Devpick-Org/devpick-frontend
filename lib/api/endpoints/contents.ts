@@ -162,6 +162,7 @@ const MOCK_CONTENTS: Content[] = [
     publishedAt: "2026-03-10T09:00:00",
     isScrapped: false,
     isLiked: false,
+    thumbnailUrl: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=240&h=240&fit=crop",
   },
   {
     id: "content-002",
@@ -187,6 +188,7 @@ const MOCK_CONTENTS: Content[] = [
     publishedAt: "2026-03-09T22:00:00",
     isScrapped: false,
     isLiked: true,
+    thumbnailUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=240&h=240&fit=crop",
   },
   {
     id: "content-004",
@@ -211,6 +213,7 @@ const MOCK_CONTENTS: Content[] = [
     publishedAt: "2026-03-09T14:30:00",
     isScrapped: false,
     isLiked: true,
+    thumbnailUrl: "https://images.unsplash.com/photo-1605745341112-85968b19335b?w=240&h=240&fit=crop",
   },
   {
     id: "content-006",
@@ -235,6 +238,7 @@ const MOCK_CONTENTS: Content[] = [
     publishedAt: "2026-03-08T20:00:00",
     isScrapped: false,
     isLiked: false,
+    thumbnailUrl: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?w=240&h=240&fit=crop",
   },
   {
     id: "content-008",
@@ -259,6 +263,7 @@ const MOCK_CONTENTS: Content[] = [
     publishedAt: "2026-03-08T10:00:00",
     isScrapped: false,
     isLiked: false,
+    thumbnailUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=240&h=240&fit=crop",
   },
   {
     id: "content-010",
