@@ -61,7 +61,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
     try {
       await mockAuthEndpoints.login(email, password)
       const user = { userId: "1", email, nickname: "테스트유저" }
-      setAuth(user, "mock-access-token", "mock-refresh-token")
+      setAuth(user, "mock-access-token")
       router.push("/home")
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : "로그인 중 오류가 발생했습니다.")

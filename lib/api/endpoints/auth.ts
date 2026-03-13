@@ -4,6 +4,8 @@ import type {
   LoginRequest,
   SignupRequest,
   AuthResponse,
+  SocialAuthResponse,
+  OAuthStartResponse,
   User,
 } from "@/types/auth";
 
@@ -16,16 +18,24 @@ export const authEndpoints = {
   login: (data: LoginRequest) =>
     apiClient.post<ApiResponse<AuthResponse>>("/auth/login", data),
 
-  /** GET /auth/google/callback — Google 소셜 로그인 콜백 */
-  googleSocialLogin: (code: string) =>
-    apiClient.get<ApiResponse<AuthResponse>>("/auth/google/callback", {
-      params: { code },
-    }),
+  /** GET /auth/github — GitHub OAuth 시작 URL 발급 */
+  getGithubOAuthUrl: () =>
+    apiClient.get<ApiResponse<OAuthStartResponse>>("/auth/github"),
+
+  /** GET /auth/google — Google OAuth 시작 URL 발급 */
+  getGoogleOAuthUrl: () =>
+    apiClient.get<ApiResponse<OAuthStartResponse>>("/auth/google"),
 
   /** GET /auth/github/callback — GitHub 소셜 로그인 콜백 */
-  githubSocialLogin: (code: string) =>
-    apiClient.get<ApiResponse<AuthResponse>>("/auth/github/callback", {
-      params: { code },
+  githubCallback: (code: string, state: string) =>
+    apiClient.get<ApiResponse<SocialAuthResponse>>("/auth/github/callback", {
+      params: { code, state },
+    }),
+
+  /** GET /auth/google/callback — Google 소셜 로그인 콜백 */
+  googleCallback: (code: string, state: string) =>
+    apiClient.get<ApiResponse<SocialAuthResponse>>("/auth/google/callback", {
+      params: { code, state },
     }),
 
   /** POST /auth/logout — 로그아웃 */
@@ -69,7 +79,6 @@ export const mockAuthEndpoints = {
 
   login: (email: string, password: string): Promise<void> =>
     new Promise((resolve, reject) => {
-      // console.log("[Mock API] 로그인 요청 데이터:", { email, password });
       setTimeout(() => {
         if (email === "test@example.com" && password === "Test1234!") {
           resolve();

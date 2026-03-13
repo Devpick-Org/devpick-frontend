@@ -1,52 +1,41 @@
 import { create } from "zustand";
 import type { User } from "@/types/auth";
-import { tokenManager } from "@/lib/auth/tokenManager";
 
 interface AuthStore {
   user: User | null;
+  accessToken: string | null;
   isAuthenticated: boolean;
 
-  setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+  /** 로그인 성공 시 — 사용자 정보와 accessToken을 메모리에 저장 */
+  setAuth: (user: User, accessToken: string) => void;
+  /** 로그아웃 또는 토큰 만료 시 — 모든 인증 상태 초기화 */
   clearAuth: () => void;
-  initAuth: (user: User) => void;
+  /** 앱 마운트 시 토큰 복원 후 인증 상태 복구 */
+  initAuth: (user: User, accessToken: string) => void;
   updateUser: (data: Partial<User>) => void;
 }
 
 /**
  * 인증 전역 상태
  *
- * 역할
- * - 현재 로그인된 사용자 정보 관리
- * - 로그인 여부 상태 관리
- *
- * 토큰 저장 전략
- * - accessToken / refreshToken 저장은 tokenManager가 담당
- * - 현재는 SessionStorageStrategy 사용
- * - 추후 HttpOnly Cookie 전략으로 교체 가능
- *
- * 구조
- * auth.store
- *    ↓
- * tokenManager
- *    ↓
- * TokenStrategy (SessionStorage / Cookie)
+ * 토큰 저장 정책
+ * - accessToken: 이 store의 메모리(Zustand)에만 저장 (XSS 방어)
+ * - refreshToken: 백엔드가 HttpOnly Cookie로 관리 (프론트에서 직접 접근 불가)
  */
-
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
+  accessToken: null,
   isAuthenticated: false,
 
-  setAuth: (user, accessToken, refreshToken) => {
-    tokenManager.setTokens(accessToken, refreshToken);
-    set({ user, isAuthenticated: true });
+  setAuth: (user, accessToken) => {
+    set({ user, accessToken, isAuthenticated: true });
   },
 
   clearAuth: () => {
-    tokenManager.clearTokens();
-    set({ user: null, isAuthenticated: false });
+    set({ user: null, accessToken: null, isAuthenticated: false });
   },
 
-  initAuth: (user) => set({ user, isAuthenticated: true }),
+  initAuth: (user, accessToken) => set({ user, accessToken, isAuthenticated: true }),
 
   updateUser: (data) =>
     set((state) => ({

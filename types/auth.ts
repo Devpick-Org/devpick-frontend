@@ -21,8 +21,23 @@ export interface SignupRequest {
 
 export interface AuthResponse {
   accessToken: string;
-  refreshToken: string;
   userId: string;
   email: string;
   nickname: string;
+}
+
+export interface SocialAuthResponse {
+  accessToken: string;
+  userId: string;
+  email: string;
+  nickname: string;
+  isNewUser: boolean;
+}
+
+export interface OAuthStartResponse {
+  authorizationUrl: string;
+}
+
+export interface RefreshTokenResponse {
+  accessToken: string;
 }
