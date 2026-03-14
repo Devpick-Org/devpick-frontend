@@ -97,8 +97,8 @@ export default function HomePage() {
     <div className="w-full px-4 py-8 lg:px-8">
       <div className="mx-auto max-w-4xl">
         {/* Greeting */}
-        <section className="mb-8">
-          <div className="mb-2 flex items-center gap-2">
+        <section className="mb-8 text-center">
+          <div className="mb-2 flex items-center justify-center gap-2">
             <h1 className="text-2xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
               {nickname}님을 위한 오늘의 추천
             </h1>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
 import { TopNav } from "@/components/layout/TopNav";
+import { TopNavVariant } from "@/components/layout/TopNavVariant";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,7 +20,8 @@ export default function MainLayout({
   return (
     <Providers>
       {/* <AuthInitializer /> */}
-      <TopNav />
+      {/* 버전 A 사이드바 + 상단바 */}
+      {/* <TopNav />
       <Sidebar sidebarOpen={sidebarOpen} />
       {sidebarOpen ? (
         <button
@@ -39,8 +41,9 @@ export default function MainLayout({
         >
           <ChevronRight className="h-4 w-4" />
         </button>
-      )}
-      {/* pt-16: TopNav 고정 높이 보정 | md:pl-[220px]: 데스크탑 사이드바 보정 | pb-16 md:pb-0: 모바일 하단 탭 보정 */}
+      )} 
+
+      // pt-16: TopNav 고정 높이 보정 | md:pl-[220px]: 데스크탑 사이드바 보정 | pb-16 md:pb-0: 모바일 하단 탭 보정
       <main
         className={cn(
           "pt-16 pb-16 transition-[padding] duration-300 md:pb-0",
@@ -48,7 +51,15 @@ export default function MainLayout({
         )}
       >
         {children}
+      </main> */}
+
+      <TopNavVariant />
+      <main className="pt-16 pb-16 md:pb-0 flex justify-center">
+        <div className="w-full max-w-5xl px-4 lg:px-8">
+          {children}
+        </div>
       </main>
+
       <Toaster richColors position="bottom-right" />
     </Providers>
   );
