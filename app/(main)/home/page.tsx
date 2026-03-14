@@ -95,53 +95,55 @@ export default function HomePage() {
 
   return (
     <div className="w-full px-4 py-8 lg:px-8">
-      {/* Greeting */}
-      <section className="mb-8 text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl text-balance">
-            안녕하세요, {nickname}님
-          </h1>
-          <WaveIcon className="text-3xl md:text-4xl" />
+      <div className="mx-auto w-full max-w-5xl">
+        {/* Greeting */}
+        <section className="mb-8 text-center">
+          <div className="mb-2 flex items-center justify-center gap-2">
+            <h1 className="text-2xl font-bold tracking-[-0.02em] text-foreground md:text-3xl">
+              {nickname}님을 위한 오늘의 추천
+            </h1>
+            <WaveIcon className="text-3xl md:text-4xl" />
+          </div>
+          <p className="text-sm text-muted-foreground md:text-base">
+            관심 기술과 학습 흐름에 맞춘 개발 콘텐츠를 모아봤어요.
+          </p>
+        </section>
+
+        {/* Search */}
+        <div className="mb-8">
+          <FeedSearch onSearch={setSearchQuery} />
         </div>
-        <p className="text-muted-foreground text-sm md:text-base">
-          오늘의 맞춤 추천 콘텐츠를 확인해 보세요.
-        </p>
-      </section>
 
-      {/* Search */}
-      <div className="mb-6">
-        <FeedSearch onSearch={setSearchQuery} />
-      </div>
+        {/* Feed list */}
+        <div className="flex flex-col gap-4">
+          {isLoading &&
+            Array.from({ length: 5 }).map((_, i) => <FeedCardSkeleton key={i} />)}
 
-      {/* Feed list */}
-      <div className="flex flex-col gap-3">
-        {isLoading &&
-          Array.from({ length: 5 }).map((_, i) => <FeedCardSkeleton key={i} />)}
+          {isError && (
+            <p className="py-10 text-center text-sm text-muted-foreground">
+              피드를 불러오는 중 문제가 발생했습니다.
+            </p>
+          )}
 
-        {isError && (
-          <p className="py-10 text-center text-sm text-muted-foreground">
-            피드를 불러오는 중 문제가 발생했습니다.
-          </p>
-        )}
+          {!isLoading &&
+            !isError &&
+            contents.map((content) => (
+              <FeedCard key={content.id} content={content} />
+            ))}
 
-        {!isLoading &&
-          !isError &&
-          contents.map((content) => (
-            <FeedCard key={content.id} content={content} />
-          ))}
+          {isFetchingNextPage &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <FeedCardSkeleton key={`next-${i}`} />
+            ))}
 
-        {isFetchingNextPage &&
-          Array.from({ length: 3 }).map((_, i) => (
-            <FeedCardSkeleton key={`next-${i}`} />
-          ))}
+          {!hasNextPage && contents.length > 0 && (
+            <p className="py-6 text-center text-sm text-muted-foreground">
+              마지막 콘텐츠입니다.
+            </p>
+          )}
 
-        {!hasNextPage && contents.length > 0 && (
-          <p className="py-6 text-center text-sm text-muted-foreground">
-            마지막 콘텐츠입니다.
-          </p>
-        )}
-
-        <div ref={loadMoreRef} className="h-4" />
+          <div ref={loadMoreRef} className="h-4" />
+        </div>
       </div>
     </div>
   );
