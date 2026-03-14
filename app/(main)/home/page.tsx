@@ -95,14 +95,14 @@ export default function HomePage() {
 
   return (
     <div className="w-full px-4 py-8 lg:px-8">
-      <div className="mx-auto w-full max-w-5xl">
+      <div className="mx-auto max-w-4xl">
         {/* Greeting */}
-        <section className="mb-8 text-center">
-          <div className="mb-2 flex items-center justify-center gap-2">
-            <h1 className="text-2xl font-bold tracking-[-0.02em] text-foreground md:text-3xl">
+        <section className="mb-8">
+          <div className="mb-2 flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
               {nickname}님을 위한 오늘의 추천
             </h1>
-            <WaveIcon className="text-3xl md:text-4xl" />
+            <WaveIcon className="text-2xl md:text-3xl" />
           </div>
           <p className="text-sm text-muted-foreground md:text-base">
             관심 기술과 학습 흐름에 맞춘 개발 콘텐츠를 모아봤어요.
@@ -115,7 +115,7 @@ export default function HomePage() {
         </div>
 
         {/* Feed list */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col">
           {isLoading &&
             Array.from({ length: 5 }).map((_, i) => <FeedCardSkeleton key={i} />)}
 

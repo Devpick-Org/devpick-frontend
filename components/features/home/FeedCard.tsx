@@ -18,16 +18,6 @@ interface FeedCardProps {
   content: Content;
 }
 
-function TagBadge({ tag }: { tag: string }) {
-  return (
-    <Badge
-      variant="outline"
-      className="rounded-full border-border bg-secondary/50 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground shadow-none"
-    >
-      {tag}
-    </Badge>
-  );
-}
 
 export function FeedCard({ content }: FeedCardProps) {
   const { init, toggleLike, toggleScrap, interactions } = useContentStore();
@@ -67,10 +57,9 @@ export function FeedCard({ content }: FeedCardProps) {
 
   return (
     <Link href={`/home/${content.id}`} className="block">
-      <Card className="group rounded-2xl border border-border/80 bg-card p-0 shadow-none transition-all duration-200 hover:border-border hover:bg-card/95 hover:shadow-sm">
-        <div className="flex items-stretch gap-4 p-6 sm:gap-5">
-          <div className={cn("min-w-0 flex-1", content.thumbnailUrl && "sm:pr-1")}>
-            
+      <article className="group border-b border-border/70 py-7 transition-colors">
+        <div className="flex items-start gap-5">
+          <div className="min-w-0 flex-1">
             {/* Source & time */}
             <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
               <ExternalLink className="h-3.5 w-3.5 shrink-0" />
@@ -80,23 +69,20 @@ export function FeedCard({ content }: FeedCardProps) {
             </div>
 
             {/* Title */}
-            <h3 className="mb-2 line-clamp-2 text-lg font-semibold leading-snug tracking-[-0.01em] text-foreground transition-colors group-hover:text-foreground">
+            <h3 className="mb-2 line-clamp-2 text-[19px] font-semibold leading-snug tracking-[-0.01em] text-foreground transition-opacity group-hover:opacity-80 sm:text">
               {content.title}
             </h3>
 
             {/* Preview */}
-            <p className="mb-4 line-clamp-2 text-sm leading-6 text-muted-foreground">
+            <p className="mb-3 line-clamp-2 text-sm leading-6 text-muted-foreground sm:text-[15px]">
               {content.preview}
             </p>
 
-
             {/* Tags */}
             {content.tags.length > 0 && (
-              <div className="mb-4 flex flex-wrap gap-2">
-                {content.tags.slice(0, 3).map((tag) => (
-                  <TagBadge key={tag} tag={tag} />
-                ))}
-              </div>
+              <p className="mb-4 line-clamp-1 text-sm text-muted-foreground/85">
+                {content.tags.slice(0, 3).join(" · ")}
+              </p>
             )}
 
             {/* Action buttons */}
@@ -104,10 +90,10 @@ export function FeedCard({ content }: FeedCardProps) {
               <button
                 onClick={handleLike}
                 className={cn(
-                  "rounded-lg p-2 transition-colors",
+                  "rounded-md p-1 transition-colors",
                   isLiked
                     ? "text-red-500"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-label={isLiked ? "좋아요 취소" : "좋아요"}
               >
@@ -120,10 +106,10 @@ export function FeedCard({ content }: FeedCardProps) {
               <button
                 onClick={handleScrap}
                 className={cn(
-                  "rounded-lg p-2 transition-colors",
+                  "rounded-md p-1 transition-colors",
                   isScrapped
                     ? "text-primary"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                    : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
               >
@@ -135,7 +121,7 @@ export function FeedCard({ content }: FeedCardProps) {
 
               <button
                 onClick={handleShare}
-                className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="relative rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
                 aria-label="공유"
               >
                 <Share2 className="h-4 w-4" />
@@ -150,20 +136,20 @@ export function FeedCard({ content }: FeedCardProps) {
 
           {/* 썸네일 — sm 이상에서만 노출, 없으면 렌더링 안 함 */}
           {content.thumbnailUrl && (
-            <div className="hidden shrink-0 self-start sm:block">
-              <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-border/60 bg-secondary">
+            <div className="hidden shrink-0 sm:block">
+              <div className="relative h-[190px] w-[200px] overflow-hidden rounded-sm bg-secondary">
                 <Image
                   src={content.thumbnailUrl}
                   alt={content.title}
                   fill
                   className="object-cover"
-                  sizes="96px"
+                  sizes="200px"
                 />
               </div>
             </div>
           )}
         </div>
-      </Card>
+      </article>
     </Link>
   );
 }
@@ -172,33 +158,34 @@ export function FeedCard({ content }: FeedCardProps) {
 
 export function FeedCardSkeleton() {
   return (
-    <Card className="rounded-2xl border border-border/80 p-0 shadow-none">
-      <div className="flex flex-col gap-3 p-6">
+    <article className="border-b border-border/70 py-7">
+      <div className="flex items-start gap-5">
+        <div className="min-w-0 flex-1">
         {/* Source & time */}
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-3.5 w-3.5 rounded" />
-          <Skeleton className="h-3 w-16 rounded" />
-          <Skeleton className="h-3 w-12 rounded" />
-        </div>
+        <div className="mb-3 flex items-center gap-2">
+            <Skeleton className="h-3.5 w-3.5 rounded" />
+            <Skeleton className="h-3 w-16 rounded" />
+            <Skeleton className="h-3 w-12 rounded" />
+          </div>
         {/* Title */}
-        <Skeleton className="h-5 w-4/5 rounded" />
-        <Skeleton className="h-5 w-3/5 rounded" />
+        <Skeleton className="mb-2 h-6 w-4/5 rounded" />
+          <Skeleton className="mb-3 h-6 w-3/5 rounded" />
         {/* Preview */}
-        <Skeleton className="h-4 w-full rounded" />
-        <Skeleton className="h-4 w-2/3 rounded" />
+        <Skeleton className="mb-2 h-4 w-full rounded" />
+          <Skeleton className="mb-3 h-4 w-2/3 rounded" />
         {/* Tags */}
-        <div className="flex gap-2">
-          <Skeleton className="h-6 w-14 rounded-full" />
-          <Skeleton className="h-6 w-16 rounded-full" />
-          <Skeleton className="h-6 w-12 rounded-full" />
-        </div>
+        <Skeleton className="mb-4 h-4 w-40 rounded" />
         {/* Actions */}
-        <div className="flex gap-1.5">
-          <Skeleton className="h-8 w-8 rounded-lg" />
-          <Skeleton className="h-8 w-8 rounded-lg" />
-          <Skeleton className="h-8 w-8 rounded-lg" />
+        <div className="flex gap-2">
+            <Skeleton className="h-7 w-7 rounded-md" />
+            <Skeleton className="h-7 w-7 rounded-md" />
+            <Skeleton className="h-7 w-7 rounded-md" />
+          </div>
+        </div>
+    <div className="hidden shrink-0 sm:block">
+          <Skeleton className="h-28 w-28 rounded-lg md:h-32 md:w-32" />
         </div>
       </div>
-    </Card>
+    </article>
   );
 }

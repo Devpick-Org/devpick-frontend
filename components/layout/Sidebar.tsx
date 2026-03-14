@@ -11,13 +11,23 @@ const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/report", label: "리포트", icon: TrendingUp },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  sidebarOpen: boolean;
+}
+
+export function Sidebar({ sidebarOpen }: SidebarProps) {
   const pathname = usePathname();
 
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="fixed left-0 top-16 bottom-0 z-40 hidden w-[220px] border-r border-border bg-card/80 backdrop-blur-xl md:block">
+      <aside
+        className={cn(
+          "fixed left-0 top-16 bottom-0 z-40 hidden w-[220px] border-r border-border bg-muted/40 transition-transform duration-300 md:block",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+
         <nav
           className="flex flex-col gap-1 px-3 pt-6"
           aria-label="Main navigation"

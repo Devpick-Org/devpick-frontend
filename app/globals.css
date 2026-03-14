@@ -6,7 +6,8 @@
 
 /* 1. v0의 디자인 색상 변수 (여기가 핵심 테마입니다) */
 :root {
-  --background: oklch(0.98 0.002 260);
+  /* --background: oklch(0.98 0.002 260); */
+  --background: oklch(1,0,0); 
   --foreground: oklch(0.14 0.005 260);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.14 0.005 260);
