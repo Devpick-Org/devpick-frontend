@@ -89,7 +89,7 @@ export function EmailSection({
   return (
     <div className="flex flex-col gap-4">
       {/* 이메일 입력 + 인증번호 발송 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="signup-email" className="text-foreground">{"이메일"}</Label>
         <div className="flex gap-2">
           <Input

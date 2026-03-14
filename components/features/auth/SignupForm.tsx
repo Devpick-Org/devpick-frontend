@@ -110,7 +110,7 @@ export function SignupForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* 닉네임 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="signup-nickname" className="text-foreground">
           {"닉네임"}
         </Label>
@@ -135,7 +135,7 @@ export function SignupForm() {
       />
 
       {/* 비밀번호 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="signup-password" className="text-foreground">
           {"비밀번호"}
         </Label>
@@ -151,7 +151,7 @@ export function SignupForm() {
       </div>
 
       {/* 비밀번호 확인 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="signup-confirm" className="text-foreground">
           {"비밀번호 확인"}
         </Label>
