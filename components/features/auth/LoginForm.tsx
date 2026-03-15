@@ -61,7 +61,13 @@ export function LoginForm({ isLoading }: LoginFormProps) {
     try {
       const response = await authEndpoints.login({ email, password })
       const { accessToken, userId, nickname } = response.data.data
+      // accessToken을 먼저 등록해야 이후 /users/me 요청에 Authorization 헤더가 붙음
       setAuth({ userId, email, nickname }, accessToken)
+
+      // 로그인 응답에는 job/level/tags가 없으므로 /users/me로 전체 프로필 조회
+      const { data: meData } = await authEndpoints.getMe()
+      setAuth(meData.data, accessToken)
+
       router.push("/home")
     } catch (err) {
       const apiError = (err as { response?: { data?: { error?: { message?: string } } } })

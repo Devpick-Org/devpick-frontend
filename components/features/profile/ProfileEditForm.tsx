@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+import { cn, dedupeTags } from "@/lib/utils";
 import {
   JOB_ROLES,
   LEVELS,
@@ -157,7 +157,7 @@ export function ProfileEditForm() {
   const [selectedLevel, setSelectedLevel] = useState<LevelId | null>(
     (user?.level as LevelId) ?? null,
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>(user?.tags ?? []);
+  const [selectedTags, setSelectedTags] = useState<string[]>(dedupeTags(user?.tags));
   const [tagSearch, setTagSearch] = useState("");
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -167,7 +167,7 @@ export function ProfileEditForm() {
     if (user?.nickname) setNickname(user.nickname);
     if (user?.job) setSelectedRole(user.job as JobRoleId);
     if (user?.level) setSelectedLevel(user.level as LevelId);
-    setSelectedTags(user?.tags ?? []);
+    setSelectedTags(dedupeTags(user?.tags));
     if (user?.profileImage) setAvatarPreview(user.profileImage);
   }, [
     user?.nickname,
@@ -212,7 +212,7 @@ export function ProfileEditForm() {
         nickname: updatedUser.nickname,
         job: updatedUser.job ?? undefined,
         level: updatedUser.level ?? undefined,
-        tags: updatedUser.tags ?? [],
+        tags: dedupeTags(updatedUser.tags),
         profileImage: updatedUser.profileImage ?? undefined,
       });
 

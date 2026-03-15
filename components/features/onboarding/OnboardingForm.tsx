@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, dedupeTags } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { usersEndpoints } from "@/lib/api/endpoints/users";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { ProfileNicknameInput } from "@/components/features/profile/ProfileNicknameInput";
 import { ProfileRoleSelector } from "@/components/features/profile/ProfileRoleSelector";
 import { ProfileLevelSelector } from "@/components/features/profile/ProfileLevelSelector";
@@ -67,18 +68,21 @@ export function OnboardingForm() {
     setIsSubmitting(true);
 
     try {
-      const { data } = await usersEndpoints.updateMe({
+      await usersEndpoints.updateMe({
         nickname: nickname.trim(),
         job: selectedRole,
         level: selectedLevel,
         tags: selectedTags,
       });
 
+      // PUT 응답의 tags가 빈 배열로 올 수 있으므로, GET /users/me로 최신 정보를 다시 조회
+      const { data: meData } = await authEndpoints.getMe();
       updateUser({
-        nickname: data.data.nickname,
-        job: data.data.job ?? undefined,
-        level: data.data.level ?? undefined,
-        tags: data.data.tags ?? selectedTags,
+        nickname: meData.data.nickname,
+        job: meData.data.job ?? undefined,
+        level: meData.data.level ?? undefined,
+        profileImage: meData.data.profileImage ?? undefined,
+        tags: dedupeTags(meData.data.tags?.length ? meData.data.tags : selectedTags),
       });
 
       router.push("/home");

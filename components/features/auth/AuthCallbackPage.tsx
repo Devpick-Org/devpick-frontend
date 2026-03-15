@@ -30,9 +30,17 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
         : authEndpoints.googleCallback;
 
     callbackFn(code, state)
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         const { accessToken, userId, email, nickname, isNewUser } = data.data;
+        // accessToken을 먼저 등록해야 이후 /users/me 요청에 Authorization 헤더가 붙음
         setAuth({ userId, email, nickname }, accessToken);
+
+        if (!isNewUser) {
+          // 기존 유저: 소셜 로그인 응답에 job/level/tags가 없으므로 /users/me로 전체 프로필 조회
+          const { data: meData } = await authEndpoints.getMe();
+          setAuth(meData.data, accessToken);
+        }
+
         router.replace(isNewUser ? "/onboarding" : "/home");
       })
       .catch(() => {
