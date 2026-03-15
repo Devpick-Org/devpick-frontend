@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/auth.store";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { cn } from "@/lib/utils";
 
 // 로고 컴포넌트
@@ -51,9 +52,15 @@ export function TopNavVariant() {
   const displayInitial = displayName.charAt(0).toUpperCase();
   const displayLevel = user?.level ? (LEVEL_LABELS[user.level] ?? user.level) : null;
 
-  const handleLogout = () => {
-    clearAuth();
-    router.push("/");
+  const handleLogout = async () => {
+    try {
+      await authEndpoints.logout();
+    } catch {
+      // 로그아웃 API 실패 시에도 클라이언트 상태는 초기화
+    } finally {
+      clearAuth();
+      router.push("/");
+    }
   };
 
   return (
@@ -117,7 +124,7 @@ export function TopNavVariant() {
                       <>
                         <Avatar className="h-7 w-7 ring-1 ring-primary/20">
                           <AvatarImage
-                            src={user.profileImageUrl ?? ""}
+                            src={user.profileImage ?? ""}
                             alt={`${displayName} avatar`}
                           />
                           <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">

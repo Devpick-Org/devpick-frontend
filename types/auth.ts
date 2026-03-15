@@ -2,8 +2,8 @@ export interface User {
   userId: string;
   email: string;
   nickname: string;
-  profileImageUrl?: string;
-  jobType?: string;
+  profileImage?: string;
+  job?: string;
   level?: string;
   tags?: string[];
 }

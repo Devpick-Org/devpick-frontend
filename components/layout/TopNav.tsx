@@ -101,7 +101,7 @@ export function TopNav() {
                   <>
                     <Avatar className="h-7 w-7 ring-1 ring-primary/20">
                       <AvatarImage
-                        src={user.profileImageUrl ?? ""}
+                        src={user.profileImage ?? ""}
                         alt={`${displayName} avatar`}
                       />
                       <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">

@@ -20,10 +20,10 @@ export function ProfileRoleSelector({
           type="button"
           onClick={() => onChange(role.id)}
           className={cn(
-            "rounded-xl border-2 px-4 py-2.5 text-sm font-medium transition-all duration-200",
+            "rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200",
             value === role.id
-              ? "border-primary bg-primary/10 text-primary shadow-md shadow-primary/10"
-              : "border-border bg-secondary text-foreground hover:border-primary/40 hover:bg-secondary/80",
+              ? "bg-primary/10 text-primary shadow-md shadow-primary/10"
+              : "bg-secondary text-foreground hover:bg-secondary/80",
           )}
         >
           {role.label}
