@@ -221,7 +221,7 @@ export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps)
         {/* 검색 결과가 아예 없을 때 안내 문구 */}
         {filteredCustomTags.length === 0 && filteredGroups.length === 0 && (
           <div className="w-full py-6 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
-            <span>"{inputValue}" 검색 결과가 없습니다.</span>
+            <span>&quot;{inputValue}&quot; 검색 결과가 없습니다.</span>
             <span className="text-primary font-medium">우측 추가 버튼을 눌러 새 태그를 만들어 보세요!</span>
           </div>
         )}
