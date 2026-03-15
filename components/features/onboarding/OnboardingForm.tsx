@@ -78,7 +78,7 @@ export function OnboardingForm() {
         nickname: data.data.nickname,
         job: data.data.job ?? undefined,
         level: data.data.level ?? undefined,
-        tags: data.data.tags ?? [],
+        tags: data.data.tags ?? selectedTags,
       });
 
       router.push("/home");

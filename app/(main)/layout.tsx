@@ -8,7 +8,7 @@ import { TopNavVariant } from "@/components/layout/TopNavVariant";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-// import { AuthInitializer } from "@/components/features/auth/AuthInitializer";
+import { AuthInitializer } from "@/components/features/auth/AuthInitializer";
 
 export default function MainLayout({
   children,
@@ -19,7 +19,7 @@ export default function MainLayout({
 
   return (
     <Providers>
-      {/* <AuthInitializer /> */}
+      <AuthInitializer />
       {/* 버전 A 사이드바 + 상단바 */}
       {/* <TopNav />
       <Sidebar sidebarOpen={sidebarOpen} />

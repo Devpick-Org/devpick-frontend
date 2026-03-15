@@ -167,7 +167,7 @@ export function ProfileEditForm() {
     if (user?.nickname) setNickname(user.nickname);
     if (user?.job) setSelectedRole(user.job as JobRoleId);
     if (user?.level) setSelectedLevel(user.level as LevelId);
-    if (user?.tags && user.tags.length > 0) setSelectedTags([...user.tags]);
+    setSelectedTags(user?.tags ?? []);
     if (user?.profileImage) setAvatarPreview(user.profileImage);
   }, [
     user?.nickname,

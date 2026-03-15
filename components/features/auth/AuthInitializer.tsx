@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { apiClient } from "@/lib/api/client";
+import { refreshClient } from "@/lib/api/client";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
 import type { ApiResponse } from "@/types/api";
@@ -22,7 +22,7 @@ export function AuthInitializer() {
     async function restoreSession() {
       try {
         // withCredentials: true 로 HttpOnly Cookie(refreshToken)를 자동 첨부
-        const { data: refreshData } = await apiClient.post<ApiResponse<RefreshTokenResponse>>(
+        const { data: refreshData } = await refreshClient.post<ApiResponse<RefreshTokenResponse>>(
           "/auth/refresh",
         );
         const newAccessToken = refreshData.data.accessToken;

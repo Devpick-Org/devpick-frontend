@@ -24,7 +24,7 @@ export const apiClient = axios.create({
 /**
  * 토큰 갱신 전용 클라이언트 (인터셉터 없음 — 순환 참조 방지)
  */
-const refreshClient = axios.create({
+export const refreshClient = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
 });
