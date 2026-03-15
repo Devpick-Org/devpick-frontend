@@ -162,28 +162,39 @@ export function FeedCardSkeleton() {
       <div className="flex items-start gap-5">
         <div className="min-w-0 flex-1">
         {/* Source & time */}
-        <div className="mb-3 flex items-center gap-2">
-            <Skeleton className="h-3.5 w-3.5 rounded" />
+          <div className="mb-3 flex items-center gap-2">
+            <Skeleton className="h-3.5 w-3.5 shrink-0 rounded" />
             <Skeleton className="h-3 w-16 rounded" />
+            <Skeleton className="h-2 w-2 rounded-full" />
             <Skeleton className="h-3 w-12 rounded" />
           </div>
-        {/* Title */}
-        <Skeleton className="mb-2 h-6 w-4/5 rounded" />
-          <Skeleton className="mb-3 h-6 w-3/5 rounded" />
-        {/* Preview */}
-        <Skeleton className="mb-2 h-4 w-full rounded" />
-          <Skeleton className="mb-3 h-4 w-2/3 rounded" />
-        {/* Tags */}
-        <Skeleton className="mb-4 h-4 w-40 rounded" />
-        {/* Actions */}
-        <div className="flex gap-2">
-            <Skeleton className="h-7 w-7 rounded-md" />
-            <Skeleton className="h-7 w-7 rounded-md" />
-            <Skeleton className="h-7 w-7 rounded-md" />
+
+          {/* Title */}
+          <div className="mb-2">
+            <Skeleton className="mb-1.5 h-6 w-4/5 rounded-sm" />
+            <Skeleton className="h-6 w-3/5 rounded-sm" />
+          </div>
+
+          {/* Preview */}
+          <div className="mb-3">
+            <Skeleton className="mb-1.5 h-4 w-full rounded-sm" />
+            <Skeleton className="h-4 w-[85%] rounded-sm" />
+          </div>
+
+          {/* Tags */}
+          <Skeleton className="mb-4 h-4 w-40 rounded-sm" />
+
+          {/* Actions */}
+          <div className="flex items-center gap-1.5">
+            <Skeleton className="h-[26px] w-[26px] rounded-md" />
+            <Skeleton className="h-[26px] w-[26px] rounded-md" />
+            <Skeleton className="h-[30px] w-[30px] rounded-md" />
           </div>
         </div>
-    <div className="hidden shrink-0 sm:block">
-          <Skeleton className="h-28 w-28 rounded-lg md:h-32 md:w-32" />
+        
+        {/* 썸네일 */}
+        <div className="hidden shrink-0 sm:block">
+          <Skeleton className="h-[190px] w-[200px] rounded-sm" />
         </div>
       </div>
     </article>
