@@ -20,10 +20,10 @@ export function ProfileLevelSelector({
           type="button"
           onClick={() => onChange(level.id)}
           className={cn(
-            "flex flex-col items-center gap-1.5 rounded-xl border-2 px-3 py-4 transition-all duration-200",
+            "flex flex-col items-center gap-1.5 rounded-xl px-3 py-4 transition-all duration-200",
             value === level.id
-              ? "border-primary bg-primary/10 shadow-md shadow-primary/10"
-              : "border-border bg-secondary hover:border-primary/40 hover:bg-secondary/80",
+              ? "bg-primary/10 shadow-md shadow-primary/10"
+              : "bg-secondary hover:bg-secondary/80",
           )}
         >
           <span

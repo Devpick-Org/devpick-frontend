@@ -48,7 +48,7 @@ export function SocialAuthButtons({ loadingProvider, onSocialLogin }: SocialAuth
         variant="outline"
         disabled={isDisabled}
         onClick={() => onSocialLogin("github")}
-        className="h-11 w-full border-border bg-secondary text-foreground hover:bg-secondary/80 hover:border-primary/40 transition-all duration-200"
+        className="h-11 w-full border-0 bg-secondary text-foreground hover:bg-secondary hover:brightness-98 hover:text-foreground transition-all"
       >
         {loadingProvider === "github" ? (
           <span className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export function SocialAuthButtons({ loadingProvider, onSocialLogin }: SocialAuth
         variant="outline"
         disabled={isDisabled}
         onClick={() => onSocialLogin("google")}
-        className="h-11 w-full border-border bg-secondary text-foreground hover:bg-secondary/80 hover:border-primary/40 transition-all duration-200"
+        className="h-11 w-full border-0 bg-secondary text-foreground hover:bg-secondary hover:brightness-98 hover:text-foreground transition-all"
       >
         {loadingProvider === "google" ? (
           <span className="flex items-center gap-2">

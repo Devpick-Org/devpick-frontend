@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EmailSection } from "./EmailSection";
-import { mockAuthEndpoints } from "@/lib/api/endpoints/auth";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,7 +28,7 @@ function validatePassword(value: string): string {
 
 export function SignupForm() {
   const router = useRouter();
-  const updateUser = useAuthStore((s) => s.updateUser);
+  const setAuth = useAuthStore((s) => s.setAuth);
 
   const [nickname, setNickname] = useState("");
   const [nicknameError, setNicknameError] = useState("");
@@ -98,12 +98,19 @@ export function SignupForm() {
     if (!isFormValid || !verifiedEmail) return;
     setIsSubmitting(true);
     try {
-      await mockAuthEndpoints.signup({
+      await authEndpoints.signup({
         email: verifiedEmail,
         password,
         nickname,
       });
-      updateUser({ nickname });
+
+      const { data: loginData } = await authEndpoints.login({
+        email: verifiedEmail,
+        password,
+      });
+      const { accessToken, userId, email, nickname: loginNickname } = loginData.data;
+      setAuth({ userId, email, nickname: loginNickname }, accessToken);
+
       router.push("/onboarding");
     } finally {
       setIsSubmitting(false);
@@ -113,7 +120,7 @@ export function SignupForm() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* 닉네임 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="signup-nickname" className="text-foreground">
           {"닉네임"}
         </Label>
@@ -138,7 +145,7 @@ export function SignupForm() {
       />
 
       {/* 비밀번호 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="signup-password" className="text-foreground">
           {"비밀번호"}
         </Label>
@@ -154,7 +161,7 @@ export function SignupForm() {
       </div>
 
       {/* 비밀번호 확인 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="signup-confirm" className="text-foreground">
           {"비밀번호 확인"}
         </Label>

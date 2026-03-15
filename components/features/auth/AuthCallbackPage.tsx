@@ -2,41 +2,51 @@
 
 import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
+import { useAuthStore } from "@/store/auth.store";
 
-function CallbackHandler() {
+interface CallbackHandlerProps {
+  provider: "github" | "google";
+}
+
+function CallbackHandler({ provider }: CallbackHandlerProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const setAuth = useAuthStore((s) => s.setAuth);
 
-  // error는 값이 확정되는 즉시 처리 (초기 렌더에서도 존재 여부가 명확)
   useEffect(() => {
     const code = searchParams.get("code");
+    const state = searchParams.get("state");
     const error = searchParams.get("error");
 
-    // console.log({ code, error });
-
-    if (error) {
-      // console.error("소셜 로그인 에러:", error);
+    if (error || !code || !state) {
       router.replace("/");
       return;
     }
 
-    if (!code) {
-      // console.error("인가 코드가 없습니다.");
-      router.replace("/");
-      return;
-    }
+    const callbackFn =
+      provider === "github"
+        ? authEndpoints.githubCallback
+        : authEndpoints.googleCallback;
 
-    // TODO: 백엔드 API 호출 후, 응답 결과(신규 회원 여부 등)에 따라 라우팅 분기 처리 및 에러 핸들링
-    const timer = setTimeout(() => {
-      if (Math.random() > 0.5) {
-        router.replace("/onboarding");
-      } else {
-        router.replace("/home");
-      }
-    }, 1500);
+    callbackFn(code, state)
+      .then(async ({ data }) => {
+        const { accessToken, userId, email, nickname, isNewUser } = data.data;
+        // accessToken을 먼저 등록해야 이후 /users/me 요청에 Authorization 헤더가 붙음
+        setAuth({ userId, email, nickname }, accessToken);
 
-    return () => clearTimeout(timer);
-  }, [searchParams, router]);
+        if (!isNewUser) {
+          // 기존 유저: 소셜 로그인 응답에 job/level/tags가 없으므로 /users/me로 전체 프로필 조회
+          const { data: meData } = await authEndpoints.getMe();
+          setAuth(meData.data, accessToken);
+        }
+
+        router.replace(isNewUser ? "/onboarding" : "/home");
+      })
+      .catch(() => {
+        router.replace("/");
+      });
+  }, [searchParams, router, setAuth, provider]);
 
   return null;
 }
@@ -52,11 +62,15 @@ function CallbackFallback() {
   );
 }
 
-export function AuthCallbackPage() {
+interface AuthCallbackPageProps {
+  provider: "github" | "google";
+}
+
+export function AuthCallbackPage({ provider }: AuthCallbackPageProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <Suspense fallback={<CallbackFallback />}>
-        <CallbackHandler />
+        <CallbackHandler provider={provider} />
       </Suspense>
     </div>
   );

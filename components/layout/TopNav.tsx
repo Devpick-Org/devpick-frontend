@@ -40,6 +40,7 @@ const LEVEL_LABELS: Record<string, string> = {
   SENIOR: "시니어",
 };
 
+
 export function TopNav() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -63,17 +64,19 @@ export function TopNav() {
   };
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
+    <header className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-card">
       <div className="flex h-16 items-center justify-between px-4 lg:px-8">
         {/* Left: Logo */}
-        <Link href="/home" className="flex items-center gap-2.5 shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
-            <DevPickLogo className="h-4.5 w-4.5 text-primary" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            DevPick
-          </span>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/home" className="flex items-center gap-2.5 shrink-0">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/15">
+              <DevPickLogo className="h-5 w-5 text-primary" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-foreground">
+              DevPick
+            </span>
+          </Link>
+        </div>
 
         {/*
          * Right: User area
@@ -91,14 +94,14 @@ export function TopNav() {
                * asChild + Button 중첩 시 Radix Slot이 ref를 잃어 <button><button> 중첩 발생 가능
                */}
               <DropdownMenuTrigger
-                className="flex h-auto items-center gap-2.5 rounded-xl border border-border bg-secondary/50 px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                className="flex h-auto items-center gap-2.5 rounded-full border border-border/80 bg-background px-3 py-1.5 text-sm transition-colors hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                 aria-label="User menu"
               >
                 {user ? (
                   <>
                     <Avatar className="h-7 w-7 ring-1 ring-primary/20">
                       <AvatarImage
-                        src={user.profileImageUrl ?? ""}
+                        src={user.profileImage ?? ""}
                         alt={`${displayName} avatar`}
                       />
                       <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">

@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
 import { SocialAuthButtons } from "./SocialAuthButtons";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 
 function DevPickLogo() {
   return (
@@ -35,16 +35,22 @@ function DevPickLogo() {
 }
 
 export function AuthContainer() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<string>("login");
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
   const handleSocialLogin = async (provider: "github" | "google") => {
     setLoadingProvider(provider);
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    // TODO: 백엔드 API 연동 후, 응답 여부에 따라 /onboarding 또는 /home으로 분기 처리
-    router.push("/home");
-    setLoadingProvider(null);
+    try {
+      const getOAuthUrl =
+        provider === "github"
+          ? authEndpoints.getGithubOAuthUrl
+          : authEndpoints.getGoogleOAuthUrl;
+
+      const { data } = await getOAuthUrl();
+      window.location.href = data.data.authorizationUrl;
+    } catch {
+      setLoadingProvider(null);
+    }
   };
 
   return (

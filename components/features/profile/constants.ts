@@ -21,40 +21,12 @@ export const LEVEL_COLORS: Record<LevelId, string> = {
   SENIOR: "bg-red-500/30 bg-red-500/10 text-red-400",
 };
 
-export const SUGGESTED_TAGS: string[] = [
-  // 프론트엔드
-  "React",
-  "Next.js",
-  "TypeScript",
-  "JavaScript",
-  "Vue",
-  "CSS",
-  "HTML",
-  // 백엔드
-  "Spring Boot",
-  "Java",
-  "Node.js",
-  "Python",
-  "Django",
-  "FastAPI",
-  "Go",
-  // 데이터베이스
-  "PostgreSQL",
-  "MongoDB",
-  "Redis",
-  "MySQL",
-  // 인프라 / DevOps
-  "Docker",
-  "Kubernetes",
-  "AWS",
-  "CI/CD",
-  "Nginx",
-  "Linux",
-  // 기타
-  "Git",
-  "알고리즘",
-  "자료구조",
-  "보안",
-  "테스트",
-  "AI/ML",
+export const TAG_GROUPS = [
+  { label: "프론트엔드", tags: ["React", "Next.js", "TypeScript", "JavaScript", "Vue", "CSS", "HTML"] },
+  { label: "백엔드", tags: ["Spring Boot", "Java", "Node.js", "Python", "Django", "FastAPI", "Go"] },
+  { label: "데이터베이스", tags: ["PostgreSQL", "MongoDB", "Redis", "MySQL"] },
+  { label: "인프라 / DevOps", tags: ["Docker", "Kubernetes", "AWS", "CI/CD", "Nginx", "Linux"] },
+  { label: "기타", tags: ["Git", "알고리즘", "자료구조", "보안", "테스트", "AI/ML"] },
 ];
+
+export const SUGGESTED_TAGS: string[] = TAG_GROUPS.flatMap(group => group.tags);

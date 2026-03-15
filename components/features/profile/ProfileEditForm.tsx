@@ -18,16 +18,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/lib/utils";
+import { cn, dedupeTags } from "@/lib/utils";
 import {
   JOB_ROLES,
   LEVELS,
   LEVEL_COLORS,
-  SUGGESTED_TAGS,
   type JobRoleId,
   type LevelId,
 } from "@/components/features/profile/constants";
+import { ProfileTagSelector } from "@/components/features/profile/ProfileTagSelector";
 import { useAuthStore } from "@/store/auth.store";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
+import { usersEndpoints } from "@/lib/api/endpoints/users";
 
 /* ── Icons ── */
 
@@ -147,17 +149,15 @@ export function ProfileEditForm() {
 
   const [nickname, setNickname] = useState(user?.nickname ?? "");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
-    user?.profileImageUrl ?? null,
+    user?.profileImage ?? null,
   );
   const [selectedRole, setSelectedRole] = useState<JobRoleId | null>(
-    (user?.jobType as JobRoleId) ?? null,
+    (user?.job as JobRoleId) ?? null,
   );
   const [selectedLevel, setSelectedLevel] = useState<LevelId | null>(
     (user?.level as LevelId) ?? null,
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>(
-    user?.tags ?? [],
-  );
+  const [selectedTags, setSelectedTags] = useState<string[]>(dedupeTags(user?.tags));
   const [tagSearch, setTagSearch] = useState("");
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -165,18 +165,17 @@ export function ProfileEditForm() {
   /* 스토어 user가 나중에 채워지는 경우 동기화 (예: 페이지 직접 진입) */
   useEffect(() => {
     if (user?.nickname) setNickname(user.nickname);
-    if (user?.jobType) setSelectedRole(user.jobType as JobRoleId);
+    if (user?.job) setSelectedRole(user.job as JobRoleId);
     if (user?.level) setSelectedLevel(user.level as LevelId);
-    if (user?.tags && user.tags.length > 0) setSelectedTags([...user.tags]);
-    if (user?.profileImageUrl) setAvatarPreview(user.profileImageUrl);
-  }, [user?.nickname, user?.jobType, user?.level, user?.tags, user?.profileImageUrl]);
-
-  const filteredTags = useMemo(() => {
-    if (!tagSearch.trim()) return SUGGESTED_TAGS;
-    return SUGGESTED_TAGS.filter((tag) =>
-      tag.toLowerCase().includes(tagSearch.toLowerCase()),
-    );
-  }, [tagSearch]);
+    setSelectedTags(dedupeTags(user?.tags));
+    if (user?.profileImage) setAvatarPreview(user.profileImage);
+  }, [
+    user?.nickname,
+    user?.job,
+    user?.level,
+    user?.tags,
+    user?.profileImage,
+  ]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -197,27 +196,45 @@ export function ProfileEditForm() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    try {
-      await new Promise((r) => setTimeout(r, 800));
 
-      updateUser({
+    try {
+      const { data } = await usersEndpoints.updateMe({
         nickname: nickname.trim(),
-        jobType: selectedRole ?? undefined,
+        job: selectedRole ?? undefined,
         level: selectedLevel ?? undefined,
         tags: selectedTags,
-        profileImageUrl: avatarPreview ?? undefined,
+        profileImage: avatarPreview ?? undefined,
+      });
+
+      const updatedUser = data.data;
+
+      updateUser({
+        nickname: updatedUser.nickname,
+        job: updatedUser.job ?? undefined,
+        level: updatedUser.level ?? undefined,
+        tags: dedupeTags(updatedUser.tags),
+        profileImage: updatedUser.profileImage ?? undefined,
       });
 
       toast.success("프로필이 저장되었습니다.");
+    } catch (error) {
+      console.error(error);
+      toast.error("프로필 저장 중 오류가 발생했습니다.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleDeleteAccount = () => {
-    clearAuth();
-    toast.success("계정이 삭제되었습니다.");
-    router.push("/");
+  const handleDeleteAccount = async () => {
+    try {
+      await authEndpoints.deleteMe();
+      clearAuth();
+      toast.success("계정이 삭제되었습니다.");
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+      toast.error("계정 삭제 중 오류가 발생했습니다.");
+    }
   };
 
   const currentRole = JOB_ROLES.find((r) => r.id === selectedRole);
@@ -258,7 +275,7 @@ export function ProfileEditForm() {
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           {/* Avatar */}
           <div className="relative shrink-0">
-            <Avatar className="h-24 w-24 ring-2 ring-primary/20">
+            <Avatar className="h-24 w-24">
               <AvatarImage src={avatarPreview ?? ""} alt="프로필 이미지" />
               <AvatarFallback className="bg-primary/15 text-2xl font-bold text-primary">
                 {displayInitial}
@@ -296,7 +313,7 @@ export function ProfileEditForm() {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}
-              className="h-11 border-border bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/50"
+              className="h-11 bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/50"
               placeholder="닉네임을 입력하세요"
             />
             <p className="mt-1.5 text-xs text-muted-foreground">
@@ -321,7 +338,7 @@ export function ProfileEditForm() {
             <button
               type="button"
               onClick={() => setIsRoleOpen((prev) => !prev)}
-              className="flex h-11 w-full items-center justify-between rounded-lg border border-border bg-secondary px-3 text-sm text-foreground transition-colors hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50"
+              className="flex h-11 w-full items-center justify-between rounded-lg bg-secondary px-3 text-sm text-foreground transition-colors hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50"
             >
               <span>{currentRole?.label ?? "직무 선택"}</span>
               <ChevronDownIcon
@@ -332,7 +349,7 @@ export function ProfileEditForm() {
               />
             </button>
             {isRoleOpen && (
-              <div className="absolute z-20 mt-1 w-full rounded-lg border border-border bg-card shadow-lg">
+              <div className="absolute z-20 mt-1 w-full rounded-lg bg-card shadow-lg">
                 {JOB_ROLES.map((role) => (
                   <button
                     key={role.id}
@@ -359,7 +376,7 @@ export function ProfileEditForm() {
         {/* Level Selection */}
         <div className="mb-6">
           <label className="mb-1.5 block text-sm font-medium text-foreground">
-            숙련도
+            경력 수준
           </label>
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             {LEVELS.map((level) => {
@@ -371,10 +388,9 @@ export function ProfileEditForm() {
                   type="button"
                   onClick={() => setSelectedLevel(level.id)}
                   className={cn(
-                    "flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 transition-all duration-200",
+                    "flex flex-col items-center gap-1 rounded-xl px-3 py-3 transition-all duration-200",
                     isSelected
                       ? cn(
-                          "shadow-sm",
                           colors.replace("bg-", "border-").split(" ")[0],
                           colors,
                         )
@@ -406,65 +422,10 @@ export function ProfileEditForm() {
           </label>
 
           {/* Selected tags */}
-          {selectedTags.length > 0 && (
-            <div className="mb-3 flex flex-wrap gap-2">
-              {selectedTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center gap-1 rounded-lg bg-primary/15 px-3 py-1.5 text-sm font-medium text-primary ring-1 ring-primary/20"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="ml-0.5 rounded-full p-0.5 transition-colors hover:bg-primary/20"
-                    aria-label={`${tag} 제거`}
-                  >
-                    <XIcon className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Search */}
-          <div className="relative mb-3">
-            <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="기술 태그 검색..."
-              value={tagSearch}
-              onChange={(e) => setTagSearch(e.target.value)}
-              className="h-10 border-border bg-secondary pl-9 text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/50"
-            />
-          </div>
-
-          {/* Tag grid */}
-          <div className="flex flex-wrap gap-2">
-            {filteredTags.map((tag) => {
-              const isSelected = selectedTags.includes(tag);
-              return (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => toggleTag(tag)}
-                  className={cn(
-                    "rounded-lg border px-3 py-1.5 text-sm font-medium transition-all duration-200",
-                    isSelected
-                      ? "border-primary bg-primary/15 text-primary shadow-sm shadow-primary/10"
-                      : "border-border bg-secondary text-muted-foreground hover:border-primary/40 hover:text-foreground",
-                  )}
-                >
-                  {tag}
-                </button>
-              );
-            })}
-            {filteredTags.length === 0 && (
-              <p className="w-full py-4 text-center text-sm text-muted-foreground">
-                검색 결과가 없습니다.
-              </p>
-            )}
-          </div>
+          <ProfileTagSelector
+            value={selectedTags}
+            onChange={setSelectedTags}
+          />
         </div>
       </section>
 

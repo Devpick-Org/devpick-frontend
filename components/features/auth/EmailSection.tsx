@@ -5,7 +5,7 @@ import { CheckIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { mockAuthEndpoints } from "@/lib/api/endpoints/auth"
+import { authEndpoints } from "@/lib/api/endpoints/auth"
 
 const TIMER_DURATION = 180 // 3분
 
@@ -30,7 +30,7 @@ export function EmailSection({
   const [verificationCode, setVerificationCode] = useState("")
   const [isVerifying, setIsVerifying] = useState(false)
   const [isEmailVerified, setIsEmailVerified] = useState(false)
-  const [verificationError, setVerificationError] = useState(false)
+  const [verificationErrorMessage, setVerificationErrorMessage] = useState("")
   const [timerSeconds, setTimerSeconds] = useState(TIMER_DURATION)
 
   // 이메일이 바뀌면 인증 관련 상태를 초기화
@@ -40,7 +40,7 @@ export function EmailSection({
       setIsCodeSent(false)
       setIsEmailVerified(false)
       setVerificationCode("")
-      setVerificationError(false)
+      setVerificationErrorMessage("")
       setTimerSeconds(TIMER_DURATION)
       prevEmailRef.current = email
     }
@@ -59,11 +59,33 @@ export function EmailSection({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }, [])
 
+  const getVerifyErrorMessage = (error: unknown) => {
+  const axiosError = error as {
+    response?: {
+      data?: {
+        error?: {
+          code?: string
+          message?: string
+        }
+      }
+    }
+  }
+
+  const errorCode = axiosError.response?.data?.error?.code
+
+  switch (errorCode) {
+    case "AUTH_005":
+      return "사용자를 찾을 수 없습니다."
+    default:
+      return "인증 확인 중 오류가 발생했습니다."
+  }
+}
+
   const handleSendCode = async () => {
     setIsSendingCode(true)
-    setVerificationError(false)
+    setVerificationErrorMessage("")
     try {
-      await mockAuthEndpoints.sendEmailCode(email)
+      await authEndpoints.sendEmailCode(email)
       setIsCodeSent(true)
       setTimerSeconds(TIMER_DURATION)
     } finally {
@@ -74,13 +96,13 @@ export function EmailSection({
   const handleVerifyCode = async () => {
     if (!verificationCode || timerSeconds === 0) return
     setIsVerifying(true)
-    setVerificationError(false)
+    setVerificationErrorMessage("")
     try {
-      await mockAuthEndpoints.verifyEmailCode(email, verificationCode)
+      await authEndpoints.verifyEmailCode(email, verificationCode)
       setIsEmailVerified(true)
       onVerified(email)
-    } catch {
-      setVerificationError(true)
+    } catch (error) {
+      setVerificationErrorMessage(getVerifyErrorMessage(error))
     } finally {
       setIsVerifying(false)
     }
@@ -89,7 +111,7 @@ export function EmailSection({
   return (
     <div className="flex flex-col gap-4">
       {/* 이메일 입력 + 인증번호 발송 */}
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <Label htmlFor="signup-email" className="text-foreground">{"이메일"}</Label>
         <div className="flex gap-2">
           <Input
@@ -133,7 +155,7 @@ export function EmailSection({
                 value={verificationCode}
                 onChange={(e) => {
                   setVerificationCode(e.target.value)
-                  setVerificationError(false)
+                  setVerificationErrorMessage("")
                 }}
                 maxLength={6}
                 disabled={isEmailVerified}
@@ -180,8 +202,8 @@ export function EmailSection({
 
           {/* 에러/성공 메시지가 같은 슬롯을 공유해 레이아웃 이동 방지 */}
           <p className={`h-5 text-sm ${isEmailVerified ? "text-emerald-500" : "text-red-500"}`}>
-            {verificationError
-              ? "인증번호가 일치하지 않습니다."
+            {verificationErrorMessage
+              ? verificationErrorMessage
               : isEmailVerified
                 ? "이메일 인증이 완료되었습니다."
                 : ""}

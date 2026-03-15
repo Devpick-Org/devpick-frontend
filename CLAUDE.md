@@ -66,15 +66,19 @@
 │ ┃ ┃ ┣ [id]/            # 게시글 상세 및 AI/유저 답변
 │ ┃ ┃ ┃ ┗ page.tsx
 │ ┃ ┃ ┗ page.tsx
-│ ┃ ┣ onboarding/        # 초기 사용자 성향 파악 온보딩
-│ ┃ ┃ ┗ page.tsx
 │ ┃ ┣ profile/           # 내 프로필, 스크랩, 활동 내역
 │ ┃ ┃ ┗ page.tsx
 │ ┃ ┗ report/            # 주간 학습 분석 리포트 대시보드
 │ ┃   ┗ page.tsx
-│ ┣ auth/                # 소셜 로그인 콜백 (Route Group 밖 — URL: /auth/callback)
-│ ┃ ┗ callback/
-│ ┃   ┗ page.tsx         # OAuth 코드 수신 → 토큰 교환 후 /home 리다이렉트
+│ ┣ auth/                # provider별 콜백 라우트 (Route Group 밖)
+│ ┃ ┣ github/
+│ ┃ ┃ ┗ callback/
+│ ┃ ┃   ┗ page.tsx       # GitHub OAuth code/state 수신 → 백엔드 콜백 호출 → 상태 저장 후 이동
+│ ┃ ┗ google/
+│ ┃   ┗ callback/
+│ ┃     ┗ page.tsx       # Google OAuth code/state 수신 → 백엔드 콜백 호출 → 상태 저장 후 이동
+│ ┣ onboarding/        # 초기 사용자 성향 파악 온보딩
+│ ┃ ┗ page.tsx
 │ ┣ favicon.ico          # 파비콘
 │ ┣ globals.css          # 전역 스타일 및 Tailwind CSS 설정 (@theme 토큰)
 │ ┗ layout.tsx           # Root Layout (HTML shell — html, body 태그만)
@@ -96,7 +100,7 @@
 │ ┃ ┗ TopNav.tsx         # 상단 GNB, useAuthStore 연동, 로그아웃
 │ ┣ features/            # 도메인별 기능 컴포넌트
 │ ┃ ┣ auth/              # 인증 화면 컴포넌트
-│ ┃ ┃ ┣ AuthCallbackPage.tsx  # 소셜 로그인 콜백 처리 (code → 토큰 저장 → 리다이렉트)
+│ ┃ ┃ ┣ AuthCallbackPage.tsx  # provider별 OAuth 콜백 공통 처리 UI/로직 (code/state 파싱 → 콜백 API 호출 → 토큰 저장 → 리다이렉트)
 │ ┃ ┃ ┣ AuthContainer.tsx    # 로그인/회원가입 탭 전환 래퍼
 │ ┃ ┃ ┣ AuthInitializer.tsx  # 앱 마운트 시 토큰 복원 및 인증 상태 초기화
 │ ┃ ┃ ┣ EmailSection.tsx     # 이메일 인증 코드 발송·검증 UI
@@ -129,18 +133,19 @@
 │ ┃   ┣ posts.ts
 │ ┃   ┣ users.ts
 │ ┃   ┗ reports.ts
-│ ┣ auth/                # 토큰 저장 전략 (Strategy Pattern)
-│ ┃ ┣ TokenStrategy.ts       # 토큰 저장 전략 인터페이스 정의
-│ ┃ ┣ CookieStrategy.ts      # Cookie 기반 토큰 저장 구현체
-│ ┃ ┣ SessionStorageStrategy.ts # SessionStorage 기반 토큰 저장 구현체
-│ ┃ ┗ tokenManager.ts        # 전략 선택 및 토큰 CRUD 관리자
+│ ┣ auth/                # 인증/토큰 관련 레거시 유틸 (구조 정리 예정)
+│ ┃ ┣ TokenStrategy.ts       # 기존 토큰 저장 전략 인터페이스 (현재 정책과 일부 불일치 가능)
+│ ┃ ┣ CookieStrategy.ts      # 레거시 구현체 — 현재 Refresh Token은 HttpOnly Cookie로만 관리
+│ ┃ ┣ SessionStorageStrategy.ts # 레거시 구현체 — 현재 운영 정책상 사용하지 않음
+│ ┃ ┗ tokenManager.ts        # accessToken 관리 및 인증 헬퍼로 점진 정리 예정
 │ ┗ utils.ts             # cn(), formatDate(), formatRelativeTime()
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated)
+│ ┣ content.store.ts
 │ ┗ ui.store.ts          # UI 상태 (Toast 큐)
 ├── types/               # TypeScript 전역 타입 정의
 │ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
-│ ┣ auth.ts              # User, LoginRequest, SignupRequest, TokenResponse
+│ ┣ auth.ts              # User, LoginRequest, SignupRequest, SocialAuthResponse, RefreshTokenResponse 등 인증 타입
 │ ┗ content.ts           # Content, ContentDetail, ContentFeedData 등 콘텐츠 타입
 └── public/              # 정적 에셋 (이미지, 폰트)
 ```
@@ -149,7 +154,7 @@
 >
 > - `(auth)`: GNB 없음 (로그인 등 인증 전 화면)
 > - `(main)`: GNB + QueryClientProvider 포함 (인증 후 메인 화면)
-> - `auth/callback`: Route Group 밖에 위치 — URL `/auth/callback`으로 직접 접근 가능한 소셜 로그인 OAuth 콜백 전용 라우트
+> - `auth/github/callback`, `auth/google/callback`: Route Group 밖에 위치 — OAuth Provider 인증 완료 후 `code`, `state`를 수신하는 전용 콜백 라우트
 
 ## 4. 자주 쓰는 커맨드
 
@@ -213,9 +218,34 @@ DP-{티켓번호}: {작업 내용}
 
 ## 6. API 공통 포맷 (ADR-003)
 
-**Base URL**: `https://api.devpick.kr/v1`
+### Base URL
+
+| 환경  | Base URL                    |
+| ----- | --------------------------- |
+| local | `http://localhost:8080`     |
+| prod  | `https://api.devpick.kr/v1` |
+
+### 인증 방식
+
+로그인이 필요한 API는 요청 헤더에 Access Token을 담아서 보낸다.
+
+### 토큰 저장 방식
+
+| 토큰          | 저장 위치                     | 설명                                               |
+| ------------- | ----------------------------- | -------------------------------------------------- |
+| Access Token  | 메모리 (전역 상태/Zustand 등) | XSS 방어 목적                                      |
+| Refresh Token | HttpOnly Cookie               | JavaScript 접근 불가, 백엔드가 자동 설정/만료 처리 |
+
+### 토큰 만료 시간
+
+| 항목               | 값         |
+| ------------------ | ---------- |
+| Access Token 만료  | 1시간      |
+| Refresh Token 만료 | 7일        |
+| OAuth state TTL    | 5분, 1회용 |
+
 **인증**: `Authorization: Bearer {access_token}`
-**에러 처리**: 백엔드 공통 에러 포맷에 맞춰 클라이언트에서 토스트(Toast) 메시지 또는 에러 바운더리(Error Boundary)로 렌더링.
+**에러 처리**: 백엔드 공통 에러 포맷에 맞춰 클라이언트에서 토스트(Toast) 메시지 또는 에러 UI로 렌더링
 
 ### 성공 응답
 
@@ -252,15 +282,19 @@ DP-{티켓번호}: {작업 내용}
 
 ### HTTP 상태 코드
 
-| 코드 | 의미         |
-| ---- | ------------ |
-| 200  | 성공         |
-| 201  | 생성 성공    |
-| 400  | 잘못된 요청  |
-| 401  | 인증 필요    |
-| 403  | 권한 없음    |
-| 404  | 찾을 수 없음 |
-| 500  | 서버 오류    |
+| 코드 | 의미                              |
+| ---- | --------------------------------- |
+| 200  | 성공                              |
+| 201  | 생성 성공                         |
+| 204  | 삭제 성공, 응답 본문 없음         |
+| 400  | 잘못된 요청                       |
+| 401  | 인증 필요 또는 토큰 문제          |
+| 403  | 권한 없음                         |
+| 404  | 찾을 수 없음                      |
+| 500  | 서버 내부 오류                    |
+| 502  | 외부 OAuth Provider API 호출 실패 |
+
+- 인증 관련 API 클라이언트는 Axios 인스턴스 하나로 통합하고, 401 응답 시 `/auth/refresh` → accessToken 갱신 → 원 요청 재시도 흐름을 기본 정책으로 사용한다.
 
 ---
 
@@ -290,19 +324,21 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic A — 회원/프로필
 
-| Method | Endpoint                | 설명                                          | 인증 | 관련 페이지               | 응답코드 |
-| ------ | ----------------------- | --------------------------------------------- | ---- | ------------------------- | -------- |
-| POST   | `/auth/signup`          | 이메일 회원가입                               | X    | `/` (로그인/회원가입)     | 201      |
-| POST   | `/auth/login`           | 이메일 로그인                                 | X    | `/` (로그인)              | 200      |
-| POST   | `/auth/logout`          | 로그아웃                                      | O    | Global (GNB)              | 200      |
-| POST   | `/auth/refresh`         | Access Token 재발급                           | X    | Axios Interceptor         | 200      |
-| GET    | `/auth/github/callback` | GitHub 소셜 로그인 콜백                       | X    | `/` (로그인)              | 200      |
-| GET    | `/auth/google/callback` | Google 소셜 로그인 콜백                       | X    | `/` (로그인)              | 200      |
-| GET    | `/users/me`             | 내 프로필 조회                                | O    | `/profile`, `/onboarding` | 200      |
-| PUT    | `/users/me`             | 내 프로필 수정 (닉네임/이미지/태그/직무/레벨) | O    | `/profile`, `/onboarding` | 200      |
-| DELETE | `/users/me`             | 회원 탈퇴 (soft delete)                       | O    | `/profile`                | 204      |
-| POST   | `/auth/email/send`      | 이메일 인증 코드 발송                         | X    | `/` (회원가입)            | 200      |
-| POST   | `/auth/email/verify`    | 인증 코드 검증                                | X    | `/` (회원가입)            | 200      |
+| Method | Endpoint                | 설명                                          | 인증 | 관련 페이지                      | 응답코드 |
+| ------ | ----------------------- | --------------------------------------------- | ---- | -------------------------------- | -------- |
+| POST   | `/auth/signup`          | 이메일 회원가입                               | X    | `/` (로그인/회원가입)            | 201      |
+| POST   | `/auth/login`           | 이메일 로그인                                 | X    | `/` (로그인)                     | 200      |
+| POST   | `/auth/logout`          | 로그아웃                                      | O    | Global (GNB)                     | 200      |
+| POST   | `/auth/refresh`         | Access Token 재발급                           | X    | Axios Interceptor                | 200      |
+| GET    | `/auth/github`          | GitHub OAuth 시작 URL 발급                    | X    | `/` (로그인)                     | 200      |
+| GET    | `/auth/google`          | Google OAuth 시작 URL 발급                    | X    | `/` (로그인)                     | 200      |
+| GET    | `/auth/github/callback` | GitHub 소셜 로그인 콜백                       | X    | `/auth/github/callback` (로그인) | 200      |
+| GET    | `/auth/google/callback` | Google 소셜 로그인 콜백                       | X    | `/auth/google/callback` (로그인) | 200      |
+| GET    | `/users/me`             | 내 프로필 조회                                | O    | `/profile`, `/onboarding`        | 200      |
+| PUT    | `/users/me`             | 내 프로필 수정 (닉네임/이미지/태그/직무/레벨) | O    | `/profile`, `/onboarding`        | 200      |
+| DELETE | `/users/me`             | 회원 탈퇴 (soft delete)                       | O    | `/profile`                       | 204      |
+| POST   | `/auth/email/send`      | 이메일 인증 코드 발송                         | X    | `/` (회원가입)                   | 200      |
+| POST   | `/auth/email/verify`    | 인증 코드 검증                                | X    | `/` (회원가입)                   | 200      |
 
 #### Epic A 상세 명세 (요청/응답 및 주요 플로우)
 
@@ -315,24 +351,39 @@ DP-{티켓번호}: {작업 내용}
 **2. 이메일 회원가입 (`POST /auth/signup`)**
 
 - 요청: `{"email": "...", "password": "...", "nickname": "..."}` (닉네임: 2~20자, 비밀번호: 8~20자, 영문+숫자+특수문자 필수)
-- 응답(201): `{"success": true, "data": {"userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
+- 응답(201):`{"success": true, "data": {"userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
 
 **3. 이메일 로그인 (`POST /auth/login`)**
 
 - 요청: `{"email": "...", "password": "..."}`
-- 응답(200): `{"success": true, "data": {"accessToken": "...", "refreshToken": "...", "userId": "...", "email": "...", "nickname": "..."}, "message": "..."}`
+- 응답(200): `{"success": true, "data": {"accessToken": "...", "userId": "...", "email": "...", "nickname": "..."}, "message": "요청이 성공했습니다"}`
+- 주의:
+  - `refreshToken`은 응답 바디에 포함하지 않는다.
+  - 백엔드가 `Set-Cookie` 헤더로 HttpOnly Cookie를 내려준다.
+  - 프론트는 `accessToken`만 메모리(Zustand)에 저장한다.
 
 **4. 로그아웃 (`POST /auth/logout`)**
 
 - 요청: Header에 `Authorization: Bearer {access_token}` 포함
-- 플로우: 응답 성공(200) 시 클라이언트는 로컬에서 Access/Refresh Token을 모두 폐기해야 함.
+- 응답(200): `{"success": true, "data": null, "message": "요청이 성공했습니다"}`
+- 플로우:
+  - 백엔드는 Refresh Token Cookie를 만료 처리한다.
+  - 프론트는 메모리에 저장한 Access Token 및 사용자 상태를 초기화한다.
 
 **5. 토큰 재발급 (`POST /auth/refresh`)**
 
-- 요청: `{"refreshToken": "..."}` (인증 헤더 불필요)
-- 응답(200): `{"success": true, "data": {"accessToken": "(새 토큰)", "refreshToken": "(새 토큰)"}}`
-- 에러(401): `AUTH_INVALID_REFRESH_TOKEN` (유효하지 않거나 만료된 토큰)
-- **중요 플로우 (Token Rotation)**: 재발급 시 기존 Refresh Token이 폐기되고 새 쌍이 발급됨. 클라이언트는 무조건 새 토큰으로 교체해야 함.
+- 요청 바디 없음
+- 브라우저가 HttpOnly Cookie(refreshToken)를 자동 첨부
+- `fetch` 사용 시 `credentials: 'include'`
+- `axios` 사용 시 `withCredentials: true`
+- 응답(200): `{"success": true, "data": {"accessToken": "eyJhbGci...(새 토큰)"}, "message": "요청이 성공했습니다"}`
+- 에러(401): `AUTH_003` (유효하지 않은 리프레시 토큰)
+
+**중요 플로우 (Token Rotation)**
+
+- 재발급 시 새 Refresh Token은 응답 바디가 아니라 `Set-Cookie` 헤더로 자동 갱신된다.
+- 프론트는 응답의 새 `accessToken`으로 메모리 값을 교체한다.
+- 리프레시 토큰은 프론트 코드에서 직접 읽거나 저장하지 않는다.
 
 **6. 프로필 조회 및 수정 (`GET/PUT /users/me`)**
 
@@ -389,15 +440,98 @@ DP-{티켓번호}: {작업 내용}
 }
 ```
 
+**회원 탈퇴**
+
+- DELETE /users/me
+- 응답: 204 No Content
+
 **7. 소셜 로그인 흐름 (GitHub: `DP-183`, Google: `DP-184`)**
 
-1. 프론트가 소셜 인가 URL로 리다이렉트
-2. 사용자가 로그인 및 권한 허용
-3. 소셜 플랫폼이 프론트의 콜백 URL(`GET /auth/{provider}/callback?code={code}`)로 리다이렉트
-4. 백엔드가 code를 탈취하여 JWT 발급 후 프론트에 반환 (신규 유저는 자동 회원가입 처리)
+### OAuth 시작 URL 발급
 
-- 에러(400): `AUTH_014` (이메일 미공개 설정 등)
-- 에러(502): `AUTH_013` (API 호출 실패)
+- 프론트는 GET /auth/github 또는 GET /auth/google을 먼저 호출한다.
+- 백엔드는 OAuth state UUID를 생성하고 Redis에 5분 동안 저장한다.
+- 응답으로 authorizationUrl을 반환한다.
+- 프론트는 해당 URL로 브라우저를 이동시킨다.
+
+### GitHub 시작 응답 예시
+
+```json
+{
+  "success": true,
+  "data": {
+    "authorizationUrl": "https://github.com/login/oauth/authorize?client_id=xxx&redirect_uri=http://localhost:3000/auth/github/callback&scope=user:email&state=550e8400-e29b-41d4-a716-446655440000"
+  }
+}
+```
+
+### Google 시작 응답 예시
+
+```json
+{
+  "success": true,
+  "data": {
+    "authorizationUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=xxx&redirect_uri=http://localhost:3000/auth/google/callback&response_type=code&scope=email%20profile&state=550e8400-e29b-41d4-a716-446655440000"
+  }
+}
+```
+
+### 프론트 OAuth 처리 플로우
+
+1. 로그인 화면에서 소셜 버튼 클릭
+2. 프론트가 GET /auth/{provider} 호출
+3. 응답의 authorizationUrl로 브라우저 이동
+4. Provider 인증 완료 후 프론트 콜백 URL(/auth/github/callback, /auth/google/callback)로 리다이렉트
+5. 프론트가 URL에서 code, state를 파싱
+6. 프론트가 백엔드 콜백 API GET /auth/{provider}/callback?code={code}&state={state} 호출
+7. 백엔드가 state 검증 후 Provider 토큰 교환 및 JWT 발급
+8. 프론트가 응답의 accessToken을 메모리에 저장
+9. isNewUser === true 이면 /onboarding으로 이동, 아니면 /home으로 이동
+
+### 콜백 응답 예시 (Github/Google 공통)
+
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJhbGci...",
+    "userId": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "user@example.com",
+    "nickname": "홍길동",
+    "isNewUser": true
+  }
+}
+```
+
+### 소셜 로그인 규칙
+
+- refreshToken은 응답 바디에 포함하지 않는다.
+- 백엔드가 HttpOnly Cookie로 자동 설정한다.
+- /users/me 추가 호출 없이 콜백 응답 데이터로 인증 상태를 초기화할 수 있다.
+- isNewUser: true면 온보딩 페이지 이동
+- isNewUser: false면 홈 피드 이동
+
+### 닉네임 생성 규칙
+
+- GitHub:
+  - 중복 없으면 GitHub name 그대로 사용
+  - 중복이면 login_providerId 형식 사용
+  - 예: khg9859_12345678
+
+- Google:
+  - 중복 없으면 Google 프로필 이름 사용
+  - 중복이면 emailPrefix_providerId 형식 사용
+  - 예: hayoung_99999999
+
+### OAuth 에러 코드
+
+| 상황                       | HTTP | code       |
+| -------------------------- | ---- | ---------- |
+| state 없음 / 만료 / 불일치 | 400  | `AUTH_017` |
+| GitHub API 실패            | 502  | `AUTH_013` |
+| GitHub 이메일 비공개       | 400  | `AUTH_014` |
+| Google API 실패            | 502  | `AUTH_015` |
+| Google 이메일 없음         | 400  | `AUTH_016` |
 
 ### Epic B — 콘텐츠 피드 (Mock Data 사용 대기 중)
 
@@ -689,7 +823,10 @@ test("사용자는 성공적으로 로그인할 수 있다", async ({ page }) =>
 
 - `NEXT_PUBLIC_`이 붙은 변수, API Key, DB 비밀번호 등 시크릿은 **절대 코드에 하드코딩 금지**
 - `.env.local` 파일은 `.gitignore`에 포함 (절대 push 금지)
-- API 토큰 관리는 HttpOnly Cookie 또는 보안이 적용된 클라이언트 스토리지 전략을 따름
+- Access Token은 메모리(Zustand 등)에만 저장하고, localStorage/sessionStorage에 저장하지 않음
+- Refresh Token은 HttpOnly Cookie로만 관리하며, 프론트 코드에서 직접 읽거나 저장하지 않음
+- `/auth/refresh` 호출 시 `withCredentials: true` 또는 `credentials: 'include'`를 반드시 설정
+- 레거시 토큰 저장 유틸 파일이 남아 있더라도, 실제 운영 기준은 Access Token 메모리 저장 + Refresh Token HttpOnly Cookie 관리 방식만 사용한다.
 - AI 프롬프트에 개인정보/시크릿 절대 포함 금지
 - Claude Code 사용 시 AI 생성 코드도 **PR 올린 사람이 책임**짐
 - PR에 AI 사용 여부 반드시 기록

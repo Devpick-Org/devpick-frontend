@@ -1,8 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/store/auth.store";
-import { tokenManager } from "@/lib/auth/tokenManager";
 import type { ApiErrorResponse, ApiResponse } from "@/types/api";
-import type { AuthResponse } from "@/types/auth";
+import type { RefreshTokenResponse } from "@/types/auth";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.devpick.kr/v1";
@@ -11,17 +10,21 @@ const BASE_URL =
  * 메인 API 클라이언트
  * - 요청 인터셉터: Zustand auth store에서 accessToken을 읽어 Authorization 헤더 자동 첨부
  * - 응답 인터셉터: 401 발생 시 /auth/refresh로 토큰 재발급 후 원래 요청 재시도
+ *
+ * 토큰 정책
+ * - accessToken: Zustand 메모리에서 읽기 (localStorage/sessionStorage 사용 안 함)
+ * - refreshToken: HttpOnly Cookie — 브라우저가 자동 첨부 (withCredentials: true)
  */
 export const apiClient = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
-  withCredentials: true, // HttpOnly Cookie(refreshToken) 전송
+  withCredentials: true, // HttpOnly Cookie(refreshToken) 자동 전송
 });
 
 /**
  * 토큰 갱신 전용 클라이언트 (인터셉터 없음 — 순환 참조 방지)
  */
-const refreshClient = axios.create({
+export const refreshClient = axios.create({
   baseURL: BASE_URL,
   withCredentials: true,
 });
@@ -29,7 +32,7 @@ const refreshClient = axios.create({
 // ─── Request Interceptor ───────────────────────────────────────────────────
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = tokenManager.getAccessToken();
+    const token = useAuthStore.getState().accessToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -83,22 +86,20 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const refreshToken = tokenManager.getRefreshToken();
-      const { data } = await refreshClient.post<ApiResponse<AuthResponse>>(
+      // 요청 바디 없음 — 브라우저가 HttpOnly Cookie(refreshToken)를 자동 첨부
+      const { data } = await refreshClient.post<ApiResponse<RefreshTokenResponse>>(
         "/auth/refresh",
-        { refreshToken },
       );
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-        data.data;
+      const newAccessToken = data.data.accessToken;
 
-      tokenManager.setTokens(newAccessToken, newRefreshToken);
+      // accessToken만 메모리 상태에 업데이트 (refreshToken은 Cookie로 자동 갱신됨)
+      useAuthStore.setState({ accessToken: newAccessToken });
       processQueue(null, newAccessToken);
 
       originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
       return apiClient(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError as AxiosError, null);
-      tokenManager.clearTokens();
       useAuthStore.getState().clearAuth();
       return Promise.reject(refreshError);
     } finally {
