@@ -15,8 +15,8 @@
 이 레포는 **Next.js (App Router) 기반 프론트엔드 웹 애플리케이션**이다.
 
 - 프론트엔드 담당: **홍보민**
-- MVP 데드라인: **2026-04-13**
-- 현재 스프린트: Sprint 1 (3/3 ~ 3/16) — 회원/프로필 화면 개발 및 콘텐츠 피드 개발
+- MVP 데드라인: **2026-03-22**
+- 현재 스프린트: Sprint 2 (3/16 ~ 3/22) — Epic C, D, E, F
 
 ### 시스템 구조 (4개 서버)
 
@@ -57,9 +57,9 @@
 │ ┣ (main)/              # Route Group — GNB 있는 레이아웃
 │ ┃ ┣ layout.tsx         # TopNav + Sidebar + QueryClientProvider
 │ ┃ ┣ home/              # 맞춤형 아티클 피드 (메인)
-│ ┃ ┃ ┣ [id]/            # 아티클 상세 및 AI 요약 뷰어
-│ ┃ ┃ ┃ ┗ page.tsx
-│ ┃ ┃ ┗ page.tsx
+│ ┃ ┃ ┣ [id]/            # 글 상세 및 AI 요약 뷰어
+│ ┃ ┃ ┃ ┗ page.tsx       # 서버 컴포넌트 — content + 추천 콘텐츠 동시 fetch, 2단 레이아웃
+│ ┃ ┃ ┗ page.tsx         # 개인화 피드 목록 (무한 스크롤)
 │ ┃ ┣ community/         # 커뮤니티 피드 (질문/게시글 목록)
 │ ┃ ┃ ┣ write/           # 커뮤니티 글쓰기 및 AI 질문 개선
 │ ┃ ┃ ┃ ┗ page.tsx
@@ -77,7 +77,8 @@
 │ ┃ ┗ google/
 │ ┃   ┗ callback/
 │ ┃     ┗ page.tsx       # Google OAuth code/state 수신 → 백엔드 콜백 호출 → 상태 저장 후 이동
-│ ┣ onboarding/        # 초기 사용자 성향 파악 온보딩
+│ ┣ onboarding/          # 초기 사용자 성향 파악 온보딩
+│ ┃ ┣ layout.tsx         # 온보딩 전용 레이아웃
 │ ┃ ┗ page.tsx
 │ ┣ favicon.ico          # 파비콘
 │ ┣ globals.css          # 전역 스타일 및 Tailwind CSS 설정 (@theme 토큰)
@@ -97,7 +98,8 @@
 │ ┃ ┗ tabs.tsx
 │ ┣ layout/              # GNB, 사이드바 등 레이아웃 컴포넌트
 │ ┃ ┣ Sidebar.tsx        # 데스크탑 사이드바 + 모바일 하단 탭바
-│ ┃ ┗ TopNav.tsx         # 상단 GNB, useAuthStore 연동, 로그아웃
+│ ┃ ┣ TopNav.tsx         # 상단 GNB, useAuthStore 연동, 로그아웃
+│ ┃ ┗ TopNavVariant.tsx  # TopNav 변형 (특수 레이아웃용)
 │ ┣ features/            # 도메인별 기능 컴포넌트
 │ ┃ ┣ auth/              # 인증 화면 컴포넌트
 │ ┃ ┃ ┣ AuthCallbackPage.tsx  # provider별 OAuth 콜백 공통 처리 UI/로직 (code/state 파싱 → 콜백 API 호출 → 토큰 저장 → 리다이렉트)
@@ -108,10 +110,10 @@
 │ ┃ ┃ ┣ SignupForm.tsx       # 회원가입 폼 (react-hook-form + zod)
 │ ┃ ┃ ┗ SocialAuthButtons.tsx # GitHub / Google 소셜 로그인 버튼
 │ ┃ ┣ home/
-│ ┃ ┃ ┣ ContentDetail.tsx    # 글 상세 뷰어 (본문 렌더링 + 좋아요/스크랩/공유)
+│ ┃ ┃ ┣ ContentDetail.tsx    # 글 상세 뷰어 ("use client", 마크다운 렌더링 + 좋아요/스크랩/공유)
 │ ┃ ┃ ┣ FeedCard.tsx         # 피드 카드 (FeedCardItem interface)
 │ ┃ ┃ ┣ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
-│ ┃ ┃ ┗ RecommendedContents.tsx # 추천 콘텐츠 사이드바 (items 배열 수신)
+│ ┃ ┃ ┗ RecommendedContents.tsx # 추천 콘텐츠 사이드바 (서버 컴포넌트, items props)
 │ ┃ ┣ community/
 │ ┃ ┃ ┗ CommunityCard.tsx    # 커뮤니티 카드 (CommunityPost interface)
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
@@ -126,22 +128,23 @@
 │ ┗ providers.tsx        # QueryClientProvider 등 클라이언트 Provider 래퍼
 ├── lib/
 │ ┣ api/                 # API 클라이언트 (DP-190)
-│ ┃ ┣ client.ts          # Axios 인스턴스 + 인터셉터
+│ ┃ ┣ client.ts          # Axios 인스턴스 + 인터셉터 (401 → /auth/refresh → 재시도)
 │ ┃ ┗ endpoints/         # 도메인별 API 함수
-│ ┃   ┣ auth.ts
-│ ┃   ┣ contents.ts
-│ ┃   ┣ posts.ts
-│ ┃   ┣ users.ts
-│ ┃   ┗ reports.ts
-│ ┣ auth/                # 인증/토큰 관련 레거시 유틸 (구조 정리 예정)
-│ ┃ ┣ TokenStrategy.ts       # 기존 토큰 저장 전략 인터페이스 (현재 정책과 일부 불일치 가능)
-│ ┃ ┣ CookieStrategy.ts      # 레거시 구현체 — 현재 Refresh Token은 HttpOnly Cookie로만 관리
-│ ┃ ┣ SessionStorageStrategy.ts # 레거시 구현체 — 현재 운영 정책상 사용하지 않음
-│ ┃ ┗ tokenManager.ts        # accessToken 관리 및 인증 헬퍼로 점진 정리 예정
+│ ┃   ┣ auth.ts          # 로그인/회원가입/로그아웃/소셜 로그인 등
+│ ┃   ┣ contents.ts      # 피드/상세/추천/좋아요/스크랩 등
+│ ┃   ┣ posts.ts         # 커뮤니티 게시글/답변/댓글
+│ ┃   ┣ users.ts         # 프로필 조회/수정/탈퇴
+│ ┃   ┗ reports.ts       # 주간 리포트
+│ ┣ auth/                # 인증/토큰 관련 유틸
+│ ┃ ┣ TokenStrategy.ts       # 토큰 저장 전략 인터페이스 (Strategy Pattern)
+│ ┃ ┣ CookieStrategy.ts      # Cookie 기반 구현체 — Refresh Token HttpOnly Cookie 관리
+│ ┃ ┣ SessionStorageStrategy.ts # SessionStorage 기반 구현체 — 현재 운영 정책상 미사용
+│ ┃ ┣ tokenManager.ts        # 토큰 저장 전략 선택 및 CRUD 관리자
+│ ┃ ┗ getAuthErrorMessage.ts # 인증 에러 코드 → 사용자 메시지 매핑
 │ ┗ utils.ts             # cn(), formatDate(), formatRelativeTime()
 ├── store/               # Zustand 전역 상태 (DP-191)
-│ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated)
-│ ┣ content.store.ts
+│ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated, setAuth, clearAuth)
+│ ┣ content.store.ts     # 콘텐츠 관련 전역 상태
 │ ┗ ui.store.ts          # UI 상태 (Toast 큐)
 ├── types/               # TypeScript 전역 타입 정의
 │ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
@@ -533,9 +536,7 @@ DP-{티켓번호}: {작업 내용}
 | Google API 실패            | 502  | `AUTH_015` |
 | Google 이메일 없음         | 400  | `AUTH_016` |
 
-### Epic B — 콘텐츠 피드 (Mock Data 사용 대기 중)
-
-> **⚠️ [중요] 현재 백엔드 API 명세는 확정되었으나, 실제 크롤링 데이터가 준비되지 않아 연동을 대기 중인 상태입니다. 프론트엔드 작업 시 실제 API 호출(`fetch` 등) 대신, 이 명세를 기반으로 한 Mock Data와 가짜 비동기 함수(delay)를 사용하여 무한 스크롤 및 UI 연동을 먼저 진행합니다.**
+### Epic B — 콘텐츠 피드
 
 | Method | Endpoint                                | 설명                | 인증 | 관련 페이지           | 응답코드 |
 | ------ | --------------------------------------- | ------------------- | ---- | --------------------- | -------- |
@@ -683,13 +684,63 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic C — AI 요약
 
-> AI 요약 UI는 `_v0-reference.tsx` 레이아웃을 참고하되,
 > 데이터 구조는 API 응답 필드를 기준으로 사용한다.
 
-| Method | Endpoint                              | 설명 | 인증         | 관련 페이지 | 응답코드 |
-| ------ | ------------------------------------- | ---- | ------------ | ----------- | -------- |
-| GET    | `/contents/{contentId}/summary`       | O    | `/home/[id]` | 200         |
-| POST   | `/contents/{contentId}/summary/retry` | O    | `/home/[id]` | 200         |
+| Method | Endpoint                              | 설명                | 인증 | 관련 페이지  | 응답코드 |
+| ------ | ------------------------------------- | ------------------- | ---- | ------------ | -------- |
+| GET    | `/contents/{contentId}/summary`       | 레벨별 AI 요약 조회 | O    | `/home/[id]` | 200      |
+| POST   | `/contents/{contentId}/summary/retry` | AI 요약 재시도      | O    | `/home/[id]` | 200      |
+
+**API 스펙 참고:**
+GET /contents/{contentId}/summary
+query param: level = BEGINNER | JUNIOR | MIDDLE | SENIOR (default JUNIOR)
+Authorization: Bearer token
+
+응답 데이터 shape:
+
+```ts
+{
+  contentId: string;
+  level: "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
+  coreSummary: string;
+  keyPoints: string[];
+  keywords: string[];
+  difficulty: string;
+  nextRecommendation: string;
+  confidence: number;
+  additionalQuestions: string[];
+  cachedAt: string;
+  expiresAt: string;
+}
+```
+
+**재시도 API 스펙 참고:**
+POST /contents/{contentId}/summary/retry
+설명: 캐시를 무시하고 FastAPI에서 새로 생성
+query param:
+
+- level: BEGINNER | JUNIOR | MIDDLE | SENIOR (default JUNIOR)
+  Authorization: Bearer token
+
+응답 데이터 shape:
+
+```ts
+  success: true,
+  data: {
+    contentId: string;
+    level: "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
+    coreSummary: string;
+    keyPoints: string[];
+    keywords: string[];
+    difficulty: string;
+    nextRecommendation: string;
+    confidence: number;
+    additionalQuestions: string[];
+    cachedAt: string;
+    expiresAt: string;
+  }
+}
+```
 
 ### Epic D — 질문/커뮤니티
 

@@ -1,5 +1,23 @@
 import { ApiResponse } from "./api";
 
+export type AiSummaryLevel = "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
+
+export interface AiSummary {
+  contentId: string;
+  level: AiSummaryLevel;
+  coreSummary: string;
+  keyPoints: string[];
+  keywords: string[];
+  difficulty: string;
+  nextRecommendation: string;
+  confidence: number;
+  additionalQuestions: string[];
+  cachedAt: string;
+  expiresAt: string;
+}
+
+export type AiSummaryResponse = ApiResponse<AiSummary>;
+
 export interface Content {
   id: string;
   title: string;

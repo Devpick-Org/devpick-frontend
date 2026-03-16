@@ -54,8 +54,8 @@ export default function MainLayout({
       </main> */}
 
       <TopNavVariant />
-      <main className="pt-16 pb-16 md:pb-0 flex justify-center">
-        <div className="w-full max-w-5xl px-4 lg:px-8">{children}</div>
+      <main className="pt-16 pb-16 md:pb-0">
+        {children}
       </main>
 
       <Toaster
