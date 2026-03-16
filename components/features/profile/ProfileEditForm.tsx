@@ -268,7 +268,7 @@ export function ProfileEditForm() {
 
       {/* Profile Avatar + Nickname */}
       <section className="mb-8 rounded-2xl bg-card p-6">
-        <h2 className="mb-5 text-base font-semibold text-foreground">
+        <h2 className="mb-5 text-lg font-semibold text-foreground">
           기본 정보
         </h2>
 
@@ -303,7 +303,7 @@ export function ProfileEditForm() {
           <div className="w-full flex-1">
             <label
               htmlFor="nickname"
-              className="mb-1.5 block text-sm font-medium text-foreground"
+              className="mb-1.5 block text-sm font-semibold text-foreground"
             >
               닉네임
             </label>
@@ -325,20 +325,20 @@ export function ProfileEditForm() {
 
       {/* Learning Info */}
       <section className="mb-8 rounded-2xl bg-card p-6">
-        <h2 className="mb-5 text-base font-semibold text-foreground">
+        <h2 className="mb-5 text-lg font-semibold text-foreground">
           학습 정보
         </h2>
 
         {/* Job Role Dropdown */}
         <div className="mb-6">
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+          <label className="mb-3 block text-sm font-semibold text-foreground">
             직무
           </label>
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsRoleOpen((prev) => !prev)}
-              className="flex h-11 w-full items-center justify-between rounded-lg bg-secondary px-3 text-sm text-foreground transition-colors hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50"
+              className="flex h-11 w-full items-center justify-between rounded-lg bg-secondary px-3 text-sm text-foreground transition-colors hover:border-primary/40 focus:outline-none"
             >
               <span>{currentRole?.label ?? "직무 선택"}</span>
               <ChevronDownIcon
@@ -349,7 +349,7 @@ export function ProfileEditForm() {
               />
             </button>
             {isRoleOpen && (
-              <div className="absolute z-20 mt-1 w-full rounded-lg bg-card shadow-lg">
+              <div className="absolute z-20 mt-1 w-full rounded-lg border border-border bg-card">
                 {JOB_ROLES.map((role) => (
                   <button
                     key={role.id}
@@ -375,7 +375,7 @@ export function ProfileEditForm() {
 
         {/* Level Selection */}
         <div className="mb-6">
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+          <label className="mb-3 block text-sm font-semibold text-foreground">
             경력 수준
           </label>
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -417,7 +417,7 @@ export function ProfileEditForm() {
 
         {/* Interest Tags */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+          <label className="mb-3 block text-sm font-semibold text-foreground">
             관심 태그
           </label>
 

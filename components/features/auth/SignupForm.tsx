@@ -195,7 +195,7 @@ export function SignupForm() {
       <Button
         type="submit"
         disabled={isSubmitting || !isFormValid}
-        className="mt-2 h-11 w-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all duration-200 shadow-md shadow-primary/20 disabled:opacity-50"
+        className="mt-2 h-11 w-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all duration-200 disabled:opacity-50"
       >
         {isSubmitting ? (
           <span className="flex items-center gap-2">

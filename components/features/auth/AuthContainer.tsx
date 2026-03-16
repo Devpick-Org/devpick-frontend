@@ -58,7 +58,7 @@ export function AuthContainer({ oauthError }: AuthContainerProps) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[448px]">
+    <div className="mx-auto w-full max-w-[464px]">
       <DevPickLogo />
 
       {oauthError && (

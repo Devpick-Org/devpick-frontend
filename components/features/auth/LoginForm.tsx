@@ -85,7 +85,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
         <Input
           id="login-email"
           type="email"
-          placeholder="name@example.com"
+          placeholder="name@google.com"
           value={email}
           onChange={handleEmailChange}
           disabled={isDisabled}
@@ -121,7 +121,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
       <Button
         type="submit"
         disabled={isDisabled}
-        className="mt-2 h-11 w-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all duration-200 shadow-md shadow-primary/20"
+        className="mt-2 h-11 w-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all duration-200"
       >
         {isSubmitting ? (
           <span className="flex items-center gap-2">

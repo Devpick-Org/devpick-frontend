@@ -118,7 +118,7 @@ export function OnboardingForm() {
       </div>
 
       {/* Main Card */}
-      <div className="relative rounded-2xl border border-border bg-card p-6 shadow-lg shadow-primary/5 md:p-8">
+      <div className="relative rounded-2xl bg-card p-6 md:p-8">
         
         {/* 폼 영역 크기 고정: min-h-[280px] 부여 */}
         <div className="min-h-[120px]">
@@ -201,7 +201,7 @@ export function OnboardingForm() {
               disabled={!canGoNext()}
               size="icon"
               className={cn(
-                "h-12 w-12 rounded-full transition-all duration-200 shadow-md",
+                "h-12 w-12 rounded-full transition-all duration-200",
                 canGoNext()
                   ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/25"
                   : "bg-muted text-muted-foreground cursor-not-allowed",
@@ -216,7 +216,7 @@ export function OnboardingForm() {
               onClick={handleSubmit}
               disabled={!canGoNext() || isSubmitting}
               className={cn(
-                "h-12 rounded-full px-6 text-base font-semibold transition-all duration-200 shadow-md",
+                "h-12 px-6 text-base font-semibold transition-all duration-200",
                 canGoNext()
                   ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/25"
                   : "bg-muted text-muted-foreground cursor-not-allowed",
@@ -230,7 +230,6 @@ export function OnboardingForm() {
               ) : (
                 <span className="flex items-center gap-1">
                   시작하기
-                  <ChevronRight className="h-5 w-5" />
                 </span>
               )}
             </Button>

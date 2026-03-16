@@ -104,7 +104,7 @@ export function EmailSection({
           <Input
             id="signup-email"
             type="email"
-            placeholder="name@example.com"
+            placeholder="name@google.com"
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
             disabled={isEmailVerified}
