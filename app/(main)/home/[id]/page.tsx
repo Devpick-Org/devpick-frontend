@@ -31,15 +31,15 @@ export default async function Page({ params }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="flex gap-10">
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* 본문 */}
-        <div className="min-w-0 flex-1">
+        <main className="min-w-0">
           <ContentDetail content={content} />
-        </div>
+        </main>
 
-        {/* 추천 — 데스크탑만 */}
-        <aside className="hidden w-72 shrink-0 pt-14 lg:block">
+        {/* 추천 — 데스크탑 */}
+        <aside className="hidden lg:block">
           <div className="sticky top-24">
             <RecommendedContents items={recommended} />
           </div>

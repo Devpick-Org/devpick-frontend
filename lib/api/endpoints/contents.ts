@@ -4,7 +4,10 @@ import {
   ContentDetail,
   ContentDetailResponse,
   ContentFeedResponse,
+  AiSummaryLevel,
+  AiSummaryResponse,
 } from "@/types/content";
+import { MOCK_AI_SUMMARIES, MOCK_AI_SUMMARY_RETRIES } from "@/lib/mock/aiSummary";
 
 const MOCK_ORIGINAL_CONTENT_WITH_CODE = `## 들어가며
 
@@ -552,6 +555,45 @@ export const contentsEndpoints = {
           message: "검색 결과를 불러왔습니다",
         });
       }, 1000);
+    });
+  },
+
+  /** GET /contents/:contentId/summary — AI 요약 (level: AiSummaryLevel) */
+  getContentSummary: (
+    contentId: string,
+    level: AiSummaryLevel = "JUNIOR",
+  ): Promise<AiSummaryResponse> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          success: true,
+          data: { ...MOCK_AI_SUMMARIES[level], contentId },
+          message: "요청이 성공했습니다",
+        });
+      }, 500);
+    });
+  },
+
+  /** POST /contents/:contentId/summary/retry — AI 요약 재시도 (캐시 무시, 새로 생성) */
+  retryContentSummary: (
+    contentId: string,
+    level: AiSummaryLevel = "JUNIOR",
+  ): Promise<AiSummaryResponse> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const now = new Date().toISOString();
+        const expiresAt = new Date(Date.now() + 86_400_000).toISOString();
+        resolve({
+          success: true,
+          data: {
+            ...MOCK_AI_SUMMARY_RETRIES[level],
+            contentId,
+            cachedAt: now,
+            expiresAt,
+          },
+          message: "요약을 새로 생성했습니다",
+        });
+      }, 1500);
     });
   },
 

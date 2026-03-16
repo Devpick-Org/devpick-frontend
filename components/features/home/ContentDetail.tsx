@@ -6,6 +6,7 @@ import { ArrowLeft, Heart, Bookmark, Share2, ExternalLink } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 import { useContentStore } from "@/store/content.store";
 import type { ContentDetail as ContentDetailType } from "@/types/content";
+import { AiSummary } from "./AiSummary";
 import { toast } from "sonner";
 
 // ─── 마크다운 렌더러 ───────────────────────────────────────────────────────────
@@ -268,6 +269,9 @@ export function ContentDetail({ content }: ContentDetailProps) {
           </p>
         )}
       </header>
+
+      {/* AI 요약 */}
+      <AiSummary contentId={content.id} />
 
       {/* 본문 */}
       <section className="mb-12 font-medium">
