@@ -104,7 +104,7 @@ export default function HomePage() {
             </h1>
             <WaveIcon className="text-2xl md:text-3xl" />
           </div>
-          <p className="text-sm text-muted-foreground md:text-base">
+          <p className="text-sm text-muted-foreground font-medium md:text-base">
             관심 기술과 학습 흐름에 맞춘 개발 콘텐츠를 모아봤어요.
           </p>
         </section>
@@ -117,10 +117,12 @@ export default function HomePage() {
         {/* Feed list */}
         <div className="flex flex-col">
           {isLoading &&
-            Array.from({ length: 5 }).map((_, i) => <FeedCardSkeleton key={i} />)}
+            Array.from({ length: 5 }).map((_, i) => (
+              <FeedCardSkeleton key={i} />
+            ))}
 
           {isError && (
-            <p className="py-10 text-center text-sm text-muted-foreground">
+            <p className="py-10 text-center text-sm font-medium text-muted-foreground">
               피드를 불러오는 중 문제가 발생했습니다.
             </p>
           )}
@@ -137,7 +139,7 @@ export default function HomePage() {
             ))}
 
           {!hasNextPage && contents.length > 0 && (
-            <p className="py-6 text-center text-sm text-muted-foreground">
+            <p className="py-6 text-center text-sm font-medium text-muted-foreground">
               마지막 콘텐츠입니다.
             </p>
           )}

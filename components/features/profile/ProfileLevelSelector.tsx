@@ -34,7 +34,9 @@ export function ProfileLevelSelector({
           >
             {level.label}
           </span>
-          <span className="text-xs text-muted-foreground">{level.sub}</span>
+          <span className="text-xs font-medium text-muted-foreground">
+            {level.sub}
+          </span>
         </button>
       ))}
     </div>

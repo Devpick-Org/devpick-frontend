@@ -1,3 +1,4 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css"; /* 로컬 shadcn 필수 설정 유지 */
@@ -7,7 +8,7 @@
 /* 1. v0의 디자인 색상 변수 (여기가 핵심 테마입니다) */
 :root {
   /* --background: oklch(0.98 0.002 260); */
-  --background: oklch(1,0,0); 
+  --background: oklch(1, 0, 0);
   --foreground: oklch(0.14 0.005 260);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.14 0.005 260);
@@ -79,7 +80,7 @@
 
 /* 2. 테마 연결 (로컬에만 있던 확장 반경 radius-2xl 등도 안전하게 포함했습니다) */
 @theme inline {
-  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-sans: "Pretendard", system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", monospace;
 
   --color-background: var(--background);
@@ -158,6 +159,7 @@
     @apply border-border outline-ring/50;
   }
   body {
+    font-family: "Pretendard", system-ui, sans-serif;
     @apply bg-background text-foreground;
   }
 }

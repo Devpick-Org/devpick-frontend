@@ -8,7 +8,10 @@ import { Label } from "@/components/ui/label";
 import { EmailSection } from "./EmailSection";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
-import { extractApiError, getAuthErrorMessage } from "@/lib/auth/getAuthErrorMessage";
+import {
+  extractApiError,
+  getAuthErrorMessage,
+} from "@/lib/auth/getAuthErrorMessage";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/;
@@ -101,7 +104,10 @@ export function SignupForm() {
 
   const getSignupErrorMessage = (error: unknown) => {
     const { code, message } = extractApiError(error);
-    return getAuthErrorMessage(code, message ?? "회원가입 중 오류가 발생했습니다.");
+    return getAuthErrorMessage(
+      code,
+      message ?? "회원가입 중 오류가 발생했습니다.",
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -110,7 +116,7 @@ export function SignupForm() {
 
     setIsSubmitting(true);
     setSubmitErrorMessage("");
-    
+
     try {
       await authEndpoints.signup({
         email: verifiedEmail,
@@ -122,7 +128,12 @@ export function SignupForm() {
         email: verifiedEmail,
         password,
       });
-      const { accessToken, userId, email, nickname: loginNickname } = loginData.data;
+      const {
+        accessToken,
+        userId,
+        email,
+        nickname: loginNickname,
+      } = loginData.data;
       setAuth({ userId, email, nickname: loginNickname }, accessToken);
 
       router.push("/onboarding");
@@ -137,7 +148,10 @@ export function SignupForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* 닉네임 */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="signup-nickname" className="text-foreground">
+        <Label
+          htmlFor="signup-nickname"
+          className="text-foreground font-semibold"
+        >
           {"닉네임"}
         </Label>
         <Input
@@ -162,7 +176,10 @@ export function SignupForm() {
 
       {/* 비밀번호 */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="signup-password" className="text-foreground">
+        <Label
+          htmlFor="signup-password"
+          className="text-foreground font-semibold"
+        >
           {"비밀번호"}
         </Label>
         <Input
@@ -178,7 +195,10 @@ export function SignupForm() {
 
       {/* 비밀번호 확인 */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="signup-confirm" className="text-foreground">
+        <Label
+          htmlFor="signup-confirm"
+          className="text-foreground font-semibold"
+        >
           {"비밀번호 확인"}
         </Label>
         <Input

@@ -11,7 +11,10 @@ import { ProfileNicknameInput } from "@/components/features/profile/ProfileNickn
 import { ProfileRoleSelector } from "@/components/features/profile/ProfileRoleSelector";
 import { ProfileLevelSelector } from "@/components/features/profile/ProfileLevelSelector";
 import { ProfileTagSelector } from "@/components/features/profile/ProfileTagSelector";
-import type { JobRoleId, LevelId } from "@/components/features/profile/constants";
+import type {
+  JobRoleId,
+  LevelId,
+} from "@/components/features/profile/constants";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function SectionBadge({ number }: { number: number }) {
@@ -82,7 +85,9 @@ export function OnboardingForm() {
         job: meData.data.job ?? undefined,
         level: meData.data.level ?? undefined,
         profileImage: meData.data.profileImage ?? undefined,
-        tags: dedupeTags(meData.data.tags?.length ? meData.data.tags : selectedTags),
+        tags: dedupeTags(
+          meData.data.tags?.length ? meData.data.tags : selectedTags,
+        ),
       });
 
       router.push("/home");
@@ -112,14 +117,13 @@ export function OnboardingForm() {
         <h1 className="text-2xl font-bold tracking-tight text-foreground text-balance">
           DevPick에 오신 것을 환영합니다!
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground text-balance">
+        <p className="mt-2 text-sm font-medium text-muted-foreground text-balance">
           맞춤형 피드를 위해 정보를 입력해 주세요.
         </p>
       </div>
 
       {/* Main Card */}
       <div className="relative rounded-2xl bg-card p-6 md:p-8">
-        
         {/* 폼 영역 크기 고정: min-h-[280px] 부여 */}
         <div className="min-h-[120px]">
           {/* Step 1: Nickname */}
@@ -144,7 +148,10 @@ export function OnboardingForm() {
                   어떤 직무를 맡고 계신가요?
                 </h2>
               </div>
-              <ProfileRoleSelector value={selectedRole} onChange={setSelectedRole} />
+              <ProfileRoleSelector
+                value={selectedRole}
+                onChange={setSelectedRole}
+              />
             </div>
           )}
 
@@ -157,7 +164,10 @@ export function OnboardingForm() {
                   경력 수준을 알려주세요
                 </h2>
               </div>
-              <ProfileLevelSelector value={selectedLevel} onChange={setSelectedLevel} />
+              <ProfileLevelSelector
+                value={selectedLevel}
+                onChange={setSelectedLevel}
+              />
             </div>
           )}
 
@@ -171,7 +181,10 @@ export function OnboardingForm() {
                 </h2>
               </div>
               {/* 태그 영역은 내용이 길어지면 min-h-[280px] 이상으로 자연스럽게 늘어납니다. */}
-              <ProfileTagSelector value={selectedTags} onChange={setSelectedTags} />
+              <ProfileTagSelector
+                value={selectedTags}
+                onChange={setSelectedTags}
+              />
             </div>
           )}
         </div>
@@ -216,10 +229,10 @@ export function OnboardingForm() {
               onClick={handleSubmit}
               disabled={!canGoNext() || isSubmitting}
               className={cn(
-                "h-12 px-6 text-base font-semibold transition-all duration-200",
+                "h-11 rounded-xl px-5 text-base font-semibold transition-colors duration-200",
                 canGoNext()
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/25"
-                  : "bg-muted text-muted-foreground cursor-not-allowed",
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "cursor-not-allowed bg-muted text-muted-foreground",
               )}
             >
               {isSubmitting ? (
@@ -228,9 +241,7 @@ export function OnboardingForm() {
                   설정 중...
                 </span>
               ) : (
-                <span className="flex items-center gap-1">
-                  시작하기
-                </span>
+                <span>DevPick 시작하기</span>
               )}
             </Button>
           )}
@@ -244,7 +255,7 @@ export function OnboardingForm() {
               className={cn(
                 "h-1.5 rounded-full transition-all duration-300",
                 i === step ? "w-8 bg-primary" : "w-2 bg-muted",
-                i < step && "bg-primary/40"
+                i < step && "bg-primary/40",
               )}
             />
           ))}

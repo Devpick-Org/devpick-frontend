@@ -4,20 +4,16 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatDate } from "@/lib/utils";
 import { useContentStore } from "@/store/content.store";
 import type { Content } from "@/types/content";
-
 
 // ─── FeedCard ─────────────────────────────────────────────────────────────────
 
 interface FeedCardProps {
   content: Content;
 }
-
 
 export function FeedCard({ content }: FeedCardProps) {
   const { init, toggleLike, toggleScrap, interactions } = useContentStore();
@@ -61,26 +57,28 @@ export function FeedCard({ content }: FeedCardProps) {
         <div className="flex items-start gap-5">
           <div className="min-w-0 flex-1">
             {/* Source & time */}
-            <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground font-medium">
               <ExternalLink className="h-3.5 w-3.5 shrink-0" />
               <span className="truncate font-medium">{content.sourceName}</span>
               <span className="text-muted-foreground/40">·</span>
-              <span className="shrink-0">{formatDate(content.publishedAt)}</span>
+              <span className="shrink-0">
+                {formatDate(content.publishedAt)}
+              </span>
             </div>
 
             {/* Title */}
-            <h3 className="mb-2 line-clamp-2 text-[19px] font-semibold leading-snug tracking-[-0.01em] text-foreground transition-opacity group-hover:opacity-80 sm:text">
+            <h3 className="mb-2 line-clamp-2 text-[19px] font-semibold leading-snug tracking-[-0.01em] text-foreground transition-opacity sm:text">
               {content.title}
             </h3>
 
             {/* Preview */}
-            <p className="mb-3 line-clamp-2 text-sm leading-6 text-muted-foreground sm:text-[15px]">
+            <p className="mb-3 line-clamp-2 text-sm leading-6 text-muted-foreground font-medium sm:text-[15px]">
               {content.preview}
             </p>
 
             {/* Tags */}
             {content.tags.length > 0 && (
-              <p className="mb-4 line-clamp-1 text-sm text-muted-foreground/85">
+              <p className="mb-4 line-clamp-1 text-sm text-muted-foreground/85 font-medium">
                 {content.tags.slice(0, 3).join(" · ")}
               </p>
             )}
@@ -161,7 +159,7 @@ export function FeedCardSkeleton() {
     <article className="border-b border-border/70 py-7">
       <div className="flex items-start gap-5">
         <div className="min-w-0 flex-1">
-        {/* Source & time */}
+          {/* Source & time */}
           <div className="mb-3 flex items-center gap-2">
             <Skeleton className="h-3.5 w-3.5 shrink-0 rounded" />
             <Skeleton className="h-3 w-16 rounded" />
@@ -191,7 +189,7 @@ export function FeedCardSkeleton() {
             <Skeleton className="h-[30px] w-[30px] rounded-md" />
           </div>
         </div>
-        
+
         {/* 썸네일 */}
         <div className="hidden shrink-0 sm:block">
           <Skeleton className="h-[190px] w-[200px] rounded-sm" />

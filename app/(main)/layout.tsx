@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
-import { TopNav } from "@/components/layout/TopNav";
+// import { TopNav } from "@/components/layout/TopNav";
 import { TopNavVariant } from "@/components/layout/TopNavVariant";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+// import { Sidebar } from "@/components/layout/Sidebar";
+// import { ChevronLeft, ChevronRight } from "lucide-react";
+// import { cn } from "@/lib/utils";
 import { AuthInitializer } from "@/components/features/auth/AuthInitializer";
 
 export default function MainLayout({
@@ -15,7 +15,7 @@ export default function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <Providers>
@@ -55,12 +55,16 @@ export default function MainLayout({
 
       <TopNavVariant />
       <main className="pt-16 pb-16 md:pb-0 flex justify-center">
-        <div className="w-full max-w-5xl px-4 lg:px-8">
-          {children}
-        </div>
+        <div className="w-full max-w-5xl px-4 lg:px-8">{children}</div>
       </main>
 
-      <Toaster richColors position="bottom-right" />
+      <Toaster
+        richColors
+        position="bottom-right"
+        toastOptions={{
+          className: "border-0",
+        }}
+      />
     </Providers>
   );
 }

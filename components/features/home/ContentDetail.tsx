@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, Heart, Bookmark, Share2, ExternalLink } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
 import { useContentStore } from "@/store/content.store";
 import type { ContentDetail as ContentDetailType } from "@/types/content";
+import { toast } from "sonner";
 
 // ─── 마크다운 렌더러 ───────────────────────────────────────────────────────────
 
@@ -169,7 +170,6 @@ interface ContentDetailProps {
 
 export function ContentDetail({ content }: ContentDetailProps) {
   const { init, toggleLike, toggleScrap, interactions } = useContentStore();
-  const [isShareTooltip, setIsShareTooltip] = useState(false);
 
   useEffect(() => {
     init(content.id, content.isLiked, content.isScrapped);
@@ -180,13 +180,12 @@ export function ContentDetail({ content }: ContentDetailProps) {
   const isScrapped = interaction?.isScrapped ?? content.isScrapped;
 
   const handleShare = useCallback(() => {
-    setIsShareTooltip(true);
     if (navigator.clipboard) {
       navigator.clipboard.writeText(
         `${window.location.origin}/home/${content.id}`,
       );
+      toast.success("링크가 복사되었습니다.");
     }
-    setTimeout(() => setIsShareTooltip(false), 1500);
   }, [content.id]);
 
   const body = content.originalContent ?? content.preview;
@@ -196,7 +195,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
       {/* 뒤로가기 */}
       <Link
         href="/home"
-        className="group/back mb-8 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        className="group/back mb-8 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground"
       >
         <ArrowLeft className="h-4 w-4 transition-transform group-hover/back:-translate-x-0.5" />
         홈으로
@@ -215,7 +214,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
                 "rounded-lg p-2 transition-all duration-200",
                 isLiked
                   ? "text-red-500 hover:text-red-400"
-                  : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  : "text-muted-foreground hover:text-foreground",
               )}
               aria-label={isLiked ? "좋아요 취소" : "좋아요"}
             >
@@ -230,7 +229,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
                 "rounded-lg p-2 transition-all duration-200",
                 isScrapped
                   ? "text-primary hover:text-primary/80"
-                  : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  : "text-muted-foreground hover:text-foreground",
               )}
               aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
             >
@@ -241,15 +240,10 @@ export function ContentDetail({ content }: ContentDetailProps) {
             </button>
             <button
               onClick={handleShare}
-              className="relative rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:bg-secondary hover:text-foreground"
+              className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:text-foreground"
               aria-label="공유"
             >
               <Share2 className="h-5 w-5" />
-              {isShareTooltip && (
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background">
-                  복사됨!
-                </span>
-              )}
             </button>
           </div>
         </div>
@@ -257,12 +251,10 @@ export function ContentDetail({ content }: ContentDetailProps) {
         {/* 메타 정보 */}
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-muted-foreground">
           <span className="font-medium">{content.sourceName}</span>
-          <span className="text-border">·</span>
-          <span>{formatDate(content.publishedAt)}</span>
+          <span className="font-medium">{formatDate(content.publishedAt)}</span>
           {content.licenseType && (
             <>
-              <span className="text-border">·</span>
-              <span className="rounded-md px-1.5 py-0.5 text-xs">
+              <span className="rounded-md px-1.5 py-0.5 text-xs font-medium">
                 {content.licenseType}
               </span>
             </>
@@ -271,20 +263,20 @@ export function ContentDetail({ content }: ContentDetailProps) {
 
         {/* 태그 */}
         {content.tags.length > 0 && (
-          <p className="mt-4 text-sm text-muted-foreground/85">
+          <p className="mt-4 text-sm text-muted-foreground/85 font-medium">
             {content.tags.join(" · ")}
           </p>
         )}
       </header>
 
       {/* 본문 */}
-      <section className="mb-12">
+      <section className="mb-12 font-medium">
         <ContentRenderer content={body} />
       </section>
 
       {/* 원문 링크 CTA */}
       <section className="flex flex-col items-center gap-3 rounded-2xl bg-card px-6 py-8">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground font-medium">
           저작권 보호를 위해 본문의 일부만 제공됩니다.
         </p>
         <a

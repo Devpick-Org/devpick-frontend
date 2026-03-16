@@ -27,7 +27,7 @@ function DevPickLogo() {
       <h1 className="text-2xl font-bold tracking-tight text-foreground">
         DevPick
       </h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">
+      <p className="mt-1.5 text-sm text-muted-foreground font-medium">
         {"개발자를 위한 맞춤형 학습 플랫폼"}
       </p>
     </div>
@@ -70,10 +70,10 @@ export function AuthContainer({ oauthError }: AuthContainerProps) {
       <div className="rounded-2xl bg-card p-6 transition-all duration-300">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 grid w-full grid-cols-2 bg-secondary">
-            <TabsTrigger value="login" className="text-sm font-medium">
+            <TabsTrigger value="login" className="text-sm font-semibold">
               {"로그인"}
             </TabsTrigger>
-            <TabsTrigger value="signup" className="text-sm font-medium">
+            <TabsTrigger value="signup" className="text-sm font-semibold">
               {"회원가입"}
             </TabsTrigger>
           </TabsList>
