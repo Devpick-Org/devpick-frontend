@@ -5,6 +5,16 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
 import {
@@ -29,6 +39,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
   const [passwordError, setPasswordError] = useState("");
   const [authError, setAuthError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showRecoverModal, setShowRecoverModal] = useState(false);
 
   const isDisabled = isLoading || isSubmitting;
 
@@ -78,8 +89,40 @@ export function LoginForm({ isLoading }: LoginFormProps) {
       router.push("/home");
     } catch (err) {
       const { code, message } = extractApiError(err);
+      if (code === "AUTH_024") {
+        setShowRecoverModal(true);
+      } else {
+        setAuthError(
+          getAuthErrorMessage(
+            code,
+            message ?? "로그인 중 오류가 발생했습니다.",
+          ),
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRecover = async () => {
+    setShowRecoverModal(false);
+    setIsSubmitting(true);
+    try {
+      const response = await authEndpoints.recover({ email, password });
+      const { accessToken, userId, nickname } = response.data.data;
+      setAuth({ userId, email, nickname }, accessToken);
+
+      const { data: meData } = await authEndpoints.getMe();
+      setAuth(meData.data, accessToken);
+
+      router.push("/home");
+    } catch (err) {
+      const { code, message } = extractApiError(err);
       setAuthError(
-        getAuthErrorMessage(code, message ?? "로그인 중 오류가 발생했습니다."),
+        getAuthErrorMessage(
+          code,
+          message ?? "계정 복구 중 오류가 발생했습니다.",
+        ),
       );
     } finally {
       setIsSubmitting(false);
@@ -87,66 +130,95 @@ export function LoginForm({ isLoading }: LoginFormProps) {
   };
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="login-email" className="text-foreground font-semibold">
-          {"이메일"}
-        </Label>
-        <Input
-          id="login-email"
-          type="email"
-          placeholder="name@google.com"
-          value={email}
-          onChange={handleEmailChange}
-          disabled={isDisabled}
-          className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
-        />
-        <p className="h-5 text-sm text-red-500">{emailError}</p>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
+    <>
+      <AlertDialog open={showRecoverModal} onOpenChange={setShowRecoverModal}>
+        <AlertDialogContent
+          size="sm"
+          className="bg-white"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>계정을 복구할까요?</AlertDialogTitle>
+            <AlertDialogDescription>
+              최근 탈퇴한 계정입니다.
+              <br />
+              재로그인 할 경우 계정이 복구됩니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-0 bg-secondary text-foreground hover:bg-secondary/90 hover:text-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
+              아니요
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleRecover}>
+              복구하기
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-2">
           <Label
-            htmlFor="login-password"
+            htmlFor="login-email"
             className="text-foreground font-semibold"
           >
-            {"비밀번호"}
+            {"이메일"}
           </Label>
-          <button
-            type="button"
-            className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-          >
-            {"비밀번호 찾기"}
-          </button>
+          <Input
+            id="login-email"
+            type="email"
+            placeholder="name@google.com"
+            value={email}
+            onChange={handleEmailChange}
+            disabled={isDisabled}
+            className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+          />
+          <p className="h-5 text-sm text-red-500">{emailError}</p>
         </div>
-        <Input
-          id="login-password"
-          type="password"
-          placeholder="••••••••"
-          value={password}
-          onChange={handlePasswordChange}
+
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <Label
+              htmlFor="login-password"
+              className="text-foreground font-semibold"
+            >
+              {"비밀번호"}
+            </Label>
+            <button
+              type="button"
+              className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              {"비밀번호 찾기"}
+            </button>
+          </div>
+          <Input
+            id="login-password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={handlePasswordChange}
+            disabled={isDisabled}
+            className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+          />
+          <p className="h-5 text-sm text-red-500">{passwordError}</p>
+        </div>
+
+        {authError && <p className="text-sm text-red-500">{authError}</p>}
+
+        <Button
+          type="submit"
           disabled={isDisabled}
-          className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
-        />
-        <p className="h-5 text-sm text-red-500">{passwordError}</p>
-      </div>
-
-      {authError && <p className="text-sm text-red-500">{authError}</p>}
-
-      <Button
-        type="submit"
-        disabled={isDisabled}
-        className="mt-2 h-11 w-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all duration-200"
-      >
-        {isSubmitting ? (
-          <span className="flex items-center gap-2">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-            {"로그인 중..."}
-          </span>
-        ) : (
-          "로그인"
-        )}
-      </Button>
-    </form>
+          className="mt-2 h-11 w-full bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all duration-200"
+        >
+          {isSubmitting ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+              {"로그인 중..."}
+            </span>
+          ) : (
+            "로그인"
+          )}
+        </Button>
+      </form>
+    </>
   );
 }
