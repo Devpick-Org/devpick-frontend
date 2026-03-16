@@ -44,6 +44,7 @@ export function SignupForm() {
 
   const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState("");
 
   const isNicknameValid = nickname.length >= 2 && nickname.length <= 20;
   const isEmailFormatValid = EMAIL_REGEX.test(email);
@@ -63,12 +64,14 @@ export function SignupForm() {
 
   const handleNicknameChange = (value: string) => {
     setNickname(value);
+    setSubmitErrorMessage("");
     setNicknameError(value ? validateNickname(value) : "");
   };
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
     setVerifiedEmail(null);
+    setSubmitErrorMessage("");
     setEmailError(
       value && !EMAIL_REGEX.test(value)
         ? "올바른 이메일 형식을 입력해 주세요."
@@ -78,6 +81,7 @@ export function SignupForm() {
 
   const handlePasswordChange = (value: string) => {
     setPassword(value);
+    setSubmitErrorMessage("");
     setPasswordError(value ? validatePassword(value) : "");
     if (confirmPassword) {
       setConfirmPasswordError(
@@ -88,15 +92,42 @@ export function SignupForm() {
 
   const handleConfirmPasswordChange = (value: string) => {
     setConfirmPassword(value);
+    setSubmitErrorMessage("");
     setConfirmPasswordError(
       value && value !== password ? "비밀번호가 일치하지 않습니다." : "",
     );
   };
 
+  const getSignupErrorMessage = (error: unknown) => {
+  const axiosError = error as {
+    response?: {
+      data?: {
+        error?: {
+          code?: string;
+          message?: string;
+        };
+      };
+    };
+  };
+
+  const errorCode = axiosError.response?.data?.error?.code;
+  const errorMessage = axiosError.response?.data?.error?.message;
+
+  switch (errorCode) {
+    case "AUTH_004":
+      return "이미 사용 중인 이메일입니다.";
+    default:
+      return errorMessage ?? "회원가입 중 오류가 발생했습니다.";
+  }
+};
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid || !verifiedEmail) return;
+
     setIsSubmitting(true);
+    setSubmitErrorMessage("");
+    
     try {
       await authEndpoints.signup({
         email: verifiedEmail,
@@ -112,6 +143,8 @@ export function SignupForm() {
       setAuth({ userId, email, nickname: loginNickname }, accessToken);
 
       router.push("/onboarding");
+    } catch (error) {
+      setSubmitErrorMessage(getSignupErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -190,6 +223,10 @@ export function SignupForm() {
           "가입하기"
         )}
       </Button>
+
+      {submitErrorMessage && (
+        <p className="text-sm text-red-500">{submitErrorMessage}</p>
+      )}
     </form>
   );
 }
