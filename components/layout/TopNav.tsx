@@ -134,19 +134,13 @@ export function TopNav() {
                 )}
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem
-                  asChild
-                  className="focus:bg-secondary focus:text-foreground data-[highlighted]:bg-secondary data-[highlighted]:text-foreground"
-                >
+                <DropdownMenuItem asChild>
                   <Link href="/profile">
                     <User />내 프로필
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={handleLogout}
-                  className="focus:bg-secondary focus:text-foreground data-[highlighted]:bg-secondary data-[highlighted]:text-foreground"
-                >
+                <DropdownMenuItem onSelect={handleLogout}>
                   <LogOut />
                   로그아웃
                 </DropdownMenuItem>

@@ -27,14 +27,18 @@ function DevPickLogo() {
       <h1 className="text-2xl font-bold tracking-tight text-foreground">
         DevPick
       </h1>
-      <p className="mt-1.5 text-sm text-muted-foreground">
+      <p className="mt-1.5 text-sm text-muted-foreground font-medium">
         {"개발자를 위한 맞춤형 학습 플랫폼"}
       </p>
     </div>
   );
 }
 
-export function AuthContainer() {
+interface AuthContainerProps {
+  oauthError?: string;
+}
+
+export function AuthContainer({ oauthError }: AuthContainerProps) {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
@@ -54,16 +58,22 @@ export function AuthContainer() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[448px]">
+    <div className="mx-auto w-full max-w-[464px]">
       <DevPickLogo />
 
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-primary/5 transition-all duration-300">
+      {oauthError && (
+        <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
+          {oauthError}
+        </div>
+      )}
+
+      <div className="rounded-2xl bg-card p-6 transition-all duration-300">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 grid w-full grid-cols-2 bg-secondary">
-            <TabsTrigger value="login" className="text-sm font-medium">
+            <TabsTrigger value="login" className="text-sm font-semibold">
               {"로그인"}
             </TabsTrigger>
-            <TabsTrigger value="signup" className="text-sm font-medium">
+            <TabsTrigger value="signup" className="text-sm font-semibold">
               {"회원가입"}
             </TabsTrigger>
           </TabsList>

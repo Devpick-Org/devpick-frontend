@@ -157,7 +157,9 @@ export function ProfileEditForm() {
   const [selectedLevel, setSelectedLevel] = useState<LevelId | null>(
     (user?.level as LevelId) ?? null,
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>(dedupeTags(user?.tags));
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    dedupeTags(user?.tags),
+  );
   const [tagSearch, setTagSearch] = useState("");
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -169,13 +171,7 @@ export function ProfileEditForm() {
     if (user?.level) setSelectedLevel(user.level as LevelId);
     setSelectedTags(dedupeTags(user?.tags));
     if (user?.profileImage) setAvatarPreview(user.profileImage);
-  }, [
-    user?.nickname,
-    user?.job,
-    user?.level,
-    user?.tags,
-    user?.profileImage,
-  ]);
+  }, [user?.nickname, user?.job, user?.level, user?.tags, user?.profileImage]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -248,14 +244,14 @@ export function ProfileEditForm() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
             내 프로필
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm font-medium text-muted-foreground">
             프로필 정보를 수정하고 관리하세요.
           </p>
         </div>
         <Button
           onClick={handleSave}
           disabled={isSaving}
-          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20"
+          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
         >
           {isSaving ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
@@ -267,8 +263,8 @@ export function ProfileEditForm() {
       </div>
 
       {/* Profile Avatar + Nickname */}
-      <section className="mb-8 rounded-2xl border border-border bg-card p-6">
-        <h2 className="mb-5 text-base font-semibold text-foreground">
+      <section className="mb-8 rounded-2xl bg-card p-6">
+        <h2 className="mb-5 text-lg font-semibold text-foreground">
           기본 정보
         </h2>
 
@@ -303,7 +299,7 @@ export function ProfileEditForm() {
           <div className="w-full flex-1">
             <label
               htmlFor="nickname"
-              className="mb-1.5 block text-sm font-medium text-foreground"
+              className="mb-1.5 block text-sm font-semibold text-foreground"
             >
               닉네임
             </label>
@@ -313,10 +309,10 @@ export function ProfileEditForm() {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}
-              className="h-11 bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/50"
+              className="h-11 bg-secondary text-foreground font-medium placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/50"
               placeholder="닉네임을 입력하세요"
             />
-            <p className="mt-1.5 text-xs text-muted-foreground">
+            <p className="mt-1.5 text-xs text-muted-foreground font-medium">
               {`${nickname.length}/20자`}
             </p>
           </div>
@@ -324,21 +320,21 @@ export function ProfileEditForm() {
       </section>
 
       {/* Learning Info */}
-      <section className="mb-8 rounded-2xl border border-border bg-card p-6">
-        <h2 className="mb-5 text-base font-semibold text-foreground">
+      <section className="mb-8 rounded-2xl bg-card p-6">
+        <h2 className="mb-5 text-lg font-semibold text-foreground">
           학습 정보
         </h2>
 
         {/* Job Role Dropdown */}
         <div className="mb-6">
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+          <label className="mb-3 block text-sm font-semibold text-foreground">
             직무
           </label>
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsRoleOpen((prev) => !prev)}
-              className="flex h-11 w-full items-center justify-between rounded-lg bg-secondary px-3 text-sm text-foreground transition-colors hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50"
+              className="flex h-11 w-full items-center justify-between rounded-lg bg-secondary px-3 text-sm text-foreground font-medium transition-colors hover:border-primary/40 focus:outline-none"
             >
               <span>{currentRole?.label ?? "직무 선택"}</span>
               <ChevronDownIcon
@@ -349,7 +345,7 @@ export function ProfileEditForm() {
               />
             </button>
             {isRoleOpen && (
-              <div className="absolute z-20 mt-1 w-full rounded-lg bg-card shadow-lg">
+              <div className="absolute z-20 mt-1 w-full rounded-lg border border-border bg-card">
                 {JOB_ROLES.map((role) => (
                   <button
                     key={role.id}
@@ -359,7 +355,7 @@ export function ProfileEditForm() {
                       setIsRoleOpen(false);
                     }}
                     className={cn(
-                      "flex w-full items-center px-3 py-2.5 text-sm transition-colors first:rounded-t-lg last:rounded-b-lg",
+                      "flex w-full items-center px-3 py-2.5 text-sm font-medium transition-colors first:rounded-t-lg last:rounded-b-lg",
                       selectedRole === role.id
                         ? "bg-primary/10 text-primary"
                         : "text-foreground hover:bg-secondary",
@@ -375,7 +371,7 @@ export function ProfileEditForm() {
 
         {/* Level Selection */}
         <div className="mb-6">
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+          <label className="mb-3 block text-sm font-semibold text-foreground">
             경력 수준
           </label>
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
@@ -406,7 +402,7 @@ export function ProfileEditForm() {
                   >
                     {level.label}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground font-medium">
                     {level.sub}
                   </span>
                 </button>
@@ -417,31 +413,28 @@ export function ProfileEditForm() {
 
         {/* Interest Tags */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+          <label className="mb-3 block text-sm font-semibold text-foreground">
             관심 태그
           </label>
 
           {/* Selected tags */}
-          <ProfileTagSelector
-            value={selectedTags}
-            onChange={setSelectedTags}
-          />
+          <ProfileTagSelector value={selectedTags} onChange={setSelectedTags} />
         </div>
       </section>
 
       {/* Danger Zone */}
-      <section className="rounded-2xl border border-red-500/30 bg-red-500/5 p-6">
+      <section className="rounded-2xl  bg-red-500/5 p-6">
         <h2 className="mb-2 text-base font-semibold text-red-400">
           Danger Zone
         </h2>
-        <p className="mb-5 text-sm text-muted-foreground">
+        <p className="mb-5 text-sm text-muted-foreground font-medium">
           계정을 삭제하면 모든 학습 데이터와 활동 기록이 영구적으로 삭제됩니다.
         </p>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
               variant="outline"
-              className="gap-2 border-red-500/40 bg-transparent text-red-400 hover:border-red-500 hover:bg-red-500/10 hover:text-red-300"
+              className="gap-2 border-red-500/40 bg-transparent text-red-400 font-medium hover:border-red-500 hover:bg-red-500/5 hover:text-red-500"
             >
               <TrashIcon className="h-4 w-4" />
               계정 삭제
@@ -452,12 +445,13 @@ export function ProfileEditForm() {
               <AlertDialogTitle className="text-foreground">
                 정말 탈퇴하시겠습니까?
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-muted-foreground">
-                학습 데이터가 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
+              <AlertDialogDescription className="text-muted-foreground font-medium">
+                학습 데이터가 모두 삭제됩니다. 7일 안에 재로그인 시 계정이
+                복구됩니다.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-border bg-secondary text-foreground hover:bg-muted">
+              <AlertDialogCancel className="border-0 bg-secondary text-foreground hover:bg-muted hover:text-foreground">
                 취소
               </AlertDialogCancel>
               <AlertDialogAction

@@ -13,7 +13,15 @@ interface ProfileTagSelectorProps {
 // --- 아이콘 컴포넌트 ---
 function SearchIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
     </svg>
@@ -22,7 +30,15 @@ function SearchIcon({ className }: { className?: string }) {
 
 function XIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M18 6 6 18" />
       <path d="m6 6 12 12" />
     </svg>
@@ -31,22 +47,34 @@ function XIcon({ className }: { className?: string }) {
 
 function PlusIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M5 12h14" />
       <path d="M12 5v14" />
     </svg>
   );
 }
 
-export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps) {
+export function ProfileTagSelector({
+  value,
+  onChange,
+}: ProfileTagSelectorProps) {
   const [inputValue, setInputValue] = useState("");
 
   const [customTags, setCustomTags] = useState<string[]>(() => {
     return value.filter(
       (selectedTag) =>
         !SUGGESTED_TAGS.some(
-          (suggestedTag) => suggestedTag.toLowerCase() === selectedTag.toLowerCase()
-        )
+          (suggestedTag) =>
+            suggestedTag.toLowerCase() === selectedTag.toLowerCase(),
+        ),
     );
   });
 
@@ -79,7 +107,7 @@ export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps)
     // 2. 전체 목록(기본+커스텀)에 이미 있는지 확인
     const allTags = [...SUGGESTED_TAGS, ...customTags];
     const existingTag = allTags.find((t) => t.toLowerCase() === lowerNewTag);
-    
+
     if (existingTag) {
       onChange([...value, existingTag]);
     } else {
@@ -101,8 +129,8 @@ export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps)
   const searchKeyword = inputValue.trim().toLowerCase();
 
   // 검색어에 맞는 커스텀 태그 필터링
-  const filteredCustomTags = customTags.filter((tag) => 
-    tag.toLowerCase().includes(searchKeyword)
+  const filteredCustomTags = customTags.filter((tag) =>
+    tag.toLowerCase().includes(searchKeyword),
   );
 
   // 검색어에 맞는 기본 태그 그룹 필터링 (일치하는 태그가 없으면 그룹 자체를 숨김)
@@ -110,7 +138,6 @@ export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps)
     label: group.label,
     tags: group.tags.filter((tag) => tag.toLowerCase().includes(searchKeyword)),
   })).filter((group) => group.tags.length > 0);
-
 
   return (
     <div className="flex flex-col">
@@ -147,7 +174,7 @@ export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps)
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="h-10 bg-secondary pl-9 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+            className="h-10 bg-secondary pl-9 text-foreground font-medium placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
           />
         </div>
         <button
@@ -163,11 +190,12 @@ export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps)
 
       {/* 3. 아래: 카테고리별 태그 목록 (스크롤 적용) */}
       <div className="max-h-[260px] overflow-y-auto pr-2 pb-2 space-y-6">
-        
         {/* 사용자가 직접 추가한 태그가 있다면 최상단에 보여줌 */}
         {filteredCustomTags.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">내 커스텀 태그</h3>
+            <h3 className="text-sm font-semibold text-foreground">
+              내 커스텀 태그
+            </h3>
             <div className="flex flex-wrap gap-2">
               {filteredCustomTags.map((tag) => {
                 const isSelected = value.includes(tag);
@@ -194,7 +222,9 @@ export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps)
         {/* 기본 제공 태그를 그룹별로 렌더링 */}
         {filteredGroups.map((group) => (
           <div key={group.label} className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">{group.label}</h3>
+            <h3 className="text-sm font-semibold text-foreground">
+              {group.label}
+            </h3>
             <div className="flex flex-wrap gap-2">
               {group.tags.map((tag) => {
                 const isSelected = value.includes(tag);
@@ -220,13 +250,14 @@ export function ProfileTagSelector({ value, onChange }: ProfileTagSelectorProps)
 
         {/* 검색 결과가 아예 없을 때 안내 문구 */}
         {filteredCustomTags.length === 0 && filteredGroups.length === 0 && (
-          <div className="w-full py-6 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
+          <div className="w-full py-6 text-center text-sm text-muted-foreground font-medium flex flex-col items-center gap-2">
             <span>&quot;{inputValue}&quot; 검색 결과가 없습니다.</span>
-            <span className="text-primary font-medium">우측 추가 버튼을 눌러 새 태그를 만들어 보세요!</span>
+            <span className="text-primary font-medium">
+              우측 추가 버튼을 눌러 새 태그를 만들어 보세요!
+            </span>
           </div>
         )}
       </div>
-      
     </div>
   );
 }

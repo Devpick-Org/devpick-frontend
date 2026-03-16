@@ -22,7 +22,7 @@ export function ProfileRoleSelector({
           className={cn(
             "rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200",
             value === role.id
-              ? "bg-primary/10 text-primary shadow-md shadow-primary/10"
+              ? "bg-primary/10 text-primary"
               : "bg-secondary text-foreground hover:bg-secondary/80",
           )}
         >

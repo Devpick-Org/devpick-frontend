@@ -22,7 +22,7 @@ export function ProfileLevelSelector({
           className={cn(
             "flex flex-col items-center gap-1.5 rounded-xl px-3 py-4 transition-all duration-200",
             value === level.id
-              ? "bg-primary/10 shadow-md shadow-primary/10"
+              ? "bg-primary/10"
               : "bg-secondary hover:bg-secondary/80",
           )}
         >
@@ -34,7 +34,9 @@ export function ProfileLevelSelector({
           >
             {level.label}
           </span>
-          <span className="text-xs text-muted-foreground">{level.sub}</span>
+          <span className="text-xs font-medium text-muted-foreground">
+            {level.sub}
+          </span>
         </button>
       ))}
     </div>

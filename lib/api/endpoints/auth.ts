@@ -54,4 +54,8 @@ export const authEndpoints = {
   /** POST /auth/email/verify — 인증 코드 검증 */
   verifyEmailCode: (email: string, code: string) =>
     apiClient.post<ApiResponse<null>>("/auth/email/verify", { email, code }),
+
+  /** POST /auth/recover — 탈퇴 계정 복구 */
+  recover: (data: LoginRequest) =>
+    apiClient.post<ApiResponse<AuthResponse>>("/auth/recover", data),
 };

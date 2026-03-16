@@ -24,7 +24,7 @@ export function FeedSearch({ onSearch }: FeedSearchProps) {
         placeholder="관심 주제나 기술을 검색해 보세요..."
         value={query}
         onChange={handleChange}
-        className="h-12 rounded-lg border-border bg-muted/60 pl-11 pr-4 text-center text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+        className="h-12 rounded-lg  bg-muted/60 pl-11 pr-4 text-center text-sm text-foreground font-medium placeholder:text-muted-foreground"
       />
     </div>
   );

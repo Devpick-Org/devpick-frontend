@@ -12,14 +12,14 @@ export function RecommendedContents({ items }: RecommendedContentsProps) {
 
   return (
     <section>
-      <h2 className="mb-4 text-sm font-semibold text-foreground">
+      <h2 className="mb-4 text-md font-semibold text-foreground">
         이런 글은 어떠신가요?
       </h2>
       <ul className="flex flex-col gap-3">
         {items.map((item) => (
           <li key={item.id}>
             <Link href={`/home/${item.id}`} className="block">
-              <div className="group overflow-hidden rounded-xl border border-border bg-card transition-all duration-200 hover:border-primary/30 hover:shadow-md hover:shadow-primary/5">
+              <div className="overflow-hidden rounded-xl border border-border bg-card">
                 {/* 썸네일 */}
                 <div className="relative h-36 w-full bg-secondary">
                   {item.thumbnailUrl ? (
@@ -39,10 +39,10 @@ export function RecommendedContents({ items }: RecommendedContentsProps) {
 
                 {/* 텍스트 */}
                 <div className="p-3">
-                  <p className="mb-1.5 line-clamp-2 text-sm font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
+                  <p className="mb-1.5 line-clamp-2 text-sm font-semibold leading-snug text-foreground">
                     {item.title}
                   </p>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground font-medium">
                     {item.sourceName}
                   </span>
                 </div>
