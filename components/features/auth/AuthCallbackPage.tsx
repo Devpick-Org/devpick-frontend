@@ -4,6 +4,7 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
+import { extractApiError, getAuthErrorMessage } from "@/lib/auth/getAuthErrorMessage";
 
 interface CallbackHandlerProps {
   provider: "github" | "google";
@@ -19,8 +20,13 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
     const state = searchParams.get("state");
     const error = searchParams.get("error");
 
-    if (error || !code || !state) {
-      router.replace("/");
+    if (error === "access_denied") {
+      router.replace(`/?oauthError=${encodeURIComponent(getAuthErrorMessage("AUTH_019"))}`);
+      return;
+    }
+
+    if (!code || !state) {
+      router.replace(`/?oauthError=${encodeURIComponent("소셜 로그인 중 오류가 발생했습니다.")}`);
       return;
     }
 
@@ -43,8 +49,10 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
 
         router.replace(isNewUser ? "/onboarding" : "/home");
       })
-      .catch(() => {
-        router.replace("/");
+      .catch((err: unknown) => {
+        const { code, message } = extractApiError(err);
+        const errorMsg = getAuthErrorMessage(code, message ?? "소셜 로그인 중 오류가 발생했습니다.");
+        router.replace(`/?oauthError=${encodeURIComponent(errorMsg)}`);
       });
   }, [searchParams, router, setAuth, provider]);
 

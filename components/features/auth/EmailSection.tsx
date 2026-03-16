@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authEndpoints } from "@/lib/api/endpoints/auth"
+import { extractApiError, getAuthErrorMessage } from "@/lib/auth/getAuthErrorMessage"
 
 const TIMER_DURATION = 180 // 3분
 
@@ -60,26 +61,9 @@ export function EmailSection({
   }, [])
 
   const getVerifyErrorMessage = (error: unknown) => {
-  const axiosError = error as {
-    response?: {
-      data?: {
-        error?: {
-          code?: string
-          message?: string
-        }
-      }
-    }
+    const { code, message } = extractApiError(error)
+    return getAuthErrorMessage(code, message ?? "인증 확인 중 오류가 발생했습니다.")
   }
-
-  const errorCode = axiosError.response?.data?.error?.code
-
-  switch (errorCode) {
-    case "AUTH_005":
-      return "사용자를 찾을 수 없습니다."
-    default:
-      return "인증 확인 중 오류가 발생했습니다."
-  }
-}
 
   const handleSendCode = async () => {
     setIsSendingCode(true)
@@ -88,6 +72,9 @@ export function EmailSection({
       await authEndpoints.sendEmailCode(email)
       setIsCodeSent(true)
       setTimerSeconds(TIMER_DURATION)
+    } catch (error) {
+      const { code, message } = extractApiError(error)
+      setVerificationErrorMessage(getAuthErrorMessage(code, message ?? "인증 코드 발송 중 오류가 발생했습니다."))
     } finally {
       setIsSendingCode(false)
     }

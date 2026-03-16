@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { EmailSection } from "./EmailSection";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
+import { extractApiError, getAuthErrorMessage } from "@/lib/auth/getAuthErrorMessage";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/;
@@ -99,27 +100,9 @@ export function SignupForm() {
   };
 
   const getSignupErrorMessage = (error: unknown) => {
-  const axiosError = error as {
-    response?: {
-      data?: {
-        error?: {
-          code?: string;
-          message?: string;
-        };
-      };
-    };
+    const { code, message } = extractApiError(error);
+    return getAuthErrorMessage(code, message ?? "회원가입 중 오류가 발생했습니다.");
   };
-
-  const errorCode = axiosError.response?.data?.error?.code;
-  const errorMessage = axiosError.response?.data?.error?.message;
-
-  switch (errorCode) {
-    case "AUTH_004":
-      return "이미 사용 중인 이메일입니다.";
-    default:
-      return errorMessage ?? "회원가입 중 오류가 발생했습니다.";
-  }
-};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

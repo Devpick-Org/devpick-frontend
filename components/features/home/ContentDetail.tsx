@@ -3,33 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, Heart, Bookmark, Share2, ExternalLink } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { cn, formatDate } from "@/lib/utils";
 import { useContentStore } from "@/store/content.store";
 import type { ContentDetail as ContentDetailType } from "@/types/content";
-
-// ─── 태그 색상 ────────────────────────────────────────────────────────────────
-
-const TAG_COLORS: Record<string, string> = {
-  React: "border-blue-500/30 bg-blue-500/10 text-blue-400",
-  "Next.js": "border-foreground/20 bg-foreground/5 text-foreground/80",
-  TypeScript: "border-blue-400/30 bg-blue-400/10 text-blue-300",
-  Spring: "border-green-500/30 bg-green-500/10 text-green-400",
-  Docker: "border-sky-500/30 bg-sky-500/10 text-sky-400",
-  Kubernetes: "border-indigo-500/30 bg-indigo-500/10 text-indigo-400",
-  Python: "border-yellow-500/30 bg-yellow-500/10 text-yellow-400",
-  AWS: "border-orange-500/30 bg-orange-500/10 text-orange-400",
-  "Node.js": "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
-  Go: "border-cyan-500/30 bg-cyan-500/10 text-cyan-400",
-  Rust: "border-orange-600/30 bg-orange-600/10 text-orange-500",
-  DevOps: "border-teal-500/30 bg-teal-500/10 text-teal-400",
-  GraphQL: "border-pink-500/30 bg-pink-500/10 text-pink-400",
-  "Tailwind CSS": "border-teal-400/30 bg-teal-400/10 text-teal-300",
-};
-
-function getTagColor(tag: string) {
-  return TAG_COLORS[tag] ?? "border-primary/20 bg-primary/5 text-primary/80";
-}
 
 // ─── 마크다운 렌더러 ───────────────────────────────────────────────────────────
 
@@ -286,7 +262,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
           {content.licenseType && (
             <>
               <span className="text-border">·</span>
-              <span className="rounded-md border border-border px-1.5 py-0.5 text-xs">
+              <span className="rounded-md px-1.5 py-0.5 text-xs">
                 {content.licenseType}
               </span>
             </>
@@ -294,20 +270,11 @@ export function ContentDetail({ content }: ContentDetailProps) {
         </div>
 
         {/* 태그 */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {content.tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant="outline"
-              className={cn(
-                "rounded-lg px-3 py-1 text-xs font-medium",
-                getTagColor(tag),
-              )}
-            >
-              {tag}
-            </Badge>
-          ))}
-        </div>
+        {content.tags.length > 0 && (
+          <p className="mt-4 text-sm text-muted-foreground/85">
+            {content.tags.join(" · ")}
+          </p>
+        )}
       </header>
 
       {/* 본문 */}
@@ -316,7 +283,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
       </section>
 
       {/* 원문 링크 CTA */}
-      <section className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-card px-6 py-8">
+      <section className="flex flex-col items-center gap-3 rounded-2xl bg-card px-6 py-8">
         <p className="text-sm text-muted-foreground">
           저작권 보호를 위해 본문의 일부만 제공됩니다.
         </p>
@@ -324,7 +291,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
           href={content.canonicalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200 hover:brightness-110 hover:shadow-xl hover:shadow-primary/30"
+          className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
         >
           <ExternalLink className="h-4 w-4" />
           원문 보러 가기

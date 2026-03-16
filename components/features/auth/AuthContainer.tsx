@@ -34,7 +34,11 @@ function DevPickLogo() {
   );
 }
 
-export function AuthContainer() {
+interface AuthContainerProps {
+  oauthError?: string;
+}
+
+export function AuthContainer({ oauthError }: AuthContainerProps) {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
 
@@ -57,7 +61,13 @@ export function AuthContainer() {
     <div className="mx-auto w-full max-w-[448px]">
       <DevPickLogo />
 
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-lg shadow-primary/5 transition-all duration-300">
+      {oauthError && (
+        <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
+          {oauthError}
+        </div>
+      )}
+
+      <div className="rounded-2xl bg-card p-6 transition-all duration-300">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6 grid w-full grid-cols-2 bg-secondary">
             <TabsTrigger value="login" className="text-sm font-medium">

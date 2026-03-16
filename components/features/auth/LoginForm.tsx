@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authEndpoints } from "@/lib/api/endpoints/auth"
 import { useAuthStore } from "@/store/auth.store"
+import { extractApiError, getAuthErrorMessage } from "@/lib/auth/getAuthErrorMessage"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/
@@ -70,9 +71,8 @@ export function LoginForm({ isLoading }: LoginFormProps) {
 
       router.push("/home")
     } catch (err) {
-      const apiError = (err as { response?: { data?: { error?: { message?: string } } } })
-        ?.response?.data?.error?.message
-      setAuthError(apiError ?? (err instanceof Error ? err.message : "로그인 중 오류가 발생했습니다."))
+      const { code, message } = extractApiError(err)
+      setAuthError(getAuthErrorMessage(code, message ?? "로그인 중 오류가 발생했습니다."))
     } finally {
       setIsSubmitting(false)
     }

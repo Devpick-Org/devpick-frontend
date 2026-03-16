@@ -255,7 +255,7 @@ export function ProfileEditForm() {
         <Button
           onClick={handleSave}
           disabled={isSaving}
-          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shadow-primary/20"
+          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
         >
           {isSaving ? (
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
@@ -267,7 +267,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* Profile Avatar + Nickname */}
-      <section className="mb-8 rounded-2xl border border-border bg-card p-6">
+      <section className="mb-8 rounded-2xl bg-card p-6">
         <h2 className="mb-5 text-base font-semibold text-foreground">
           기본 정보
         </h2>
@@ -324,7 +324,7 @@ export function ProfileEditForm() {
       </section>
 
       {/* Learning Info */}
-      <section className="mb-8 rounded-2xl border border-border bg-card p-6">
+      <section className="mb-8 rounded-2xl bg-card p-6">
         <h2 className="mb-5 text-base font-semibold text-foreground">
           학습 정보
         </h2>
@@ -430,7 +430,7 @@ export function ProfileEditForm() {
       </section>
 
       {/* Danger Zone */}
-      <section className="rounded-2xl border border-red-500/30 bg-red-500/5 p-6">
+      <section className="rounded-2xl  bg-red-500/5 p-6">
         <h2 className="mb-2 text-base font-semibold text-red-400">
           Danger Zone
         </h2>
