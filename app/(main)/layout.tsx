@@ -9,6 +9,7 @@ import { TopNavVariant } from "@/components/layout/TopNavVariant";
 // import { ChevronLeft, ChevronRight } from "lucide-react";
 // import { cn } from "@/lib/utils";
 import { AuthInitializer } from "@/components/features/auth/AuthInitializer";
+import { ScrollToTopButton } from "@/components/layout/ScrollToTopButton";
 
 export default function MainLayout({
   children,
@@ -57,6 +58,8 @@ export default function MainLayout({
       <main className="pt-16 pb-16 md:pb-0">
         {children}
       </main>
+
+      <ScrollToTopButton />
 
       <Toaster
         richColors

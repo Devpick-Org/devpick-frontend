@@ -110,6 +110,7 @@
 │ ┃ ┃ ┣ SignupForm.tsx       # 회원가입 폼 (react-hook-form + zod)
 │ ┃ ┃ ┗ SocialAuthButtons.tsx # GitHub / Google 소셜 로그인 버튼
 │ ┃ ┣ home/
+│ ┃ ┃ ┣ AiSummary.tsx        # AI 요약 렌더러 (레벨별 요약, 키포인트, 키워드 등)
 │ ┃ ┃ ┣ ContentDetail.tsx    # 글 상세 뷰어 ("use client", 마크다운 렌더링 + 좋아요/스크랩/공유)
 │ ┃ ┃ ┣ FeedCard.tsx         # 피드 카드 (FeedCardItem interface)
 │ ┃ ┃ ┣ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
@@ -129,6 +130,7 @@
 ├── lib/
 │ ┣ api/                 # API 클라이언트 (DP-190)
 │ ┃ ┣ client.ts          # Axios 인스턴스 + 인터셉터 (401 → /auth/refresh → 재시도)
+│ ┃ ┣ extractApiError.ts # API 에러 추출 유틸
 │ ┃ ┗ endpoints/         # 도메인별 API 함수
 │ ┃   ┣ auth.ts          # 로그인/회원가입/로그아웃/소셜 로그인 등
 │ ┃   ┣ contents.ts      # 피드/상세/추천/좋아요/스크랩 등
@@ -141,6 +143,10 @@
 │ ┃ ┣ SessionStorageStrategy.ts # SessionStorage 기반 구현체 — 현재 운영 정책상 미사용
 │ ┃ ┣ tokenManager.ts        # 토큰 저장 전략 선택 및 CRUD 관리자
 │ ┃ ┗ getAuthErrorMessage.ts # 인증 에러 코드 → 사용자 메시지 매핑
+│ ┣ content/             # 콘텐츠 관련 유틸
+│ ┃ ┗ getContentErrorMessage.ts # 콘텐츠 에러 코드 → 사용자 메시지 매핑
+│ ┣ mock/                # 개발용 목 데이터
+│ ┃ ┗ aiSummary.ts       # AI 요약 목 데이터
 │ ┗ utils.ts             # cn(), formatDate(), formatRelativeTime()
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated, setAuth, clearAuth)
@@ -780,7 +786,7 @@ query param:
 
 ## 9. 스프린트 진행 현황 — 프론트엔드
 
-### 지난 스프린트: Sprint 0 (완료)
+### 지난 스프린트: Sprint 0, 1 (완료)
 
 | 티켓   | 작업                                                  |
 | ------ | ----------------------------------------------------- |
@@ -792,19 +798,29 @@ query param:
 | DP-167 | PR 템플릿 추가                                        |
 | DP-168 | 브랜치 보호 규칙 설정                                 |
 | DP-169 | CLAUDE.md 각 레포에 작성                              |
+| DP-190 | 프론트엔드 API 클라이언트 세팅 (axios 인터셉터 등)    |
+| DP-191 | 프론트엔드 전역 상태 관리 세팅 (Zustand store 구조)   |
+| DP-192 | 프론트엔드 공통 컴포넌트 개발 (버튼/카드/모달 등)     |
+| DP-193 | 회원가입 화면 개발                                    |
+| DP-194 | 로그인 화면 개발                                      |
+| DP-195 | 프로필 설정 화면 개발 (태그/직무/레벨)                |
+| DP-211 | 피드 화면 개발 (무한 스크롤)                          |
+| DP-212 | 글 상세 화면 개발                                     |
 
-### 현재 스프린트: Sprint 1 (3/3 ~ 3/16) — Epic A/B 핵심
+### 현재 스프린트: Sprint 2 (3/16 ~ 3/22) — Epic C/D/E/F 핵심
 
-| 티켓   | 작업                                                |
-| ------ | --------------------------------------------------- |
-| DP-190 | 프론트엔드 API 클라이언트 세팅 (axios 인터셉터 등)  |
-| DP-191 | 프론트엔드 전역 상태 관리 세팅 (Zustand store 구조) |
-| DP-192 | 프론트엔드 공통 컴포넌트 개발 (버튼/카드/모달 등)   |
-| DP-193 | 회원가입 화면 개발                                  |
-| DP-194 | 로그인 화면 개발                                    |
-| DP-195 | 프로필 설정 화면 개발 (태그/직무/레벨)              |
-| DP-211 | 피드 화면 개발 (무한 스크롤)                        |
-| DP-212 | 글 상세 화면 개발                                   |
+| 티켓   | 작업                                                    |
+| ------ | ------------------------------------------------------- |
+| DP-224 | 글 상세 화면 AI 요약 섹션 개발                          |
+| DP-225 | AI 요약 실패/지연 대체 화면 처리                        |
+| DP-241 | 게시글 작성 화면 개발 (질문(왼쪽) + 바로 커뮤니티 게시) |
+| DP-242 | AI 질문 개선 화면(오른쪽) 개발                          |
+| DP-243 | AI 1차 답변 화면 개발 + 게시글 화면                     |
+| DP-244 | 커뮤니티 화면 개발                                      |
+| DP-251 | 학습 히스토리 화면 개발 (타임라인)                      |
+| DP-261 | 주간 리포트 화면 개발 (바 차트/레이더 차트)             |
+| DP-262 | AI 인사이트 화면 개발                                   |
+| DP-263 | 리포트 저장/공유 화면 개발                              |
 
 ---
 
