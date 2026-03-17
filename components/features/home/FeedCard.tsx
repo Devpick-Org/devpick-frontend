@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, copyShareLink } from "@/lib/utils";
 import { useContentStore } from "@/store/content.store";
 import type { Content } from "@/types/content";
 
@@ -17,7 +17,6 @@ interface FeedCardProps {
 
 export function FeedCard({ content }: FeedCardProps) {
   const { init, toggleLike, toggleScrap, interactions } = useContentStore();
-  const [isShareTooltip, setIsShareTooltip] = useState(false);
 
   useEffect(() => {
     init(content.id, content.isLiked, content.isScrapped);
@@ -42,13 +41,7 @@ export function FeedCard({ content }: FeedCardProps) {
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsShareTooltip(true);
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(
-        `${window.location.origin}/home/${content.id}`,
-      );
-    }
-    setTimeout(() => setIsShareTooltip(false), 1500);
+    copyShareLink(`${window.location.origin}/home/${content.id}`);
   };
 
   return (
@@ -119,15 +112,10 @@ export function FeedCard({ content }: FeedCardProps) {
 
               <button
                 onClick={handleShare}
-                className="relative rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
                 aria-label="공유"
               >
                 <Share2 className="h-4 w-4" />
-                {isShareTooltip && (
-                  <span className="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background shadow-sm">
-                    링크 복사됨
-                  </span>
-                )}
               </button>
             </div>
           </div>
