@@ -7,7 +7,12 @@ import {
   AiSummaryLevel,
   AiSummaryResponse,
 } from "@/types/content";
-import { MOCK_AI_SUMMARIES, MOCK_AI_SUMMARY_RETRIES } from "@/lib/mock/aiSummary";
+import {
+  MOCK_AI_SUMMARIES,
+  MOCK_AI_SUMMARY_RETRIES,
+  MOCK_SUMMARY_SCENARIO,
+  MOCK_SCENARIO_ERROR,
+} from "@/lib/mock/aiSummary";
 
 const MOCK_ORIGINAL_CONTENT_WITH_CODE = `## 들어가며
 
@@ -563,8 +568,13 @@ export const contentsEndpoints = {
     contentId: string,
     level: AiSummaryLevel = "JUNIOR",
   ): Promise<AiSummaryResponse> => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       setTimeout(() => {
+        if (MOCK_SUMMARY_SCENARIO !== "success") {
+          const { code, message } = MOCK_SCENARIO_ERROR[MOCK_SUMMARY_SCENARIO];
+          reject({ response: { data: { error: { code, message } } } });
+          return;
+        }
         resolve({
           success: true,
           data: { ...MOCK_AI_SUMMARIES[level], contentId },
@@ -579,8 +589,13 @@ export const contentsEndpoints = {
     contentId: string,
     level: AiSummaryLevel = "JUNIOR",
   ): Promise<AiSummaryResponse> => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       setTimeout(() => {
+        if (MOCK_SUMMARY_SCENARIO !== "success") {
+          const { code, message } = MOCK_SCENARIO_ERROR[MOCK_SUMMARY_SCENARIO];
+          reject({ response: { data: { error: { code, message } } } });
+          return;
+        }
         const now = new Date().toISOString();
         const expiresAt = new Date(Date.now() + 86_400_000).toISOString();
         resolve({
