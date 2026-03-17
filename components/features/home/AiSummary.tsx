@@ -131,17 +131,21 @@ interface AiSummaryFallbackProps {
   onRetry: () => void;
 }
 
-function AiSummaryFallback({ kind, isRetrying, onRetry }: AiSummaryFallbackProps) {
+function AiSummaryFallback({
+  kind,
+  isRetrying,
+  onRetry,
+}: AiSummaryFallbackProps) {
   const { icon: Icon, title, description, buttonLabel } = FALLBACK_CONFIG[kind];
 
   return (
-    <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-background px-6 py-8 text-center">
+    <div className="flex flex-col items-center gap-4 rounded-xl bg-background px-6 py-8 text-center">
       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary">
         <Icon className="h-5 w-5 text-muted-foreground" />
       </div>
       <div className="space-y-1.5">
         <p className="text-sm font-semibold text-foreground">{title}</p>
-        <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground">
+        <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground font-medium">
           {description}
         </p>
       </div>
