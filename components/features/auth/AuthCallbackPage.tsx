@@ -1,7 +1,17 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
 import { extractApiError, getAuthErrorMessage } from "@/lib/auth/getAuthErrorMessage";
@@ -10,10 +20,29 @@ interface CallbackHandlerProps {
   provider: "github" | "google";
 }
 
+function CallbackFallback() {
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+      <p className="text-muted-foreground text-sm">
+        로그인 정보를 확인하고 있습니다...
+      </p>
+    </div>
+  );
+}
+
 function CallbackHandler({ provider }: CallbackHandlerProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const setAuth = useAuthStore((s) => s.setAuth);
+
+  const [showRecoverModal, setShowRecoverModal] = useState(false);
+  const [recoveryToken, setRecoveryToken] = useState<string | null>(null);
+  const [isRecovering, setIsRecovering] = useState(false);
+  const [recoverError, setRecoverError] = useState("");
+
+  // AlertDialogAction 클릭 시 onOpenChange가 동시에 호출되어 /로 이동하는 것을 방지
+  const isRecoveringRef = useRef(false);
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -38,11 +67,9 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
     callbackFn(code, state)
       .then(async ({ data }) => {
         const { accessToken, userId, email, nickname, isNewUser } = data.data;
-        // accessToken을 먼저 등록해야 이후 /users/me 요청에 Authorization 헤더가 붙음
         setAuth({ userId, email, nickname }, accessToken);
 
         if (!isNewUser) {
-          // 기존 유저: 소셜 로그인 응답에 job/level/tags가 없으므로 /users/me로 전체 프로필 조회
           const { data: meData } = await authEndpoints.getMe();
           setAuth(meData.data, accessToken);
         }
@@ -50,23 +77,86 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
         router.replace(isNewUser ? "/onboarding" : "/home");
       })
       .catch((err: unknown) => {
-        const { code, message } = extractApiError(err);
-        const errorMsg = getAuthErrorMessage(code, message ?? "소셜 로그인 중 오류가 발생했습니다.");
-        router.replace(`/?oauthError=${encodeURIComponent(errorMsg)}`);
+        const { code: errCode, message, recoveryToken: token } = extractApiError(err);
+
+        if (errCode === "AUTH_024" && token) {
+          setRecoveryToken(token);
+          setShowRecoverModal(true);
+        } else {
+          const errorMsg = getAuthErrorMessage(errCode, message ?? "소셜 로그인 중 오류가 발생했습니다.");
+          router.replace(`/?oauthError=${encodeURIComponent(errorMsg)}`);
+        }
       });
   }, [searchParams, router, setAuth, provider]);
 
-  return null;
-}
+  const handleRecover = useCallback(async () => {
+    if (!recoveryToken) return;
 
-function CallbackFallback() {
+    isRecoveringRef.current = true;
+    setIsRecovering(true);
+    setRecoverError("");
+
+    try {
+      const response = await authEndpoints.socialRecover({ recoveryToken });
+      const { accessToken, userId, email, nickname } = response.data.data;
+      setAuth({ userId, email, nickname }, accessToken);
+
+      const { data: meData } = await authEndpoints.getMe();
+      setAuth(meData.data, accessToken);
+
+      router.replace("/home");
+    } catch (err) {
+      const { code: errCode, message } = extractApiError(err);
+      setRecoverError(
+        getAuthErrorMessage(errCode, message ?? "계정 복구 중 오류가 발생했습니다."),
+      );
+      setShowRecoverModal(true);
+    } finally {
+      isRecoveringRef.current = false;
+      setIsRecovering(false);
+    }
+  }, [recoveryToken, setAuth, router]);
+
+  const handleDialogOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open && !isRecoveringRef.current) {
+        router.replace("/");
+      }
+      setShowRecoverModal(open);
+    },
+    [router],
+  );
+
+  if (isRecovering) {
+    return <CallbackFallback />;
+  }
+
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="w-12 h-12 rounded-full border-4 border-primary border-t-transparent animate-spin" />
-      <p className="text-muted-foreground text-sm">
-        로그인 정보를 확인하고 있습니다...
-      </p>
-    </div>
+    <AlertDialog open={showRecoverModal} onOpenChange={handleDialogOpenChange}>
+      <AlertDialogContent
+        size="sm"
+        className="bg-white"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <AlertDialogHeader>
+          <AlertDialogTitle>계정을 복구할까요?</AlertDialogTitle>
+          <AlertDialogDescription>
+            최근 탈퇴한 계정입니다.
+            <br />
+            복구하시면 바로 로그인됩니다.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        {recoverError && (
+          <p className="text-sm text-center text-red-500">{recoverError}</p>
+        )}
+        <AlertDialogFooter>
+          <AlertDialogCancel className="border-0 bg-secondary text-foreground hover:bg-secondary/90 hover:text-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
+            아니요
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleRecover}>복구하기</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

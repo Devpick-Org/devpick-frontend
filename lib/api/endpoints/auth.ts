@@ -5,6 +5,7 @@ import type {
   SignupRequest,
   AuthResponse,
   SocialAuthResponse,
+  SocialRecoverRequest,
   OAuthStartResponse,
   User,
 } from "@/types/auth";
@@ -55,7 +56,11 @@ export const authEndpoints = {
   verifyEmailCode: (email: string, code: string) =>
     apiClient.post<ApiResponse<null>>("/auth/email/verify", { email, code }),
 
-  /** POST /auth/recover — 탈퇴 계정 복구 */
+  /** POST /auth/recover — 탈퇴 계정 복구 (이메일 로그인) */
   recover: (data: LoginRequest) =>
     apiClient.post<ApiResponse<AuthResponse>>("/auth/recover", data),
+
+  /** POST /auth/social/recover — 소셜 탈퇴 계정 복구 */
+  socialRecover: (data: SocialRecoverRequest) =>
+    apiClient.post<ApiResponse<AuthResponse>>("/auth/social/recover", data),
 };

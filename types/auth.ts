@@ -41,3 +41,7 @@ export interface OAuthStartResponse {
 export interface RefreshTokenResponse {
   accessToken: string;
 }
+
+export interface SocialRecoverRequest {
+  recoveryToken: string;
+}
