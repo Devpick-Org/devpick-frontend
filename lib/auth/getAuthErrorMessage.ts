@@ -1,3 +1,5 @@
+export { extractApiError, type ApiErrorShape } from "@/lib/api/extractApiError";
+
 const AUTH_ERROR_MESSAGES: Record<string, string> = {
   AUTH_004: "이미 사용 중인 이메일입니다.",
   AUTH_005: "사용자를 찾을 수 없습니다.",
@@ -20,21 +22,6 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
   AUTH_025: "탈퇴 처리가 완료된 계정입니다.",
   COMMON_005: "서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
 };
-
-export interface ApiErrorShape {
-  code?: string;
-  message?: string;
-}
-
-export function extractApiError(error: unknown): ApiErrorShape {
-  const axiosError = error as {
-    response?: { data?: { error?: { code?: string; message?: string } } };
-  };
-  return {
-    code: axiosError.response?.data?.error?.code,
-    message: axiosError.response?.data?.error?.message,
-  };
-}
 
 /**
  * 에러 코드로 사용자에게 보여줄 메시지를 반환한다.

@@ -7,8 +7,17 @@ import {
   ChevronUp,
   RefreshCw,
   Loader2,
+  FileQuestion,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
+import { extractApiError } from "@/lib/api/extractApiError";
+import {
+  getAiSummaryErrorKind,
+  type AiSummaryErrorKind,
+} from "@/lib/content/getContentErrorMessage";
 import type {
   AiSummary as AiSummaryType,
   AiSummaryLevel,
@@ -24,6 +33,39 @@ const LEVEL_LABELS: Record<AiSummaryLevel, string> = {
   JUNIOR: "주니어",
   MIDDLE: "미들",
   SENIOR: "시니어",
+};
+
+// ─── Fallback 설정 ────────────────────────────────────────────────────────────
+
+interface FallbackConfig {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  buttonLabel: string;
+}
+
+const FALLBACK_CONFIG: Record<AiSummaryErrorKind, FallbackConfig> = {
+  empty: {
+    icon: FileQuestion,
+    title: "아직 요약이 없어요",
+    description:
+      "이 글에 대한 AI 요약이 준비되지 않았습니다.\n직접 생성해 볼 수 있어요.",
+    buttonLabel: "요약 생성하기",
+  },
+  timeout: {
+    icon: Clock,
+    title: "응답 시간이 초과됐어요",
+    description:
+      "AI 서버가 응답하는 데 시간이 오래 걸렸습니다.\n잠시 후 다시 시도해 주세요.",
+    buttonLabel: "다시 시도하기",
+  },
+  error: {
+    icon: AlertCircle,
+    title: "AI 요약을 불러오지 못했어요",
+    description:
+      "AI 서버에 일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해 주세요.",
+    buttonLabel: "다시 시도하기",
+  },
 };
 
 // ─── 스켈레톤 ─────────────────────────────────────────────────────────────────
@@ -81,6 +123,49 @@ function AiSummarySkeleton() {
   );
 }
 
+// ─── Fallback UI ──────────────────────────────────────────────────────────────
+
+interface AiSummaryFallbackProps {
+  kind: AiSummaryErrorKind;
+  isRetrying: boolean;
+  onRetry: () => void;
+}
+
+function AiSummaryFallback({ kind, isRetrying, onRetry }: AiSummaryFallbackProps) {
+  const { icon: Icon, title, description, buttonLabel } = FALLBACK_CONFIG[kind];
+
+  return (
+    <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-background px-6 py-8 text-center">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary">
+        <Icon className="h-5 w-5 text-muted-foreground" />
+      </div>
+      <div className="space-y-1.5">
+        <p className="text-sm font-semibold text-foreground">{title}</p>
+        <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground">
+          {description}
+        </p>
+      </div>
+      <button
+        onClick={onRetry}
+        disabled={isRetrying}
+        className={cn(
+          "flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150",
+          isRetrying
+            ? "cursor-not-allowed bg-primary/50 text-primary-foreground"
+            : "bg-primary text-primary-foreground hover:bg-primary/90",
+        )}
+      >
+        {isRetrying ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <RefreshCw className="h-3.5 w-3.5" />
+        )}
+        {isRetrying ? "생성 중..." : buttonLabel}
+      </button>
+    </div>
+  );
+}
+
 // ─── AiSummary ───────────────────────────────────────────────────────────────
 
 interface AiSummaryProps {
@@ -90,6 +175,7 @@ interface AiSummaryProps {
 export function AiSummary({ contentId }: AiSummaryProps) {
   const [level, setLevel] = useState<AiSummaryLevel>("JUNIOR");
   const [summary, setSummary] = useState<AiSummaryType | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -97,17 +183,29 @@ export function AiSummary({ contentId }: AiSummaryProps) {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
+    setErrorCode(null);
     contentsEndpoints
       .getContentSummary(contentId, level)
       .then((res) => setSummary(res.data))
+      .catch((err) => {
+        const { code } = extractApiError(err);
+        setErrorCode(code ?? "UNKNOWN");
+        setSummary(null);
+      })
       .finally(() => setIsLoading(false));
   }, [contentId, level]);
 
   const handleRetry = useCallback(() => {
     setIsRetrying(true);
+    setErrorCode(null);
     contentsEndpoints
       .retryContentSummary(contentId, level)
       .then((res) => setSummary(res.data))
+      .catch((err) => {
+        const { code } = extractApiError(err);
+        setErrorCode(code ?? "UNKNOWN");
+        setSummary(null);
+      })
       .finally(() => setIsRetrying(false));
   }, [contentId, level]);
 
@@ -147,25 +245,27 @@ export function AiSummary({ contentId }: AiSummaryProps) {
           {/* 구분선 */}
           <div className="h-5 w-px bg-border" />
 
-          {/* 다시 생성 */}
-          <button
-            onClick={handleRetry}
-            disabled={isLoading || isRetrying}
-            className={cn(
-              "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150",
-              isLoading || isRetrying
-                ? "cursor-not-allowed text-muted-foreground/40"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-            aria-label="AI 요약 다시 생성"
-          >
-            {isRetrying ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4" />
-            )}
-            {isRetrying ? "생성 중..." : "다시 생성"}
-          </button>
+          {/* 다시 생성 — success 상태에서만 표시 */}
+          {!errorCode && (
+            <button
+              onClick={handleRetry}
+              disabled={isLoading || isRetrying}
+              className={cn(
+                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150",
+                isLoading || isRetrying
+                  ? "cursor-not-allowed text-muted-foreground/40"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+              aria-label="AI 요약 다시 생성"
+            >
+              {isRetrying ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              {isRetrying ? "생성 중..." : "다시 생성"}
+            </button>
+          )}
 
           {/* 접기/펼치기 */}
           <button
@@ -185,9 +285,15 @@ export function AiSummary({ contentId }: AiSummaryProps) {
       {/* 본문 */}
       {isExpanded && (
         <div className="px-5 py-5">
-          {isLoading || isRetrying || !summary ? (
+          {isLoading || isRetrying ? (
             <AiSummarySkeleton />
-          ) : (
+          ) : errorCode ? (
+            <AiSummaryFallback
+              kind={getAiSummaryErrorKind(errorCode)}
+              isRetrying={isRetrying}
+              onRetry={handleRetry}
+            />
+          ) : summary ? (
             <div className="space-y-8">
               {/* 난이도 · 신뢰도 뱃지 */}
               <div className="flex flex-wrap gap-2">
@@ -282,7 +388,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
                 </div>
               )}
             </div>
-          )}
+          ) : null}
         </div>
       )}
     </section>

@@ -1,6 +1,25 @@
 import type { AiSummary, AiSummaryLevel } from "@/types/content";
 
-export const MOCK_AI_SUMMARIES: Record<AiSummaryLevel, Omit<AiSummary, "contentId">> = {
+// ─── 테스트 시나리오 전환 포인트 ───────────────────────────────────────────────
+// 아래 값을 변경해 각 fallback UI 상태를 빠르게 확인할 수 있습니다.
+// "success" | "empty" | "timeout" | "error"
+export type MockSummaryScenario = "success" | "empty" | "timeout" | "error";
+export const MOCK_SUMMARY_SCENARIO: MockSummaryScenario = "success";
+
+// 시나리오별 에러 코드 매핑
+export const MOCK_SCENARIO_ERROR: Record<
+  Exclude<MockSummaryScenario, "success">,
+  { code: string; message: string }
+> = {
+  empty: { code: "AI_003", message: "AI 요약을 찾을 수 없습니다." },
+  timeout: { code: "AI_002", message: "AI 서버 응답 시간이 초과되었습니다." },
+  error: { code: "AI_001", message: "AI 서버 오류가 발생했습니다." },
+};
+
+export const MOCK_AI_SUMMARIES: Record<
+  AiSummaryLevel,
+  Omit<AiSummary, "contentId">
+> = {
   BEGINNER: {
     level: "BEGINNER",
     coreSummary:
@@ -32,7 +51,13 @@ export const MOCK_AI_SUMMARIES: Record<AiSummaryLevel, Omit<AiSummary, "contentI
       "비동기 요청에는 cancelled 플래그 또는 AbortController로 클린업을 처리하세요",
       "eslint-plugin-react-hooks의 exhaustive-deps 규칙을 반드시 활성화하세요",
     ],
-    keywords: ["stale closure", "의존성 배열", "클린업", "exhaustive-deps", "함수형 업데이트"],
+    keywords: [
+      "stale closure",
+      "의존성 배열",
+      "클린업",
+      "exhaustive-deps",
+      "함수형 업데이트",
+    ],
     difficulty: "보통",
     nextRecommendation:
       "useCallback과 useEffect를 함께 쓸 때 발생하는 의존성 순환 문제를 분석해보세요.",
@@ -55,7 +80,13 @@ export const MOCK_AI_SUMMARIES: Record<AiSummaryLevel, Omit<AiSummary, "contentI
       "커스텀 훅으로 Effect를 추상화하면 테스트 가능성과 재사용성이 높아집니다",
       "External Store 구독에는 useSyncExternalStore를 사용하는 것이 권장됩니다",
     ],
-    keywords: ["Concurrent Mode", "Strict Mode", "useLayoutEffect", "useSyncExternalStore", "커스텀 훅"],
+    keywords: [
+      "Concurrent Mode",
+      "Strict Mode",
+      "useLayoutEffect",
+      "useSyncExternalStore",
+      "커스텀 훅",
+    ],
     difficulty: "어려움",
     nextRecommendation:
       "React 공식 문서의 'Synchronizing with Effects' 와 'You Might Not Need an Effect' 섹션을 읽고, Effect가 필요 없는 케이스를 정리해보세요.",
@@ -78,7 +109,14 @@ export const MOCK_AI_SUMMARIES: Record<AiSummaryLevel, Omit<AiSummary, "contentI
       "Effect 내 비동기 로직은 AbortController + 제너레이터 패턴으로 복잡한 취소 시나리오를 처리할 수 있습니다",
       "Effect profiling: React DevTools의 'Why did this render?' 와 함께 불필요한 Effect 재실행을 측정·최적화하세요",
     ],
-    keywords: ["React Compiler", "RSC", "AbortController", "탈출구 패턴", "동기화 모델", "Effect profiling"],
+    keywords: [
+      "React Compiler",
+      "RSC",
+      "AbortController",
+      "탈출구 패턴",
+      "동기화 모델",
+      "Effect profiling",
+    ],
     difficulty: "매우 어려움",
     nextRecommendation:
       "React 팀의 RFC: React without memo를 읽고, React Compiler가 Effect 의존성 분석에 미치는 영향을 정리해보세요.",
@@ -94,7 +132,10 @@ export const MOCK_AI_SUMMARIES: Record<AiSummaryLevel, Omit<AiSummary, "contentI
 };
 
 // 재시도 시 반환할 변형 데이터 — cachedAt/expiresAt은 endpoint에서 동적으로 주입
-export const MOCK_AI_SUMMARY_RETRIES: Record<AiSummaryLevel, Omit<AiSummary, "contentId" | "cachedAt" | "expiresAt">> = {
+export const MOCK_AI_SUMMARY_RETRIES: Record<
+  AiSummaryLevel,
+  Omit<AiSummary, "contentId" | "cachedAt" | "expiresAt">
+> = {
   BEGINNER: {
     level: "BEGINNER",
     coreSummary:
@@ -105,7 +146,14 @@ export const MOCK_AI_SUMMARY_RETRIES: Record<AiSummaryLevel, Omit<AiSummary, "co
       "return () => {} 로 타이머·구독 등을 정리할 수 있어요",
       "fetch, setInterval 같은 '외부 연결'은 useEffect 안에서 처리합니다",
     ],
-    keywords: ["useEffect", "마운트", "사이드 이펙트", "의존성 배열", "클린업", "렌더링"],
+    keywords: [
+      "useEffect",
+      "마운트",
+      "사이드 이펙트",
+      "의존성 배열",
+      "클린업",
+      "렌더링",
+    ],
     difficulty: "쉬움",
     nextRecommendation:
       "간단한 카운터에 useEffect로 타이틀(document.title)을 자동 업데이트하는 예제를 만들어보세요.",
@@ -125,7 +173,13 @@ export const MOCK_AI_SUMMARY_RETRIES: Record<AiSummaryLevel, Omit<AiSummary, "co
       "객체/배열 리터럴은 매 렌더마다 새 참조가 생성되므로 의존성으로 직접 쓰지 마세요",
       "AbortController를 사용하면 비동기 요청의 클린업을 간결하게 처리할 수 있습니다",
     ],
-    keywords: ["stale closure", "useCallback", "의존성 안정화", "AbortController", "exhaustive-deps"],
+    keywords: [
+      "stale closure",
+      "useCallback",
+      "의존성 안정화",
+      "AbortController",
+      "exhaustive-deps",
+    ],
     difficulty: "보통",
     nextRecommendation:
       "커스텀 훅 useFetch를 직접 만들어 보면 Effect, 클린업, AbortController를 한 번에 연습할 수 있습니다.",
@@ -146,7 +200,14 @@ export const MOCK_AI_SUMMARY_RETRIES: Record<AiSummaryLevel, Omit<AiSummary, "co
       "Effect를 커스텀 훅으로 분리하면 로직 단위 테스트와 Storybook 연동이 용이해집니다",
       "데이터 패칭은 TanStack Query·SWR 같은 라이브러리에 위임하고 useEffect를 직접 쓰지 마세요",
     ],
-    keywords: ["Strict Mode", "이중 실행", "useLayoutEffect", "커스텀 훅", "TanStack Query", "동시성 안전"],
+    keywords: [
+      "Strict Mode",
+      "이중 실행",
+      "useLayoutEffect",
+      "커스텀 훅",
+      "TanStack Query",
+      "동시성 안전",
+    ],
     difficulty: "어려움",
     nextRecommendation:
       "'You Might Not Need an Effect' — React 공식 문서 챕터를 읽고 Effect를 제거할 수 있는 패턴 5가지를 정리해보세요.",
@@ -167,7 +228,14 @@ export const MOCK_AI_SUMMARY_RETRIES: Record<AiSummaryLevel, Omit<AiSummary, "co
       "useOptimistic, useTransition과 Effect를 조합하면 낙관적 업데이트 패턴을 구현할 수 있습니다",
       "Next.js App Router에서 Effect 기반 데이터 패칭은 RSC 전환 시 완전 재작성이 필요합니다",
     ],
-    keywords: ["외부 동기화", "React Compiler", "useOptimistic", "useTransition", "RSC", "탈출구"],
+    keywords: [
+      "외부 동기화",
+      "React Compiler",
+      "useOptimistic",
+      "useTransition",
+      "RSC",
+      "탈출구",
+    ],
     difficulty: "매우 어려움",
     nextRecommendation:
       "React 18 Working Group의 'Strict Effects' 논의와 React Compiler 베타 문서를 읽고, Effect 자동 최적화의 한계를 분석해보세요.",
