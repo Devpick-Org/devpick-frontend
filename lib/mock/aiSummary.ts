@@ -4,7 +4,7 @@ import type { AiSummary, AiSummaryLevel } from "@/types/content";
 // 아래 값을 변경해 각 fallback UI 상태를 빠르게 확인할 수 있습니다.
 // "success" | "empty" | "timeout" | "error"
 export type MockSummaryScenario = "success" | "empty" | "timeout" | "error";
-export const MOCK_SUMMARY_SCENARIO: MockSummaryScenario = "timeout";
+export const MOCK_SUMMARY_SCENARIO: MockSummaryScenario = "success";
 
 // 시나리오별 에러 코드 매핑
 export const MOCK_SCENARIO_ERROR: Record<
