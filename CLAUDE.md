@@ -98,6 +98,7 @@
 │ ┃ ┗ tabs.tsx
 │ ┣ layout/              # GNB, 사이드바 등 레이아웃 컴포넌트
 │ ┃ ┣ Sidebar.tsx        # 데스크탑 사이드바 + 모바일 하단 탭바
+│ ┃ ┣ ScrollToTopButton.tsx # 스크롤 최상단 이동 버튼
 │ ┃ ┣ TopNav.tsx         # 상단 GNB, useAuthStore 연동, 로그아웃
 │ ┃ ┗ TopNavVariant.tsx  # TopNav 변형 (특수 레이아웃용)
 │ ┣ features/            # 도메인별 기능 컴포넌트
@@ -116,7 +117,8 @@
 │ ┃ ┃ ┣ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
 │ ┃ ┃ ┗ RecommendedContents.tsx # 추천 콘텐츠 사이드바 (서버 컴포넌트, items props)
 │ ┃ ┣ community/
-│ ┃ ┃ ┗ CommunityCard.tsx    # 커뮤니티 카드 (CommunityPost interface)
+│ ┃ ┃ ┣ CommunityCard.tsx    # 커뮤니티 카드 (CommunityPost interface)
+│ ┃ ┃ ┗ CommunitySearch.tsx  # 커뮤니티 검색 입력 컴포넌트
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
 │ ┃ ┃ ┣ constants.ts         # 직무/레벨/태그 상수 정의
 │ ┃ ┃ ┣ ProfileEditForm.tsx  # 프로필 수정 폼 (닉네임/이미지/직무/레벨/태그)
@@ -146,7 +148,8 @@
 │ ┣ content/             # 콘텐츠 관련 유틸
 │ ┃ ┗ getContentErrorMessage.ts # 콘텐츠 에러 코드 → 사용자 메시지 매핑
 │ ┣ mock/                # 개발용 목 데이터
-│ ┃ ┗ aiSummary.ts       # AI 요약 목 데이터
+│ ┃ ┣ aiSummary.ts       # AI 요약 목 데이터
+│ ┃ ┗ posts.ts           # 커뮤니티 게시글 목 데이터
 │ ┗ utils.ts             # cn(), formatDate(), formatRelativeTime()
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated, setAuth, clearAuth)
@@ -155,7 +158,8 @@
 ├── types/               # TypeScript 전역 타입 정의
 │ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
 │ ┣ auth.ts              # User, LoginRequest, SignupRequest, SocialAuthResponse, RefreshTokenResponse 등 인증 타입
-│ ┗ content.ts           # Content, ContentDetail, ContentFeedData 등 콘텐츠 타입
+│ ┣ content.ts           # Content, ContentDetail, ContentFeedData 등 콘텐츠 타입
+│ ┗ post.ts              # 커뮤니티 게시글/답변/댓글 타입
 └── public/              # 정적 에셋 (이미지, 폰트)
 ```
 
