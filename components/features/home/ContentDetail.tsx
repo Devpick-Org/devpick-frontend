@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, Heart, Bookmark, Share2, ExternalLink } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn, formatDate } from "@/lib/utils";
-import { useContentStore } from "@/store/content.store";
-import type { ContentDetail as ContentDetailType } from "@/types/content";
+import { contentsEndpoints } from "@/lib/api/endpoints/contents";
+import {
+  updateContentInteractionCache,
+  invalidateContentInteractionQueries,
+} from "@/lib/content/updateContentInteractionCache";
+import type {
+  ContentDetail as ContentDetailType,
+  ContentDetailResponse,
+} from "@/types/content";
 import { AiSummary } from "./AiSummary";
 import { toast } from "sonner";
 
@@ -170,15 +178,58 @@ interface ContentDetailProps {
 }
 
 export function ContentDetail({ content }: ContentDetailProps) {
-  const { init, toggleLike, toggleScrap, interactions } = useContentStore();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    init(content.id, content.isLiked, content.isScrapped);
-  }, [content.id, content.isLiked, content.isScrapped, init]);
+  // mutate(wasLiked) — 클릭 직전 상태를 variable로 넘겨 onMutate/mutationFn이 같은 기준으로 동작
+  const likeMutation = useMutation({
+    mutationFn: (wasLiked: boolean) =>
+      wasLiked
+        ? contentsEndpoints.unlikeContent(content.id)
+        : contentsEndpoints.likeContent(content.id),
+    onMutate: async (wasLiked) => {
+      // 진행 중인 상세 refetch가 optimistic update를 덮어쓰지 않도록 취소
+      await queryClient.cancelQueries({ queryKey: ["content", content.id] });
+      const previous = queryClient.getQueryData<ContentDetailResponse>([
+        "content",
+        content.id,
+      ]);
+      // 상세 + 목록/검색 + 추천 캐시를 동시에 반영
+      updateContentInteractionCache(queryClient, content.id, "isLiked", !wasLiked);
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      // 상세 캐시 스냅샷 복구 후 나머지는 invalidate로 서버 상태 복원
+      queryClient.setQueryData(["content", content.id], context?.previous);
+      invalidateContentInteractionQueries(queryClient, content.id);
+    },
+    onSettled: () => {
+      invalidateContentInteractionQueries(queryClient, content.id);
+    },
+  });
 
-  const interaction = interactions[content.id];
-  const isLiked = interaction?.isLiked ?? content.isLiked;
-  const isScrapped = interaction?.isScrapped ?? content.isScrapped;
+  // mutate(wasScrapped) — 같은 패턴
+  const scrapMutation = useMutation({
+    mutationFn: (wasScrapped: boolean) =>
+      wasScrapped
+        ? contentsEndpoints.unscrapContent(content.id)
+        : contentsEndpoints.scrapContent(content.id),
+    onMutate: async (wasScrapped) => {
+      await queryClient.cancelQueries({ queryKey: ["content", content.id] });
+      const previous = queryClient.getQueryData<ContentDetailResponse>([
+        "content",
+        content.id,
+      ]);
+      updateContentInteractionCache(queryClient, content.id, "isScrapped", !wasScrapped);
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(["content", content.id], context?.previous);
+      invalidateContentInteractionQueries(queryClient, content.id);
+    },
+    onSettled: () => {
+      invalidateContentInteractionQueries(queryClient, content.id);
+    },
+  });
 
   const handleShare = useCallback(() => {
     if (navigator.clipboard) {
@@ -210,33 +261,41 @@ export function ContentDetail({ content }: ContentDetailProps) {
           </h1>
           <div className="flex shrink-0 items-center gap-1">
             <button
-              onClick={() => toggleLike(content.id)}
+              onClick={() => {
+                if (likeMutation.isPending) return;
+                likeMutation.mutate(content.isLiked);
+              }}
               className={cn(
                 "rounded-lg p-2 transition-all duration-200",
-                isLiked
+                content.isLiked
                   ? "text-red-500 hover:text-red-400"
                   : "text-muted-foreground hover:text-foreground",
+                likeMutation.isPending && "opacity-50",
               )}
-              aria-label={isLiked ? "좋아요 취소" : "좋아요"}
+              aria-label={content.isLiked ? "좋아요 취소" : "좋아요"}
             >
               <Heart
                 className="h-5 w-5"
-                fill={isLiked ? "currentColor" : "none"}
+                fill={content.isLiked ? "currentColor" : "none"}
               />
             </button>
             <button
-              onClick={() => toggleScrap(content.id)}
+              onClick={() => {
+                if (scrapMutation.isPending) return;
+                scrapMutation.mutate(content.isScrapped);
+              }}
               className={cn(
                 "rounded-lg p-2 transition-all duration-200",
-                isScrapped
+                content.isScrapped
                   ? "text-primary hover:text-primary/80"
                   : "text-muted-foreground hover:text-foreground",
+                scrapMutation.isPending && "opacity-50",
               )}
-              aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
+              aria-label={content.isScrapped ? "스크랩 해제" : "스크랩"}
             >
               <Bookmark
                 className="h-5 w-5"
-                fill={isScrapped ? "currentColor" : "none"}
+                fill={content.isScrapped ? "currentColor" : "none"}
               />
             </button>
             <button
@@ -254,11 +313,9 @@ export function ContentDetail({ content }: ContentDetailProps) {
           <span className="font-medium">{content.sourceName}</span>
           <span className="font-medium">{formatDate(content.publishedAt)}</span>
           {content.licenseType && (
-            <>
-              <span className="rounded-md px-1.5 py-0.5 text-xs font-medium">
-                {content.licenseType}
-              </span>
-            </>
+            <span className="rounded-md px-1.5 py-0.5 text-xs font-medium">
+              {content.licenseType}
+            </span>
           )}
         </div>
 

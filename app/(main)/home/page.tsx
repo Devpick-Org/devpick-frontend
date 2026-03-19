@@ -41,7 +41,7 @@ export default function HomePage() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["contents", searchQuery],
+    queryKey: searchQuery.trim() ? ["contents", searchQuery] : ["contents"],
     initialPageParam: 0,
     queryFn: ({ pageParam }) => {
       if (searchQuery.trim()) {

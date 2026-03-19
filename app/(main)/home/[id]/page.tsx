@@ -1,28 +1,38 @@
+"use client";
+
+import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import { ContentDetail } from "@/components/features/home/ContentDetail";
 import { RecommendedContents } from "@/components/features/home/RecommendedContents";
-import type { ContentDetail as ContentDetailType, Content } from "@/types/content";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface Props {
-  params: Promise<{ id: string }>;
-}
+export default function Page() {
+  const { id } = useParams<{ id: string }>();
 
-export default async function Page({ params }: Props) {
-  const { id } = await params;
+  const {
+    data: contentRes,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["content", id],
+    queryFn: () => contentsEndpoints.getContentById(id),
+  });
 
-  let content: ContentDetailType | null = null;
-  let recommended: Content[] = [];
+  const { data: recommendedRes } = useQuery({
+    queryKey: ["content-recommendations", id],
+    queryFn: () => contentsEndpoints.getContentRecommendations(id),
+    enabled: !!contentRes?.data,
+  });
 
-  try {
-    [content, recommended] = await Promise.all([
-      contentsEndpoints.getContentById(id).then((res) => res.data),
-      contentsEndpoints.getContentRecommendations(id).then((res) => res.data.contents),
-    ]);
-  } catch {
-    // getContentById가 reject하면 content는 null 유지
+  const content = contentRes?.data ?? null;
+  const recommended = recommendedRes?.data?.contents ?? [];
+
+  if (isLoading) {
+    return <ContentDetailSkeleton />;
   }
 
-  if (!content) {
+  if (isError || !content) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <p className="text-muted-foreground">콘텐츠를 찾을 수 없습니다.</p>
@@ -49,6 +59,35 @@ export default async function Page({ params }: Props) {
       {/* 추천 — 모바일 */}
       <div className="mt-8 lg:hidden">
         <RecommendedContents items={recommended} />
+      </div>
+    </div>
+  );
+}
+
+function ContentDetailSkeleton() {
+  return (
+    <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0">
+          <Skeleton className="mb-8 h-4 w-24" />
+          <Skeleton className="mb-4 h-8 w-4/5" />
+          <Skeleton className="mb-2 h-4 w-48" />
+          <div className="mt-8 space-y-2.5">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[88%]" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[75%]" />
+          </div>
+        </div>
+        <div className="hidden lg:block">
+          <div className="space-y-3">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-36 w-full rounded-xl" />
+            <Skeleton className="h-36 w-full rounded-xl" />
+            <Skeleton className="h-36 w-full rounded-xl" />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -430,6 +430,14 @@ const MOCK_CONTENTS: Content[] = [
   },
 ];
 
+// mock 전용 — 인터랙션 상태를 메모리에서 추적
+const _scrappedIds = new Set<string>(
+  MOCK_CONTENTS.filter((c) => c.isScrapped).map((c) => c.id),
+);
+const _likedIds = new Set<string>(
+  MOCK_CONTENTS.filter((c) => c.isLiked).map((c) => c.id),
+);
+
 export const contentsEndpoints = {
   /** GET /contents — 개인화 피드 목록 (params: { page: number; size: number }) */
   getContents: (params: {
@@ -440,7 +448,11 @@ export const contentsEndpoints = {
       setTimeout(() => {
         const start = params.page * params.size;
         const end = start + params.size;
-        const pagedContents = MOCK_CONTENTS.slice(start, end);
+        const pagedContents = MOCK_CONTENTS.slice(start, end).map((c) => ({
+          ...c,
+          isScrapped: _scrappedIds.has(c.id),
+          isLiked: _likedIds.has(c.id),
+        }));
         resolve({
           success: true,
           data: {
@@ -467,6 +479,8 @@ export const contentsEndpoints = {
         }
         const detail: ContentDetail = {
           ...base,
+          isScrapped: _scrappedIds.has(base.id),
+          isLiked: _likedIds.has(base.id),
           originalContent:
             id === "content-001"
               ? MOCK_ORIGINAL_CONTENT_WITH_CODE
@@ -490,10 +504,13 @@ export const contentsEndpoints = {
   ): Promise<ContentFeedResponse> => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const items = MOCK_CONTENTS.filter((c) => c.id !== contentId).slice(
-          0,
-          size,
-        );
+        const items = MOCK_CONTENTS.filter((c) => c.id !== contentId)
+          .slice(0, size)
+          .map((c) => ({
+            ...c,
+            isScrapped: _scrappedIds.has(c.id),
+            isLiked: _likedIds.has(c.id),
+          }));
         resolve({
           success: true,
           data: {
@@ -546,7 +563,11 @@ export const contentsEndpoints = {
 
         const start = params.page * params.size;
         const end = start + params.size;
-        const pagedContents = filteredContents.slice(start, end);
+        const pagedContents = filteredContents.slice(start, end).map((c) => ({
+          ...c,
+          isScrapped: _scrappedIds.has(c.id),
+          isLiked: _likedIds.has(c.id),
+        }));
 
         resolve({
           success: true,
@@ -612,27 +633,43 @@ export const contentsEndpoints = {
     });
   },
 
-  /** POST /contents/:contentId/scrap — 스크랩 (contentId: number) */
-  scrapContent: () => {
-    throw new Error("Not implemented");
-    return apiClient.post("/contents/0/scrap");
+  /** POST /contents/:contentId/scrap */
+  scrapContent: (contentId: string): Promise<void> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        _scrappedIds.add(contentId);
+        resolve();
+      }, 300);
+    });
   },
 
-  /** DELETE /contents/:contentId/scrap — 스크랩 취소 (contentId: number) */
-  unscrapContent: () => {
-    throw new Error("Not implemented");
-    return apiClient.delete("/contents/0/scrap");
+  /** DELETE /contents/:contentId/scrap */
+  unscrapContent: (contentId: string): Promise<void> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        _scrappedIds.delete(contentId);
+        resolve();
+      }, 300);
+    });
   },
 
-  /** POST /contents/:contentId/like — 좋아요 (contentId: number) */
-  likeContent: () => {
-    throw new Error("Not implemented");
-    return apiClient.post("/contents/0/like");
+  /** POST /contents/:contentId/like */
+  likeContent: (contentId: string): Promise<void> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        _likedIds.add(contentId);
+        resolve();
+      }, 300);
+    });
   },
 
-  /** DELETE /contents/:contentId/like — 좋아요 취소 (contentId: number) */
-  unlikeContent: () => {
-    throw new Error("Not implemented");
-    return apiClient.delete("/contents/0/like");
+  /** DELETE /contents/:contentId/like */
+  unlikeContent: (contentId: string): Promise<void> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        _likedIds.delete(contentId);
+        resolve();
+      }, 300);
+    });
   },
 };
