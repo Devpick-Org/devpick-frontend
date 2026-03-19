@@ -113,16 +113,98 @@ function CommunityDetailSkeleton() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0 flex-1 space-y-4">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-7 w-3/4" />
-          <Skeleton className="h-48 w-full rounded-xl" />
+
+        {/* 메인 */}
+        <div className="min-w-0">
+          {/* 뒤로가기 */}
+          <Skeleton className="mb-6 h-4 w-24" />
+
+          {/* 메타: 작성자 · 레벨 · 시간 */}
+          <div className="mb-4 flex items-center gap-2">
+            <Skeleton className="h-3.5 w-3.5 rounded-full" />
+            <Skeleton className="h-3.5 w-16" />
+            <Skeleton className="h-3.5 w-10" />
+            <Skeleton className="h-3.5 w-14" />
+          </div>
+
+          {/* 제목 */}
+          <Skeleton className="mb-6 h-7 w-4/5" />
+
+          {/* 본문 */}
+          <div className="mb-8 space-y-2.5">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[92%]" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[85%]" />
+            <Skeleton className="h-20 w-full rounded-lg" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[78%]" />
+          </div>
+
+          {/* 첨부 파일 자리 */}
+          <Skeleton className="mb-8 h-14 w-full rounded-lg" />
+
+          {/* AI 답변 카드 */}
+          <div className="mb-8 rounded-xl border border-border p-5 space-y-3">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[70%]" />
+          </div>
+
+          {/* 답변 섹션 제목 */}
+          <Skeleton className="mb-6 h-5 w-16" />
+
+          {/* 답변 카드 1 */}
+          <div className="mb-5 rounded-xl bg-card p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-3.5 w-3.5 rounded-full" />
+              <Skeleton className="h-3.5 w-20" />
+              <Skeleton className="h-3.5 w-14" />
+            </div>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[80%]" />
+          </div>
+
+          {/* 답변 카드 2 */}
+          <div className="rounded-xl bg-card p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-3.5 w-3.5 rounded-full" />
+              <Skeleton className="h-3.5 w-24" />
+              <Skeleton className="h-3.5 w-14" />
+            </div>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[88%]" />
+          </div>
         </div>
-        <div className="hidden space-y-3 lg:block">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-20 w-full rounded-xl" />
-          <Skeleton className="h-20 w-full rounded-xl" />
+
+        {/* 사이드바 */}
+        <div className="hidden lg:block">
+          <div className="sticky top-24 space-y-4">
+            {/* 유사 질문 제목 */}
+            <Skeleton className="h-5 w-20" />
+
+            {/* 유사 질문 카드 3개 */}
+            <div className="rounded-xl border border-border p-4 space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-[75%]" />
+              <Skeleton className="h-3.5 w-16" />
+            </div>
+            <div className="rounded-xl border border-border p-4 space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-[60%]" />
+              <Skeleton className="h-3.5 w-16" />
+            </div>
+            <div className="rounded-xl border border-border p-4 space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-[80%]" />
+              <Skeleton className="h-3.5 w-16" />
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   );
