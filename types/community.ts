@@ -51,6 +51,36 @@ export interface CommentDTO {
 
 // ─── 요청 타입 ────────────────────────────────────────────────────────────────
 
+/** 질문 작성 폼의 임시 상태 (UI 전용) */
+export interface PostDraft {
+  title: string;
+  content: string;
+  level: PostLevel;
+}
+
+export interface CreatePostRequest {
+  title: string;
+  content: string;
+  level: PostLevel;
+  attachments?: PostAttachmentDTO[];
+}
+
+export interface RefinePostRequest {
+  title: string;
+  content: string;
+  level: PostLevel;
+}
+
+export interface RefinePostData {
+  refinedTitle: string;
+  refinedContent: string;
+  /** 질문 품질 향상을 위한 보완 제안 목록 */
+  suggestions: string[];
+}
+
+export type CreatePostResponse = ApiResponse<PostDetailDTO>;
+export type RefinePostResponse = ApiResponse<RefinePostData>;
+
 export interface UpdatePostRequest {
   title: string;
   content: string;

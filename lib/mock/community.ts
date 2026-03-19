@@ -491,3 +491,15 @@ export const mockAnswerStore = {
     );
   },
 };
+
+// ─── 게시글 생성 Store ────────────────────────────────────────────────────────
+
+/**
+ * 새로 작성된 게시글을 MOCK_POST_STORE에 등록한다.
+ * postsEndpoints.createPost 에서 호출하며, 이후 getPostDetail이 즉시 조회 가능해진다.
+ * 실제 API 연동 시 이 함수를 제거하고 서버 응답을 그대로 사용하면 된다.
+ */
+export function mockCreatePost(post: PostDetailDTO): PostDetailDTO {
+  MOCK_POST_STORE[post.id] = post;
+  return post;
+}

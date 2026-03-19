@@ -7,6 +7,11 @@ import type {
   CommentDTO,
   AiAnswer,
   SimilarPost,
+  CreatePostRequest,
+  CreatePostResponse,
+  RefinePostRequest,
+  RefinePostResponse,
+  RefinePostData,
 } from "@/types/community";
 import type { ApiResponse } from "@/types/api";
 import { MOCK_POSTS } from "@/lib/mock/posts";
@@ -15,9 +20,47 @@ import {
   MOCK_AI_ANSWER_STORE,
   MOCK_SIMILAR_POSTS_STORE,
   mockAnswerStore,
+  mockCreatePost,
 } from "@/lib/mock/community";
 import { useAuthStore } from "@/store/auth.store";
 
+// ─── Mock AI 질문 개선 ────────────────────────────────────────────────────────
+// 실제 API 연동 시 이 함수를 제거하고 서버 응답을 그대로 사용한다.
+
+function buildMockRefineResult(req: RefinePostRequest): RefinePostData {
+  const { title, content } = req;
+  const lower = content.toLowerCase();
+
+  const hasEnv = /버전|환경|프레임워크|스택|framework|library/.test(lower);
+  const hasError = /에러|오류|error|exception|stack trace/.test(lower);
+  const hasTried = /시도|해봤|했는데|해보았|tried/.test(lower);
+  const hasExpected = /기대|원하|결과|expected/.test(lower);
+
+  // 본문 구조화: 원문을 "문제 상황" 섹션으로 감싸고 누락 섹션을 plain text로 추가
+  const sections: string[] = [`[문제 상황]\n${content.trim()}`];
+  if (!hasEnv) sections.push("[환경 정보]\n- 사용 언어 / 프레임워크:\n- 버전:");
+  if (!hasError) sections.push("[에러 메시지]\n(에러 메시지나 예외 내용을 여기에 붙여 주세요)");
+  if (!hasTried) sections.push("[시도해본 것]\n- ");
+  if (!hasExpected) sections.push("[기대하는 결과]\n- ");
+
+  const refinedContent = sections.join("\n\n");
+
+  // 제목: 의문형이 아니면 "?" 추가
+  const endsAsQuestion = /[?요까]$/.test(title.trim());
+  const refinedTitle = endsAsQuestion ? title : `${title}?`;
+
+  // Suggestions: 누락 항목에 대한 개선 제안
+  const suggestions: string[] = [];
+  if (!hasEnv) suggestions.push("사용 중인 언어·프레임워크 버전 정보를 추가하면 더 정확한 답변을 받을 수 있어요.");
+  if (!hasError) suggestions.push("발생하는 에러 메시지나 예외 내용을 그대로 붙여 주세요.");
+  if (!hasTried) suggestions.push("이미 시도해본 방법을 함께 적어 주시면 중복 제안을 줄일 수 있어요.");
+  if (!hasExpected) suggestions.push("기대하는 결과를 구체적으로 적어 주시면 질문 의도가 명확해져요.");
+  if (suggestions.length === 0) suggestions.push("질문 구성이 잘 되어 있어요. 그대로 게시해도 좋습니다.");
+
+  return { refinedTitle, refinedContent, suggestions };
+}
+
+// ─── Mock 유틸 ────────────────────────────────────────────────────────────────
 // mockAnswerStore 기준으로 answerCount와 topAnswerPreview를 계산합니다.
 // 채택된 답변이 있으면 그 답변, 없으면 첫 번째 답변의 내용을 preview로 사용합니다.
 function enrichPost(post: (typeof MOCK_POSTS)[number]) {
@@ -323,22 +366,82 @@ export const postsEndpoints = {
     });
   },
 
-  // ─── 게시글 작성/개선 (미구현) ───────────────────────────────────────────────
+  // ─── 게시글 작성/개선 ────────────────────────────────────────────────────────
 
-  /** POST /posts */
-  createPost: () => {
-    throw new Error("Not implemented");
-    return apiClient.post("/posts");
+  /**
+   * POST /posts — 질문 작성 (mock)
+   * 실제 API 연동 시: mock 블록 제거 후 `return apiClient.post<CreatePostResponse>("/posts", req)` 로 교체
+   */
+  createPost: (req: CreatePostRequest): Promise<CreatePostResponse> => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const { user } = useAuthStore.getState();
+        if (!user) {
+          reject(new Error("로그인이 필요합니다"));
+          return;
+        }
+        const now = new Date().toISOString();
+        const newPost = mockCreatePost({
+          id: `post-${Date.now()}`,
+          title: req.title,
+          content: req.content,
+          level: req.level,
+          authorId: user.userId,
+          authorNickname: user.nickname,
+          answerCount: 0,
+          attachments: req.attachments ?? [],
+          createdAt: now,
+          updatedAt: now,
+        });
+        // 목록 캐시(MOCK_POSTS)에도 선두 삽입 — invalidateQueries 후 refetch 시 반영
+        MOCK_POSTS.unshift({
+          id: newPost.id,
+          title: newPost.title,
+          contentPreview: newPost.content
+            .replace(/```[\s\S]*?```/g, "")
+            .replace(/[#*`_>]/g, "")
+            .trim()
+            .slice(0, 120),
+          topAnswerPreview: null,
+          level: newPost.level,
+          authorId: newPost.authorId,
+          authorNickname: newPost.authorNickname,
+          answerCount: 0,
+          createdAt: newPost.createdAt,
+        });
+        resolve({ success: true, data: newPost, message: "질문이 게시되었습니다" });
+      }, 700);
+    });
   },
 
-  /** DELETE /posts/{postId} — 204 No Content */
-  deletePost: (_postId: string): Promise<void> => {
-    throw new Error("Not implemented");
+  /**
+   * DELETE /posts/{postId} — 204 No Content (mock)
+   * 실제 API 연동 시: `return apiClient.delete(\`/posts/\${postId}\`)` 로 교체
+   */
+  deletePost: (postId: string): Promise<void> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        delete MOCK_POST_STORE[postId];
+        const idx = MOCK_POSTS.findIndex((p) => p.id === postId);
+        if (idx !== -1) MOCK_POSTS.splice(idx, 1);
+        resolve();
+      }, 300);
+    });
   },
 
-  /** POST /posts/refine */
-  refinePost: () => {
-    throw new Error("Not implemented");
-    return apiClient.post("/posts/refine");
+  /**
+   * POST /posts/refine — AI 질문 개선 (mock)
+   * 실제 API 연동 시: mock 블록 제거 후 `return apiClient.post<RefinePostResponse>("/posts/refine", req)` 로 교체
+   */
+  refinePost: (req: RefinePostRequest): Promise<RefinePostResponse> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          success: true,
+          data: buildMockRefineResult(req),
+          message: "질문이 개선되었습니다",
+        });
+      }, 1200);
+    });
   },
 };
