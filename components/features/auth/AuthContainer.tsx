@@ -107,14 +107,14 @@ export function AuthContainer({ oauthError }: AuthContainerProps) {
         {"계속 진행하면 DevPick의 "}
         <button
           type="button"
-          className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+          className="cursor-pointer text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
         >
           {"서비스 이용약관"}
         </button>
         {" 및 "}
         <button
           type="button"
-          className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+          className="cursor-pointer text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
         >
           {"개인정보 처리방침"}
         </button>

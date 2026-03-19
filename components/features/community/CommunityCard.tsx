@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { MessageCircle, Share2, User } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { cn, copyShareLink } from "@/lib/utils";
 import type { PostSummary, PostLevel } from "@/types/post";
 
