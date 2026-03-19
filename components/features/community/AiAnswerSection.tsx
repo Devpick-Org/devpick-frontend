@@ -12,7 +12,12 @@ interface AiAnswerSectionProps {
   isRetrying?: boolean;
 }
 
-export function AiAnswerSection({ status, content, onRetry, isRetrying = false }: AiAnswerSectionProps) {
+export function AiAnswerSection({
+  status,
+  content,
+  onRetry,
+  isRetrying = false,
+}: AiAnswerSectionProps) {
   return (
     <section className="mb-8">
       <div className="rounded-xl bg-primary/5 p-5">
@@ -28,7 +33,9 @@ export function AiAnswerSection({ status, content, onRetry, isRetrying = false }
             className="space-y-3 text-[15px] leading-7 text-foreground/85 font-medium"
           />
         )}
-        {status === "error" && <AiAnswerError onRetry={onRetry} isRetrying={isRetrying} />}
+        {status === "error" && (
+          <AiAnswerError onRetry={onRetry} isRetrying={isRetrying} />
+        )}
         {status === "empty" && <AiAnswerEmpty />}
       </div>
     </section>
@@ -54,7 +61,7 @@ function AiAnswerError({
 }) {
   return (
     <div className="flex min-h-[72px] items-center justify-between gap-4">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground font-medium">
         AI 답변을 불러오지 못했습니다.
       </p>
       {onRetry && (
@@ -79,7 +86,7 @@ function AiAnswerError({
 function AiAnswerEmpty() {
   return (
     <div className="flex min-h-[72px] items-center">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground font-medium">
         아직 생성된 AI 답변이 없습니다.
       </p>
     </div>

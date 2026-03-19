@@ -41,7 +41,7 @@ export function AnswerList({
 
   if (answers.length === 0) {
     return (
-      <p className="py-10 text-center text-sm text-muted-foreground">
+      <p className="py-10 text-center text-sm text-muted-foreground font-medium">
         아직 답변이 없습니다. 첫 번째 답변을 작성해 보세요!
       </p>
     );

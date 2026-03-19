@@ -1,5 +1,6 @@
 import type {
   PostDetailDTO,
+  PostAttachmentDTO,
   CommunityAnswer,
   CommentDTO,
   AiAnswer,
@@ -7,6 +8,19 @@ import type {
 } from "@/types/community";
 
 // ─── 게시글 상세 Store ────────────────────────────────────────────────────────
+
+const SAMPLE_ATTACHMENTS: PostAttachmentDTO[] = [
+  {
+    type: "IMAGE",
+    url: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800",
+    fileName: "useEffect-diagram.png",
+  },
+  {
+    type: "FILE",
+    url: "https://example.com/files/useEffect-example.zip",
+    fileName: "useEffect-example.zip",
+  },
+];
 
 const POST_DETAIL_001: PostDetailDTO = {
   id: "post-001",
@@ -34,6 +48,7 @@ useEffect(() => {
   answerCount: 2,
   createdAt: "2026-03-17T08:30:00.000Z",
   updatedAt: "2026-03-17T08:30:00.000Z",
+  attachments: SAMPLE_ATTACHMENTS,
 };
 
 const POST_DETAIL_002: PostDetailDTO = {
@@ -59,6 +74,7 @@ export default function PostPage() {
   answerCount: 1,
   createdAt: "2026-03-17T07:15:00.000Z",
   updatedAt: "2026-03-17T07:15:00.000Z",
+  attachments: [],
 };
 
 const POST_DETAIL_004: PostDetailDTO = {
@@ -77,6 +93,7 @@ const POST_DETAIL_004: PostDetailDTO = {
   answerCount: 1,
   createdAt: "2026-03-16T22:00:00.000Z",
   updatedAt: "2026-03-16T22:00:00.000Z",
+  attachments: [],
 };
 
 const POST_DETAIL_010: PostDetailDTO = {
@@ -101,6 +118,7 @@ function handleSearch(query: string) {
   answerCount: 1,
   createdAt: "2026-03-16T08:00:00.000Z",
   updatedAt: "2026-03-16T08:00:00.000Z",
+  attachments: [],
 };
 
 /** postId → PostDetailDTO. 실제 API 연동 시 이 Map을 제거하고 axios 호출로 교체합니다. */

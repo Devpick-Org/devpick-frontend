@@ -18,6 +18,19 @@ import {
 } from "@/lib/mock/community";
 import { useAuthStore } from "@/store/auth.store";
 
+// mockAnswerStore 기준으로 answerCount와 topAnswerPreview를 계산합니다.
+// 채택된 답변이 있으면 그 답변, 없으면 첫 번째 답변의 내용을 preview로 사용합니다.
+function enrichPost(post: (typeof MOCK_POSTS)[number]) {
+  const answers = mockAnswerStore.getAll(post.id);
+  const answerCount = answers.length;
+  const topAnswer =
+    answers.find((a) => a.isAdopted) ?? (answers.length > 0 ? answers[0] : null);
+  const topAnswerPreview = topAnswer
+    ? topAnswer.content.replace(/```[\s\S]*?```/g, "").replace(/[#*`_>]/g, "").trim().slice(0, 120)
+    : null;
+  return { ...post, answerCount, topAnswerPreview };
+}
+
 export const postsEndpoints = {
   // ─── 게시글 목록 ────────────────────────────────────────────────────────────
 
@@ -31,7 +44,7 @@ export const postsEndpoints = {
     return new Promise((resolve) => {
       setTimeout(() => {
         const start = page * size;
-        const pagedPosts = MOCK_POSTS.slice(start, start + size);
+        const pagedPosts = MOCK_POSTS.slice(start, start + size).map(enrichPost);
         resolve({
           success: true,
           data: {
@@ -65,7 +78,7 @@ export const postsEndpoints = {
             p.authorNickname.toLowerCase().includes(q),
         );
         const start = page * size;
-        const pagedPosts = filtered.slice(start, start + size);
+        const pagedPosts = filtered.slice(start, start + size).map(enrichPost);
         resolve({
           success: true,
           data: {
@@ -88,15 +101,37 @@ export const postsEndpoints = {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const post = MOCK_POST_STORE[postId];
-        if (!post) {
+
+        if (post) {
+          const answerCount = mockAnswerStore.getAll(postId).length;
+          resolve({
+            success: true,
+            data: { ...post, answerCount },
+            message: "게시글을 불러왔습니다",
+          });
+          return;
+        }
+
+        // MOCK_POST_STORE에 없으면 MOCK_POSTS 목록 데이터로 fallback
+        const summary = MOCK_POSTS.find((p) => p.id === postId);
+        if (!summary) {
           reject(new Error("게시글을 찾을 수 없습니다"));
           return;
         }
-        // answerCount를 store의 현재 답변 수 기준으로 계산 (mock 동기화)
-        const answerCount = mockAnswerStore.getAll(postId).length;
         resolve({
           success: true,
-          data: { ...post, answerCount },
+          data: {
+            id: summary.id,
+            title: summary.title,
+            content: summary.contentPreview,
+            level: summary.level,
+            authorId: summary.authorId,
+            authorNickname: summary.authorNickname,
+            answerCount: summary.answerCount,
+            createdAt: summary.createdAt,
+            updatedAt: summary.createdAt,
+            attachments: [],
+          },
           message: "게시글을 불러왔습니다",
         });
       }, 400);
@@ -107,13 +142,16 @@ export const postsEndpoints = {
   getPostAnswers: (postId: string): Promise<AnswerListResponse> => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        if (!MOCK_POST_STORE[postId]) {
+        const postExists =
+          !!MOCK_POST_STORE[postId] ||
+          MOCK_POSTS.some((p) => p.id === postId);
+        if (!postExists) {
           reject(new Error("게시글을 찾을 수 없습니다"));
           return;
         }
         resolve({
           success: true,
-          data: mockAnswerStore.getAll(postId),
+          data: { answers: mockAnswerStore.getAll(postId) },
           message: "답변 목록을 불러왔습니다",
         });
       }, 500);
@@ -122,12 +160,8 @@ export const postsEndpoints = {
 
   /** GET /posts/{postId}/ai-answer — AI 1차 답변 (미구현, mock) */
   getAiAnswer: (postId: string): Promise<ApiResponse<AiAnswer | null>> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        if (!MOCK_POST_STORE[postId]) {
-          reject(new Error("게시글을 찾을 수 없습니다"));
-          return;
-        }
         resolve({
           success: true,
           data: MOCK_AI_ANSWER_STORE[postId] ?? null,
@@ -139,12 +173,8 @@ export const postsEndpoints = {
 
   /** GET /posts/{postId}/similar — 유사 질문 (미구현, mock) */
   getSimilarPosts: (postId: string): Promise<ApiResponse<SimilarPost[]>> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       setTimeout(() => {
-        if (!MOCK_POST_STORE[postId]) {
-          reject(new Error("게시글을 찾을 수 없습니다"));
-          return;
-        }
         resolve({
           success: true,
           data: MOCK_SIMILAR_POSTS_STORE[postId] ?? [],

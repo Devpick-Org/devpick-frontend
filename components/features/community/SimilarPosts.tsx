@@ -36,7 +36,7 @@ export function SimilarPosts({ posts }: SimilarPostsProps) {
           <Link
             key={post.id}
             href={`/community/${post.id}`}
-            className="block rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/30 hover:bg-primary/5"
+            className="block rounded-xl border border-border bg-card p-4"
           >
             <p className="mb-2 line-clamp-2 text-sm font-medium leading-snug text-foreground">
               {post.title}

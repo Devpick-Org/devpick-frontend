@@ -48,7 +48,7 @@ export function CommunityDetailPage({ postId }: Props) {
   });
 
   const post = postRes?.data;
-  const answers = answersRes?.data ?? [];
+  const answers = answersRes?.data?.answers ?? [];
   const similarPosts = similarRes?.data ?? [];
 
   const aiStatus = isAiLoading

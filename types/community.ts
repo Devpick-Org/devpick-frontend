@@ -3,6 +3,13 @@ import type { ApiResponse } from "./api";
 
 // ─── 백엔드 확정 DTO ──────────────────────────────────────────────────────────
 
+/** 첨부 파일 DTO */
+export interface PostAttachmentDTO {
+  type: "IMAGE" | "FILE";
+  url: string;
+  fileName: string;
+}
+
 /** GET /posts/{postId} 응답 DTO */
 export interface PostDetailDTO {
   id: string;
@@ -14,6 +21,7 @@ export interface PostDetailDTO {
   answerCount: number;
   createdAt: string;
   updatedAt: string;
+  attachments: PostAttachmentDTO[];
 }
 
 export type PostDetailResponse = ApiResponse<PostDetailDTO>;
@@ -70,7 +78,7 @@ export interface CommunityAnswer extends AnswerDTO {
   comments: CommentDTO[];
 }
 
-export type AnswerListResponse = ApiResponse<CommunityAnswer[]>;
+export type AnswerListResponse = ApiResponse<{ answers: CommunityAnswer[] }>;
 
 /** AI 1차 답변 (미확정 API) */
 export interface AiAnswer {

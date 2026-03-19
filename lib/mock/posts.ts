@@ -9,7 +9,7 @@ export const MOCK_POSTS: PostSummary[] = [
     level: "BEGINNER",
     authorId: "user-001",
     authorNickname: "코딩입문자",
-    answerCount: 5,
+    answerCount: 2,
     createdAt: "2026-03-17T08:30:00.000Z",
   },
   {
@@ -20,7 +20,7 @@ export const MOCK_POSTS: PostSummary[] = [
     level: "JUNIOR",
     authorId: "user-002",
     authorNickname: "프론트엔드주니어",
-    answerCount: 8,
+    answerCount: 1,
     createdAt: "2026-03-17T07:15:00.000Z",
   },
   {
@@ -42,7 +42,7 @@ export const MOCK_POSTS: PostSummary[] = [
     level: "MIDDLE",
     authorId: "user-004",
     authorNickname: "리액트개발자",
-    answerCount: 6,
+    answerCount: 1,
     createdAt: "2026-03-16T22:00:00.000Z",
   },
   {
@@ -108,7 +108,7 @@ export const MOCK_POSTS: PostSummary[] = [
     level: "SENIOR",
     authorId: "user-010",
     authorNickname: "시니어프론트",
-    answerCount: 14,
+    answerCount: 1,
     createdAt: "2026-03-16T08:00:00.000Z",
   },
   {
