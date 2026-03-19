@@ -430,7 +430,7 @@ startTransition(() => {
   },
 ];
 
-let _answersByPost: Record<string, CommunityAnswer[]> = {
+const _answersByPost: Record<string, CommunityAnswer[]> = {
   "post-001": structuredClone(INITIAL_ANSWERS_001),
   "post-002": structuredClone(INITIAL_ANSWERS_002),
   "post-004": structuredClone(INITIAL_ANSWERS_004),
