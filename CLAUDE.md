@@ -117,8 +117,15 @@
 │ ┃ ┃ ┣ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
 │ ┃ ┃ ┗ RecommendedContents.tsx # 추천 콘텐츠 사이드바 (서버 컴포넌트, items props)
 │ ┃ ┣ community/
-│ ┃ ┃ ┣ CommunityCard.tsx    # 커뮤니티 카드 (CommunityPost interface)
-│ ┃ ┃ ┗ CommunitySearch.tsx  # 커뮤니티 검색 입력 컴포넌트
+│ ┃ ┃ ┣ AiAnswerSection.tsx      # AI 답변 생성 요청 및 결과 렌더링
+│ ┃ ┃ ┣ AnswerList.tsx           # 답변 목록 (댓글/채택/수정/삭제 포함)
+│ ┃ ┃ ┣ AnswerSection.tsx        # 답변 작성 폼 및 전체 답변 영역 (useMutation)
+│ ┃ ┃ ┣ CommunityCard.tsx        # 커뮤니티 카드 (CommunityPost interface)
+│ ┃ ┃ ┣ CommunityDetailPage.tsx  # 상세 페이지 레이아웃 (useQuery, 좌: 본문+답변, 우: 유사질문)
+│ ┃ ┃ ┣ CommunitySearch.tsx      # 커뮤니티 검색 입력 컴포넌트
+│ ┃ ┃ ┣ ContentRenderer.tsx      # react-markdown 기반 마크다운 렌더러
+│ ┃ ┃ ┣ PostDetail.tsx           # 게시글 제목/태그/본문/수정·삭제 메뉴
+│ ┃ ┃ ┗ SimilarPosts.tsx         # 유사 질문 목록 사이드바
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
 │ ┃ ┃ ┣ constants.ts         # 직무/레벨/태그 상수 정의
 │ ┃ ┃ ┣ ProfileEditForm.tsx  # 프로필 수정 폼 (닉네임/이미지/직무/레벨/태그)
@@ -149,7 +156,8 @@
 │ ┃ ┗ getContentErrorMessage.ts # 콘텐츠 에러 코드 → 사용자 메시지 매핑
 │ ┣ mock/                # 개발용 목 데이터
 │ ┃ ┣ aiSummary.ts       # AI 요약 목 데이터
-│ ┃ ┗ posts.ts           # 커뮤니티 게시글 목 데이터
+│ ┃ ┣ community.ts       # 커뮤니티 상세 목 데이터 (게시글/답변/댓글/AI답변/유사질문)
+│ ┃ ┗ posts.ts           # 커뮤니티 목록 목 데이터
 │ ┗ utils.ts             # cn(), formatDate(), formatRelativeTime()
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated, setAuth, clearAuth)
@@ -158,8 +166,9 @@
 ├── types/               # TypeScript 전역 타입 정의
 │ ┣ api.ts               # ApiResponse<T>, ApiError, PaginatedData<T>
 │ ┣ auth.ts              # User, LoginRequest, SignupRequest, SocialAuthResponse, RefreshTokenResponse 등 인증 타입
+│ ┣ community.ts         # Post, Answer, Comment, AiAnswer 등 커뮤니티 상세 타입
 │ ┣ content.ts           # Content, ContentDetail, ContentFeedData 등 콘텐츠 타입
-│ ┗ post.ts              # 커뮤니티 게시글/답변/댓글 타입
+│ ┗ post.ts              # 커뮤니티 게시글 목록 타입
 └── public/              # 정적 에셋 (이미지, 폰트)
 ```
 

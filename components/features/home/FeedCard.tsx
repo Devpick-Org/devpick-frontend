@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatDate, copyShareLink } from "@/lib/utils";
-import { useContentStore } from "@/store/content.store";
+import { contentsEndpoints } from "@/lib/api/endpoints/contents";
+import {
+  updateContentInteractionCache,
+  invalidateContentInteractionQueries,
+} from "@/lib/content/updateContentInteractionCache";
 import type { Content } from "@/types/content";
 
 // ─── FeedCard ─────────────────────────────────────────────────────────────────
@@ -16,26 +20,45 @@ interface FeedCardProps {
 }
 
 export function FeedCard({ content }: FeedCardProps) {
-  const { init, toggleLike, toggleScrap, interactions } = useContentStore();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    init(content.id, content.isLiked, content.isScrapped);
-  }, [content.id, content.isLiked, content.isScrapped, init]);
+  // mutate(wasLiked) — 클릭 직전 상태를 variable로 넘겨 onMutate/mutationFn이 같은 기준으로 동작
+  const likeMutation = useMutation({
+    mutationFn: (wasLiked: boolean) =>
+      wasLiked
+        ? contentsEndpoints.unlikeContent(content.id)
+        : contentsEndpoints.likeContent(content.id),
+    // 상세 + 목록/검색 + 추천 캐시를 동시에 반영
+    onMutate: (wasLiked) =>
+      updateContentInteractionCache(queryClient, content.id, "isLiked", !wasLiked),
+    onError: () => invalidateContentInteractionQueries(queryClient, content.id),
+    onSettled: () => invalidateContentInteractionQueries(queryClient, content.id),
+  });
 
-  const interaction = interactions[content.id];
-  const isLiked = interaction?.isLiked ?? content.isLiked;
-  const isScrapped = interaction?.isScrapped ?? content.isScrapped;
+  // mutate(wasScrapped) — 같은 패턴
+  const scrapMutation = useMutation({
+    mutationFn: (wasScrapped: boolean) =>
+      wasScrapped
+        ? contentsEndpoints.unscrapContent(content.id)
+        : contentsEndpoints.scrapContent(content.id),
+    onMutate: (wasScrapped) =>
+      updateContentInteractionCache(queryClient, content.id, "isScrapped", !wasScrapped),
+    onError: () => invalidateContentInteractionQueries(queryClient, content.id),
+    onSettled: () => invalidateContentInteractionQueries(queryClient, content.id),
+  });
 
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleLike(content.id);
+    if (likeMutation.isPending) return;
+    likeMutation.mutate(content.isLiked);
   };
 
   const handleScrap = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleScrap(content.id);
+    if (scrapMutation.isPending) return;
+    scrapMutation.mutate(content.isScrapped);
   };
 
   const handleShare = (e: React.MouseEvent) => {
@@ -82,15 +105,16 @@ export function FeedCard({ content }: FeedCardProps) {
                 onClick={handleLike}
                 className={cn(
                   "rounded-md p-1 transition-colors",
-                  isLiked
+                  content.isLiked
                     ? "text-red-500"
                     : "text-muted-foreground hover:text-foreground",
+                  likeMutation.isPending && "opacity-50",
                 )}
-                aria-label={isLiked ? "좋아요 취소" : "좋아요"}
+                aria-label={content.isLiked ? "좋아요 취소" : "좋아요"}
               >
                 <Heart
                   className="h-4 w-4"
-                  fill={isLiked ? "currentColor" : "none"}
+                  fill={content.isLiked ? "currentColor" : "none"}
                 />
               </button>
 
@@ -98,15 +122,16 @@ export function FeedCard({ content }: FeedCardProps) {
                 onClick={handleScrap}
                 className={cn(
                   "rounded-md p-1 transition-colors",
-                  isScrapped
+                  content.isScrapped
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground",
+                  scrapMutation.isPending && "opacity-50",
                 )}
-                aria-label={isScrapped ? "스크랩 해제" : "스크랩"}
+                aria-label={content.isScrapped ? "스크랩 해제" : "스크랩"}
               >
                 <Bookmark
                   className="h-4 w-4"
-                  fill={isScrapped ? "currentColor" : "none"}
+                  fill={content.isScrapped ? "currentColor" : "none"}
                 />
               </button>
 
