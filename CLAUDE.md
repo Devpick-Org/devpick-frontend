@@ -58,7 +58,7 @@
 │ ┃ ┣ layout.tsx         # TopNav + Sidebar + QueryClientProvider
 │ ┃ ┣ home/              # 맞춤형 아티클 피드 (메인)
 │ ┃ ┃ ┣ [id]/            # 글 상세 및 AI 요약 뷰어
-│ ┃ ┃ ┃ ┗ page.tsx       # 서버 컴포넌트 — content + 추천 콘텐츠 동시 fetch, 2단 레이아웃
+│ ┃ ┃ ┃ ┗ page.tsx       # 클라이언트 컴포넌트 — useParams, useQuery(content + recommendations), 2단 레이아웃
 │ ┃ ┃ ┗ page.tsx         # 개인화 피드 목록 (무한 스크롤)
 │ ┃ ┣ community/         # 커뮤니티 피드 (질문/게시글 목록)
 │ ┃ ┃ ┣ write/           # 커뮤니티 글쓰기 및 AI 질문 개선
@@ -153,7 +153,8 @@
 │ ┃ ┣ tokenManager.ts        # 토큰 저장 전략 선택 및 CRUD 관리자
 │ ┃ ┗ getAuthErrorMessage.ts # 인증 에러 코드 → 사용자 메시지 매핑
 │ ┣ content/             # 콘텐츠 관련 유틸
-│ ┃ ┗ getContentErrorMessage.ts # 콘텐츠 에러 코드 → 사용자 메시지 매핑
+│ ┃ ┣ getContentErrorMessage.ts    # 콘텐츠 에러 코드 → 사용자 메시지 매핑
+│ ┃ ┗ updateContentInteractionCache.ts # 좋아요/스크랩 상태를 detail·피드·추천 캐시에 동시 반영 (TanStack Query)
 │ ┣ mock/                # 개발용 목 데이터
 │ ┃ ┣ aiSummary.ts       # AI 요약 목 데이터
 │ ┃ ┣ community.ts       # 커뮤니티 상세 목 데이터 (게시글/답변/댓글/AI답변/유사질문)
