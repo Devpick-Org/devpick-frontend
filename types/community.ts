@@ -26,27 +26,25 @@ export interface PostDetailDTO {
 
 export type PostDetailResponse = ApiResponse<PostDetailDTO>;
 
-/** 답변 DTO (GET /posts/{postId}/answers 아이템 기준) */
-export interface AnswerDTO {
-  id: string;
-  postId: string;
-  content: string;
-  isAdopted: boolean;
-  authorId: string;
-  authorNickname: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 /** 댓글 DTO */
 export interface CommentDTO {
   id: string;
-  answerId: string;
+  content: string;
   userId: string;
   nickname: string;
+  createdAt: string;
+}
+
+/** 답변 DTO (GET /posts/{postId}/answers 아이템 기준, comments 포함) */
+export interface AnswerDTO {
+  id: string;
   content: string;
+  authorId: string;
+  authorNickname: string;
+  isAdopted: boolean;
   createdAt: string;
   updatedAt: string;
+  comments: CommentDTO[];
 }
 
 // ─── 요청 타입 ────────────────────────────────────────────────────────────────
@@ -103,12 +101,10 @@ export interface CreateCommentRequest {
 // 미확정 API(answers, ai-answer, similar)의 raw DTO는 확정하지 않고,
 // 프론트에서 필요한 최소 타입만 유지합니다.
 
-/** 답변 + 댓글 목록을 합친 화면용 타입 */
-export interface CommunityAnswer extends AnswerDTO {
-  comments: CommentDTO[];
-}
+/** 화면용 타입 — AnswerDTO와 동일 (comments가 DTO에 포함됨) */
+export type CommunityAnswer = AnswerDTO;
 
-export type AnswerListResponse = ApiResponse<{ answers: CommunityAnswer[] }>;
+export type AnswerListResponse = ApiResponse<{ answers: AnswerDTO[] }>;
 
 /** AI 1차 답변 (미확정 API) */
 export interface AiAnswer {

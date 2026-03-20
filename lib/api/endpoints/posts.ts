@@ -247,7 +247,6 @@ export const postsEndpoints = {
         }
         const newAnswer = mockAnswerStore.create(postId, {
           id: `answer-${Date.now()}`,
-          postId,
           content,
           authorId: user.userId,
           authorNickname: user.nickname,
@@ -336,12 +335,10 @@ export const postsEndpoints = {
         const now = new Date().toISOString();
         const newComment = mockAnswerStore.addComment(postId, answerId, {
           id: `comment-${Date.now()}`,
-          answerId,
           userId: user.userId,
           nickname: user.nickname,
           content,
           createdAt: now,
-          updatedAt: now,
         });
         resolve({
           success: true,
