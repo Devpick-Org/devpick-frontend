@@ -267,7 +267,6 @@ export const MOCK_SIMILAR_POSTS_STORE: Record<string, SimilarPost[]> = {
 const INITIAL_ANSWERS_001: CommunityAnswer[] = [
   {
     id: "answer-001",
-    postId: "post-001",
     content: `빈 배열 \`[]\`과 생략의 핵심 차이를 정리해 드릴게요.
 
 **빈 배열 \`[]\`**: 컴포넌트가 처음 **마운트될 때 단 한 번**만 실행됩니다.
@@ -294,27 +293,22 @@ useEffect(() => {
     comments: [
       {
         id: "comment-001",
-        answerId: "answer-001",
         userId: "user-001",
         nickname: "코딩입문자",
         content: "정말 명확한 설명 감사합니다! 이제 이해가 됐어요.",
         createdAt: "2026-03-17T09:30:00.000Z",
-        updatedAt: "2026-03-17T09:30:00.000Z",
       },
       {
         id: "comment-002",
-        answerId: "answer-001",
         userId: "user-middle-01",
         nickname: "미들개발자",
         content: "cleanup 함수 반환도 알아두면 좋아요. 이벤트 리스너나 타이머 해제할 때 유용합니다.",
         createdAt: "2026-03-17T10:00:00.000Z",
-        updatedAt: "2026-03-17T10:00:00.000Z",
       },
     ],
   },
   {
     id: "answer-002",
-    postId: "post-001",
     content: `추가로 의존성 배열에 특정 값을 넣는 케이스도 알아두세요.
 
 \`\`\`js
@@ -339,7 +333,6 @@ ESLint의 \`exhaustive-deps\` 규칙을 활성화하면, effect 내부에서 참
 const INITIAL_ANSWERS_002: CommunityAnswer[] = [
   {
     id: "answer-002-001",
-    postId: "post-002",
     content: `\`"use client"\`는 최대한 트리 **말단**에 두는 게 좋습니다.
 
 상위 레이아웃은 서버 컴포넌트로 유지하고, 버튼이나 폼처럼 이벤트가 필요한 리프 컴포넌트에만 선언하세요.
@@ -371,7 +364,6 @@ export default async function PostPage() {
 const INITIAL_ANSWERS_004: CommunityAnswer[] = [
   {
     id: "answer-004-001",
-    postId: "post-004",
     content: `인증 정보는 서버에서 받아오지만 앱 전반에 걸쳐 **동기적으로 접근**해야 하므로 Zustand가 적합합니다.
 
 **판단 기준**:
@@ -400,7 +392,6 @@ useEffect(() => {
 const INITIAL_ANSWERS_010: CommunityAnswer[] = [
   {
     id: "answer-010-001",
-    postId: "post-010",
     content: `실무에서 겪은 주요 주의사항을 공유합니다.
 
 **1. 외부 상태와 함께 쓸 때**
