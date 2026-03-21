@@ -1,14 +1,17 @@
 import type { ApiResponse } from "./api";
 
-/** GET /history actionType — content_liked 제외 */
+/** GET /history actionType — 학습 탭 전용 */
 export type HistoryActionType =
   | "content_opened"
   | "ai_summary_viewed"
   | "scrapped"
   | "question_created";
 
-/** GET /history/activity actionType — content_liked 포함 전체 */
-export type ActivityActionType = HistoryActionType | "content_liked";
+/** GET /history/activity actionType — 활동 탭 전용 */
+export type ActivityActionType =
+  | "content_liked"
+  | "answer_written"
+  | "comment_created";
 
 /** 히스토리 아이템이 참조하는 콘텐츠 요약 */
 export interface HistoryContentRef {

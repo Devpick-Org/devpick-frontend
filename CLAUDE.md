@@ -135,13 +135,14 @@
 │ ┃ ┃ ┣ PostWriteForm.tsx        # 게시글 작성 폼 (제목/내용/태그 입력)
 │ ┃ ┃ ┣ PostRefinePanel.tsx      # AI 질문 개선 패널 (우측 사이드 패널)
 │ ┃ ┃ ┗ SimilarPosts.tsx         # 유사 질문 목록 사이드바
-│ ┃ ┣ history/               # 학습 히스토리 컴포넌트
-│ ┃ ┃ ┣ history.constants.ts # actionType 메타데이터 (label/icon/색상)
+│ ┃ ┣ history/               # 히스토리 컴포넌트 (학습/활동 탭)
+│ ┃ ┃ ┣ history.constants.ts # actionType 메타데이터 (label/icon/색상) + 필터 옵션 상수
 │ ┃ ┃ ┣ HistoryTabsPage.tsx  # 학습/활동 탭 wrapper (페이지 진입점)
-│ ┃ ┃ ┣ HistoryPage.tsx      # 학습 탭 — useQuery + HistoryContent
-│ ┃ ┃ ┣ HistoryContent.tsx   # 학습 탭 wrapper (isLoading/isError/empty 상태 분기)
-│ ┃ ┃ ┣ HistoryList.tsx      # items 배열 map
-│ ┃ ┃ ┣ HistoryItem.tsx      # 단일 히스토리 카드
+│ ┃ ┃ ┣ HistoryPage.tsx      # 학습 탭 — useQuery + 필터 상태 + groupByDate
+│ ┃ ┃ ┣ HistoryContent.tsx   # 학습 탭 wrapper (isLoading/isError/empty 상태 분기 + HistoryFilterBar)
+│ ┃ ┃ ┣ HistoryFilterBar.tsx # 액션 chip 필터 + 기간 dropdown
+│ ┃ ┃ ┣ HistoryTimeline.tsx  # 날짜 그룹 헤더 + 타임라인 아이템 목록
+│ ┃ ┃ ┣ HistoryTimelineItem.tsx # 단일 타임라인 아이템 (아이콘 노드 + 카드)
 │ ┃ ┃ ┣ ActivityPage.tsx     # 활동 탭 — TODO: useQuery 연동 예정
 │ ┃ ┃ ┗ ActivityContent.tsx  # 활동 탭 wrapper — TODO: ActivityList 연결 예정
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
@@ -187,7 +188,9 @@
 │ ┃ ┗ reports.ts         # 주간 리포트 목 데이터
 │ ┣ report/              # 리포트 관련 유틸
 │ ┃ ┗ exportPdf.ts       # 리포트 PDF 내보내기
-│ ┗ utils.ts             # cn(), formatDate(), formatDateTime(), formatWeekLabel()
+│ ┣ history/             # 히스토리 관련 유틸
+│ ┃ ┗ groupByDate.ts    # PeriodFilter, DateGroup, filterByPeriod(), filterByActions(), groupByDate()
+│ ┗ utils.ts             # cn(), formatDate(), formatDateTime(), formatTime(), formatWeekLabel()
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated, setAuth, clearAuth)
 │ ┣ content.store.ts     # 콘텐츠 관련 전역 상태

@@ -2,7 +2,6 @@
 
 import { ChevronDown } from "lucide-react";
 
-import type { HistoryActionType } from "@/types/history";
 import type { PeriodFilter } from "@/lib/history/groupByDate";
 import { PERIOD_OPTIONS } from "./history.constants";
 import {
@@ -13,27 +12,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-interface ActionOption {
-  value: HistoryActionType;
+interface ActionOption<T extends string> {
+  value: T;
   label: string;
 }
 
-interface Props {
-  actionOptions: ActionOption[];
-  selectedActions: HistoryActionType[];
-  onActionsChange: (actions: HistoryActionType[]) => void;
+interface Props<T extends string> {
+  actionOptions: ActionOption<T>[];
+  selectedActions: T[];
+  onActionsChange: (actions: T[]) => void;
   period: PeriodFilter;
   onPeriodChange: (period: PeriodFilter) => void;
 }
 
-export default function HistoryFilterBar({
+function HistoryFilterBar<T extends string>({
   actionOptions,
   selectedActions,
   onActionsChange,
   period,
   onPeriodChange,
-}: Props) {
-  function toggleAction(value: HistoryActionType) {
+}: Props<T>) {
+  function toggleAction(value: T) {
     if (selectedActions.includes(value)) {
       onActionsChange(selectedActions.filter((a) => a !== value));
     } else {
@@ -52,7 +51,7 @@ export default function HistoryFilterBar({
         {/* 액션 chips — 중간 강조 */}
         <div className="flex flex-wrap gap-1.5">
           <button
-            onClick={() => onActionsChange([])}
+            onClick={() => onActionsChange([] as T[])}
             className={cn(
               "px-3.5 py-1 rounded-full text-sm font-medium transition-colors",
               isAll
@@ -106,3 +105,5 @@ export default function HistoryFilterBar({
     </div>
   );
 }
+
+export default HistoryFilterBar;

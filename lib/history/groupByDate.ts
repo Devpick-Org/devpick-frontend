@@ -1,13 +1,13 @@
-import type { HistoryItem, HistoryActionType } from "@/types/history";
+import type { HistoryItem, HistoryActionType, ActivityItem, ActivityActionType } from "@/types/history";
 
 export type PeriodFilter = "7d" | "30d" | "all";
 
-/** 날짜별 그룹 — HistoryTimeline에서 사용 */
-export interface DateGroup {
+/** 날짜별 그룹 — T 기본값 HistoryItem (기존 코드 호환) */
+export interface DateGroup<T = HistoryItem> {
   dateKey: string;   // "2026-03-21" — 정렬/식별 키
   dateLabel: string; // "2026년 3월 21일" — 화면 표시
   count: number;
-  items: HistoryItem[];
+  items: T[];
 }
 
 /** ISO 문자열 → 로컬 "YYYY-MM-DD" 키 */
@@ -21,7 +21,6 @@ function toLocalDateKey(dateStr: string): string {
 
 /** "YYYY-MM-DD" → "2026년 3월 21일" */
 function toLocalDateLabel(dateKey: string): string {
-  // T00:00:00 붙여 UTC 해석 방지
   const d = new Date(dateKey + "T00:00:00");
   return d.toLocaleDateString("ko-KR", {
     year: "numeric",
@@ -30,11 +29,11 @@ function toLocalDateLabel(dateKey: string): string {
   });
 }
 
-/** period 필터 — createdAt 로컬 날짜 기준 */
-export function filterByPeriod(
-  items: HistoryItem[],
+/** period 필터 — createdAt 로컬 날짜 기준 (제네릭: 학습/활동 공용) */
+export function filterByPeriod<T extends { createdAt: string }>(
+  items: T[],
   period: PeriodFilter,
-): HistoryItem[] {
+): T[] {
   if (period === "all") return items;
   const days = period === "7d" ? 7 : 30;
   const cutoff = new Date();
@@ -43,7 +42,7 @@ export function filterByPeriod(
   return items.filter((item) => new Date(item.createdAt) >= cutoff);
 }
 
-/** actionType 필터 — selectedActions가 비어 있으면 전체 반환 */
+/** actionType 필터 — 학습 탭 전용 */
 export function filterByActions(
   items: HistoryItem[],
   selectedActions: HistoryActionType[],
@@ -52,9 +51,20 @@ export function filterByActions(
   return items.filter((item) => selectedActions.includes(item.actionType));
 }
 
-/** createdAt 기준 로컬 날짜별 그룹핑 (날짜: 최신순 / 그룹 내 아이템: 최신순) */
-export function groupByDate(items: HistoryItem[]): DateGroup[] {
-  const map = new Map<string, HistoryItem[]>();
+/** actionType 필터 — 활동 탭 전용 */
+export function filterByActivityActions(
+  items: ActivityItem[],
+  selectedActions: ActivityActionType[],
+): ActivityItem[] {
+  if (selectedActions.length === 0) return items;
+  return items.filter((item) => selectedActions.includes(item.actionType));
+}
+
+/** 날짜별 그룹핑 공통 로직 (날짜: 최신순 / 그룹 내 아이템: 최신순) */
+function groupItemsByLocalDate<T extends { createdAt: string }>(
+  items: T[],
+): DateGroup<T>[] {
+  const map = new Map<string, T[]>();
 
   for (const item of items) {
     const key = toLocalDateKey(item.createdAt);
@@ -67,7 +77,7 @@ export function groupByDate(items: HistoryItem[]): DateGroup[] {
   }
 
   return Array.from(map.entries())
-    .sort(([a], [b]) => b.localeCompare(a)) // 최신 날짜 먼저
+    .sort(([a], [b]) => b.localeCompare(a))
     .map(([dateKey, groupItems]) => ({
       dateKey,
       dateLabel: toLocalDateLabel(dateKey),
@@ -76,4 +86,14 @@ export function groupByDate(items: HistoryItem[]): DateGroup[] {
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       ),
     }));
+}
+
+/** createdAt 기준 날짜별 그룹핑 — 학습 탭 */
+export function groupByDate(items: HistoryItem[]): DateGroup[] {
+  return groupItemsByLocalDate(items);
+}
+
+/** createdAt 기준 날짜별 그룹핑 — 활동 탭 */
+export function groupByActivityDate(items: ActivityItem[]): DateGroup<ActivityItem>[] {
+  return groupItemsByLocalDate(items);
 }
