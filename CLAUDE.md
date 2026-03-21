@@ -143,8 +143,10 @@
 │ ┃ ┃ ┣ HistoryFilterBar.tsx # 액션 chip 필터 + 기간 dropdown
 │ ┃ ┃ ┣ HistoryTimeline.tsx  # 날짜 그룹 헤더 + 타임라인 아이템 목록
 │ ┃ ┃ ┣ HistoryTimelineItem.tsx # 단일 타임라인 아이템 (아이콘 노드 + 카드)
-│ ┃ ┃ ┣ ActivityPage.tsx     # 활동 탭 — TODO: useQuery 연동 예정
-│ ┃ ┃ ┗ ActivityContent.tsx  # 활동 탭 wrapper — TODO: ActivityList 연결 예정
+│ ┃ ┃ ┣ ActivityPage.tsx     # 활동 탭 — useQuery 연동
+│ ┃ ┃ ┣ ActivityContent.tsx  # 활동 탭 wrapper (isLoading/isError/empty 상태 분기)
+│ ┃ ┃ ┣ ActivityTimeline.tsx # 날짜 그룹 헤더 + 활동 타임라인 아이템 목록
+│ ┃ ┃ ┗ ActivityTimelineItem.tsx # 단일 활동 타임라인 아이템 (아이콘 노드 + 카드)
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
 │ ┃ ┃ ┣ constants.ts         # 직무/레벨/태그 상수 정의
 │ ┃ ┃ ┣ ProfileEditForm.tsx  # 프로필 수정 폼 (닉네임/이미지/직무/레벨/태그)

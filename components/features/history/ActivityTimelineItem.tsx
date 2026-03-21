@@ -11,10 +11,23 @@ interface Props {
   isLast: boolean;
 }
 
+/**
+ * actionType별 이동 경로
+ * - content_liked → /home/{content.id}
+ * - answer_written / comment_created → /community/{post.id}
+ *   TODO: answer.id 앵커 스크롤 — 게시글 상세 페이지에 #answer-{answer.id} 구현 후 아래 활성화
+ *         if (item.answer?.id) return `/community/${item.post.id}#answer-${item.answer.id}`;
+ * - 참조 항목이 null(삭제됨)이면 null 반환 → 클릭 비활성화
+ */
 function getHref(item: ActivityItem): string | null {
-  if (item.content?.id) return `/home/${item.content.id}`;
-  if (item.post?.id) return `/community/${item.post.id}`;
-  return null;
+  if (item.actionType === "content_liked") {
+    return item.content?.id ? `/home/${item.content.id}` : null;
+  }
+  // answer_written / comment_created
+  if (!item.post?.id) return null;
+  // TODO: 답변 앵커 스크롤 활성화 시 아래 주석 해제
+  // if (item.answer?.id) return `/community/${item.post.id}#answer-${item.answer.id}`;
+  return `/community/${item.post.id}`;
 }
 
 export default function ActivityTimelineItem({ item, isLast }: Props) {
@@ -43,7 +56,9 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
           <p className="text-sm text-muted-foreground italic">삭제된 콘텐츠</p>
         )}
         {preview && (
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{preview}</p>
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+            {preview}
+          </p>
         )}
       </div>
 
@@ -69,9 +84,7 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
         >
           <Icon className={cn("h-4 w-4", meta.iconClass)} />
         </div>
-        {!isLast && (
-          <div className="w-px flex-1 min-h-3 bg-border mt-1" />
-        )}
+        {!isLast && <div className="w-px flex-1 min-h-3 bg-border mt-1" />}
       </div>
 
       {/* 오른쪽: 카드 */}

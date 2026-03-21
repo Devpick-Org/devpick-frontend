@@ -11,10 +11,23 @@ interface Props {
   isLast: boolean;
 }
 
+/**
+ * actionType별 이동 경로
+ * - content_opened / ai_summary_viewed / scrapped → /home/{content.id}
+ * - question_created → /community/{post.id}
+ * - 참조 항목이 null(삭제됨)이면 null 반환 → 클릭 비활성화
+ */
 function getHref(item: HistoryItem): string | null {
-  if (item.content?.id) return `/home/${item.content.id}`;
-  if (item.post?.id) return `/community/${item.post.id}`;
-  return null;
+  switch (item.actionType) {
+    case "content_opened":
+    case "ai_summary_viewed":
+    case "scrapped":
+      return item.content?.id ? `/home/${item.content.id}` : null;
+    case "question_created":
+      return item.post?.id ? `/community/${item.post.id}` : null;
+    default:
+      return null;
+  }
 }
 
 export default function HistoryTimelineItem({ item, isLast }: Props) {
@@ -43,7 +56,9 @@ export default function HistoryTimelineItem({ item, isLast }: Props) {
           <p className="text-sm text-muted-foreground italic">삭제된 콘텐츠</p>
         )}
         {preview && (
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{preview}</p>
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+            {preview}
+          </p>
         )}
       </div>
 
@@ -69,9 +84,7 @@ export default function HistoryTimelineItem({ item, isLast }: Props) {
         >
           <Icon className={cn("h-4 w-4", meta.iconClass)} />
         </div>
-        {!isLast && (
-          <div className="w-px flex-1 min-h-3 bg-border mt-1" />
-        )}
+        {!isLast && <div className="w-px flex-1 min-h-3 bg-border mt-1" />}
       </div>
 
       {/* 오른쪽: 카드 */}

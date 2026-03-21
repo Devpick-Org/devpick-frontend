@@ -22,7 +22,7 @@ export default function HistoryTabsPage() {
           나의 학습 기록과 활동 내역을 한눈에 확인하세요.
         </p>
         <Tabs defaultValue="learning">
-          <TabsList className="mb-8 w-full border-b border-border bg-transparent rounded-none p-0 h-auto justify-start gap-0">
+          <TabsList className="mb-4 w-full border-b border-border bg-transparent rounded-none p-0 h-auto justify-start gap-0">
             <TabsTrigger value="learning" className={TRIGGER_CLASS}>
               학습
             </TabsTrigger>
