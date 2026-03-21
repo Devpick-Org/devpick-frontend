@@ -10,6 +10,7 @@ import {
   Home,
   Users,
   TrendingUp,
+  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -55,6 +56,7 @@ const LEVEL_LABELS: Record<string, string> = {
 const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/home", label: "홈", icon: Home },
   { href: "/community", label: "커뮤니티", icon: Users },
+  { href: "/history", label: "히스토리", icon: BookOpen },
   { href: "/report", label: "리포트", icon: TrendingUp },
 ];
 

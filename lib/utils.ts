@@ -27,6 +27,26 @@ export function formatDate(dateStr: string): string {
   });
 }
 
+/** "2026-03-21T10:30:00.000Z" → "2026년 3월 21일 오전 10:30" */
+export function formatDateTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/** "2026-03-21T10:30:00.000Z" → "오전 10:30" */
+export function formatTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 /**
  * "2026-03-14" → "2026년 3월 3주차"
  * 월요일 기준 주차 계산 (ISO 방식과 유사)
