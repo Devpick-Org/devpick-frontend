@@ -275,7 +275,7 @@ function ErrorState() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-foreground">
       <AlertCircle className="w-8 h-8" />
-      <p className="text-sm font-medium">리포트를 불러오지 못했습니다.</p>
+      <p className="text-md font-medium">리포트를 불러오지 못했습니다.</p>
     </div>
   );
 }

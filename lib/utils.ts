@@ -28,6 +28,37 @@ export function formatDate(dateStr: string): string {
 }
 
 /**
+ * "2026-03-21T10:30:00" → "2026년 3월 21일 오전 10:30"
+ *
+ * [주의] 히스토리 createdAt은 timezone 없는 서버 로컬 시간(KST).
+ * ECMAScript에서 timezone 없는 datetime 문자열은 로컬 시간으로 파싱되므로
+ * 한국(KST) 사용자 환경에서 올바르게 동작함.
+ */
+export function formatDateTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/**
+ * "2026-03-21T10:30:00" → "오전 10:30"
+ *
+ * [주의] 히스토리 createdAt은 timezone 없는 서버 로컬 시간(KST).
+ * timezone 없는 datetime 문자열은 브라우저 로컬 시간으로 파싱됨.
+ */
+export function formatTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/**
  * "2026-03-14" → "2026년 3월 3주차"
  * 월요일 기준 주차 계산 (ISO 방식과 유사)
  * 월의 첫날 요일 offset을 보정해 해당 날짜가 몇 번째 월~일 구간에 속하는지 반환

@@ -55,7 +55,7 @@
 │ ┣ (auth)/              # Route Group — GNB 없는 레이아웃 (로그인/회원가입)
 │ ┃ ┗ page.tsx           # / (로그인·회원가입 통합 페이지)
 │ ┣ (main)/              # Route Group — GNB 있는 레이아웃
-│ ┃ ┣ layout.tsx         # TopNav + Sidebar + QueryClientProvider
+│ ┃ ┣ layout.tsx         # TopNavVariant + QueryClientProvider
 │ ┃ ┣ home/              # 맞춤형 아티클 피드 (메인)
 │ ┃ ┃ ┣ [id]/            # 글 상세 및 AI 요약 뷰어
 │ ┃ ┃ ┃ ┗ page.tsx       # 클라이언트 컴포넌트 — useParams, useQuery(content + recommendations), 2단 레이아웃
@@ -65,6 +65,8 @@
 │ ┃ ┃ ┃ ┗ page.tsx
 │ ┃ ┃ ┣ [id]/            # 게시글 상세 및 AI/유저 답변
 │ ┃ ┃ ┃ ┗ page.tsx
+│ ┃ ┃ ┗ page.tsx
+│ ┃ ┣ history/           # 학습 히스토리 (학습/활동 탭)
 │ ┃ ┃ ┗ page.tsx
 │ ┃ ┣ profile/           # 내 프로필, 스크랩, 활동 내역
 │ ┃ ┃ ┗ page.tsx
@@ -80,6 +82,11 @@
 │ ┣ onboarding/          # 초기 사용자 성향 파악 온보딩
 │ ┃ ┣ layout.tsx         # 온보딩 전용 레이아웃
 │ ┃ ┗ page.tsx
+│ ┣ report/              # 리포트 공유 라우트 (Route Group 밖 — GNB 없는 독립 레이아웃)
+│ ┃ ┗ share/
+│ ┃   ┣ layout.tsx       # 공유 페이지 전용 레이아웃
+│ ┃   ┗ [token]/
+│ ┃     ┗ page.tsx       # 공유 토큰으로 리포트 열람 (비로그인 접근 가능)
 │ ┣ favicon.ico          # 파비콘
 │ ┣ globals.css          # 전역 스타일 및 Tailwind CSS 설정 (@theme 토큰)
 │ ┗ layout.tsx           # Root Layout (HTML shell — html, body 태그만)
@@ -97,10 +104,10 @@
 │ ┃ ┣ skeleton.tsx
 │ ┃ ┗ tabs.tsx
 │ ┣ layout/              # GNB, 사이드바 등 레이아웃 컴포넌트
-│ ┃ ┣ Sidebar.tsx        # 데스크탑 사이드바 + 모바일 하단 탭바
+│ ┃ ┣ Sidebar.tsx        # 데스크탑 사이드바 + 모바일 하단 탭바 (현재 미사용)
 │ ┃ ┣ ScrollToTopButton.tsx # 스크롤 최상단 이동 버튼
-│ ┃ ┣ TopNav.tsx         # 상단 GNB, useAuthStore 연동, 로그아웃
-│ ┃ ┗ TopNavVariant.tsx  # TopNav 변형 (특수 레이아웃용)
+│ ┃ ┣ TopNav.tsx         # 상단 GNB 구버전 (현재 미사용)
+│ ┃ ┗ TopNavVariant.tsx  # 상단 GNB + 모바일 하단 탭바 (현재 운영)
 │ ┣ features/            # 도메인별 기능 컴포넌트
 │ ┃ ┣ auth/              # 인증 화면 컴포넌트
 │ ┃ ┃ ┣ AuthCallbackPage.tsx  # provider별 OAuth 콜백 공통 처리 UI/로직 (code/state 파싱 → 콜백 API 호출 → 토큰 저장 → 리다이렉트)
@@ -128,6 +135,18 @@
 │ ┃ ┃ ┣ PostWriteForm.tsx        # 게시글 작성 폼 (제목/내용/태그 입력)
 │ ┃ ┃ ┣ PostRefinePanel.tsx      # AI 질문 개선 패널 (우측 사이드 패널)
 │ ┃ ┃ ┗ SimilarPosts.tsx         # 유사 질문 목록 사이드바
+│ ┃ ┣ history/               # 히스토리 컴포넌트 (학습/활동 탭)
+│ ┃ ┃ ┣ history.constants.ts # actionType 메타데이터 (label/icon/색상) + 필터 옵션 상수
+│ ┃ ┃ ┣ HistoryTabsPage.tsx  # 학습/활동 탭 wrapper (페이지 진입점)
+│ ┃ ┃ ┣ HistoryPage.tsx      # 학습 탭 — useQuery + 필터 상태 + groupByDate
+│ ┃ ┃ ┣ HistoryContent.tsx   # 학습 탭 wrapper (isLoading/isError/empty 상태 분기 + HistoryFilterBar)
+│ ┃ ┃ ┣ HistoryFilterBar.tsx # 액션 chip 필터 + 기간 dropdown
+│ ┃ ┃ ┣ HistoryTimeline.tsx  # 날짜 그룹 헤더 + 타임라인 아이템 목록
+│ ┃ ┃ ┣ HistoryTimelineItem.tsx # 단일 타임라인 아이템 (아이콘 노드 + 카드)
+│ ┃ ┃ ┣ ActivityPage.tsx     # 활동 탭 — useQuery 연동
+│ ┃ ┃ ┣ ActivityContent.tsx  # 활동 탭 wrapper (isLoading/isError/empty 상태 분기)
+│ ┃ ┃ ┣ ActivityTimeline.tsx # 날짜 그룹 헤더 + 활동 타임라인 아이템 목록
+│ ┃ ┃ ┗ ActivityTimelineItem.tsx # 단일 활동 타임라인 아이템 (아이콘 노드 + 카드)
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
 │ ┃ ┃ ┣ constants.ts         # 직무/레벨/태그 상수 정의
 │ ┃ ┃ ┣ ProfileEditForm.tsx  # 프로필 수정 폼 (닉네임/이미지/직무/레벨/태그)
@@ -135,6 +154,11 @@
 │ ┃ ┃ ┣ ProfileNicknameInput.tsx  # 닉네임 입력
 │ ┃ ┃ ┣ ProfileRoleSelector.tsx   # 직무 선택 (FRONTEND/BACKEND/FULLSTACK)
 │ ┃ ┃ ┗ ProfileTagSelector.tsx    # 기술 태그 선택
+│ ┃ ┣ report/                # 주간 리포트 컴포넌트
+│ ┃ ┃ ┣ ReportContent.tsx    # 리포트 콘텐츠 렌더러 (차트/인사이트 등)
+│ ┃ ┃ ┣ ReportTabsPage.tsx   # 리포트 페이지 wrapper (주간 리포트 단독)
+│ ┃ ┃ ┣ SharedReportPage.tsx # 공유 리포트 뷰어 (비로그인 접근용)
+│ ┃ ┃ ┗ WeeklyReportPage.tsx # 주간 리포트 대시보드 (바 차트/레이더 차트/PDF 저장/공유)
 │ ┃ ┗ onboarding/
 │ ┃   ┗ OnboardingForm.tsx   # 온보딩 폼 (초기 성향 파악)
 │ ┗ providers.tsx        # QueryClientProvider 등 클라이언트 Provider 래퍼
@@ -145,9 +169,10 @@
 │ ┃ ┗ endpoints/         # 도메인별 API 함수
 │ ┃   ┣ auth.ts          # 로그인/회원가입/로그아웃/소셜 로그인 등
 │ ┃   ┣ contents.ts      # 피드/상세/추천/좋아요/스크랩 등
+│ ┃   ┣ history.ts       # 학습 히스토리 (HISTORY_QUERY_KEYS + historyEndpoints)
 │ ┃   ┣ posts.ts         # 커뮤니티 게시글/답변/댓글
-│ ┃   ┣ users.ts         # 프로필 조회/수정/탈퇴
-│ ┃   ┗ reports.ts       # 주간 리포트
+│ ┃   ┣ reports.ts       # 주간 리포트
+│ ┃   ┗ users.ts         # 프로필 조회/수정/탈퇴
 │ ┣ auth/                # 인증/토큰 관련 유틸
 │ ┃ ┣ TokenStrategy.ts       # 토큰 저장 전략 인터페이스 (Strategy Pattern)
 │ ┃ ┣ CookieStrategy.ts      # Cookie 기반 구현체 — Refresh Token HttpOnly Cookie 관리
@@ -160,8 +185,14 @@
 │ ┣ mock/                # 개발용 목 데이터
 │ ┃ ┣ aiSummary.ts       # AI 요약 목 데이터
 │ ┃ ┣ community.ts       # 커뮤니티 상세 목 데이터 (게시글/답변/댓글/AI답변/유사질문)
-│ ┃ ┗ posts.ts           # 커뮤니티 목록 목 데이터
-│ ┗ utils.ts             # cn(), formatDate(), formatRelativeTime()
+│ ┃ ┣ history.ts         # 학습 히스토리 목 데이터 (최신순 정렬 + pagination)
+│ ┃ ┣ posts.ts           # 커뮤니티 목록 목 데이터
+│ ┃ ┗ reports.ts         # 주간 리포트 목 데이터
+│ ┣ report/              # 리포트 관련 유틸
+│ ┃ ┗ exportPdf.ts       # 리포트 PDF 내보내기
+│ ┣ history/             # 히스토리 관련 유틸
+│ ┃ ┗ groupByDate.ts    # PeriodFilter, DateGroup, filterByPeriod(), filterByActions(), groupByDate()
+│ ┗ utils.ts             # cn(), formatDate(), formatDateTime(), formatTime(), formatWeekLabel()
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated, setAuth, clearAuth)
 │ ┣ content.store.ts     # 콘텐츠 관련 전역 상태
@@ -171,7 +202,9 @@
 │ ┣ auth.ts              # User, LoginRequest, SignupRequest, SocialAuthResponse, RefreshTokenResponse 등 인증 타입
 │ ┣ community.ts         # Post, Answer, Comment, AiAnswer 등 커뮤니티 상세 타입
 │ ┣ content.ts           # Content, ContentDetail, ContentFeedData 등 콘텐츠 타입
-│ ┗ post.ts              # 커뮤니티 게시글 목록 타입
+│ ┣ history.ts           # HistoryItem, ActivityItem, HistoryPageData, HistoryParams 등 히스토리 타입
+│ ┣ post.ts              # 커뮤니티 게시글 목록 타입
+│ ┗ report.ts            # 주간 리포트 타입
 └── public/              # 정적 에셋 (이미지, 폰트)
 ```
 

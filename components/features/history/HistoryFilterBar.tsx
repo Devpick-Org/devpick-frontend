@@ -1,0 +1,109 @@
+"use client";
+
+import { ChevronDown } from "lucide-react";
+
+import type { PeriodFilter } from "@/lib/history/groupByDate";
+import { PERIOD_OPTIONS } from "./history.constants";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+
+interface ActionOption<T extends string> {
+  value: T;
+  label: string;
+}
+
+interface Props<T extends string> {
+  actionOptions: ActionOption<T>[];
+  selectedActions: T[];
+  onActionsChange: (actions: T[]) => void;
+  period: PeriodFilter;
+  onPeriodChange: (period: PeriodFilter) => void;
+}
+
+function HistoryFilterBar<T extends string>({
+  actionOptions,
+  selectedActions,
+  onActionsChange,
+  period,
+  onPeriodChange,
+}: Props<T>) {
+  function toggleAction(value: T) {
+    if (selectedActions.includes(value)) {
+      onActionsChange(selectedActions.filter((a) => a !== value));
+    } else {
+      onActionsChange([...selectedActions, value]);
+    }
+  }
+
+  const isAll = selectedActions.length === 0;
+  const currentPeriodLabel =
+    PERIOD_OPTIONS.find((o) => o.value === period)?.label ?? period;
+
+  return (
+    <div className="space-y-2 pb-4">
+      {/* 액션 chips + 기간 dropdown — 한 행 */}
+      <div className="flex flex-wrap items-center justify-between gap-y-2">
+        {/* 액션 chips — 중간 강조 */}
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            onClick={() => onActionsChange([] as T[])}
+            className={cn(
+              "px-3.5 py-1 rounded-full text-sm font-medium transition-colors",
+              isAll
+                ? "bg-primary/10 text-primary"
+                : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+            )}
+          >
+            전체
+          </button>
+          {actionOptions.map((opt) => {
+            const isActive = selectedActions.includes(opt.value);
+            return (
+              <button
+                key={opt.value}
+                onClick={() => toggleAction(opt.value)}
+                className={cn(
+                  "px-2.5 py-1 rounded-full text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+                )}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 기간 dropdown — 가장 약한 강조 */}
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors outline-none">
+            {currentPeriodLabel}
+            <ChevronDown className="h-3 w-3 opacity-60" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[6rem]">
+            {PERIOD_OPTIONS.map((opt) => (
+              <DropdownMenuItem
+                key={opt.value}
+                onSelect={() => onPeriodChange(opt.value)}
+                className={cn(
+                  "text-xs cursor-pointer",
+                  period === opt.value && "font-semibold text-primary",
+                )}
+              >
+                {opt.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+}
+
+export default HistoryFilterBar;
