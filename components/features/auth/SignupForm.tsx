@@ -228,7 +228,7 @@ export function SignupForm() {
       </Button>
 
       {submitErrorMessage && (
-        <p className="text-sm text-red-500">{submitErrorMessage}</p>
+        <p className="text-sm text-center text-red-500">{submitErrorMessage}</p>
       )}
     </form>
   );

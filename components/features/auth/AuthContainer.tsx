@@ -41,9 +41,11 @@ interface AuthContainerProps {
 export function AuthContainer({ oauthError }: AuthContainerProps) {
   const [activeTab, setActiveTab] = useState<string>("login");
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+  const [socialError, setSocialError] = useState("");
 
   const handleSocialLogin = async (provider: "github" | "google") => {
     setLoadingProvider(provider);
+    setSocialError("");
     try {
       const getOAuthUrl =
         provider === "github"
@@ -54,6 +56,7 @@ export function AuthContainer({ oauthError }: AuthContainerProps) {
       window.location.href = data.data.authorizationUrl;
     } catch {
       setLoadingProvider(null);
+      setSocialError("소셜 로그인 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.");
     }
   };
 
@@ -61,10 +64,8 @@ export function AuthContainer({ oauthError }: AuthContainerProps) {
     <div className="mx-auto w-full max-w-[464px]">
       <DevPickLogo />
 
-      {oauthError && (
-        <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
-          {oauthError}
-        </div>
+      {(oauthError || socialError) && (
+        <p className="mb-4 text-sm text-center text-red-500">{oauthError || socialError}</p>
       )}
 
       <div className="rounded-2xl bg-card p-6 transition-all duration-300">
