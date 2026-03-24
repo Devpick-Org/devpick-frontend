@@ -106,7 +106,7 @@ export function CommunityCard({ post }: CommunityCardProps) {
 
             <button
               onClick={handleShare}
-              className="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
               aria-label="공유"
             >
               <Share2 className="h-4 w-4" />

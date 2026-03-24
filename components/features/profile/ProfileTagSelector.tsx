@@ -154,7 +154,7 @@ export function ProfileTagSelector({
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="ml-0.5 rounded-full p-1 hover:bg-primary/20 transition-colors"
+                className="ml-0.5 rounded-full p-1 hover:bg-primary/20 transition-colors cursor-pointer"
                 aria-label={`${tag} 제거`}
               >
                 <XIcon className="h-3.5 w-3.5" />
@@ -181,7 +181,7 @@ export function ProfileTagSelector({
           type="button"
           onClick={handleAddTag}
           disabled={!inputValue.trim()}
-          className="flex h-10 items-center justify-center gap-1 rounded-md bg-secondary px-4 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex h-10 items-center justify-center gap-1 rounded-md bg-secondary px-4 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           <PlusIcon className="h-4 w-4" />
           추가
@@ -205,7 +205,7 @@ export function ProfileTagSelector({
                     type="button"
                     onClick={() => toggleTag(tag)}
                     className={cn(
-                      "rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
+                      "rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer",
                       isSelected
                         ? "bg-primary/10 text-primary shadow-sm shadow-primary/10"
                         : "bg-secondary text-muted-foreground hover:text-foreground",
@@ -234,7 +234,7 @@ export function ProfileTagSelector({
                     type="button"
                     onClick={() => toggleTag(tag)}
                     className={cn(
-                      "rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200",
+                      "rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-200 cursor-pointer",
                       isSelected
                         ? "bg-primary/10 text-primary shadow-sm shadow-primary/10"
                         : "bg-secondary text-muted-foreground hover:text-foreground",

@@ -1,6 +1,10 @@
+"use client";
+
+import { useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, User, FileDown, ImageIcon, Paperclip } from "lucide-react";
+import { ArrowLeft, User, FileDown, ImageIcon, Paperclip, Share2 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatRelativeDate } from "./CommunityCard";
 import { ContentRenderer } from "./ContentRenderer";
@@ -71,6 +75,15 @@ function AttachmentItem({ attachment }: { attachment: PostAttachmentDTO }) {
 }
 
 export function PostDetail({ post }: PostDetailProps) {
+  const handleShare = useCallback(() => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(
+        `${window.location.origin}/community/${post.id}`,
+      );
+      toast.success("링크가 복사되었습니다.");
+    }
+  }, [post.id]);
+
   return (
     <article className="mb-8">
       <Link
@@ -92,9 +105,18 @@ export function PostDetail({ post }: PostDetailProps) {
         <span>{formatRelativeDate(post.createdAt)}</span>
       </div>
 
-      <h1 className="mb-6 text-2xl font-bold leading-snug tracking-[-0.01em] text-foreground">
-        {post.title}
-      </h1>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <h1 className="flex-1 text-2xl font-bold leading-snug tracking-[-0.01em] text-foreground">
+          {post.title}
+        </h1>
+        <button
+          onClick={handleShare}
+          className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:text-foreground cursor-pointer"
+          aria-label="공유"
+        >
+          <Share2 className="h-5 w-5" />
+        </button>
+      </div>
 
       <ContentRenderer
         content={post.content}

@@ -224,7 +224,7 @@ function AnswerItem({
             {!showCommentForm ? (
               <button
                 onClick={() => setShowCommentForm(true)}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium transition-colors hover:text-foreground"
+                className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium transition-colors hover:text-foreground cursor-pointer"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
                 댓글 달기
@@ -249,7 +249,7 @@ function AnswerItem({
                 <button
                   onClick={handleCommentSubmit}
                   disabled={!commentInput.trim()}
-                  className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+                  className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40 cursor-pointer"
                   aria-label="댓글 등록"
                 >
                   <Send className="h-3.5 w-3.5" />
@@ -259,7 +259,7 @@ function AnswerItem({
                     setShowCommentForm(false);
                     setCommentInput("");
                   }}
-                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground"
+                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
                   aria-label="취소"
                 >
                   <X className="h-3.5 w-3.5" />

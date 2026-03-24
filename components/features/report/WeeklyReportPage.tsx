@@ -181,7 +181,7 @@ function WeekHeader({
       {reportList.length > 1 ? (
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 text-lg font-semibold hover:text-foreground/80 transition-colors">
+            <button className="flex items-center gap-1 text-lg font-semibold hover:text-foreground/80 transition-colors cursor-pointer">
               {formatWeekLabel(report.weekStart)}
               <ChevronDown className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -191,7 +191,7 @@ function WeekHeader({
               <DropdownMenuItem
                 key={item.reportId}
                 onClick={() => onSelect(item.reportId)}
-                className="flex items-center justify-between gap-6"
+                className="flex items-center justify-between gap-6 cursor-pointer"
               >
                 <span>{formatWeekLabel(item.weekStart)}</span>
                 {item.reportId === currentId && (
