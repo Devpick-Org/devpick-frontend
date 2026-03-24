@@ -4,6 +4,10 @@ import type {
   ActivityItem,
   ActivityPageResponse,
   HistoryParams,
+  BadgeItem,
+  BadgesResponse,
+  PointsSummary,
+  PointsSummaryResponse,
 } from "@/types/history";
 
 // ── 학습 히스토리 mock 데이터 ────────────────────────────────────────────────
@@ -11,6 +15,11 @@ import type {
 //
 // createdAt 형식: "YYYY-MM-DDTHH:mm:ss" — timezone 없는 서버 로컬 시간(KST)
 // 실제 백엔드 응답과 동일한 형식을 사용해 formatTime 등 파싱 함수 동작을 검증
+//
+// points 스펙:
+//   content_opened: null  | ai_summary_viewed: 3  | question_created: 10
+//   scrapped: 5           | content_liked: 2       | answer_written: 15
+//   comment_created: null | daily_login: 1         | answer_adopted: 30
 
 const MOCK_HISTORY_ITEMS: HistoryItem[] = [
   // ── 오늘 (2026-03-21) ──────────────────────────────────────────────────────
@@ -26,6 +35,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-21T10:30:00",
+    points: null,
   },
   {
     id: "h-002",
@@ -39,6 +49,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-21T10:35:00",
+    points: 3,
   },
   {
     id: "h-003",
@@ -52,6 +63,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-21T11:00:00",
+    points: 5,
   },
   {
     id: "h-004",
@@ -64,6 +76,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     },
     answer: null,
     createdAt: "2026-03-21T11:30:00",
+    points: 10,
   },
   // ── 3일 전 (2026-03-18) ────────────────────────────────────────────────────
   {
@@ -78,6 +91,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-18T14:00:00",
+    points: null,
   },
   {
     id: "h-006",
@@ -90,6 +104,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-18T14:10:00",
+    points: 3,
   },
   {
     id: "h-007",
@@ -103,6 +118,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-18T15:20:00",
+    points: 5,
   },
   // ── 10일 전 (2026-03-11) ───────────────────────────────────────────────────
   {
@@ -117,6 +133,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-11T09:00:00",
+    points: null,
   },
   {
     id: "h-009",
@@ -128,6 +145,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     },
     answer: null,
     createdAt: "2026-03-11T10:45:00",
+    points: 10,
   },
   {
     id: "h-010",
@@ -141,6 +159,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-11T13:00:00",
+    points: 5,
   },
   // ── 20일 전 (2026-03-01) ───────────────────────────────────────────────────
   {
@@ -155,6 +174,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-01T14:30:00",
+    points: null,
   },
   {
     id: "h-012",
@@ -168,6 +188,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-01T14:40:00",
+    points: 3,
   },
   {
     id: "h-013",
@@ -179,6 +200,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     },
     answer: null,
     createdAt: "2026-03-01T16:00:00",
+    points: 10,
   },
   // ── 40일 전 (2026-02-10) ───────────────────────────────────────────────────
   {
@@ -193,6 +215,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-02-10T11:00:00",
+    points: null,
   },
   {
     id: "h-015",
@@ -206,6 +229,7 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-02-10T15:30:00",
+    points: 5,
   },
   // content, post 모두 null인 edge case — 삭제된 항목 UI 방어 처리 테스트용
   {
@@ -215,11 +239,12 @@ const MOCK_HISTORY_ITEMS: HistoryItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-02-10T09:00:00",
+    points: null,
   },
 ];
 
 // ── 활동 내역 mock 데이터 ─────────────────────────────────────────────────────
-// TODO: 실제 API 연동 시 GET /history?actionTypes=content_liked,answer_written,comment_created 응답으로 교체
+// TODO: 실제 API 연동 시 GET /history?actionTypes=content_liked,answer_written,answer_adopted,comment_created,daily_login 응답으로 교체
 //
 // answer 필드: answer_written / comment_created 아이템에 실제 answer.id 포함
 // → ActivityTimelineItem 클릭 시 /community/{post.id}#answer-{answer.id} 앵커 이동에 사용 예정
@@ -228,6 +253,15 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
   // ── 오늘 (2026-03-21) ──────────────────────────────────────────────────────
   {
     id: "a-001",
+    actionType: "daily_login",
+    content: null,
+    post: null,
+    answer: null,
+    createdAt: "2026-03-21T08:00:00",
+    points: 1,
+  },
+  {
+    id: "a-002",
     actionType: "content_liked",
     content: {
       id: "c-001",
@@ -238,9 +272,10 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-21T09:00:00",
+    points: 2,
   },
   {
-    id: "a-002",
+    id: "a-003",
     actionType: "answer_written",
     content: null,
     post: {
@@ -250,9 +285,22 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     },
     answer: { id: "ans-001" },
     createdAt: "2026-03-21T11:00:00",
+    points: 15,
   },
   {
-    id: "a-003",
+    id: "a-004",
+    actionType: "answer_adopted",
+    content: null,
+    post: {
+      id: "p-002",
+      title: "Zustand와 Redux Toolkit 중 어떤 것을 선택해야 할까요?",
+    },
+    answer: { id: "ans-004" },
+    createdAt: "2026-03-21T13:00:00",
+    points: 30,
+  },
+  {
+    id: "a-005",
     actionType: "comment_created",
     content: null,
     post: {
@@ -261,10 +309,20 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     },
     answer: { id: "ans-002" },
     createdAt: "2026-03-21T14:30:00",
+    points: null,
   },
   // ── 3일 전 (2026-03-18) ────────────────────────────────────────────────────
   {
-    id: "a-004",
+    id: "a-006",
+    actionType: "daily_login",
+    content: null,
+    post: null,
+    answer: null,
+    createdAt: "2026-03-18T08:30:00",
+    points: 1,
+  },
+  {
+    id: "a-007",
     actionType: "content_liked",
     content: {
       id: "c-003",
@@ -275,9 +333,10 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-18T10:00:00",
+    points: 2,
   },
   {
-    id: "a-005",
+    id: "a-008",
     actionType: "content_liked",
     content: {
       id: "c-004",
@@ -288,9 +347,10 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-18T13:00:00",
+    points: 2,
   },
   {
-    id: "a-006",
+    id: "a-009",
     actionType: "answer_written",
     content: null,
     post: {
@@ -299,10 +359,20 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     },
     answer: { id: "ans-003" },
     createdAt: "2026-03-18T15:30:00",
+    points: 15,
   },
   // ── 10일 전 (2026-03-11) ───────────────────────────────────────────────────
   {
-    id: "a-007",
+    id: "a-010",
+    actionType: "daily_login",
+    content: null,
+    post: null,
+    answer: null,
+    createdAt: "2026-03-11T09:00:00",
+    points: 1,
+  },
+  {
+    id: "a-011",
     actionType: "content_liked",
     content: {
       id: "c-005",
@@ -312,9 +382,10 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-11T09:30:00",
+    points: 2,
   },
   {
-    id: "a-008",
+    id: "a-012",
     actionType: "answer_written",
     content: null,
     post: {
@@ -323,9 +394,10 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     },
     answer: { id: "ans-004" },
     createdAt: "2026-03-11T11:00:00",
+    points: 15,
   },
   {
-    id: "a-009",
+    id: "a-013",
     actionType: "comment_created",
     content: null,
     post: {
@@ -335,10 +407,20 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     },
     answer: { id: "ans-005" },
     createdAt: "2026-03-11T14:00:00",
+    points: null,
   },
   // ── 20일 전 (2026-03-01) ───────────────────────────────────────────────────
   {
-    id: "a-010",
+    id: "a-014",
+    actionType: "daily_login",
+    content: null,
+    post: null,
+    answer: null,
+    createdAt: "2026-03-01T09:10:00",
+    points: 1,
+  },
+  {
+    id: "a-015",
     actionType: "content_liked",
     content: {
       id: "c-007",
@@ -349,9 +431,10 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-03-01T10:00:00",
+    points: 2,
   },
   {
-    id: "a-011",
+    id: "a-016",
     actionType: "answer_written",
     content: null,
     post: {
@@ -360,9 +443,22 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     },
     answer: { id: "ans-006" },
     createdAt: "2026-03-01T13:00:00",
+    points: 15,
   },
   {
-    id: "a-012",
+    id: "a-017",
+    actionType: "answer_adopted",
+    content: null,
+    post: {
+      id: "p-004",
+      title: "Spring Boot에서 N+1 문제를 해결하는 방법을 알려주세요",
+    },
+    answer: { id: "ans-006" },
+    createdAt: "2026-03-01T15:00:00",
+    points: 30,
+  },
+  {
+    id: "a-018",
     actionType: "comment_created",
     content: null,
     post: {
@@ -371,10 +467,11 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     },
     answer: { id: "ans-007" },
     createdAt: "2026-03-01T16:00:00",
+    points: null,
   },
   // ── 40일 전 (2026-02-10) ───────────────────────────────────────────────────
   {
-    id: "a-013",
+    id: "a-019",
     actionType: "content_liked",
     content: {
       id: "c-008",
@@ -385,9 +482,10 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     post: null,
     answer: null,
     createdAt: "2026-02-10T10:00:00",
+    points: 2,
   },
   {
-    id: "a-014",
+    id: "a-020",
     actionType: "comment_created",
     content: null,
     post: {
@@ -396,17 +494,83 @@ const MOCK_ACTIVITY_ITEMS: ActivityItem[] = [
     },
     answer: { id: "ans-008" },
     createdAt: "2026-02-10T12:00:00",
+    points: null,
   },
   // edge case: content + post + answer 모두 null — 삭제된 항목 UI 방어 처리 테스트용
   {
-    id: "a-015",
+    id: "a-021",
     actionType: "answer_written",
     content: null,
     post: null,
     answer: null,
     createdAt: "2026-02-10T15:00:00",
+    points: null,
   },
 ];
+
+// ── 배지 mock 데이터 ──────────────────────────────────────────────────────────
+// TODO: 실제 API 연동 시 GET /history/badges 응답으로 교체
+
+const MOCK_BADGES: BadgeItem[] = [
+  {
+    badgeId: "FIRST_SCRAP",
+    name: "수집가",
+    description: "스크랩 1회 달성",
+    acquired: true,
+    acquiredAt: "2026-03-11T13:00:00",
+  },
+  {
+    badgeId: "FIRST_QUESTION",
+    name: "탐험가",
+    description: "질문 작성 1회 달성",
+    acquired: true,
+    acquiredAt: "2026-03-21T11:30:00",
+  },
+  {
+    badgeId: "ANSWER_MASTER",
+    name: "멘토",
+    description: "답변 채택 5회 달성",
+    acquired: false,
+    acquiredAt: null,
+  },
+  {
+    badgeId: "POINT_100",
+    name: "새싹",
+    description: "누적 포인트 100p 달성",
+    acquired: true,
+    acquiredAt: "2026-03-18T15:30:00",
+  },
+  {
+    badgeId: "POINT_500",
+    name: "성장주",
+    description: "누적 포인트 500p 달성",
+    acquired: false,
+    acquiredAt: null,
+  },
+  {
+    badgeId: "POINT_1000",
+    name: "픽커",
+    description: "누적 포인트 1000p 달성",
+    acquired: false,
+    acquiredAt: null,
+  },
+  {
+    badgeId: "STREAK_7",
+    name: "꾸준이",
+    description: "연속 로그인 7일 달성",
+    acquired: false,
+    acquiredAt: null,
+  },
+];
+
+// ── 포인트 요약 mock 데이터 ───────────────────────────────────────────────────
+// TODO: 실제 API 연동 시 GET /history/points 응답으로 교체
+
+const MOCK_POINTS_SUMMARY: PointsSummary = {
+  totalPoints: 148,
+  weeklyPoints: 43,
+  streak: 3,
+};
 
 // ── mock 함수들 ────────────────────────────────────────────────────────────────
 // params.actionTypes / startDate / endDate는 mock 단계에서 무시됨
@@ -470,5 +634,29 @@ export function mockGetActivityList(
         message: "활동 내역을 불러왔습니다",
       });
     }, 500);
+  });
+}
+
+export function mockGetBadges(): Promise<BadgesResponse> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: MOCK_BADGES,
+        message: "배지 목록을 불러왔습니다",
+      });
+    }, 400);
+  });
+}
+
+export function mockGetPointsSummary(): Promise<PointsSummaryResponse> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        success: true,
+        data: MOCK_POINTS_SUMMARY,
+        message: "포인트 요약을 불러왔습니다",
+      });
+    }, 300);
   });
 }

@@ -62,13 +62,20 @@ export default function HistoryTimelineItem({ item, isLast }: Props) {
         )}
       </div>
 
-      {/* 시간 */}
-      <time
-        dateTime={item.createdAt}
-        className="shrink-0 text-xs text-muted-foreground mt-0.5 whitespace-nowrap"
-      >
-        {formatTime(item.createdAt)}
-      </time>
+      {/* 시간 + 포인트 */}
+      <div className="shrink-0 flex flex-col items-end justify-between self-stretch gap-1">
+        <time
+          dateTime={item.createdAt}
+          className="text-xs text-muted-foreground whitespace-nowrap"
+        >
+          {formatTime(item.createdAt)}
+        </time>
+        {item.points !== null && (
+          <span className="text-xs font-semibold text-primary whitespace-nowrap">
+            +{item.points}p
+          </span>
+        )}
+      </div>
     </div>
   );
 

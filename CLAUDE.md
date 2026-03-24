@@ -124,14 +124,14 @@
 │ ┃ ┃ ┣ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
 │ ┃ ┃ ┗ RecommendedContents.tsx # 추천 콘텐츠 사이드바 (서버 컴포넌트, items props)
 │ ┃ ┣ community/
-│ ┃ ┃ ┣ AiAnswerSection.tsx      # AI 답변 생성 요청 및 결과 렌더링
-│ ┃ ┃ ┣ AnswerList.tsx           # 답변 목록 (댓글/채택/수정/삭제 포함)
+│ ┃ ┃ ┣ AiAnswerSection.tsx      # AI 1차 답변 렌더링 (헤더 카드 외부, loading/success/error/empty 상태)
+│ ┃ ┃ ┣ AnswerList.tsx           # 답변 목록 (댓글/채택/수정/삭제, 채택 배지 반응형)
 │ ┃ ┃ ┣ AnswerSection.tsx        # 답변 작성 폼 및 전체 답변 영역 (useMutation)
 │ ┃ ┃ ┣ CommunityCard.tsx        # 커뮤니티 카드 (CommunityPost interface)
 │ ┃ ┃ ┣ CommunityDetailPage.tsx  # 상세 페이지 레이아웃 (useQuery, 좌: 본문+답변, 우: 유사질문)
 │ ┃ ┃ ┣ CommunitySearch.tsx      # 커뮤니티 검색 입력 컴포넌트
 │ ┃ ┃ ┣ ContentRenderer.tsx      # react-markdown 기반 마크다운 렌더러
-│ ┃ ┃ ┣ PostDetail.tsx           # 게시글 제목/태그/본문/수정·삭제 메뉴
+│ ┃ ┃ ┣ PostDetail.tsx           # 게시글 제목/사용자 정보/본문/공유 버튼 ("use client")
 │ ┃ ┃ ┣ PostWriteForm.tsx        # 게시글 작성 폼 (제목/내용/태그 입력)
 │ ┃ ┃ ┣ PostRefinePanel.tsx      # AI 질문 개선 패널 (우측 사이드 패널)
 │ ┃ ┃ ┗ SimilarPosts.tsx         # 유사 질문 목록 사이드바
