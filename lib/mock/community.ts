@@ -197,6 +197,18 @@ export const MOCK_SIMILAR_POSTS_STORE: Record<string, SimilarPost[]> = {
       answerCount: 1,
       level: "JUNIOR",
     },
+    {
+      id: "post-005",
+      title: "TypeScript에서 제네릭을 사용할 때 타입 추론이 안 되는 경우가 있어서 질문드립니다.",
+      answerCount: 3,
+      level: "JUNIOR",
+    },
+    {
+      id: "post-006",
+      title: "CSS Grid와 Flexbox를 언제 각각 사용하는 게 적합한가요?",
+      answerCount: 2,
+      level: "BEGINNER",
+    },
   ],
   "post-002": [
     {
@@ -215,6 +227,18 @@ export const MOCK_SIMILAR_POSTS_STORE: Record<string, SimilarPost[]> = {
       id: "post-004",
       title: "TanStack Query와 Zustand를 함께 쓸 때 서버 상태와 클라이언트 상태를 어떻게 구분하나요?",
       answerCount: 1,
+      level: "MIDDLE",
+    },
+    {
+      id: "post-007",
+      title: "Next.js에서 Image 컴포넌트 사용 시 layout shift가 발생하는 이유가 궁금합니다.",
+      answerCount: 2,
+      level: "JUNIOR",
+    },
+    {
+      id: "post-008",
+      title: "React에서 Context API와 전역 상태 라이브러리를 언제 구분해서 쓰나요?",
+      answerCount: 4,
       level: "MIDDLE",
     },
   ],
@@ -237,6 +261,18 @@ export const MOCK_SIMILAR_POSTS_STORE: Record<string, SimilarPost[]> = {
       answerCount: 1,
       level: "SENIOR",
     },
+    {
+      id: "post-009",
+      title: "Redux Toolkit과 TanStack Query를 같이 쓰는 게 맞는 방향인가요?",
+      answerCount: 3,
+      level: "MIDDLE",
+    },
+    {
+      id: "post-005",
+      title: "TypeScript에서 제네릭을 사용할 때 타입 추론이 안 되는 경우가 있어서 질문드립니다.",
+      answerCount: 3,
+      level: "JUNIOR",
+    },
   ],
   "post-010": [
     {
@@ -256,6 +292,18 @@ export const MOCK_SIMILAR_POSTS_STORE: Record<string, SimilarPost[]> = {
       title: "React useEffect 의존성 배열, 빈 배열과 생략의 차이가 뭔가요?",
       answerCount: 2,
       level: "BEGINNER",
+    },
+    {
+      id: "post-008",
+      title: "React에서 Context API와 전역 상태 라이브러리를 언제 구분해서 쓰나요?",
+      answerCount: 4,
+      level: "MIDDLE",
+    },
+    {
+      id: "post-009",
+      title: "Redux Toolkit과 TanStack Query를 같이 쓰는 게 맞는 방향인가요?",
+      answerCount: 3,
+      level: "MIDDLE",
     },
   ],
 };

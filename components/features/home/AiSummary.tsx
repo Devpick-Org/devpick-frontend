@@ -235,7 +235,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
                 key={l}
                 onClick={() => setLevel(l)}
                 className={cn(
-                  "rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-150",
+                  "rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-150 cursor-pointer",
                   level === l
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
@@ -258,7 +258,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
                 "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150",
                 isLoading || isRetrying
                   ? "cursor-not-allowed text-muted-foreground/40"
-                  : "text-muted-foreground hover:text-foreground",
+                  : "cursor-pointer text-muted-foreground hover:text-foreground",
               )}
               aria-label="AI 요약 다시 생성"
             >
@@ -274,7 +274,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
           {/* 접기/펼치기 */}
           <button
             onClick={() => setIsExpanded((prev) => !prev)}
-            className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+            className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
             aria-label={isExpanded ? "접기" : "펼치기"}
           >
             {isExpanded ? (

@@ -28,7 +28,7 @@ export function ScrollToTopButton() {
         // 색상 · 테두리 · 그림자
         "border border-border bg-card text-muted-foreground shadow-md",
         // 호버
-        "transition-all duration-200 hover:text-foreground hover:shadow-lg",
+        "transition-all duration-200 hover:text-foreground hover:shadow-lg hover:cursor-pointer",
         // 노출 토글 — opacity + translate로 부드럽게
         visible
           ? "pointer-events-auto translate-y-0 opacity-100"

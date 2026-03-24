@@ -334,7 +334,7 @@ export function ProfileEditForm() {
             <button
               type="button"
               onClick={() => setIsRoleOpen((prev) => !prev)}
-              className="flex h-11 w-full items-center justify-between rounded-lg bg-secondary px-3 text-sm text-foreground font-medium transition-colors hover:border-primary/40 focus:outline-none"
+              className="flex h-11 w-full items-center justify-between rounded-lg bg-secondary px-3 text-sm text-foreground font-medium transition-colors hover:border-primary/40 focus:outline-none cursor-pointer"
             >
               <span>{currentRole?.label ?? "직무 선택"}</span>
               <ChevronDownIcon
@@ -355,7 +355,7 @@ export function ProfileEditForm() {
                       setIsRoleOpen(false);
                     }}
                     className={cn(
-                      "flex w-full items-center px-3 py-2.5 text-sm font-medium transition-colors first:rounded-t-lg last:rounded-b-lg",
+                      "flex w-full items-center px-3 py-2.5 text-sm font-medium transition-colors first:rounded-t-lg last:rounded-b-lg cursor-pointer",
                       selectedRole === role.id
                         ? "bg-primary/10 text-primary"
                         : "text-foreground hover:bg-secondary",
@@ -384,7 +384,7 @@ export function ProfileEditForm() {
                   type="button"
                   onClick={() => setSelectedLevel(level.id)}
                   className={cn(
-                    "flex flex-col items-center gap-1 rounded-xl px-3 py-3 transition-all duration-200",
+                    "flex flex-col items-center gap-1 rounded-xl px-3 py-3 transition-all duration-200 cursor-pointer",
                     isSelected
                       ? cn(
                           colors.replace("bg-", "border-").split(" ")[0],

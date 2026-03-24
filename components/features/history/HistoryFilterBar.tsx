@@ -53,7 +53,7 @@ function HistoryFilterBar<T extends string>({
           <button
             onClick={() => onActionsChange([] as T[])}
             className={cn(
-              "px-3.5 py-1 rounded-full text-sm font-medium transition-colors",
+              "px-3.5 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer",
               isAll
                 ? "bg-primary/10 text-primary"
                 : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
@@ -68,7 +68,7 @@ function HistoryFilterBar<T extends string>({
                 key={opt.value}
                 onClick={() => toggleAction(opt.value)}
                 className={cn(
-                  "px-2.5 py-1 rounded-full text-sm font-medium transition-colors",
+                  "px-2.5 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer",
                   isActive
                     ? "bg-primary/10 text-primary"
                     : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
@@ -82,7 +82,7 @@ function HistoryFilterBar<T extends string>({
 
         {/* 기간 dropdown — 가장 약한 강조 */}
         <DropdownMenu modal={false}>
-          <DropdownMenuTrigger className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors outline-none">
+          <DropdownMenuTrigger className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors outline-none cursor-pointer">
             {currentPeriodLabel}
             <ChevronDown className="h-3 w-3 opacity-60" />
           </DropdownMenuTrigger>

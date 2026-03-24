@@ -104,7 +104,7 @@ export function FeedCard({ content }: FeedCardProps) {
               <button
                 onClick={handleLike}
                 className={cn(
-                  "rounded-md p-1 transition-colors",
+                  "rounded-md p-1 transition-colors cursor-pointer",
                   content.isLiked
                     ? "text-red-500"
                     : "text-muted-foreground hover:text-foreground",
@@ -121,7 +121,7 @@ export function FeedCard({ content }: FeedCardProps) {
               <button
                 onClick={handleScrap}
                 className={cn(
-                  "rounded-md p-1 transition-colors",
+                  "rounded-md p-1 transition-colors cursor-pointer",
                   content.isScrapped
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground",
@@ -137,7 +137,7 @@ export function FeedCard({ content }: FeedCardProps) {
 
               <button
                 onClick={handleShare}
-                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
                 aria-label="공유"
               >
                 <Share2 className="h-4 w-4" />
