@@ -158,7 +158,7 @@ export function PostRefinePanel({
           <label className="mb-2 block text-sm font-semibold text-foreground">
             레벨
           </label>
-          <span className="inline-block rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+          <span className="inline-block rounded-lg bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
             {LEVEL_LABELS[originalLevel]}
           </span>
         </div>

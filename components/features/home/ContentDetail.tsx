@@ -266,7 +266,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
                 likeMutation.mutate(content.isLiked);
               }}
               className={cn(
-                "rounded-lg p-2 transition-all duration-200",
+                "rounded-lg p-2 transition-all duration-200 cursor-pointer",
                 content.isLiked
                   ? "text-red-500 hover:text-red-400"
                   : "text-muted-foreground hover:text-foreground",
@@ -285,7 +285,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
                 scrapMutation.mutate(content.isScrapped);
               }}
               className={cn(
-                "rounded-lg p-2 transition-all duration-200",
+                "rounded-lg p-2 transition-all duration-200 cursor-pointer",
                 content.isScrapped
                   ? "text-primary hover:text-primary/80"
                   : "text-muted-foreground hover:text-foreground",
@@ -300,7 +300,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
             </button>
             <button
               onClick={handleShare}
-              className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:text-foreground"
+              className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:text-foreground cursor-pointer"
               aria-label="공유"
             >
               <Share2 className="h-5 w-5" />

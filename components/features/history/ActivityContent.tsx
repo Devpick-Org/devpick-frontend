@@ -2,7 +2,7 @@
 
 import { AlertCircle, Activity } from "lucide-react";
 
-import type { ActivityActionType, ActivityItem } from "@/types/history";
+import type { ActivityFilterValue, ActivityItem } from "@/types/history";
 import type { DateGroup, PeriodFilter } from "@/lib/history/groupByDate";
 import { ACTIVITY_FILTER_OPTIONS } from "./history.constants";
 import HistoryFilterBar from "./HistoryFilterBar";
@@ -12,8 +12,8 @@ interface Props {
   groups?: DateGroup<ActivityItem>[];
   isLoading?: boolean;
   isError?: boolean;
-  selectedActions: ActivityActionType[];
-  onActionsChange: (actions: ActivityActionType[]) => void;
+  selectedActions: ActivityFilterValue[];
+  onActionsChange: (actions: ActivityFilterValue[]) => void;
   period: PeriodFilter;
   onPeriodChange: (period: PeriodFilter) => void;
 }

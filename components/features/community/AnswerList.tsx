@@ -118,12 +118,14 @@ function AnswerItem({
     <div
       className={cn(
         "rounded-xl p-5",
-        answer.isAdopted ? "bg-primary/5" : "bg-card",
+        answer.isAdopted
+          ? "bg-card border border-border"
+          : "bg-card border border-border",
       )}
     >
-      {/* 채택 배지 */}
+      {/* 채택 배지 — 모바일에서 작성자 위에 표시 */}
       {answer.isAdopted && (
-        <div className="mb-5 flex items-center gap-1.5 text-sm font-semibold text-primary">
+        <div className="mb-2 flex items-center gap-1 text-sm font-semibold text-primary sm:hidden">
           <Check className="h-3.5 w-3.5" />
           채택된 답변
         </div>
@@ -142,10 +144,17 @@ function AnswerItem({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5">
+          {/* 채택 배지 — 데스크탑에서 오른쪽 위에 표시 */}
+          {answer.isAdopted && (
+            <div className="hidden items-center gap-1 text-sm font-semibold text-primary sm:flex">
+              <Check className="h-3.5 w-3.5" />
+              채택된 답변
+            </div>
+          )}
           {canAdopt && (
             <button
               onClick={() => onAdopt(answer.id)}
-              className="rounded-md border border-primary/30 px-2.5 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+              className="rounded-md border border-primary/30 px-2.5 py-1 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
             >
               채택
             </button>
@@ -224,7 +233,7 @@ function AnswerItem({
             {!showCommentForm ? (
               <button
                 onClick={() => setShowCommentForm(true)}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium transition-colors hover:text-foreground"
+                className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium transition-colors hover:text-foreground cursor-pointer"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
                 댓글 달기
@@ -249,7 +258,7 @@ function AnswerItem({
                 <button
                   onClick={handleCommentSubmit}
                   disabled={!commentInput.trim()}
-                  className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+                  className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40 cursor-pointer"
                   aria-label="댓글 등록"
                 >
                   <Send className="h-3.5 w-3.5" />
@@ -259,7 +268,7 @@ function AnswerItem({
                     setShowCommentForm(false);
                     setCommentInput("");
                   }}
-                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground"
+                  className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
                   aria-label="취소"
                 >
                   <X className="h-3.5 w-3.5" />

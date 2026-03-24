@@ -31,13 +31,13 @@ const MOCK_WEEKLY_REPORTS: WeeklyReport[] = [
     // TODO: 실제 API 연동 시 교체 예정
     chartData: {
       dailyActivities: [
-        { dayOfWeek: "월", count: 2 },
-        { dayOfWeek: "화", count: 5 },
-        { dayOfWeek: "수", count: 3 },
-        { dayOfWeek: "목", count: 7 },
-        { dayOfWeek: "금", count: 4 },
-        { dayOfWeek: "토", count: 1 },
-        { dayOfWeek: "일", count: 0 },
+        { dayOfWeek: "MON", count: 2 },
+        { dayOfWeek: "TUE", count: 5 },
+        { dayOfWeek: "WED", count: 3 },
+        { dayOfWeek: "THU", count: 7 },
+        { dayOfWeek: "FRI", count: 4 },
+        { dayOfWeek: "SAT", count: 1 },
+        { dayOfWeek: "SUN", count: 0 },
       ],
       tagActivities: [
         { tagName: "React", count: 90 },
@@ -68,13 +68,13 @@ const MOCK_WEEKLY_REPORTS: WeeklyReport[] = [
     // TODO: 실제 API 연동 시 교체 예정
     chartData: {
       dailyActivities: [
-        { dayOfWeek: "월", count: 3 },
-        { dayOfWeek: "화", count: 4 },
-        { dayOfWeek: "수", count: 2 },
-        { dayOfWeek: "목", count: 5 },
-        { dayOfWeek: "금", count: 3 },
-        { dayOfWeek: "토", count: 2 },
-        { dayOfWeek: "일", count: 1 },
+        { dayOfWeek: "MON", count: 3 },
+        { dayOfWeek: "TUE", count: 4 },
+        { dayOfWeek: "WED", count: 2 },
+        { dayOfWeek: "THU", count: 5 },
+        { dayOfWeek: "FRI", count: 3 },
+        { dayOfWeek: "SAT", count: 2 },
+        { dayOfWeek: "SUN", count: 1 },
       ],
       tagActivities: [
         { tagName: "TypeScript", count: 80 },
@@ -105,13 +105,13 @@ const MOCK_WEEKLY_REPORTS: WeeklyReport[] = [
     // TODO: 실제 API 연동 시 교체 예정
     chartData: {
       dailyActivities: [
-        { dayOfWeek: "월", count: 1 },
-        { dayOfWeek: "화", count: 2 },
-        { dayOfWeek: "수", count: 1 },
-        { dayOfWeek: "목", count: 3 },
-        { dayOfWeek: "금", count: 2 },
-        { dayOfWeek: "토", count: 0 },
-        { dayOfWeek: "일", count: 0 },
+        { dayOfWeek: "MON", count: 1 },
+        { dayOfWeek: "TUE", count: 2 },
+        { dayOfWeek: "WED", count: 1 },
+        { dayOfWeek: "THU", count: 3 },
+        { dayOfWeek: "FRI", count: 2 },
+        { dayOfWeek: "SAT", count: 0 },
+        { dayOfWeek: "SUN", count: 0 },
       ],
       tagActivities: [
         { tagName: "Docker", count: 70 },
@@ -142,13 +142,13 @@ const MOCK_WEEKLY_REPORTS: WeeklyReport[] = [
     // TODO: 실제 API 연동 시 교체 예정
     chartData: {
       dailyActivities: [
-        { dayOfWeek: "월", count: 2 },
-        { dayOfWeek: "화", count: 3 },
-        { dayOfWeek: "수", count: 1 },
-        { dayOfWeek: "목", count: 4 },
-        { dayOfWeek: "금", count: 2 },
-        { dayOfWeek: "토", count: 1 },
-        { dayOfWeek: "일", count: 0 },
+        { dayOfWeek: "MON", count: 2 },
+        { dayOfWeek: "TUE", count: 3 },
+        { dayOfWeek: "WED", count: 1 },
+        { dayOfWeek: "THU", count: 4 },
+        { dayOfWeek: "FRI", count: 2 },
+        { dayOfWeek: "SAT", count: 1 },
+        { dayOfWeek: "SUN", count: 0 },
       ],
       tagActivities: [
         { tagName: "Spring", count: 85 },

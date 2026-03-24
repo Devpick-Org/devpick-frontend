@@ -128,164 +128,164 @@ export function PostWriteForm({
     <div className="flex flex-col gap-5">
       {/* 입력 필드 카드 */}
       <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
-      {/* 제목 */}
-      <div>
-        <div className="mb-1.5 flex items-center justify-between">
-          <label className="text-sm font-semibold text-foreground">
-            제목 <span className="text-destructive">*</span>
-          </label>
-          <span
-            className={cn(
-              "text-xs font-medium",
-              title.length > TITLE_MAX
-                ? "text-destructive"
-                : "text-muted-foreground",
-            )}
-          >
-            {title.length} / {TITLE_MAX}
-          </span>
-        </div>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => {
-            setTitle(e.target.value);
-            setErrors((p) => ({ ...p, title: undefined }));
-          }}
-          placeholder="예: React useState 업데이트가 즉시 반영되지 않는 이유가 궁금합니다"
-          className={cn(
-            "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground font-medium placeholder:text-muted-foreground/50 outline-none transition-colors focus:border-primary",
-            errors.title ? "border-destructive" : "border-border",
-          )}
-        />
-        {errors.title && (
-          <p className="mt-1.5 text-xs font-medium text-destructive">
-            {errors.title}
-          </p>
-        )}
-      </div>
-
-      {/* 레벨 */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-foreground">
-          레벨 <span className="text-destructive">*</span>
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {LEVELS.map((l) => (
-            <button
-              key={l.id}
-              type="button"
-              onClick={() => setLevel(l.id)}
+        {/* 제목 */}
+        <div>
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="text-sm font-semibold text-foreground">
+              제목 <span className="text-destructive">*</span>
+            </label>
+            <span
               className={cn(
-                "rounded-lg border px-4 py-2 text-sm font-medium transition-all",
-                level === l.id
-                  ? "border-primary/40 bg-primary/10 text-primary"
-                  : "border-border bg-background text-muted-foreground hover:border-border/80 hover:text-foreground",
+                "text-xs font-medium",
+                title.length > TITLE_MAX
+                  ? "text-destructive"
+                  : "text-muted-foreground",
               )}
             >
-              {l.label}
-              <span className="ml-1.5 text-xs opacity-60">{l.desc}</span>
-            </button>
-          ))}
-        </div>
-        {errors.level && (
-          <p className="mt-1.5 text-xs font-medium text-destructive">
-            {errors.level}
-          </p>
-        )}
-      </div>
-
-      {/* 본문 */}
-      <div>
-        <label className="mb-1.5 block text-sm font-semibold text-foreground">
-          본문 <span className="text-destructive">*</span>
-        </label>
-        <textarea
-          value={content}
-          onChange={(e) => {
-            setContent(e.target.value);
-            setErrors((p) => ({ ...p, content: undefined }));
-          }}
-          placeholder={CONTENT_PLACEHOLDER}
-          rows={14}
-          className={cn(
-            "w-full resize-y rounded-xl border bg-background px-4 py-3 text-sm font-medium leading-relaxed text-foreground placeholder:text-muted-foreground/40 outline-none transition-colors focus:border-primary",
-            errors.content ? "border-destructive" : "border-border",
+              {title.length} / {TITLE_MAX}
+            </span>
+          </div>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              setErrors((p) => ({ ...p, title: undefined }));
+            }}
+            placeholder="예: React useState 업데이트가 즉시 반영되지 않는 이유가 궁금합니다"
+            className={cn(
+              "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground font-medium placeholder:text-muted-foreground/50 outline-none transition-colors focus:border-primary",
+              errors.title ? "border-destructive" : "border-border",
+            )}
+          />
+          {errors.title && (
+            <p className="mt-1.5 text-xs font-medium text-destructive">
+              {errors.title}
+            </p>
           )}
-        />
-        {errors.content && (
-          <p className="mt-1.5 text-xs font-medium text-destructive">
-            {errors.content}
-          </p>
-        )}
-      </div>
+        </div>
 
-      {/* 첨부파일 */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-foreground">
-          첨부파일
-          <span className="ml-1.5 text-xs font-normal text-muted-foreground">
-            (선택)
-          </span>
-        </label>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="image/*,.pdf,.txt,.zip"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-        {files.length > 0 && (
-          <ul className="mb-2 space-y-1.5">
-            {files.map((f) => (
-              <li
-                key={f.name}
-                className="flex items-center justify-between rounded-lg border border-border bg-secondary/40 px-3 py-2"
+        {/* 레벨 */}
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-foreground">
+            레벨 <span className="text-destructive">*</span>
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {LEVELS.map((l) => (
+              <button
+                key={l.id}
+                type="button"
+                onClick={() => setLevel(l.id)}
+                className={cn(
+                  "rounded-lg border px-4 py-2 text-sm font-medium transition-all cursor-pointer",
+                  level === l.id
+                    ? "bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:border-border/80 hover:text-foreground",
+                )}
               >
-                <div className="flex min-w-0 items-center gap-2">
-                  <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                  <span className="truncate text-xs font-medium text-foreground">
-                    {f.name}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onRemoveFile(f.name)}
-                  className="ml-2 shrink-0 rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-                  aria-label="파일 제거"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </li>
+                {l.label}
+                <span className="ml-1.5 text-xs opacity-60">{l.desc}</span>
+              </button>
             ))}
-          </ul>
-        )}
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => fileInputRef.current?.click()}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ")
-              fileInputRef.current?.click();
-          }}
-          onDragEnter={handleDragEnter}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          className={cn(
-            "flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed px-4 py-2.5 text-sm font-medium transition-colors",
-            isDragging
-              ? "border-primary bg-primary/5 text-primary"
-              : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",
+          </div>
+          {errors.level && (
+            <p className="mt-1.5 text-xs font-medium text-destructive">
+              {errors.level}
+            </p>
           )}
-        >
-          <Paperclip className="h-4 w-4" />
-          {isDragging ? "여기에 놓으세요" : "파일 추가"}
+        </div>
+
+        {/* 본문 */}
+        <div>
+          <label className="mb-1.5 block text-sm font-semibold text-foreground">
+            본문 <span className="text-destructive">*</span>
+          </label>
+          <textarea
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value);
+              setErrors((p) => ({ ...p, content: undefined }));
+            }}
+            placeholder={CONTENT_PLACEHOLDER}
+            rows={14}
+            className={cn(
+              "w-full resize-y rounded-xl border bg-background px-4 py-3 text-sm font-medium leading-relaxed text-foreground placeholder:text-muted-foreground/40 outline-none transition-colors focus:border-primary",
+              errors.content ? "border-destructive" : "border-border",
+            )}
+          />
+          {errors.content && (
+            <p className="mt-1.5 text-xs font-medium text-destructive">
+              {errors.content}
+            </p>
+          )}
+        </div>
+
+        {/* 첨부파일 */}
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-foreground">
+            첨부파일
+            <span className="ml-1.5 text-xs font-normal text-muted-foreground">
+              (선택)
+            </span>
+          </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,.pdf,.txt,.zip"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          {files.length > 0 && (
+            <ul className="mb-2 space-y-1.5">
+              {files.map((f) => (
+                <li
+                  key={f.name}
+                  className="flex items-center justify-between rounded-lg border border-border bg-secondary/40 px-3 py-2"
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    <span className="truncate text-xs font-medium text-foreground">
+                      {f.name}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onRemoveFile(f.name)}
+                    className="ml-2 shrink-0 rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="파일 제거"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ")
+                fileInputRef.current?.click();
+            }}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={cn(
+              "flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed px-4 py-2.5 text-sm font-medium transition-colors",
+              isDragging
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",
+            )}
+          >
+            <Paperclip className="h-4 w-4" />
+            {isDragging ? "여기에 놓으세요" : "파일 추가"}
+          </div>
         </div>
       </div>
-
-      </div>{/* 입력 필드 카드 끝 */}
+      {/* 입력 필드 카드 끝 */}
 
       {/* 에러 */}
       {(refineError ?? submitError) && (

@@ -38,8 +38,8 @@ export const MOCK_AI_SUMMARIES: Record<
       "의존성 배열에 아무것도 넣지 않으면 어떤 일이 벌어질까요?",
       "컴포넌트가 사라질 때 타이머를 어떻게 멈출 수 있을까요?",
     ],
-    cachedAt: "2026-03-16T09:00:00",
-    expiresAt: "2026-03-17T09:00:00",
+    cachedAt: "2026-03-16T09:00:00.000Z",
+    expiresAt: "2026-03-17T09:00:00.000Z",
   },
   JUNIOR: {
     level: "JUNIOR",
@@ -67,8 +67,8 @@ export const MOCK_AI_SUMMARIES: Record<
       "Object나 Array를 의존성으로 넣으면 어떤 문제가 생기나요?",
       "useEffect와 useLayoutEffect의 실행 타이밍 차이는 무엇인가요?",
     ],
-    cachedAt: "2026-03-16T09:00:00",
-    expiresAt: "2026-03-17T09:00:00",
+    cachedAt: "2026-03-16T09:00:00.000Z",
+    expiresAt: "2026-03-17T09:00:00.000Z",
   },
   MIDDLE: {
     level: "MIDDLE",
@@ -96,8 +96,8 @@ export const MOCK_AI_SUMMARIES: Record<
       "Effect 내에서 발생하는 경쟁 조건(race condition)을 어떻게 해결하나요?",
       "Suspense와 useEffect의 실행 순서는 어떻게 보장되나요?",
     ],
-    cachedAt: "2026-03-16T09:00:00",
-    expiresAt: "2026-03-17T09:00:00",
+    cachedAt: "2026-03-16T09:00:00.000Z",
+    expiresAt: "2026-03-17T09:00:00.000Z",
   },
   SENIOR: {
     level: "SENIOR",
@@ -117,7 +117,7 @@ export const MOCK_AI_SUMMARIES: Record<
       "동기화 모델",
       "Effect profiling",
     ],
-    difficulty: "매우 어려움",
+    difficulty: "어려움",
     nextRecommendation:
       "React 팀의 RFC: React without memo를 읽고, React Compiler가 Effect 의존성 분석에 미치는 영향을 정리해보세요.",
     confidence: 0.85,
@@ -126,8 +126,8 @@ export const MOCK_AI_SUMMARIES: Record<
       "Effect 내에서 발생하는 메모리 누수를 프로덕션 환경에서 어떻게 탐지하나요?",
       "React의 '순수 함수 컴포넌트' 원칙과 Effect의 '사이드 이펙트 허용'은 어떻게 공존하나요?",
     ],
-    cachedAt: "2026-03-16T09:00:00",
-    expiresAt: "2026-03-17T09:00:00",
+    cachedAt: "2026-03-16T09:00:00.000Z",
+    expiresAt: "2026-03-17T09:00:00.000Z",
   },
 };
 
@@ -236,7 +236,7 @@ export const MOCK_AI_SUMMARY_RETRIES: Record<
       "RSC",
       "탈출구",
     ],
-    difficulty: "매우 어려움",
+    difficulty: "어려움",
     nextRecommendation:
       "React 18 Working Group의 'Strict Effects' 논의와 React Compiler 베타 문서를 읽고, Effect 자동 최적화의 한계를 분석해보세요.",
     confidence: 0.88,

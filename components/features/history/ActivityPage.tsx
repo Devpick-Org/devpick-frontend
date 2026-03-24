@@ -7,7 +7,7 @@ import {
   historyEndpoints,
   HISTORY_QUERY_KEYS,
 } from "@/lib/api/endpoints/history";
-import type { ActivityActionType } from "@/types/history";
+import type { ActivityFilterValue } from "@/types/history";
 import {
   filterByPeriod,
   filterByActivityActions,
@@ -20,7 +20,7 @@ const PAGE = 0;
 const PAGE_SIZE = 100;
 
 export default function ActivityPage() {
-  const [selectedActions, setSelectedActions] = useState<ActivityActionType[]>([]);
+  const [selectedActions, setSelectedActions] = useState<ActivityFilterValue[]>([]);
   const [period, setPeriod] = useState<PeriodFilter>("30d");
 
   const { data, isLoading, isError } = useQuery({

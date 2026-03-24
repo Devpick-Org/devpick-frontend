@@ -47,28 +47,35 @@ export default function HistoryTimelineItem({ item, isLast }: Props) {
     >
       {/* 본문 */}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-muted-foreground mb-0.5">{meta.label}</p>
+        <p className="text-xs text-muted-foreground mb-1.5">{meta.label}</p>
         {title ? (
-          <p className="text-sm font-medium text-foreground leading-snug line-clamp-1">
+          <p className="text-sm font-semibold text-foreground leading-snug line-clamp-1">
             {title}
           </p>
         ) : (
           <p className="text-sm text-muted-foreground italic">삭제된 콘텐츠</p>
         )}
         {preview && (
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+          <p className="text-xs font-medium text-muted-foreground mt-0.5 line-clamp-1">
             {preview}
           </p>
         )}
       </div>
 
-      {/* 시간 */}
-      <time
-        dateTime={item.createdAt}
-        className="shrink-0 text-xs text-muted-foreground mt-0.5 whitespace-nowrap"
-      >
-        {formatTime(item.createdAt)}
-      </time>
+      {/* 시간 + 포인트 */}
+      <div className="shrink-0 flex flex-col items-end justify-between self-stretch gap-1">
+        <time
+          dateTime={item.createdAt}
+          className="text-xs text-muted-foreground whitespace-nowrap"
+        >
+          {formatTime(item.createdAt)}
+        </time>
+        {item.points !== null && (
+          <span className="text-xs font-semibold text-primary whitespace-nowrap">
+            +{item.points}p
+          </span>
+        )}
+      </div>
     </div>
   );
 

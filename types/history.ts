@@ -11,7 +11,15 @@ export type HistoryActionType =
 export type ActivityActionType =
   | "content_liked"
   | "answer_written"
-  | "comment_created";
+  | "answer_adopted"
+  | "comment_created"
+  | "daily_login";
+
+/**
+ * 활동 탭 필터 칩 값 — "answer"는 answer_written + answer_adopted를 묶는 가상 값
+ * HistoryFilterBar에 전달할 때 사용하며 실제 API 파라미터로는 변환 후 전달
+ */
+export type ActivityFilterValue = ActivityActionType | "answer";
 
 /** 히스토리 아이템이 참조하는 콘텐츠 요약 */
 export interface HistoryContentRef {
@@ -35,6 +43,7 @@ export interface HistoryAnswerRef {
  * GET /history 단일 행동 기록 — 학습 탭
  * createdAt: "YYYY-MM-DDTHH:mm:ss" — timezone 없는 서버 로컬 시간(KST)
  * 삭제된 참조 항목은 해당 필드가 null로 반환됨
+ * points: 해당 행동으로 적립된 포인트 (미지원 시 null)
  */
 export interface HistoryItem {
   id: string;
@@ -43,12 +52,14 @@ export interface HistoryItem {
   post: HistoryPostRef | null;
   answer: HistoryAnswerRef | null;
   createdAt: string;
+  points: number | null;
 }
 
 /**
  * GET /history 단일 행동 기록 — 활동 탭
  * createdAt: "YYYY-MM-DDTHH:mm:ss" — timezone 없는 서버 로컬 시간(KST)
  * 삭제된 참조 항목은 해당 필드가 null로 반환됨
+ * points: 해당 행동으로 적립된 포인트 (미지원 시 null)
  */
 export interface ActivityItem {
   id: string;
@@ -57,6 +68,33 @@ export interface ActivityItem {
   post: HistoryPostRef | null;
   answer: HistoryAnswerRef | null;
   createdAt: string;
+  points: number | null;
+}
+
+/** 배지 ID — 서버 정의 값 */
+export type BadgeId =
+  | "FIRST_SCRAP"
+  | "FIRST_QUESTION"
+  | "ANSWER_MASTER"
+  | "POINT_100"
+  | "POINT_500"
+  | "POINT_1000"
+  | "STREAK_7";
+
+/** 단일 배지 */
+export interface BadgeItem {
+  badgeId: BadgeId;
+  name: string;
+  description: string;
+  acquired: boolean;
+  acquiredAt: string | null; // null → 미획득
+}
+
+/** 포인트 요약 */
+export interface PointsSummary {
+  totalPoints: number;
+  weeklyPoints: number;
+  streak: number; // 연속 로그인 일수
 }
 
 /** GET /history 페이지 응답 data — 학습 탭 */
@@ -98,3 +136,5 @@ export interface HistoryParams {
 
 export type HistoryPageResponse = ApiResponse<HistoryPageData>;
 export type ActivityPageResponse = ApiResponse<ActivityPageData>;
+export type BadgesResponse = ApiResponse<BadgeItem[]>;
+export type PointsSummaryResponse = ApiResponse<PointsSummary>;

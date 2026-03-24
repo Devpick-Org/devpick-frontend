@@ -142,7 +142,7 @@ export function TopNavVariant() {
                    * asChild + Button 중첩 시 Radix Slot이 ref를 잃어 <button><button> 중첩 발생 가능
                    */}
                   <DropdownMenuTrigger
-                    className="flex h-auto items-center gap-2.5 rounded-full border border-border/80 bg-background px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                    className="flex h-auto items-center gap-2.5 rounded-full border border-border/80 bg-background px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
                     aria-label="User menu"
                   >
                     {user ? (
@@ -185,7 +185,7 @@ export function TopNavVariant() {
                     <DropdownMenuItem asChild>
                       <Link
                         href="/profile"
-                        className="flex items-center gap-2 font-medium"
+                        className="flex items-center gap-2 font-medium cursor-pointer"
                       >
                         <User />내 프로필
                       </Link>
@@ -193,7 +193,7 @@ export function TopNavVariant() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onSelect={handleLogout}
-                      className="font-medium"
+                      className="font-medium cursor-pointer"
                     >
                       <LogOut />
                       로그아웃

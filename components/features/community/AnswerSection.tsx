@@ -148,7 +148,7 @@ export function AnswerSection({
             disabled={
               !newAnswerContent.trim() || createAnswerMutation.isPending
             }
-            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40 cursor-pointer"
           >
             {createAnswerMutation.isPending ? "등록 중..." : "답변 등록"}
           </button>
