@@ -135,6 +135,9 @@ export default function ReportContent({
                   tick={{ fontSize: 12 }}
                   axisLine={false}
                   tickLine={false}
+                  tickFormatter={(v: string) =>
+                    ({ MON: "월", TUE: "화", WED: "수", THU: "목", FRI: "금", SAT: "토", SUN: "일" }[v] ?? v)
+                  }
                 />
                 <YAxis
                   tick={{ fontSize: 12 }}
