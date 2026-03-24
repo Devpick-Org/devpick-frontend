@@ -186,7 +186,7 @@ function CommunityDetailSkeleton() {
             {/* 유사 질문 제목 */}
             <Skeleton className="h-5 w-20" />
 
-            {/* 유사 질문 카드 3개 */}
+            {/* 유사 질문 카드 5개 */}
             <div className="rounded-xl border border-border p-4 space-y-2">
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-[75%]" />
@@ -200,6 +200,16 @@ function CommunityDetailSkeleton() {
             <div className="rounded-xl border border-border p-4 space-y-2">
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-[80%]" />
+              <Skeleton className="h-3.5 w-16" />
+            </div>
+            <div className="rounded-xl border border-border p-4 space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-[70%]" />
+              <Skeleton className="h-3.5 w-16" />
+            </div>
+            <div className="rounded-xl border border-border p-4 space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-[85%]" />
               <Skeleton className="h-3.5 w-16" />
             </div>
           </div>

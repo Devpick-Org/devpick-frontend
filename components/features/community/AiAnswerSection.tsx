@@ -20,12 +20,10 @@ export function AiAnswerSection({
 }: AiAnswerSectionProps) {
   return (
     <section className="mb-8">
+      <div className="mb-3 flex items-center gap-2">
+        <h2 className="text-lg font-bold text-foreground">AI 1차 답변</h2>
+      </div>
       <div className="rounded-xl bg-primary/5 p-5">
-        <div className="mb-3 flex items-center gap-2">
-          <Bot className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold text-primary">AI 1차 답변</h2>
-        </div>
-
         {status === "loading" && <AiAnswerLoading />}
         {status === "success" && content && (
           <ContentRenderer

@@ -3,7 +3,14 @@
 import { useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, User, FileDown, ImageIcon, Paperclip, Share2 } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  FileDown,
+  ImageIcon,
+  Paperclip,
+  Share2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatRelativeDate } from "./CommunityCard";
@@ -94,18 +101,7 @@ export function PostDetail({ post }: PostDetailProps) {
         커뮤니티로
       </Link>
 
-      <div className="mb-4 mt-5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        <User className="h-3.5 w-3.5 shrink-0" />
-        <span>{post.authorNickname}</span>
-        <span className="text-muted-foreground/40">·</span>
-        <span className={cn("font-medium", LEVEL_TEXT_COLORS[post.level])}>
-          {LEVEL_LABEL[post.level]}
-        </span>
-        <span className="text-muted-foreground/40">·</span>
-        <span>{formatRelativeDate(post.createdAt)}</span>
-      </div>
-
-      <div className="mb-6 flex items-start justify-between gap-4">
+      <div className="mb-4 mt-5 flex items-start justify-between gap-4">
         <h1 className="flex-1 text-2xl font-bold leading-snug tracking-[-0.01em] text-foreground">
           {post.title}
         </h1>
@@ -118,13 +114,24 @@ export function PostDetail({ post }: PostDetailProps) {
         </button>
       </div>
 
+      <div className="mb-6 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+        <User className="h-3.5 w-3.5 shrink-0" />
+        <span>{post.authorNickname}</span>
+        <span className="text-muted-foreground/40">·</span>
+        <span className={cn("font-medium", LEVEL_TEXT_COLORS[post.level])}>
+          {LEVEL_LABEL[post.level]}
+        </span>
+        <span className="text-muted-foreground/40">·</span>
+        <span>{formatRelativeDate(post.createdAt)}</span>
+      </div>
+
       <ContentRenderer
         content={post.content}
         className="text-[15px] leading-7 text-foreground/90 font-medium"
       />
 
       {post.attachments.length > 0 && (
-        <div className="mt-6 space-y-3 rounded-lg border border-border/60 bg-muted/30 p-4">
+        <div className="mt-6 space-y-3 rounded-lg p-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Paperclip className="h-4 w-4 text-muted-foreground" />
             첨부 파일{" "}
