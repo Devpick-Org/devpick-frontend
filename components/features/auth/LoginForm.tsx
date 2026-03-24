@@ -202,7 +202,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
           <p className="h-5 text-sm text-red-500">{passwordError}</p>
         </div>
 
-        {authError && <p className="text-sm text-red-500">{authError}</p>}
+        {authError && <p className="text-sm text-center text-red-500">{authError}</p>}
 
         <Button
           type="submit"

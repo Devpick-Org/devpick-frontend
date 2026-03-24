@@ -131,7 +131,7 @@ export function EmailSection({
             variant="secondary"
             onClick={handleSendCode}
             disabled={!canSendCode || isSendingCode || isEmailVerified}
-            className="h-11 shrink-0 border border-border bg-secondary text-foreground hover:bg-secondary/80 hover:border-primary/40 transition-all duration-200 disabled:opacity-50"
+            className="h-11 shrink-0 bg-secondary text-foreground hover:bg-secondary/80 transition-all duration-200 disabled:opacity-50"
           >
             {isSendingCode ? (
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
