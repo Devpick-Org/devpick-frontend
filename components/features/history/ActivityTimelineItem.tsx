@@ -23,7 +23,8 @@ function getHref(item: ActivityItem): string | null {
   if (item.actionType === "content_liked") {
     return item.content?.id ? `/home/${item.content.id}` : null;
   }
-  // answer_written / comment_created
+  if (item.actionType === "daily_login") return null;
+  // answer_written / answer_adopted / comment_created
   if (!item.post?.id) return null;
   // TODO: 답변 앵커 스크롤 활성화 시 아래 주석 해제
   // if (item.answer?.id) return `/community/${item.post.id}#answer-${item.answer.id}`;
@@ -34,7 +35,10 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
   const meta = ACTIVITY_ACTION_META[item.actionType];
   const Icon = meta.icon;
   const href = getHref(item);
-  const title = item.content?.title ?? item.post?.title ?? null;
+  const title =
+    item.content?.title ??
+    item.post?.title ??
+    (item.actionType === "daily_login" ? "출석을 완료했어요" : null);
   const preview = item.content?.preview ?? null;
 
   const card = (
@@ -62,13 +66,20 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
         )}
       </div>
 
-      {/* 시간 */}
-      <time
-        dateTime={item.createdAt}
-        className="shrink-0 text-xs text-muted-foreground mt-0.5 whitespace-nowrap"
-      >
-        {formatTime(item.createdAt)}
-      </time>
+      {/* 시간 + 포인트 */}
+      <div className="shrink-0 flex flex-col items-end justify-between self-stretch gap-1">
+        <time
+          dateTime={item.createdAt}
+          className="text-xs text-muted-foreground whitespace-nowrap"
+        >
+          {formatTime(item.createdAt)}
+        </time>
+        {item.points !== null && (
+          <span className="text-xs font-semibold text-primary whitespace-nowrap">
+            +{item.points}p
+          </span>
+        )}
+      </div>
     </div>
   );
 
@@ -82,7 +93,7 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
             meta.iconBgClass,
           )}
         >
-          <Icon className={cn("h-4 w-4", meta.iconClass)} />
+          <Icon className={cn(meta.iconSizeClass ?? "h-4 w-4", meta.iconClass)} />
         </div>
         {!isLast && <div className="w-px flex-1 min-h-3 bg-border mt-1" />}
       </div>

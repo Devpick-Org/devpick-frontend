@@ -3,6 +3,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import HistoryPage from "./HistoryPage";
 import ActivityPage from "./ActivityPage";
+import BadgePage from "./BadgePage";
 
 const TRIGGER_CLASS =
   "rounded-none border-b-2 border-transparent px-4 pb-3 pt-1 text-sm font-semibold " +
@@ -29,12 +30,18 @@ export default function HistoryTabsPage() {
             <TabsTrigger value="activity" className={TRIGGER_CLASS}>
               활동
             </TabsTrigger>
+            <TabsTrigger value="badge" className={TRIGGER_CLASS}>
+              배지
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="learning">
             <HistoryPage />
           </TabsContent>
           <TabsContent value="activity">
             <ActivityPage />
+          </TabsContent>
+          <TabsContent value="badge">
+            <BadgePage />
           </TabsContent>
         </Tabs>
       </div>

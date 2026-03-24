@@ -3,6 +3,7 @@ import type {
   HistoryActionType,
   ActivityItem,
   ActivityActionType,
+  ActivityFilterValue,
 } from "@/types/history";
 
 export type PeriodFilter = "7d" | "30d" | "all";
@@ -71,13 +72,21 @@ export function filterByActions(
   return items.filter((item) => selectedActions.includes(item.actionType));
 }
 
-/** actionType 필터 — 활동 탭 전용 */
+/**
+ * actionType 필터 — 활동 탭 전용
+ * "answer" 가상 필터 값은 answer_written + answer_adopted로 확장됨
+ */
 export function filterByActivityActions(
   items: ActivityItem[],
-  selectedActions: ActivityActionType[],
+  selectedActions: ActivityFilterValue[],
 ): ActivityItem[] {
   if (selectedActions.length === 0) return items;
-  return items.filter((item) => selectedActions.includes(item.actionType));
+
+  const expanded: ActivityActionType[] = selectedActions.flatMap((v) =>
+    v === "answer" ? (["answer_written", "answer_adopted"] as ActivityActionType[]) : [v as ActivityActionType],
+  );
+
+  return items.filter((item) => expanded.includes(item.actionType));
 }
 
 /** 날짜별 그룹핑 공통 로직 (날짜: 최신순 / 그룹 내 아이템: 최신순) */
