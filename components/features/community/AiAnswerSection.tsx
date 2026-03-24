@@ -1,4 +1,4 @@
-import { Bot, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { ContentRenderer } from "./ContentRenderer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
