@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 
@@ -8,7 +9,6 @@ import {
   HISTORY_QUERY_KEYS,
 } from "@/lib/api/endpoints/history";
 import type { BadgeItem } from "@/types/history";
-import { BADGE_META } from "./history.constants";
 import { cn } from "@/lib/utils";
 
 export default function BadgePage() {
@@ -39,7 +39,7 @@ export default function BadgePage() {
             value={`${points.totalPoints}p`}
             highlight
           />
-          <SummaryCard label="이번 주" value={`${points.weeklyPoints}p`} />
+          <SummaryCard label="이번 주 획득 포인트" value={`${points.weeklyPoints}p`} />
           <SummaryCard label="연속 출석" value={`${points.streak}일`} />
         </div>
       ) : null}
@@ -48,10 +48,10 @@ export default function BadgePage() {
       {badgesLoading ? (
         <BadgeGridSkeleton />
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-12">
           {acquired.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-foreground">
+              <h3 className="text-md font-semibold text-foreground">
                 획득한 배지{" "}
                 <span className="text-primary">{acquired.length}</span>
               </h3>
@@ -61,7 +61,7 @@ export default function BadgePage() {
 
           {unacquired.length > 0 && (
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground">
+              <h3 className="text-md font-semibold text-muted-foreground">
                 미획득 배지{" "}
                 <span className="text-muted-foreground/60">
                   {unacquired.length}
@@ -93,7 +93,7 @@ function SummaryCard({
 }) {
   return (
     <div className="rounded-xl border border-border bg-card px-4 py-3 text-center">
-      <p className="text-xs text-muted-foreground mb-1">{label}</p>
+      <p className="text-xs text-muted-foreground mb-2">{label}</p>
       <div className="flex items-center justify-center gap-1">
         {icon}
         <p
@@ -112,41 +112,31 @@ function SummaryCard({
 function BadgeGrid({ badges }: { badges: BadgeItem[] }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-      {badges.map((badge) => {
-        const meta = BADGE_META[badge.badgeId];
-        const Icon = meta.icon;
-        return (
-          <div
-            key={badge.badgeId}
-            className={cn(
-              "rounded-xl border border-border bg-card px-4 py-4 flex flex-col items-center gap-2 text-center",
-              !badge.acquired && "opacity-40",
-            )}
-          >
-            <div
-              className={cn(
-                "h-11 w-11 rounded-full flex items-center justify-center",
-                badge.acquired ? meta.iconBgClass : "bg-muted",
-              )}
-            >
-              <Icon
-                className={cn(
-                  "h-5 w-5",
-                  badge.acquired ? meta.iconClass : "text-muted-foreground",
-                )}
-              />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                {badge.name}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {badge.description}
-              </p>
-            </div>
+      {badges.map((badge) => (
+        <div
+          key={badge.badgeId}
+          className={cn(
+            "rounded-xl bg-card px-4 py-4 flex flex-col items-center gap-0 text-center",
+            !badge.acquired && "opacity-40",
+          )}
+        >
+          <Image
+            src={`/icons/badges/${badge.badgeId}.svg`}
+            alt={badge.name}
+            width={156}
+            height={156}
+            className={cn(!badge.acquired && "grayscale")}
+          />
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              {badge.name}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {badge.description}
+            </p>
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 }
@@ -182,12 +172,12 @@ function BadgeGridSkeleton() {
       {Array.from({ length: 7 }).map((_, i) => (
         <div
           key={i}
-          className="rounded-xl border border-border bg-card px-4 py-4 flex flex-col items-center gap-2"
+          className="rounded-xl bg-card px-4 py-4 flex flex-col items-center gap-0"
         >
-          <div className="h-11 w-11 rounded-full bg-muted animate-pulse" />
-          <div className="space-y-1.5 w-full">
-            <div className="h-3.5 w-3/4 bg-muted rounded animate-pulse mx-auto" />
-            <div className="h-3 w-full bg-muted rounded animate-pulse" />
+          <div className="w-[156px] h-[156px] bg-muted rounded-xl animate-pulse" />
+          <div className="space-y-1.5 w-full mt-1">
+            <div className="h-3.5 w-2/3 bg-muted rounded animate-pulse mx-auto" />
+            <div className="h-3 w-4/5 bg-muted rounded animate-pulse mx-auto" />
           </div>
         </div>
       ))}

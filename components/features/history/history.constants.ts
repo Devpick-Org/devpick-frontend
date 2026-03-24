@@ -9,9 +9,6 @@ import {
   MessageCircle,
   LogIn,
   Award,
-  Star,
-  Flame,
-  Zap,
 } from "lucide-react";
 
 import type {
@@ -30,11 +27,6 @@ export interface ActionMeta {
   iconSizeClass?: string; // 기본값 "h-4 w-4", 특정 액션에서만 오버라이드
 }
 
-export interface BadgeMeta {
-  icon: ElementType;
-  iconClass: string;
-  iconBgClass: string;
-}
 
 /** 액션 필터 chip 옵션 — 학습 탭 전용 */
 export const ACTION_FILTER_OPTIONS: {
@@ -130,41 +122,3 @@ export const ACTIVITY_ACTION_META: Record<ActivityActionType, ActionMeta> = {
   },
 };
 
-/** 배지 메타 — badgeId별 아이콘/색상 */
-export const BADGE_META: Record<BadgeId, BadgeMeta> = {
-  FIRST_SCRAP: {
-    icon: Bookmark,
-    iconClass: "text-blue-500",
-    iconBgClass: "bg-blue-50",
-  },
-  FIRST_QUESTION: {
-    icon: HelpCircle,
-    iconClass: "text-purple-500",
-    iconBgClass: "bg-purple-50",
-  },
-  ANSWER_MASTER: {
-    icon: Award,
-    iconClass: "text-amber-500",
-    iconBgClass: "bg-amber-50",
-  },
-  POINT_100: {
-    icon: Star,
-    iconClass: "text-green-500",
-    iconBgClass: "bg-green-50",
-  },
-  POINT_500: {
-    icon: Zap,
-    iconClass: "text-orange-500",
-    iconBgClass: "bg-orange-50",
-  },
-  POINT_1000: {
-    icon: Star,
-    iconClass: "text-primary",
-    iconBgClass: "bg-primary/10",
-  },
-  STREAK_7: {
-    icon: Flame,
-    iconClass: "text-red-500",
-    iconBgClass: "bg-red-50",
-  },
-};
