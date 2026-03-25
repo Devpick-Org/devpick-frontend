@@ -8,7 +8,7 @@ export interface TrendKeywordsData {
 export type TrendKeywordsResponse = ApiResponse<TrendKeywordsData>;
 
 /** rank에 따른 버블 크기 티어 */
-export type KeywordTier = "large" | "medium" | "small";
+export type KeywordTier = "top" | "large" | "medium" | "small";
 
 /** 화면 렌더링용 가공 타입 */
 export interface RankedKeyword {

@@ -9,8 +9,9 @@ import { TrendKeywordsEmpty } from "./TrendKeywordsEmpty";
 import type { RankedKeyword, KeywordTier } from "@/types/trends";
 
 function getTier(rank: number): KeywordTier {
-  if (rank <= 5) return "large";
-  if (rank <= 10) return "medium";
+  if (rank === 1) return "top";
+  if (rank <= 3) return "large";
+  if (rank <= 8) return "medium";
   return "small";
 }
 

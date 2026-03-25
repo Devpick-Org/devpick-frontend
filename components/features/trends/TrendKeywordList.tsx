@@ -8,7 +8,7 @@ interface TrendKeywordListProps {
 
 export function TrendKeywordList({ keywords }: TrendKeywordListProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
       {keywords.map(({ keyword, rank, tier }) => (
         <div
           key={keyword}
@@ -16,8 +16,8 @@ export function TrendKeywordList({ keywords }: TrendKeywordListProps) {
         >
           <span
             className={cn(
-              "w-6 shrink-0 text-center text-sm font-bold tabular-nums",
-              tier === "large"
+              "w-6 shrink-0 text-center text-md font-bold tabular-nums",
+              tier === "top" || tier === "large"
                 ? "text-primary"
                 : tier === "medium"
                   ? "text-foreground/70"
@@ -29,9 +29,9 @@ export function TrendKeywordList({ keywords }: TrendKeywordListProps) {
           <TrendKeywordIcon keyword={keyword} size={24} />
           <span
             className={cn(
-              "truncate font-medium",
-              tier === "large"
-                ? "text-md text-foreground"
+              "truncate font-semibold",
+              tier === "top" || tier === "large"
+                ? "text-md text-foreground/80"
                 : "text-sm text-foreground/80",
             )}
           >
