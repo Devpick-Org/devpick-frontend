@@ -41,6 +41,8 @@ export interface AnswerDTO {
   content: string;
   authorId: string;
   authorNickname: string;
+  authorJob?: string | null;
+  authorLevel?: string | null;
   isAdopted: boolean;
   createdAt: string;
   updatedAt: string;
@@ -98,24 +100,30 @@ export interface CreateCommentRequest {
 }
 
 // ─── 화면용 타입 ──────────────────────────────────────────────────────────────
-// 미확정 API(answers, ai-answer, similar)의 raw DTO는 확정하지 않고,
-// 프론트에서 필요한 최소 타입만 유지합니다.
 
 /** 화면용 타입 — AnswerDTO와 동일 (comments가 DTO에 포함됨) */
 export type CommunityAnswer = AnswerDTO;
 
 export type AnswerListResponse = ApiResponse<{ answers: AnswerDTO[] }>;
 
-/** AI 1차 답변 (미확정 API) */
+/** AI 1차 답변 (POST /posts/{postId}/ai-answer) */
 export interface AiAnswer {
+  id: string;
+  postId: string;
   content: string;
-  generatedAt: string;
+  isAdopted: boolean;
+  createdAt: string;
 }
 
-/** 유사 질문 (미확정 API) */
+export type AiAnswerResponse = ApiResponse<AiAnswer | null>;
+
+/** 유사 질문 (GET /posts/{postId}/similar) */
 export interface SimilarPost {
   id: string;
   title: string;
-  answerCount: number;
   level: PostLevel;
+  answerCount: number;
+  createdAt: string;
 }
+
+export type SimilarPostListResponse = ApiResponse<{ posts: SimilarPost[] }>;

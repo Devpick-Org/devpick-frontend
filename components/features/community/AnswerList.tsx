@@ -16,6 +16,19 @@ import { formatRelativeDate } from "./CommunityCard";
 import { ContentRenderer } from "./ContentRenderer";
 import type { CommunityAnswer, CommentDTO } from "@/types/community";
 
+const JOB_LABELS: Record<string, string> = {
+  FRONTEND: "프론트엔드",
+  BACKEND: "백엔드",
+  FULLSTACK: "풀스택",
+};
+
+const LEVEL_LABELS: Record<string, string> = {
+  BEGINNER: "입문",
+  JUNIOR: "주니어",
+  MIDDLE: "미들",
+  SENIOR: "시니어",
+};
+
 interface AnswerListProps {
   answers: CommunityAnswer[];
   postAuthorId: string;
@@ -132,10 +145,27 @@ function AnswerItem({
       )}
 
       {/* 헤더: 작성자 + 액션 버튼 */}
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
           <User className="h-3.5 w-3.5 shrink-0" />
-          <span>{answer.authorNickname}</span>
+          <span className="text-foreground">{answer.authorNickname}</span>
+          {(answer.authorJob || answer.authorLevel) && (
+            <>
+              <span className="text-muted-foreground">·</span>
+              <span className="font-medium">
+                {[
+                  answer.authorJob
+                    ? (JOB_LABELS[answer.authorJob] ?? answer.authorJob)
+                    : null,
+                  answer.authorLevel
+                    ? (LEVEL_LABELS[answer.authorLevel] ?? answer.authorLevel)
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
+            </>
+          )}
           <span className="text-muted-foreground/40">·</span>
           <span>{formatRelativeDate(answer.createdAt)}</span>
           {answer.updatedAt !== answer.createdAt && (
@@ -183,9 +213,11 @@ function AnswerItem({
         </div>
       </div>
 
+      <div className="border-t border-border" />
+
       {/* 본문 또는 편집 폼 */}
       {isEditing ? (
-        <div>
+        <div className="pt-3">
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
@@ -208,7 +240,9 @@ function AnswerItem({
           </div>
         </div>
       ) : (
-        <ContentRenderer content={answer.content} />
+        <div className="pt-3">
+          <ContentRenderer content={answer.content} />
+        </div>
       )}
 
       {/* 댓글 영역 */}
