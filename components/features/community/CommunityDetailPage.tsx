@@ -49,7 +49,7 @@ export function CommunityDetailPage({ postId }: Props) {
 
   const post = postRes?.data;
   const answers = answersRes?.data?.answers ?? [];
-  const similarPosts = similarRes?.data ?? [];
+  const similarPosts = similarRes?.data?.posts ?? [];
 
   const aiStatus = isAiLoading
     ? "loading"

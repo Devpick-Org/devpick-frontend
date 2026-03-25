@@ -131,9 +131,11 @@ export const MOCK_POST_STORE: Record<string, PostDetailDTO> = {
 
 // ─── AI 답변 Store ────────────────────────────────────────────────────────────
 
-/** postId → AiAnswer */
+/** postId → AiAnswer. 실제 API 연동 시 이 Map을 제거하고 POST /posts/{postId}/ai-answer 호출로 교체합니다. */
 export const MOCK_AI_ANSWER_STORE: Record<string, AiAnswer> = {
   "post-001": {
+    id: "ai-answer-001",
+    postId: "post-001",
     content: `**핵심 차이점**
 
 | 구분 | 실행 시점 |
@@ -144,166 +146,196 @@ export const MOCK_AI_ANSWER_STORE: Record<string, AiAnswer> = {
 **주의**: 생략 + 내부 상태 변경 = 무한 루프 위험
 
 빈 배열은 컴포넌트 초기화 시 한 번만 데이터를 불러올 때 적합하고, 생략은 실무에서 거의 사용하지 않습니다. 특정 값에 반응해야 한다면 해당 값을 의존성 배열에 명시하세요.`,
-    generatedAt: "2026-03-17T08:35:00.000Z",
+    isAdopted: false,
+    createdAt: "2026-03-17T08:35:00.000Z",
   },
   "post-002": {
+    id: "ai-answer-002",
+    postId: "post-002",
     content: `**핵심 원칙**: \`"use client"\`는 트리 **말단**에 배치하세요.
 
 - **서버 컴포넌트**: 데이터 패칭, DB 접근, 민감 정보 처리
 - **클라이언트 컴포넌트**: 이벤트 핸들러, useState/useEffect, 브라우저 API
 
 \`useState\`와 \`await fetch\`를 같은 컴포넌트에서 쓸 수 없습니다. 상태가 필요한 부분만 별도 클라이언트 컴포넌트로 분리하고, 나머지는 서버 컴포넌트로 유지하는 것이 권장 패턴입니다.`,
-    generatedAt: "2026-03-17T07:20:00.000Z",
+    isAdopted: false,
+    createdAt: "2026-03-17T07:20:00.000Z",
   },
   "post-004": {
+    id: "ai-answer-004",
+    postId: "post-004",
     content: `**구분 기준**
 
 - **TanStack Query**: 서버와 동기화가 필요한 데이터 (캐시, 재검증, 로딩/에러 상태)
 - **Zustand**: 컴포넌트 간 공유되는 순수 클라이언트 상태
 
 **인증 정보**는 서버에서 받아오지만 앱 전반에 동기적으로 접근해야 하므로 **Zustand**가 적합합니다. 초기 로드 시 \`/users/me\`를 한 번 호출해 Zustand에 저장하고, 이후에는 store에서 읽는 패턴이 일반적입니다.`,
-    generatedAt: "2026-03-16T22:05:00.000Z",
+    isAdopted: false,
+    createdAt: "2026-03-16T22:05:00.000Z",
   },
   "post-010": {
+    id: "ai-answer-010",
+    postId: "post-010",
     content: `**주요 주의사항**
 
 - \`startTransition\` 내부의 업데이트는 **긴급하지 않음**으로 표시됩니다. 외부 상태(Zustand store 등)를 직접 변경하면 트랜지션 밖에서 즉시 반영되어 의도한 지연 효과가 없을 수 있습니다.
 - \`useDeferredValue\`는 값이 안정화될 때까지 이전 값을 유지합니다. 이 값으로 파생된 무거운 연산에 \`useMemo\`를 함께 사용하면 효과적입니다.
 - 순수 렌더링 최적화 목적에만 활용하고, 사이드 이펙트가 있는 로직에는 적용을 피하세요.`,
-    generatedAt: "2026-03-16T08:05:00.000Z",
+    isAdopted: false,
+    createdAt: "2026-03-16T08:05:00.000Z",
   },
 };
 
 // ─── 유사 질문 Store ──────────────────────────────────────────────────────────
 
-/** postId → SimilarPost[] */
+/** postId → SimilarPost[]. 실제 API 연동 시 이 Map을 제거하고 GET /posts/{postId}/similar 호출로 교체합니다. */
 export const MOCK_SIMILAR_POSTS_STORE: Record<string, SimilarPost[]> = {
   "post-001": [
     {
       id: "post-010",
       title: "React 19 Concurrent Features를 실무에 적용할 때 주의할 점이 있을까요?",
-      answerCount: 1,
       level: "SENIOR",
+      answerCount: 1,
+      createdAt: "2026-03-16T08:00:00.000Z",
     },
     {
       id: "post-004",
       title: "TanStack Query와 Zustand를 함께 쓸 때 서버 상태와 클라이언트 상태를 어떻게 구분하나요?",
-      answerCount: 1,
       level: "MIDDLE",
+      answerCount: 1,
+      createdAt: "2026-03-16T22:00:00.000Z",
     },
     {
       id: "post-002",
       title: "Next.js App Router에서 서버 컴포넌트와 클라이언트 컴포넌트를 어떻게 나누는 게 좋을까요?",
-      answerCount: 1,
       level: "JUNIOR",
+      answerCount: 1,
+      createdAt: "2026-03-17T07:15:00.000Z",
     },
     {
       id: "post-005",
       title: "TypeScript에서 제네릭을 사용할 때 타입 추론이 안 되는 경우가 있어서 질문드립니다.",
-      answerCount: 3,
       level: "JUNIOR",
+      answerCount: 3,
+      createdAt: "2026-03-15T14:00:00.000Z",
     },
     {
       id: "post-006",
       title: "CSS Grid와 Flexbox를 언제 각각 사용하는 게 적합한가요?",
-      answerCount: 2,
       level: "BEGINNER",
+      answerCount: 2,
+      createdAt: "2026-03-14T10:00:00.000Z",
     },
   ],
   "post-002": [
     {
       id: "post-001",
       title: "React useEffect 의존성 배열, 빈 배열과 생략의 차이가 뭔가요?",
-      answerCount: 2,
       level: "BEGINNER",
+      answerCount: 2,
+      createdAt: "2026-03-17T08:30:00.000Z",
     },
     {
       id: "post-010",
       title: "React 19 Concurrent Features를 실무에 적용할 때 주의할 점이 있을까요?",
-      answerCount: 1,
       level: "SENIOR",
+      answerCount: 1,
+      createdAt: "2026-03-16T08:00:00.000Z",
     },
     {
       id: "post-004",
       title: "TanStack Query와 Zustand를 함께 쓸 때 서버 상태와 클라이언트 상태를 어떻게 구분하나요?",
-      answerCount: 1,
       level: "MIDDLE",
+      answerCount: 1,
+      createdAt: "2026-03-16T22:00:00.000Z",
     },
     {
       id: "post-007",
       title: "Next.js에서 Image 컴포넌트 사용 시 layout shift가 발생하는 이유가 궁금합니다.",
-      answerCount: 2,
       level: "JUNIOR",
+      answerCount: 2,
+      createdAt: "2026-03-15T09:00:00.000Z",
     },
     {
       id: "post-008",
       title: "React에서 Context API와 전역 상태 라이브러리를 언제 구분해서 쓰나요?",
-      answerCount: 4,
       level: "MIDDLE",
+      answerCount: 4,
+      createdAt: "2026-03-13T16:00:00.000Z",
     },
   ],
   "post-004": [
     {
       id: "post-002",
       title: "Next.js App Router에서 서버 컴포넌트와 클라이언트 컴포넌트를 어떻게 나누는 게 좋을까요?",
-      answerCount: 1,
       level: "JUNIOR",
+      answerCount: 1,
+      createdAt: "2026-03-17T07:15:00.000Z",
     },
     {
       id: "post-001",
       title: "React useEffect 의존성 배열, 빈 배열과 생략의 차이가 뭔가요?",
-      answerCount: 2,
       level: "BEGINNER",
+      answerCount: 2,
+      createdAt: "2026-03-17T08:30:00.000Z",
     },
     {
       id: "post-010",
       title: "React 19 Concurrent Features를 실무에 적용할 때 주의할 점이 있을까요?",
-      answerCount: 1,
       level: "SENIOR",
+      answerCount: 1,
+      createdAt: "2026-03-16T08:00:00.000Z",
     },
     {
       id: "post-009",
       title: "Redux Toolkit과 TanStack Query를 같이 쓰는 게 맞는 방향인가요?",
-      answerCount: 3,
       level: "MIDDLE",
+      answerCount: 3,
+      createdAt: "2026-03-12T11:00:00.000Z",
     },
     {
       id: "post-005",
       title: "TypeScript에서 제네릭을 사용할 때 타입 추론이 안 되는 경우가 있어서 질문드립니다.",
-      answerCount: 3,
       level: "JUNIOR",
+      answerCount: 3,
+      createdAt: "2026-03-15T14:00:00.000Z",
     },
   ],
   "post-010": [
     {
       id: "post-004",
       title: "TanStack Query와 Zustand를 함께 쓸 때 서버 상태와 클라이언트 상태를 어떻게 구분하나요?",
-      answerCount: 1,
       level: "MIDDLE",
+      answerCount: 1,
+      createdAt: "2026-03-16T22:00:00.000Z",
     },
     {
       id: "post-002",
       title: "Next.js App Router에서 서버 컴포넌트와 클라이언트 컴포넌트를 어떻게 나누는 게 좋을까요?",
-      answerCount: 1,
       level: "JUNIOR",
+      answerCount: 1,
+      createdAt: "2026-03-17T07:15:00.000Z",
     },
     {
       id: "post-001",
       title: "React useEffect 의존성 배열, 빈 배열과 생략의 차이가 뭔가요?",
-      answerCount: 2,
       level: "BEGINNER",
+      answerCount: 2,
+      createdAt: "2026-03-17T08:30:00.000Z",
     },
     {
       id: "post-008",
       title: "React에서 Context API와 전역 상태 라이브러리를 언제 구분해서 쓰나요?",
-      answerCount: 4,
       level: "MIDDLE",
+      answerCount: 4,
+      createdAt: "2026-03-13T16:00:00.000Z",
     },
     {
       id: "post-009",
       title: "Redux Toolkit과 TanStack Query를 같이 쓰는 게 맞는 방향인가요?",
-      answerCount: 3,
       level: "MIDDLE",
+      answerCount: 3,
+      createdAt: "2026-03-12T11:00:00.000Z",
     },
   ],
 };
@@ -335,6 +367,8 @@ useEffect(() => {
 생략했을 때 effect 내부에서 상태를 변경하면 렌더링 유발 → effect 재실행 → 무한 루프가 됩니다. 대부분의 경우 **빈 배열이 의도한 동작**에 더 가깝습니다.`,
     authorId: "user-senior-01",
     authorNickname: "시니어개발자",
+    authorJob: "FRONTEND",
+    authorLevel: "SENIOR",
     isAdopted: true,
     createdAt: "2026-03-17T09:00:00.000Z",
     updatedAt: "2026-03-17T09:00:00.000Z",
@@ -371,6 +405,8 @@ useEffect(() => {
 ESLint의 \`exhaustive-deps\` 규칙을 활성화하면, effect 내부에서 참조하는 외부 변수를 빠짐없이 의존성 배열에 추가하도록 자동으로 경고해줍니다.`,
     authorId: "user-junior-01",
     authorNickname: "주니어개발자",
+    authorJob: "BACKEND",
+    authorLevel: "JUNIOR",
     isAdopted: false,
     createdAt: "2026-03-17T11:00:00.000Z",
     updatedAt: "2026-03-17T11:00:00.000Z",
@@ -402,6 +438,8 @@ export default async function PostPage() {
 \`useState\`가 필요한 \`LikeButton\`만 "use client"로 분리하면 됩니다.`,
     authorId: "user-senior-01",
     authorNickname: "시니어개발자",
+    authorJob: "FULLSTACK",
+    authorLevel: "SENIOR",
     isAdopted: true,
     createdAt: "2026-03-17T08:00:00.000Z",
     updatedAt: "2026-03-17T08:00:00.000Z",
@@ -430,6 +468,8 @@ useEffect(() => {
 이후 컴포넌트에서는 \`useAuthStore()\`로 동기 접근합니다.`,
     authorId: "user-senior-01",
     authorNickname: "시니어개발자",
+    authorJob: "BACKEND",
+    authorLevel: "SENIOR",
     isAdopted: true,
     createdAt: "2026-03-16T23:00:00.000Z",
     updatedAt: "2026-03-16T23:00:00.000Z",
@@ -462,6 +502,8 @@ startTransition(() => {
 순수 렌더링 최적화 목적에만 활용하는 것이 안전합니다.`,
     authorId: "user-senior-01",
     authorNickname: "시니어프론트2",
+    authorJob: "FRONTEND",
+    authorLevel: "SENIOR",
     isAdopted: true,
     createdAt: "2026-03-16T09:00:00.000Z",
     updatedAt: "2026-03-16T09:00:00.000Z",

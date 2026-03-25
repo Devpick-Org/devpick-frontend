@@ -45,13 +45,6 @@ function DevPickLogo({ className }: { className?: string }) {
   );
 }
 
-const LEVEL_LABELS: Record<string, string> = {
-  BEGINNER: "입문",
-  JUNIOR: "주니어",
-  MIDDLE: "미들",
-  SENIOR: "시니어",
-};
-
 // 사이드바에 있던 메뉴들을 이쪽으로 가져옵니다.
 const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/home", label: "홈", icon: Home },
@@ -71,9 +64,7 @@ export function TopNavVariant() {
 
   const displayName = user?.nickname ?? "Guest";
   const displayInitial = displayName.charAt(0).toUpperCase();
-  const displayLevel = user?.level
-    ? (LEVEL_LABELS[user.level] ?? user.level)
-    : null;
+  const displayBadge = user?.representativeBadge?.name ?? null;
 
   const handleLogout = async () => {
     try {
@@ -160,12 +151,12 @@ export function TopNavVariant() {
                           <span className="text-sm font-medium text-foreground">
                             {displayName}
                           </span>
-                          {displayLevel && (
+                          {displayBadge && (
                             <Badge
                               variant="secondary"
-                              className="border border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary"
+                              className="max-w-[80px] truncate border border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary"
                             >
-                              {displayLevel}
+                              {displayBadge}
                             </Badge>
                           )}
                         </div>

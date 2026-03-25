@@ -1,3 +1,9 @@
+export interface RepresentativeBadge {
+  badgeId: string;
+  name: string;
+  acquiredAt: string;
+}
+
 export interface User {
   userId: string;
   email: string;
@@ -6,6 +12,8 @@ export interface User {
   job?: string;
   level?: string;
   tags?: string[];
+  totalPoints?: number;
+  representativeBadge?: RepresentativeBadge | null;
 }
 
 export interface LoginRequest {

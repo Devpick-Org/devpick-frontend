@@ -5,8 +5,8 @@ import type {
   AnswerListResponse,
   CommunityAnswer,
   CommentDTO,
-  AiAnswer,
-  SimilarPost,
+  AiAnswerResponse,
+  SimilarPostListResponse,
   CreatePostRequest,
   CreatePostResponse,
   RefinePostRequest,
@@ -201,8 +201,11 @@ export const postsEndpoints = {
     });
   },
 
-  /** GET /posts/{postId}/ai-answer — AI 1차 답변 (미구현, mock) */
-  getAiAnswer: (postId: string): Promise<ApiResponse<AiAnswer | null>> => {
+  /**
+   * POST /posts/{postId}/ai-answer — AI 1차 답변 생성 (게시글당 1개, 이미 존재하면 기존 반환)
+   * 실제 API 연동 시: mock 블록 제거 후 `return apiClient.post<AiAnswerResponse>(\`/posts/\${postId}/ai-answer\`)` 로 교체
+   */
+  getAiAnswer: (postId: string): Promise<AiAnswerResponse> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
@@ -214,13 +217,16 @@ export const postsEndpoints = {
     });
   },
 
-  /** GET /posts/{postId}/similar — 유사 질문 (미구현, mock) */
-  getSimilarPosts: (postId: string): Promise<ApiResponse<SimilarPost[]>> => {
+  /**
+   * GET /posts/{postId}/similar — 유사 질문 조회
+   * 실제 API 연동 시: mock 블록 제거 후 `return apiClient.get<SimilarPostListResponse>(\`/posts/\${postId}/similar\`)` 로 교체
+   */
+  getSimilarPosts: (postId: string): Promise<SimilarPostListResponse> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
           success: true,
-          data: MOCK_SIMILAR_POSTS_STORE[postId] ?? [],
+          data: { posts: MOCK_SIMILAR_POSTS_STORE[postId] ?? [] },
           message: "유사 질문을 불러왔습니다",
         });
       }, 600);
