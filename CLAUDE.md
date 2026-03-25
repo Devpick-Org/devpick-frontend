@@ -147,6 +147,7 @@
 │ ┃ ┃ ┣ ActivityContent.tsx  # 활동 탭 wrapper (isLoading/isError/empty 상태 분기)
 │ ┃ ┃ ┣ ActivityTimeline.tsx # 날짜 그룹 헤더 + 활동 타임라인 아이템 목록
 │ ┃ ┃ ┗ ActivityTimelineItem.tsx # 단일 활동 타임라인 아이템 (아이콘 노드 + 카드)
+│ ┃ ┃ ┗ BadgePage.tsx           # 배지 & 포인트 화면
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
 │ ┃ ┃ ┣ constants.ts         # 직무/레벨/태그 상수 정의
 │ ┃ ┃ ┣ ProfileEditForm.tsx  # 프로필 수정 폼 (닉네임/이미지/직무/레벨/태그)
@@ -206,6 +207,8 @@
 │ ┣ post.ts              # 커뮤니티 게시글 목록 타입
 │ ┗ report.ts            # 주간 리포트 타입
 └── public/              # 정적 에셋 (이미지, 폰트)
+  ┗ icons/
+    ┗ badges/            # 배지 SVG 아이콘 (ANSWER_MASTER, FIRST_QUESTION, FIRST_SCRAP, POINT_100/500/1000, STREAK_7)
 ```
 
 > **Route Group 규칙**: 괄호로 묶인 폴더명 `(auth)`, `(main)` 은 URL에 영향을 주지 않음.
