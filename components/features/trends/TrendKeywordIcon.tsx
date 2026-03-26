@@ -5,15 +5,21 @@ import Image from "next/image";
 
 /**
  * 키워드 → 아이콘 파일 slug 변환
- * - next.js  → nextjs
- * - node.js  → nodejs
- * - c#       → c%23  (URL에서 # 은 fragment로 해석되므로 인코딩 필요)
- * - 나머지는 키워드 소문자 그대로 사용
+ * API에서 내려오는 키워드 값이 파일명과 다를 수 있으므로 가능한 변형을 모두 매핑
+ * 나머지는 키워드 소문자 그대로 사용
  */
 const KEYWORD_SLUG_MAP: Record<string, string> = {
+  // .js 계열
   "next.js": "nextjs",
   "node.js": "nodejs",
-  "c#": "c%23",
+  "vue.js": "vuejs",
+  "vue": "vuejs",
+  // 특수문자 계열
+  "c#": "csharp",
+  "c++": "cplusplus",
+  // 버전 suffix 계열
+  "html5": "html",
+  "css3": "css",
 };
 
 function getIconPath(keyword: string): string {

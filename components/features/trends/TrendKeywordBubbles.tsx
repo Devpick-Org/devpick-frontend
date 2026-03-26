@@ -18,13 +18,15 @@ export function TrendKeywordBubbles({ keywords }: TrendKeywordBubblesProps) {
     <div className="flex flex-col items-center gap-4 py-2">
       {/* 1위: 단독 한 줄, crown 아이콘 */}
       {first && (
-        <div className="relative inline-flex flex-col items-center gap-0.5">
+        <div className="relative inline-flex flex-col items-center gap-0.5 transition-all duration-200 hover:-translate-y-0.5">
           <Crown className="h-7 w-7 text-yellow-500" />
-          <TrendKeywordBubble
-            keyword={first.keyword}
-            rank={first.rank}
-            tier={first.tier}
-          />
+          <div className="pointer-events-none">
+            <TrendKeywordBubble
+              keyword={first.keyword}
+              rank={first.rank}
+              tier={first.tier}
+            />
+          </div>
         </div>
       )}
 

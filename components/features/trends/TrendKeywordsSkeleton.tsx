@@ -11,12 +11,18 @@ export function TrendKeywordsSkeleton() {
           <Skeleton className="h-3.5 w-28" />
         </div>
 
-        {/* 버블 3구역 */}
+        {/* 버블 4구역 */}
         <div className="flex flex-col items-center gap-4 py-2">
-          {/* 1~3위: large 버블 3개 */}
-          <div className="flex flex-wrap justify-center gap-3">
-            {[130, 110, 120].map((w, i) => (
-              <Skeleton key={i} className="h-12 rounded-full" style={{ width: w }} />
+          {/* 1위: 왕관 + 단독 버블 */}
+          <div className="flex flex-col items-center gap-0.5">
+            <Skeleton className="h-7 w-7 rounded-full" />
+            <Skeleton className="h-14 w-36 rounded-full" />
+          </div>
+
+          {/* 2~3위: 버블 2개 */}
+          <div className="flex justify-center gap-3">
+            {[120, 110].map((w, i) => (
+              <Skeleton key={i} className="h-11 rounded-full" style={{ width: w }} />
             ))}
           </div>
 

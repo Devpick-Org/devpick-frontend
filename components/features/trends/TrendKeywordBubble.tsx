@@ -15,10 +15,10 @@ const TIER_STYLES: Record<KeywordTier, string> = {
 };
 
 const TIER_COLOR_STYLES: Record<KeywordTier, string> = {
-  top: "bg-primary/15 text-primary hover:bg-primary/20",
-  large: "bg-primary/15 text-primary hover:bg-primary/20",
-  medium: "bg-secondary text-foreground hover:bg-secondary/80",
-  small: "bg-muted/60 text-muted-foreground hover:bg-muted/80",
+  top: "bg-primary/15 text-primary",
+  large: "bg-primary/15 text-primary",
+  medium: "bg-secondary text-foreground",
+  small: "bg-muted/60 text-muted-foreground",
 };
 
 export function TrendKeywordBubble({
@@ -30,7 +30,7 @@ export function TrendKeywordBubble({
     <span
       title={`#${rank} ${keyword}`}
       className={cn(
-        "inline-flex items-center rounded-full transition-colors cursor-default select-none",
+        "inline-flex items-center rounded-full transition-all duration-200 cursor-default select-none hover:-translate-y-0.5",
         TIER_STYLES[tier],
         TIER_COLOR_STYLES[tier],
       )}
