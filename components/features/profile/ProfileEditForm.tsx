@@ -30,6 +30,7 @@ import { ProfileTagSelector } from "@/components/features/profile/ProfileTagSele
 import { useAuthStore } from "@/store/auth.store";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { usersEndpoints } from "@/lib/api/endpoints/users";
+import { AlertCircle } from "lucide-react";
 
 /* ── Icons ── */
 
@@ -163,6 +164,9 @@ export function ProfileEditForm() {
   const [tagSearch, setTagSearch] = useState("");
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   /* 스토어 user가 나중에 채워지는 경우 동기화 (예: 페이지 직접 진입) */
   useEffect(() => {
@@ -192,6 +196,7 @@ export function ProfileEditForm() {
 
   const handleSave = async () => {
     setIsSaving(true);
+    setSaveError(null);
 
     try {
       const { data } = await usersEndpoints.updateMe({
@@ -215,13 +220,16 @@ export function ProfileEditForm() {
       toast.success("프로필이 저장되었습니다.");
     } catch (error) {
       console.error(error);
-      toast.error("프로필 저장 중 오류가 발생했습니다.");
+      setSaveError("프로필 저장 중 오류가 발생했습니다. 다시 시도해 주세요.");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+
     try {
       await authEndpoints.deleteMe();
       clearAuth();
@@ -229,7 +237,9 @@ export function ProfileEditForm() {
       router.push("/");
     } catch (error) {
       console.error(error);
-      toast.error("계정 삭제 중 오류가 발생했습니다.");
+      setDeleteError("계정 삭제 중 오류가 발생했습니다. 다시 시도해 주세요.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -248,18 +258,26 @@ export function ProfileEditForm() {
             프로필 정보를 수정하고 관리하세요.
           </p>
         </div>
-        <Button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          {isSaving ? (
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-          ) : (
-            <SaveIcon className="h-4 w-4" />
+        <div className="flex flex-col items-end gap-2">
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            {isSaving ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+            ) : (
+              <SaveIcon className="h-4 w-4" />
+            )}
+            {isSaving ? "저장 중..." : "변경 사항 저장"}
+          </Button>
+          {saveError && (
+            <p className="flex items-center gap-1.5 text-xs font-medium text-red-500">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+              {saveError}
+            </p>
           )}
-          {isSaving ? "저장 중..." : "변경 사항 저장"}
-        </Button>
+        </div>
       </div>
 
       {/* Profile Avatar + Nickname */}
@@ -450,15 +468,32 @@ export function ProfileEditForm() {
                 복구됩니다.
               </AlertDialogDescription>
             </AlertDialogHeader>
+            {deleteError && (
+              <p className="flex items-center gap-1.5 text-xs font-medium text-red-500">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                {deleteError}
+              </p>
+            )}
             <AlertDialogFooter>
-              <AlertDialogCancel className="border-0 bg-secondary text-foreground hover:bg-muted hover:text-foreground">
+              <AlertDialogCancel
+                disabled={isDeleting}
+                className="border-0 bg-secondary text-foreground hover:bg-muted hover:text-foreground"
+              >
                 취소
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteAccount}
-                className="border-0 bg-red-500 text-foreground hover:bg-red-600"
+                disabled={isDeleting}
+                className="border-0 bg-red-500 text-foreground hover:bg-red-600 disabled:opacity-60"
               >
-                계정 삭제
+                {isDeleting ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+                    삭제 중...
+                  </span>
+                ) : (
+                  "계정 삭제"
+                )}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
