@@ -94,15 +94,15 @@ export default function HomePage() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className="w-full px-4 py-8 lg:px-8">
+    <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto max-w-4xl">
         {/* Greeting */}
-        <section className="mb-8 text-center">
+        <section className="mb-6 text-center md:mb-8">
           <div className="mb-2 flex items-center justify-center gap-2">
-            <h1 className="text-2xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
+            <h1 className="text-xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
               {nickname}님을 위한 오늘의 추천
             </h1>
-            <WaveIcon className="text-2xl md:text-3xl" />
+            <WaveIcon className="text-xl md:text-3xl" />
           </div>
           <p className="text-sm text-muted-foreground font-medium md:text-base">
             관심 기술과 학습 흐름에 맞춘 개발 콘텐츠를 모아봤어요.

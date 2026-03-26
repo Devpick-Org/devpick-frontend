@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactElement } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
@@ -24,24 +25,38 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
             return <p className="mb-3 last:mb-0">{children}</p>;
           },
           pre({ children }) {
+            const codeChild = children as ReactElement<{ className?: string }>;
+            const langClass = codeChild?.props?.className ?? "";
+            const lang = langClass.startsWith("language-")
+              ? langClass.slice(9)
+              : null;
             return (
-              <pre className="my-3 overflow-x-auto rounded-lg bg-muted/60 px-4 py-3 text-xs font-mono leading-6">
-                {children}
-              </pre>
+              <div className="my-3 overflow-hidden rounded-xl border border-border">
+                {lang && (
+                  <div className="flex items-center gap-2 border-b border-border bg-secondary/80 px-4 py-2">
+                    <span className="font-mono text-xs font-medium text-muted-foreground">
+                      {lang}
+                    </span>
+                  </div>
+                )}
+                <pre className="overflow-x-auto bg-[#0d1117] px-4 py-3 text-xs font-mono leading-6 text-[#e6edf3]">
+                  {children}
+                </pre>
+              </div>
             );
           },
           code({ className: langClass, children, ...props }) {
             const isBlock = langClass?.startsWith("language-");
             if (isBlock) {
               return (
-                <code className="font-mono" {...props}>
+                <code className="font-mono text-[#e6edf3]" {...props}>
                   {children}
                 </code>
               );
             }
             return (
               <code
-                className="rounded bg-muted/60 px-1 py-0.5 text-xs font-mono"
+                className="rounded-md bg-secondary px-1.5 py-0.5 font-mono text-sm text-primary"
                 {...props}
               >
                 {children}

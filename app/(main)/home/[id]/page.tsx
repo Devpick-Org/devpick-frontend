@@ -68,24 +68,55 @@ function ContentDetailSkeleton() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0">
-          <Skeleton className="mb-8 h-4 w-24" />
-          <Skeleton className="mb-4 h-8 w-4/5" />
-          <Skeleton className="mb-2 h-4 w-48" />
-          <div className="mt-8 space-y-2.5">
+        <div className="min-w-0 pb-20">
+          {/* 뒤로가기 */}
+          <Skeleton className="mb-8 h-6 w-16" />
+
+          {/* 헤더 — 제목 + 액션 버튼 */}
+          <div className="mb-8">
+            <div className="flex items-start justify-between gap-4">
+              <Skeleton className="h-8 w-3/4" />
+              <div className="flex shrink-0 items-center gap-1">
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <Skeleton className="h-9 w-9 rounded-lg" />
+                <Skeleton className="h-9 w-9 rounded-lg" />
+              </div>
+            </div>
+
+            {/* 메타 정보 */}
+            <div className="mt-4 flex items-center gap-3">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+
+            {/* 태그 */}
+            <div className="mt-4 flex items-center gap-2">
+              <Skeleton className="h-4 w-32" />
+            </div>
+          </div>
+
+          {/* AI 요약 */}
+          <Skeleton className="mb-10 h-48 w-full rounded-2xl" />
+
+          {/* 본문 */}
+          <div className="space-y-3">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-[88%]" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-[75%]" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-[82%]" />
           </div>
         </div>
+
+        {/* 추천 콘텐츠 — 데스크탑 */}
         <div className="hidden lg:block">
           <div className="space-y-3">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-36 w-full rounded-xl" />
-            <Skeleton className="h-36 w-full rounded-xl" />
-            <Skeleton className="h-36 w-full rounded-xl" />
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-28 w-full rounded-xl" />
+            <Skeleton className="h-28 w-full rounded-xl" />
+            <Skeleton className="h-28 w-full rounded-xl" />
           </div>
         </div>
       </div>

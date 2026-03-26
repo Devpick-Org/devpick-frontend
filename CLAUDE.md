@@ -58,7 +58,7 @@
 │ ┃ ┣ layout.tsx         # TopNavVariant + QueryClientProvider
 │ ┃ ┣ home/              # 맞춤형 아티클 피드 (메인)
 │ ┃ ┃ ┣ [id]/            # 글 상세 및 AI 요약 뷰어
-│ ┃ ┃ ┃ ┗ page.tsx       # 클라이언트 컴포넌트 — useParams, useQuery(content + recommendations), 2단 레이아웃
+│ ┃ ┃ ┃ ┗ page.tsx       # 서버 컴포넌트 — content + recommendations 동시 fetch, 2단 레이아웃
 │ ┃ ┃ ┗ page.tsx         # 개인화 피드 목록 (무한 스크롤)
 │ ┃ ┣ community/         # 커뮤니티 피드 (질문/게시글 목록)
 │ ┃ ┃ ┣ write/           # 커뮤니티 글쓰기 및 AI 질문 개선
@@ -66,11 +66,13 @@
 │ ┃ ┃ ┣ [id]/            # 게시글 상세 및 AI/유저 답변
 │ ┃ ┃ ┃ ┗ page.tsx
 │ ┃ ┃ ┗ page.tsx
-│ ┃ ┣ history/           # 학습 히스토리 (학습/활동 탭)
+│ ┃ ┣ history/           # 학습 히스토리 (학습/활동/배지 탭)
 │ ┃ ┃ ┗ page.tsx
-│ ┃ ┣ profile/           # 내 프로필, 스크랩, 활동 내역
+│ ┃ ┣ profile/           # 내 프로필 설정
 │ ┃ ┃ ┗ page.tsx
-│ ┃ ┗ report/            # 주간 학습 분석 리포트 대시보드
+│ ┃ ┣ report/            # 주간 학습 분석 리포트 대시보드
+│ ┃ ┃ ┗ page.tsx
+│ ┃ ┗ trends/            # 트렌드 키워드 시각화 (DP-268)
 │ ┃   ┗ page.tsx
 │ ┣ auth/                # provider별 콜백 라우트 (Route Group 밖)
 │ ┃ ┣ github/
@@ -124,7 +126,7 @@
 │ ┃ ┃ ┣ FeedSearch.tsx       # 피드 검색 입력 컴포넌트
 │ ┃ ┃ ┗ RecommendedContents.tsx # 추천 콘텐츠 사이드바 (서버 컴포넌트, items props)
 │ ┃ ┣ community/
-│ ┃ ┃ ┣ AiAnswerSection.tsx      # AI 1차 답변 렌더링 (헤더 카드 외부, loading/success/error/empty 상태)
+│ ┃ ┃ ┣ AiAnswerSection.tsx      # AI 1차 답변 렌더링 (loading/success/error/empty 상태)
 │ ┃ ┃ ┣ AnswerList.tsx           # 답변 목록 (댓글/채택/수정/삭제, 채택 배지 반응형)
 │ ┃ ┃ ┣ AnswerSection.tsx        # 답변 작성 폼 및 전체 답변 영역 (useMutation)
 │ ┃ ┃ ┣ CommunityCard.tsx        # 커뮤니티 카드 (CommunityPost interface)
@@ -135,9 +137,9 @@
 │ ┃ ┃ ┣ PostWriteForm.tsx        # 게시글 작성 폼 (제목/내용/태그 입력)
 │ ┃ ┃ ┣ PostRefinePanel.tsx      # AI 질문 개선 패널 (우측 사이드 패널)
 │ ┃ ┃ ┗ SimilarPosts.tsx         # 유사 질문 목록 사이드바
-│ ┃ ┣ history/               # 히스토리 컴포넌트 (학습/활동 탭)
+│ ┃ ┣ history/               # 히스토리 컴포넌트 (학습/활동/배지 탭)
 │ ┃ ┃ ┣ history.constants.ts # actionType 메타데이터 (label/icon/색상) + 필터 옵션 상수
-│ ┃ ┃ ┣ HistoryTabsPage.tsx  # 학습/활동 탭 wrapper (페이지 진입점)
+│ ┃ ┃ ┣ HistoryTabsPage.tsx  # 학습/활동/배지 탭 wrapper (페이지 진입점)
 │ ┃ ┃ ┣ HistoryPage.tsx      # 학습 탭 — useQuery + 필터 상태 + groupByDate
 │ ┃ ┃ ┣ HistoryContent.tsx   # 학습 탭 wrapper (isLoading/isError/empty 상태 분기 + HistoryFilterBar)
 │ ┃ ┃ ┣ HistoryFilterBar.tsx # 액션 chip 필터 + 기간 dropdown
@@ -146,8 +148,8 @@
 │ ┃ ┃ ┣ ActivityPage.tsx     # 활동 탭 — useQuery 연동
 │ ┃ ┃ ┣ ActivityContent.tsx  # 활동 탭 wrapper (isLoading/isError/empty 상태 분기)
 │ ┃ ┃ ┣ ActivityTimeline.tsx # 날짜 그룹 헤더 + 활동 타임라인 아이템 목록
-│ ┃ ┃ ┗ ActivityTimelineItem.tsx # 단일 활동 타임라인 아이템 (아이콘 노드 + 카드)
-│ ┃ ┃ ┗ BadgePage.tsx           # 배지 & 포인트 화면
+│ ┃ ┃ ┣ ActivityTimelineItem.tsx # 단일 활동 타임라인 아이템 (아이콘 노드 + 카드)
+│ ┃ ┃ ┗ BadgePage.tsx        # 배지 & 포인트 화면
 │ ┃ ┣ profile/               # 프로필 설정 컴포넌트
 │ ┃ ┃ ┣ constants.ts         # 직무/레벨/태그 상수 정의
 │ ┃ ┃ ┣ ProfileEditForm.tsx  # 프로필 수정 폼 (닉네임/이미지/직무/레벨/태그)
@@ -160,8 +162,17 @@
 │ ┃ ┃ ┣ ReportTabsPage.tsx   # 리포트 페이지 wrapper (주간 리포트 단독)
 │ ┃ ┃ ┣ SharedReportPage.tsx # 공유 리포트 뷰어 (비로그인 접근용)
 │ ┃ ┃ ┗ WeeklyReportPage.tsx # 주간 리포트 대시보드 (바 차트/레이더 차트/PDF 저장/공유)
-│ ┃ ┗ onboarding/
-│ ┃   ┗ OnboardingForm.tsx   # 온보딩 폼 (초기 성향 파악)
+│ ┃ ┣ onboarding/
+│ ┃ ┃ ┗ OnboardingForm.tsx   # 온보딩 폼 (초기 성향 파악)
+│ ┃ ┗ trends/                # 트렌드 키워드 시각화 컴포넌트 (DP-268)
+│ ┃   ┣ TrendPage.tsx            # 트렌드 페이지 메인
+│ ┃   ┣ TrendKeywordsSection.tsx # 키워드 섹션 wrapper (카드 + 헤더)
+│ ┃   ┣ TrendKeywordBubbles.tsx  # 버블 레이아웃 (1위 왕관 포함, tier별 구역)
+│ ┃   ┣ TrendKeywordBubble.tsx   # 단일 버블 (tier별 크기/색상)
+│ ┃   ┣ TrendKeywordList.tsx     # 순위별 키워드 리스트
+│ ┃   ┣ TrendKeywordIcon.tsx     # 기술 스택 아이콘 (slug 매핑 포함)
+│ ┃   ┣ TrendKeywordsSkeleton.tsx # 스켈레톤 로더
+│ ┃   ┗ TrendKeywordsEmpty.tsx   # 빈 상태 UI
 │ ┗ providers.tsx        # QueryClientProvider 등 클라이언트 Provider 래퍼
 ├── lib/
 │ ┣ api/                 # API 클라이언트 (DP-190)
@@ -173,6 +184,7 @@
 │ ┃   ┣ history.ts       # 학습 히스토리 (HISTORY_QUERY_KEYS + historyEndpoints)
 │ ┃   ┣ posts.ts         # 커뮤니티 게시글/답변/댓글
 │ ┃   ┣ reports.ts       # 주간 리포트
+│ ┃   ┣ trends.ts        # 트렌드 키워드 조회
 │ ┃   ┗ users.ts         # 프로필 조회/수정/탈퇴
 │ ┣ auth/                # 인증/토큰 관련 유틸
 │ ┃ ┣ TokenStrategy.ts       # 토큰 저장 전략 인터페이스 (Strategy Pattern)
@@ -188,7 +200,8 @@
 │ ┃ ┣ community.ts       # 커뮤니티 상세 목 데이터 (게시글/답변/댓글/AI답변/유사질문)
 │ ┃ ┣ history.ts         # 학습 히스토리 목 데이터 (최신순 정렬 + pagination)
 │ ┃ ┣ posts.ts           # 커뮤니티 목록 목 데이터
-│ ┃ ┗ reports.ts         # 주간 리포트 목 데이터
+│ ┃ ┣ reports.ts         # 주간 리포트 목 데이터
+│ ┃ ┗ trends.ts          # 트렌드 키워드 목 데이터
 │ ┣ report/              # 리포트 관련 유틸
 │ ┃ ┗ exportPdf.ts       # 리포트 PDF 내보내기
 │ ┣ history/             # 히스토리 관련 유틸
@@ -205,10 +218,12 @@
 │ ┣ content.ts           # Content, ContentDetail, ContentFeedData 등 콘텐츠 타입
 │ ┣ history.ts           # HistoryItem, ActivityItem, HistoryPageData, HistoryParams 등 히스토리 타입
 │ ┣ post.ts              # 커뮤니티 게시글 목록 타입
-│ ┗ report.ts            # 주간 리포트 타입
+│ ┣ report.ts            # 주간 리포트 타입
+│ ┗ trends.ts            # TrendKeyword, RankedKeyword, KeywordTier 등 트렌드 타입
 └── public/              # 정적 에셋 (이미지, 폰트)
   ┗ icons/
-    ┗ badges/            # 배지 SVG 아이콘 (ANSWER_MASTER, FIRST_QUESTION, FIRST_SCRAP, POINT_100/500/1000, STREAK_7)
+    ┣ badges/            # 배지 SVG 아이콘 (ANSWER_MASTER, FIRST_QUESTION, FIRST_SCRAP, POINT_100/500/1000, STREAK_7)
+    ┗ tech/              # 기술 스택 SVG 아이콘 (56개 — python, java, react, nextjs, docker 등)
 ```
 
 > **Route Group 규칙**: 괄호로 묶인 폴더명 `(auth)`, `(main)` 은 URL에 영향을 주지 않음.

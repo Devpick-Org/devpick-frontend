@@ -107,22 +107,23 @@ export default function CommunityPage() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className="w-full px-4 py-8 lg:px-8">
+    <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
-        <section className="mb-8 flex items-end justify-between">
+        <section className="mb-6 flex items-start justify-between gap-3 md:mb-8 md:items-end">
           <div>
-            <h1 className="text-2xl font-bold tracking-[-0.01em] text-foreground">
+            <h1 className="text-xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
               커뮤니티
             </h1>
             <p className="mt-1 text-sm font-medium text-muted-foreground">
               개발자들과 질문하고 답변을 나눠보세요.
             </p>
           </div>
-          <Button asChild size="sm" className="gap-1.5">
+          <Button asChild size="sm" className="shrink-0 gap-1.5">
             <Link href="/community/write">
               <PenLine className="h-4 w-4" />
-              질문하기
+              <span className="hidden sm:inline">질문하기</span>
+              <span className="sm:hidden">질문</span>
             </Link>
           </Button>
         </section>

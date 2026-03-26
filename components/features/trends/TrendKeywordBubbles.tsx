@@ -15,7 +15,7 @@ export function TrendKeywordBubbles({ keywords }: TrendKeywordBubblesProps) {
   const secondThird = top.slice(1);
 
   return (
-    <div className="flex flex-col items-center gap-4 py-2">
+    <div className="flex flex-col items-center gap-3 py-2 md:gap-4">
       {/* 1위: 단독 한 줄, crown 아이콘 */}
       {first && (
         <div className="relative inline-flex flex-col items-center gap-0.5 transition-all duration-200 hover:-translate-y-0.5">
