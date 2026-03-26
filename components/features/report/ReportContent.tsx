@@ -53,7 +53,7 @@ export default function ReportContent({
       {/* 섹션 1: 이번 주 활동 요약 */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">이번 주 활동 요약</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard
             icon={BookOpen}
             label="읽은 글"
@@ -251,21 +251,21 @@ function StatCard({
   iconBgClass,
 }: StatCardProps) {
   return (
-    <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between">
+    <div className="bg-card border border-border rounded-xl p-3 md:p-4 flex flex-col justify-between">
       <div className="flex items-center gap-1.5 text-muted-foreground font-medium mb-2">
         <span
           className={cn(
-            "inline-flex h-8 w-8 items-center justify-center rounded-full",
+            "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full md:h-8 md:w-8",
             iconBgClass,
           )}
         >
-          <Icon className={cn("w-4 h-4", accentClass)} />
+          <Icon className={cn("w-3.5 h-3.5 md:w-4 md:h-4", accentClass)} />
         </span>
-        <span className="text-sm">{label}</span>
+        <span className="text-xs md:text-sm truncate">{label}</span>
       </div>
-      <p className="text-2xl font-bold ml-2">
+      <p className="text-xl font-bold ml-1 md:ml-2 md:text-2xl">
         {value}
-        <span className="text-sm font-medium text-muted-foreground ml-1">
+        <span className="text-xs font-medium text-muted-foreground ml-1 md:text-sm">
           {unit}
         </span>
       </p>

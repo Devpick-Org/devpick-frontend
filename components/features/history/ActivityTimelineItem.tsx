@@ -51,7 +51,9 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
     >
       {/* 본문 */}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-muted-foreground mb-1.5">{meta.label}</p>
+        <p className="text-xs font-medium text-muted-foreground mb-1.5">
+          {meta.label}
+        </p>
         {title ? (
           <p className="text-sm font-semibold text-foreground leading-snug line-clamp-1">
             {title}
@@ -93,7 +95,9 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
             meta.iconBgClass,
           )}
         >
-          <Icon className={cn(meta.iconSizeClass ?? "h-4 w-4", meta.iconClass)} />
+          <Icon
+            className={cn(meta.iconSizeClass ?? "h-4 w-4", meta.iconClass)}
+          />
         </div>
         {!isLast && <div className="w-px flex-1 min-h-3 bg-border mt-1" />}
       </div>

@@ -98,30 +98,30 @@ export default function WeeklyReportPage() {
   return (
     <>
       <div className="space-y-8">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <WeekHeader
             report={report}
             reportList={reportList}
             selectedReportId={selectedReportId}
             onSelect={setSelectedReportId}
           />
-          <div className="flex gap-2 shrink-0 mt-0.5">
+          <div className="flex gap-2 shrink-0 sm:mt-0.5">
             <button
               onClick={() =>
                 exportMutation.mutate({ weekStart: report.weekStart })
               }
               disabled={exportMutation.isPending}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 text-sm border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-4 h-4 shrink-0" />
               {exportMutation.isPending ? "저장 중..." : "저장 (PDF)"}
             </button>
             <button
               onClick={() => shareMutation.mutate(report.reportId)}
               disabled={shareMutation.isPending}
-              className="flex items-center gap-1.5 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Share2 className="w-4 h-4" />
+              <Share2 className="w-4 h-4 shrink-0" />
               {shareMutation.isPending ? "공유 중..." : "공유"}
             </button>
           </div>

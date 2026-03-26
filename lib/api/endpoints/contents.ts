@@ -14,6 +14,81 @@ import {
   MOCK_SCENARIO_ERROR,
 } from "@/lib/mock/aiSummary";
 
+// ─── Stack Overflow mock 본문 ─────────────────────────────────────────────────
+
+const MOCK_SO_QUESTION = `Java 애플리케이션에서 아래 코드를 실행하면 런타임에 \`NullPointerException\`이 발생합니다.
+
+\`\`\`java
+String text = null;
+System.out.println(text.length());
+\`\`\`
+
+개발 환경에서는 변수가 정상적으로 할당되는 것 같은데 프로덕션에서만 오류가 납니다.
+
+Java에서 \`NullPointerException\`이 발생하는 주요 원인과 체계적으로 디버깅하고 수정하는 방법이 궁금합니다.`;
+
+const MOCK_SO_ACCEPTED_ANSWER = `\`NullPointerException\` (NPE)은 메모리에 아무 위치도 가리키지 않는 참조(null)를 사용하려 할 때 발생합니다.
+
+## 주요 원인
+
+1. **null 객체의 메서드 호출**
+\`\`\`java
+String s = null;
+s.length(); // NPE 발생
+\`\`\`
+2. **null 객체의 필드 접근**
+3. **null인 기본형 래퍼 타입의 언박싱**
+
+## 해결 방법
+
+방어적 null 체크를 사용하세요.
+
+\`\`\`java
+if (text != null) {
+    System.out.println(text.length());
+}
+\`\`\`
+
+또는 Java 8 이상에서 \`Optional\`을 활용할 수 있습니다.
+
+\`\`\`java
+Optional.ofNullable(text)
+    .ifPresent(t -> System.out.println(t.length()));
+\`\`\`
+
+더 깊은 디버깅이 필요하다면 **Helpful NPE** 기능을 활성화하세요 (Java 14+, Java 17부터 기본값).
+
+\`\`\`bash
+-XX:+ShowCodeDetailsInExceptionMessages
+\`\`\`
+
+이 옵션을 켜면 *"text"가 null이기 때문에 "String.length()"를 호출할 수 없습니다* 와 같이 구체적인 메시지가 출력됩니다.`;
+
+const MOCK_SO_ANSWER_1 = `Java 14부터 도입된 **Helpful NullPointerException** 기능을 사용하면 어떤 변수가 null인지 정확히 알 수 있습니다.
+
+> "text"가 null이기 때문에 "String.length()"를 호출할 수 없습니다
+
+**Java 17** 이상에서는 기본으로 활성화되어 있고, 이전 버전에서는 아래 옵션을 추가하면 됩니다.
+
+\`\`\`bash
+-XX:+ShowCodeDetailsInExceptionMessages
+\`\`\`
+
+스택 트레이스와 함께 사용하면 디버거 없이도 문제 위치를 즉시 파악할 수 있습니다.`;
+
+const MOCK_SO_ANSWER_2 = `메서드 경계에서 빠른 실패(fail-fast)를 위해 **Objects.requireNonNull()**을 활용해 보세요.
+
+\`\`\`java
+public void process(String text) {
+    Objects.requireNonNull(text, "text는 null이 될 수 없습니다");
+    System.out.println(text.length()); // 여기서는 안전
+}
+\`\`\`
+
+이렇게 하면 로직 깊은 곳이 아닌 진입 시점에 명확한 메시지와 함께 NPE가 발생해 원인 추적이 훨씬 쉬워집니다. \`@NonNull\` 어노테이션과 정적 분석 도구(IntelliJ, SpotBugs)를 함께 사용하면 컴파일 타임에 잠재적인 NPE를 미리 잡을 수 있습니다.`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const MOCK_ORIGINAL_CONTENT_WITH_CODE = `## 들어가며
 
 React의 \`useEffect\`는 컴포넌트가 렌더링된 이후 사이드 이펙트를 처리하는 훅입니다. 하지만 의존성 배열을 잘못 관리하면 무한 루프, stale closure 같은 버그가 발생합니다. 이 글에서는 올바른 사용법과 흔한 실수를 코드로 살펴봅니다.
@@ -142,6 +217,20 @@ const MOCK_ORIGINAL_CONTENT = `## 들어가며
 이 개념을 완전히 이해하면 복잡한 로직도 명확하게 표현할 수 있습니다. 공식 문서와 함께 직접 코드를 작성해보며 익혀두세요.`;
 
 const MOCK_CONTENTS: Content[] = [
+  {
+    id: "so-001",
+    title: "Java에서 NullPointerException을 해결하는 방법은?",
+    author: "john_doe",
+    sourceName: "Stack Overflow",
+    preview:
+      "변수가 제대로 할당된 것 같은데 메서드를 호출하면 NullPointerException이 발생합니다. 주요 원인과 체계적인 디버깅 및 수정 방법이 궁금합니다.",
+    canonicalUrl: "https://stackoverflow.com/questions/218384",
+    tags: ["java", "nullpointerexception", "debugging"],
+    publishedAt: "2024-11-15T09:23:00Z",
+    isScrapped: false,
+    isLiked: true,
+    thumbnailUrl: null,
+  },
   {
     id: "content-001",
     title: "React useEffect 완전 정복: 의존성 배열부터 클린업까지",
@@ -477,6 +566,31 @@ export const contentsEndpoints = {
           reject(new Error("콘텐츠를 찾을 수 없습니다"));
           return;
         }
+
+        // Stack Overflow 전용 상세 데이터
+        if (id === "so-001") {
+          const detail: ContentDetail = {
+            ...base,
+            isScrapped: _scrappedIds.has(base.id),
+            isLiked: _likedIds.has(base.id),
+            originalContent: null,
+            isOriginalVisible: false,
+            licenseType: "CC BY-SA 4.0",
+            score: 342,
+            viewCount: 85200,
+            isAnswered: true,
+            questionContent: MOCK_SO_QUESTION,
+            acceptedAnswer: { body: MOCK_SO_ACCEPTED_ANSWER, score: 512 },
+            topAnswers: [
+              { body: MOCK_SO_ANSWER_1, score: 198 },
+              { body: MOCK_SO_ANSWER_2, score: 87 },
+            ],
+          };
+          resolve({ success: true, data: detail, message: "요청이 성공했습니다" });
+          return;
+        }
+
+        // 일반 블로그 상세 데이터
         const detail: ContentDetail = {
           ...base,
           isScrapped: _scrappedIds.has(base.id),

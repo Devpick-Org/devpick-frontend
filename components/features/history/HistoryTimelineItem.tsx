@@ -47,7 +47,9 @@ export default function HistoryTimelineItem({ item, isLast }: Props) {
     >
       {/* 본문 */}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-muted-foreground mb-1.5">{meta.label}</p>
+        <p className="text-xs font-medium text-muted-foreground mb-1.5">
+          {meta.label}
+        </p>
         {title ? (
           <p className="text-sm font-semibold text-foreground leading-snug line-clamp-1">
             {title}

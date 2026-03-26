@@ -14,12 +14,12 @@ const TRIGGER_CLASS =
 
 export default function HistoryTabsPage() {
   return (
-    <div className="w-full px-4 py-8 lg:px-8">
+    <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-bold tracking-[-0.01em] text-foreground">
+        <h1 className="text-xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
           히스토리
         </h1>
-        <p className="mt-1 text-sm font-medium text-muted-foreground mb-6">
+        <p className="mt-1 mb-6 text-sm font-medium text-muted-foreground">
           나의 학습 기록과 활동 내역을 한눈에 확인하세요.
         </p>
         <Tabs defaultValue="learning">

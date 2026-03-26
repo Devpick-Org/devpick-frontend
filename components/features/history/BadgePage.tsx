@@ -33,13 +33,16 @@ export default function BadgePage() {
       {pointsLoading ? (
         <PointsSummarySkeleton />
       ) : points ? (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <SummaryCard
             label="총 포인트"
             value={`${points.totalPoints}p`}
             highlight
           />
-          <SummaryCard label="이번 주 획득 포인트" value={`${points.weeklyPoints}p`} />
+          <SummaryCard
+            label="이번 주 획득 포인트"
+            value={`${points.weeklyPoints}p`}
+          />
           <SummaryCard label="연속 출석" value={`${points.streak}일`} />
         </div>
       ) : null}
@@ -92,8 +95,10 @@ function SummaryCard({
   icon?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card px-4 py-3 text-center">
-      <p className="text-xs text-muted-foreground mb-2">{label}</p>
+    <div className="rounded-xl border border-border bg-card px-4 py-3 flex items-center justify-between sm:flex-col sm:items-center sm:text-center">
+      <p className="text-xs font-medium text-muted-foreground sm:mb-2">
+        {label}
+      </p>
       <div className="flex items-center justify-center gap-1">
         {icon}
         <p
@@ -152,7 +157,7 @@ function EmptyState() {
 
 function PointsSummarySkeleton() {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {Array.from({ length: 3 }).map((_, i) => (
         <div
           key={i}
