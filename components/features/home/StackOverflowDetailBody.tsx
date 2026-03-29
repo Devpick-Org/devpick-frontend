@@ -1,9 +1,11 @@
+import Link from "next/link";
 import {
   ThumbsUp,
   Eye,
   MessageSquare,
   CheckCircle2,
   ExternalLink,
+  Brain,
 } from "lucide-react";
 import { ContentRenderer } from "./ContentRenderer";
 import type {
@@ -153,13 +155,20 @@ export function StackOverflowDetailBody({
         </div>
       )}
 
-      {/* 원문 보기 */}
-      <div className="flex justify-center pt-4">
+      {/* CTA */}
+      <div className="flex justify-center gap-3 pt-4">
+        <Link
+          href={`/home/${content.id}/quiz`}
+          className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
+        >
+          <Brain className="h-4 w-4" />
+          AI 퀴즈 풀기
+        </Link>
         <a
           href={canonicalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
+          className="inline-flex items-center gap-2.5 rounded-xl border border-primary px-6 py-3 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary/5"
         >
           <ExternalLink className="h-4 w-4" />
           원문 보러 가기
