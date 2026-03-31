@@ -190,21 +190,20 @@ export function AiSummary({ contentId }: AiSummaryProps) {
     if (!isExpanded) return;
     if (fetchedLevel === level) return; // 이미 해당 레벨 데이터 있음
 
-    setIsLoading(true);
-    setErrorCode(null);
-    setSummary(null);
-    contentsEndpoints
-      .getContentSummary(contentId, level)
-      .then((res) => {
+    void (async () => {
+      setIsLoading(true);
+      setErrorCode(null);
+      try {
+        const res = await contentsEndpoints.getContentSummary(contentId, level);
         setSummary(res.data);
         setFetchedLevel(level);
-      })
-      .catch((err) => {
+      } catch (err) {
         const { code } = extractApiError(err);
         setErrorCode(code ?? "UNKNOWN");
-        setSummary(null);
-      })
-      .finally(() => setIsLoading(false));
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, [contentId, level, isExpanded, fetchedLevel]);
 
   const handleRetry = useCallback(() => {
