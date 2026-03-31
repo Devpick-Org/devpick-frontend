@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: frontend-ci-${{ github.ref }}
@@ -39,3 +40,13 @@ jobs:
 
       - name: Build Next.js App
         run: npm run build
+
+      - name: Auto-merge PR
+        if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'automerge')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge "${{ github.event.pull_request.html_url }}" \
+            --squash \
+            --subject "${{ github.event.pull_request.title }}" \
+            --body "Auto-merged by bot after CI passed. (Label: automerge)"
