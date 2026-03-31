@@ -1,10 +1,18 @@
-import { CheckCircle2, XCircle, RotateCcw, ArrowLeft } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  ArrowLeft,
+  Star,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { ContentQuiz, QuizAnswer } from "@/types/quiz";
+import { calculateQuizResult } from "@/lib/quiz/quizResult";
+import type { ContentQuiz, QuizAnswer, QuizSubmitResult } from "@/types/quiz";
 
 interface QuizResultProps {
   quiz: ContentQuiz;
   answers: QuizAnswer[];
+  submitResult: QuizSubmitResult | null;
   onRetry: () => void;
   onBack: () => void;
 }
@@ -12,26 +20,21 @@ interface QuizResultProps {
 export function QuizResult({
   quiz,
   answers,
+  submitResult,
   onRetry,
   onBack,
 }: QuizResultProps) {
-  const correctCount = quiz.questions.filter((q) => {
-    const answer = answers.find((a) => a.questionId === q.id);
-    return answer?.selectedOptionId === q.correctOptionId;
-  }).length;
-
-  const passed = correctCount >= quiz.passingCount;
+  const { correctCount, passed } = calculateQuizResult(
+    quiz.questions,
+    answers,
+    quiz.passingCount,
+  );
 
   return (
     <div className="space-y-8">
       {/* 결과 요약 */}
-      <div className="flex flex-col items-center gap-4 text-center">
-        <div
-          className={cn(
-            "flex h-16 w-16 items-center justify-center rounded-2xl",
-            passed ? "bg-green-500/10" : "bg-red-500/10",
-          )}
-        >
+      <div className="flex flex-col items-center gap-2 text-center">
+        <div>
           {passed ? (
             <CheckCircle2 className="h-8 w-8 text-green-500" />
           ) : (
@@ -49,7 +52,7 @@ export function QuizResult({
           >
             {passed ? "통과!" : "아쉽네요"}
           </p>
-          <p className="text-sm text-muted-foreground font-medium">
+          <p className="mt-2 text-sm text-muted-foreground font-medium">
             {quiz.questions.length}문제 중{" "}
             <span className="font-bold text-foreground">
               {correctCount}문제
@@ -62,6 +65,16 @@ export function QuizResult({
             </p>
           )}
         </div>
+
+        {/* 포인트 획득 */}
+        {submitResult && submitResult.pointsEarned > 0 && (
+          <div className="mt-2 flex items-center gap-2 rounded-xl bg-yellow-500/10 px-4 py-2.5">
+            <Star className="h-4 w-4 text-yellow-500" />
+            <span className="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
+              퀴즈 통과! +{submitResult.pointsEarned} 포인트 획득
+            </span>
+          </div>
+        )}
       </div>
 
       {/* 문제별 정오답 */}

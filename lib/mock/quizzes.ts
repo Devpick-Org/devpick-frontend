@@ -1,8 +1,16 @@
-import type { ContentQuiz } from "@/types/quiz";
+import type { QuizQuestion } from "@/types/quiz";
 
-export const MOCK_QUIZZES: Record<string, ContentQuiz> = {
+// API 응답 래핑 없는 원본 퀴즈 데이터.
+// level 필드 및 attempt 메타데이터는 quizzesEndpoints에서 동적으로 추가.
+export interface MockQuizBase {
+  title: string;
+  questions: QuizQuestion[];
+  passingCount: number;
+  estimatedMinutes: number;
+}
+
+export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
   "so-001": {
-    contentId: "so-001",
     title: "Java NullPointerException 이해 확인",
     estimatedMinutes: 3,
     passingCount: 3, // 4문제 중 3개 이상 정답
@@ -69,7 +77,6 @@ export const MOCK_QUIZZES: Record<string, ContentQuiz> = {
     ],
   },
   "mock-001": {
-    contentId: "mock-001",
     title: "React useEffect 이해 확인",
     estimatedMinutes: 3,
     passingCount: 2, // 3문제 중 2개 이상 정답

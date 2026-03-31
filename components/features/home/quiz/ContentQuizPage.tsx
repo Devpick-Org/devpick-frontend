@@ -2,16 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft,
   Loader2,
   AlertCircle,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { quizzesEndpoints } from "@/lib/api/endpoints/quizzes";
-import type { QuizStage, QuizAnswer } from "@/types/quiz";
+import { calculateQuizResult } from "@/lib/quiz/quizResult";
+import type {
+  QuizStage,
+  QuizAnswer,
+  QuizLevel,
+  QuizSubmitResult,
+} from "@/types/quiz";
 import { QuizIntro } from "./QuizIntro";
 import { QuizProgress } from "./QuizProgress";
 import { QuizQuestionCard } from "./QuizQuestionCard";
@@ -23,11 +28,15 @@ interface ContentQuizPageProps {
 
 export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // ─── 서버 상태 ───────────────────────────────────────────────────────────────
+  const [level, setLevel] = useState<QuizLevel>("JUNIOR");
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["quiz", contentId],
-    queryFn: () => quizzesEndpoints.getContentQuiz(contentId),
+    queryKey: ["quiz", contentId, level],
+    queryFn: () => quizzesEndpoints.getContentQuiz(contentId, level),
+    placeholderData: (prev) => prev,
   });
 
   const quiz = data?.data ?? null;
@@ -36,12 +45,20 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   const [stage, setStage] = useState<QuizStage>("intro");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<QuizSubmitResult | null>(null);
+  const [submitError, setSubmitError] = useState(false);
 
   // ─── 핸들러 ──────────────────────────────────────────────────────────────────
+  function handleLevelChange(newLevel: QuizLevel) {
+    setLevel(newLevel);
+  }
+
   function handleStart() {
     setStage("quiz");
     setCurrentIndex(0);
     setAnswers([]);
+    setSubmitResult(null);
   }
 
   function handleSelect(optionId: string) {
@@ -64,14 +81,41 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
     }
   }
 
-  function handleSubmit() {
-    setStage("result");
+  async function handleSubmit() {
+    if (!quiz || isSubmitting) return;
+    setIsSubmitting(true);
+    setSubmitError(false);
+
+    const { correctCount, passed } = calculateQuizResult(
+      quiz.questions,
+      answers,
+      quiz.passingCount,
+    );
+
+    try {
+      const res = await quizzesEndpoints.submitQuiz(contentId, {
+        level,
+        score: correctCount,
+        totalQuestions: quiz.questions.length,
+        passed,
+      });
+      setSubmitResult(res.data);
+      // 인트로로 돌아올 때 hasAttempted 반영되도록 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ["quiz", contentId, level] });
+      setStage("result");
+    } catch {
+      setSubmitError(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function handleRetry() {
     setStage("intro");
     setCurrentIndex(0);
     setAnswers([]);
+    setSubmitResult(null);
+    setSubmitError(false);
   }
 
   function handleBack() {
@@ -107,9 +151,7 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   }
 
   const currentQuestion = quiz.questions[currentIndex];
-  const currentAnswer = answers.find(
-    (a) => a.questionId === currentQuestion?.id,
-  );
+  const currentAnswer = answers.find((a) => a.questionId === currentQuestion?.id);
   const isLast = currentIndex === quiz.questions.length - 1;
   const allAnswered = quiz.questions.every((q) =>
     answers.some((a) => a.questionId === q.id),
@@ -117,7 +159,14 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
 
   return (
     <div className="space-y-8">
-      {stage === "intro" && <QuizIntro quiz={quiz} onStart={handleStart} />}
+      {stage === "intro" && (
+        <QuizIntro
+          quiz={quiz}
+          selectedLevel={level}
+          onLevelChange={handleLevelChange}
+          onStart={handleStart}
+        />
+      )}
 
       {stage === "quiz" && currentQuestion && (
         <>
@@ -131,6 +180,13 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
             selectedOptionId={currentAnswer?.selectedOptionId ?? null}
             onSelect={handleSelect}
           />
+
+          {/* 제출 에러 */}
+          {submitError && (
+            <p className="text-center text-sm font-medium text-red-500">
+              제출에 실패했어요. 다시 시도해 주세요.
+            </p>
+          )}
 
           {/* 이전 / 다음·제출 버튼 */}
           <div className="flex items-center justify-between gap-3">
@@ -146,10 +202,14 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
             {isLast ? (
               <button
                 onClick={handleSubmit}
-                disabled={!allAnswered}
+                disabled={!allAnswered || isSubmitting}
                 className="flex items-center gap-1.5 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                제출하기
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "제출하기"
+                )}
               </button>
             ) : (
               <button
@@ -169,6 +229,7 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
         <QuizResult
           quiz={quiz}
           answers={answers}
+          submitResult={submitResult}
           onRetry={handleRetry}
           onBack={handleBack}
         />

@@ -1,5 +1,7 @@
 import type { ApiResponse } from "./api";
 
+export type QuizLevel = "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
+
 export interface QuizOption {
   id: string;
   text: string;
@@ -16,12 +18,37 @@ export interface QuizQuestion {
 export interface ContentQuiz {
   contentId: string;
   title: string;
+  level: QuizLevel;
   questions: QuizQuestion[];
-  passingCount: number; // 통과 기준 정답 수 (예: 3문제 이상 맞으면 통과)
+  passingCount: number;
   estimatedMinutes: number;
+  cachedAt: string;
+  expiresAt: string;
+  hasAttempted: boolean;
+  lastPassed: boolean | null;
+  lastScore: number | null;
+  lastTotalQuestions: number | null;
 }
 
 export type ContentQuizResponse = ApiResponse<ContentQuiz>;
+
+// ─── Submit ───────────────────────────────────────────────────────────────────
+
+export interface QuizSubmitRequest {
+  level: QuizLevel;
+  score: number;
+  totalQuestions: number;
+  passed: boolean;
+}
+
+export interface QuizSubmitResult {
+  passed: boolean;
+  score: number;
+  totalQuestions: number;
+  pointsEarned: number;
+}
+
+export type QuizSubmitResponse = ApiResponse<QuizSubmitResult>;
 
 // ─── 로컬 상태 타입 ────────────────────────────────────────────────────────────
 
