@@ -44,7 +44,7 @@ jobs:
       - name: Auto-merge PR
         if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'automerge')
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.MY_PAT_TOKEN }}
         run: |
           gh pr merge "${{ github.event.pull_request.html_url }}" \
             --squash \
