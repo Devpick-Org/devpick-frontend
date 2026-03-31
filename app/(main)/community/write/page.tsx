@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
 import { PostWriteForm } from "@/components/features/community/PostWriteForm";
@@ -108,6 +108,15 @@ export default function CommunityWritePage() {
 
   return (
     <div className="w-full px-4 py-8 lg:px-8">
+      {/* 게시 중 모달 */}
+      {createMutation.isPending && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4 rounded-2xl bg-card px-20 py-14 shadow-lg">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm font-semibold text-foreground">게시 중...</p>
+          </div>
+        </div>
+      )}
       <div className="mx-auto max-w-6xl">
         {/* 뒤로가기 */}
         <Link

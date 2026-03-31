@@ -10,7 +10,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DevPick",
+  title: "Trace",
   description: "당신을 위한 최적의 개발 콘텐츠 피드",
 };
 

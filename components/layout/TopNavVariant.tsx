@@ -29,7 +29,7 @@ import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { cn } from "@/lib/utils";
 
 // 로고 컴포넌트
-function DevPickLogo({ className }: { className?: string }) {
+function TraceLogo({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -88,10 +88,10 @@ export function TopNavVariant() {
           <div className="flex items-center">
             <Link href="/home" className="flex items-center gap-2.5 shrink-0">
               <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/15">
-                <DevPickLogo className="h-5 w-5 text-primary" />
+                <TraceLogo className="h-5 w-5 text-primary" />
               </div>
               <span className="text-xl font-bold tracking-tight text-foreground">
-                DevPick
+                Trace
               </span>
             </Link>
           </div>

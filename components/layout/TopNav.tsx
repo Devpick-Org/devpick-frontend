@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/auth.store";
 
-function DevPickLogo({ className }: { className?: string }) {
+function TraceLogo({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -39,7 +39,6 @@ const LEVEL_LABELS: Record<string, string> = {
   MIDDLE: "미들",
   SENIOR: "시니어",
 };
-
 
 export function TopNav() {
   const router = useRouter();
@@ -70,10 +69,10 @@ export function TopNav() {
         <div className="flex items-center gap-3">
           <Link href="/home" className="flex items-center gap-2.5 shrink-0">
             <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/15">
-              <DevPickLogo className="h-5 w-5 text-primary" />
+              <TraceLogo className="h-5 w-5 text-primary" />
             </div>
             <span className="text-xl font-bold tracking-tight text-foreground">
-              DevPick
+              Trace
             </span>
           </Link>
         </div>

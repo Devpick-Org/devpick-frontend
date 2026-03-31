@@ -41,7 +41,7 @@ export interface HistoryAnswerRef {
 
 /**
  * GET /history 단일 행동 기록 — 학습 탭
- * createdAt: "YYYY-MM-DDTHH:mm:ss" — timezone 없는 서버 로컬 시간(KST)
+ * createdAt: "YYYY-MM-DDTHH:mm:ssZ" — UTC ISO 8601 (KST = UTC+9)
  * 삭제된 참조 항목은 해당 필드가 null로 반환됨
  * points: 해당 행동으로 적립된 포인트 (미지원 시 null)
  */
@@ -57,7 +57,7 @@ export interface HistoryItem {
 
 /**
  * GET /history 단일 행동 기록 — 활동 탭
- * createdAt: "YYYY-MM-DDTHH:mm:ss" — timezone 없는 서버 로컬 시간(KST)
+ * createdAt: "YYYY-MM-DDTHH:mm:ssZ" — UTC ISO 8601 (KST = UTC+9)
  * 삭제된 참조 항목은 해당 필드가 null로 반환됨
  * points: 해당 행동으로 적립된 포인트 (미지원 시 null)
  */

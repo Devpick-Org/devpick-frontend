@@ -115,7 +115,7 @@ export function OnboardingForm() {
           </svg>
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground text-balance">
-          DevPick에 오신 것을 환영합니다!
+          Trace에 오신 것을 환영합니다!
         </h1>
         <p className="mt-2 text-sm font-medium text-muted-foreground text-balance">
           맞춤형 피드를 위해 정보를 입력해 주세요.
@@ -241,7 +241,7 @@ export function OnboardingForm() {
                   설정 중...
                 </span>
               ) : (
-                <span>DevPick 시작하기</span>
+                <span>Trace 시작하기</span>
               )}
             </Button>
           )}
