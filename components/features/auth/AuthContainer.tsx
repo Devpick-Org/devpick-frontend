@@ -7,7 +7,7 @@ import { SignupForm } from "./SignupForm";
 import { SocialAuthButtons } from "./SocialAuthButtons";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 
-function DevPickLogo() {
+function TraceLogo() {
   return (
     <div className="mb-8 text-center">
       <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
@@ -25,7 +25,7 @@ function DevPickLogo() {
         </svg>
       </div>
       <h1 className="text-2xl font-bold tracking-tight text-foreground">
-        DevPick
+        Trace
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground font-medium">
         {"개발자를 위한 맞춤형 학습 플랫폼"}
@@ -56,16 +56,20 @@ export function AuthContainer({ oauthError }: AuthContainerProps) {
       window.location.href = data.data.authorizationUrl;
     } catch {
       setLoadingProvider(null);
-      setSocialError("소셜 로그인 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      setSocialError(
+        "소셜 로그인 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+      );
     }
   };
 
   return (
     <div className="mx-auto w-full max-w-[464px]">
-      <DevPickLogo />
+      <TraceLogo />
 
       {(oauthError || socialError) && (
-        <p className="mb-4 text-sm text-center text-red-500">{oauthError || socialError}</p>
+        <p className="mb-4 text-sm text-center text-red-500">
+          {oauthError || socialError}
+        </p>
       )}
 
       <div className="rounded-2xl bg-card p-6 transition-all duration-300">
@@ -105,7 +109,7 @@ export function AuthContainer({ oauthError }: AuthContainerProps) {
       </div>
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
-        {"계속 진행하면 DevPick의 "}
+        {"계속 진행하면 Trace의 "}
         <button
           type="button"
           className="cursor-pointer text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"

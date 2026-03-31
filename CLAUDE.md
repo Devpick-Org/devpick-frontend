@@ -1,6 +1,6 @@
-# DevPick Frontend - Claude Code Context
+# Trace Frontend - Claude Code Context
 
-당신은 'DevPick' 프론트엔드 개발 전문가입니다. 이 문서를 바탕으로 프로젝트의 문맥을 이해하고 가이드라인을 준수하세요.
+당신은 'Trace' 프론트엔드 개발 전문가입니다. 이 문서를 바탕으로 프로젝트의 문맥을 이해하고 가이드라인을 준수하세요.
 
 > **참고**: 이 문서는 프로젝트 전체의 아키텍처, 기술 스택, API 명세, 코드 컨벤션 및 CI/CD 전략을 정의하는 단일 진실 공급원(SSOT, Single Source of Truth)입니다.
 
@@ -8,7 +8,7 @@
 
 ## 1. 프로젝트 개요
 
-**DevPick** — 개발자 성장형 통합 플랫폼
+**Trace** — 개발자 성장형 통합 플랫폼
 
 > 개발 콘텐츠 탐색 → AI 요약/질문 → 커뮤니티 소통 → 성장 기록/리포트를 하나의 흐름으로 연결
 
@@ -58,7 +58,9 @@
 │ ┃ ┣ layout.tsx         # TopNavVariant + QueryClientProvider
 │ ┃ ┣ home/              # 맞춤형 아티클 피드 (메인)
 │ ┃ ┃ ┣ [id]/            # 글 상세 및 AI 요약 뷰어
-│ ┃ ┃ ┃ ┗ page.tsx       # "use client" — useQuery로 content + recommendations fetch, 2단 레이아웃
+│ ┃ ┃ ┃ ┣ page.tsx       # "use client" — useQuery로 content + recommendations fetch, 2단 레이아웃
+│ ┃ ┃ ┃ ┗ quiz/          # AI 퀴즈
+│ ┃ ┃ ┃   ┗ page.tsx     # 퀴즈 페이지 (ContentQuizPage 진입점)
 │ ┃ ┃ ┗ page.tsx         # 개인화 피드 목록 (무한 스크롤)
 │ ┃ ┣ community/         # 커뮤니티 피드 (질문/게시글 목록)
 │ ┃ ┃ ┣ write/           # 커뮤니티 글쓰기 및 AI 질문 개선
@@ -127,7 +129,13 @@
 │ ┃ ┃ ┣ FeedCard.tsx               # 피드 카드 (FeedCardItem interface)
 │ ┃ ┃ ┣ FeedSearch.tsx             # 피드 검색 입력 컴포넌트
 │ ┃ ┃ ┣ RecommendedContents.tsx    # 추천 콘텐츠 사이드바 (items props)
-│ ┃ ┃ ┗ StackOverflowDetailBody.tsx # SO 전용 본문 (질문/채택답변/다른답변/원문 CTA, SOStats export)
+│ ┃ ┃ ┣ StackOverflowDetailBody.tsx # SO 전용 본문 (질문/채택답변/다른답변/원문 CTA, SOStats export)
+│ ┃ ┃ ┗ quiz/                      # AI 퀴즈 컴포넌트
+│ ┃ ┃   ┣ ContentQuizPage.tsx      # 퀴즈 전체 흐름 관리 ("use client", intro→quiz→result 스테이지)
+│ ┃ ┃   ┣ QuizIntro.tsx            # 퀴즈 인트로 (난이도 선택, 이전 시도 결과 표시)
+│ ┃ ┃   ┣ QuizProgress.tsx         # 진행률 바 (현재 문제 / 전체)
+│ ┃ ┃   ┣ QuizQuestionCard.tsx     # 단일 문제 카드 (선택지 버튼)
+│ ┃ ┃   ┗ QuizResult.tsx           # 결과 화면 (정오답, 포인트 획득)
 │ ┃ ┣ community/
 │ ┃ ┃ ┣ AiAnswerSection.tsx      # AI 1차 답변 렌더링 (loading/success/error/empty 상태)
 │ ┃ ┃ ┣ AnswerList.tsx           # 답변 목록 (댓글/채택/수정/삭제, 채택 배지 반응형)
@@ -186,6 +194,7 @@
 │ ┃   ┣ contents.ts      # 피드/상세/추천/좋아요/스크랩/AI요약 등
 │ ┃   ┣ history.ts       # 학습 히스토리 (HISTORY_QUERY_KEYS + historyEndpoints)
 │ ┃   ┣ posts.ts         # 커뮤니티 게시글/답변/댓글
+│ ┃   ┣ quizzes.ts       # AI 퀴즈 조회/제출 (mock, TODO: API 연동)
 │ ┃   ┣ reports.ts       # 주간 리포트
 │ ┃   ┣ trends.ts        # 트렌드 키워드 조회
 │ ┃   ┗ users.ts         # 프로필 조회/수정/탈퇴
@@ -203,13 +212,19 @@
 │ ┃ ┣ community.ts       # 커뮤니티 상세 목 데이터 (게시글/답변/댓글/AI답변/유사질문)
 │ ┃ ┣ history.ts         # 학습 히스토리 목 데이터 (최신순 정렬 + pagination)
 │ ┃ ┣ posts.ts           # 커뮤니티 목록 목 데이터
+│ ┃ ┣ quizzes.ts         # AI 퀴즈 원본 데이터 (MOCK_QUIZ_BASES — level/attempt 메타 제외)
 │ ┃ ┣ reports.ts         # 주간 리포트 목 데이터
 │ ┃ ┗ trends.ts          # 트렌드 키워드 목 데이터
+│ ┣ quiz/                # 퀴즈 관련 유틸
+│ ┃ ┣ quizResult.ts      # calculateQuizResult() — 정답 수/통과 여부 계산 순수 함수
+│ ┃ ┗ quizResult.test.ts # 단위 테스트 (일부 정답 / 통과 / 미응답 포함 3케이스)
 │ ┣ report/              # 리포트 관련 유틸
 │ ┃ ┗ exportPdf.ts       # 리포트 PDF 내보내기
 │ ┣ history/             # 히스토리 관련 유틸
-│ ┃ ┗ groupByDate.ts     # PeriodFilter, DateGroup, filterByPeriod(), filterByActions(), groupByDate()
-│ ┗ utils.ts             # cn(), formatDate(), formatDateTime(), formatTime(), formatWeekLabel()
+│ ┃ ┣ groupByDate.ts     # PeriodFilter, DateGroup, filterByPeriod(), filterByActions(), groupByDate()
+│ ┃ ┗ groupByDate.test.ts # 단위 테스트
+│ ┣ utils.ts             # cn(), formatDate(), formatDateTime(), formatTime(), formatWeekLabel()
+│ ┗ utils.test.ts        # 단위 테스트
 ├── store/               # Zustand 전역 상태 (DP-191)
 │ ┣ auth.store.ts        # 인증 상태 (user, accessToken, isAuthenticated, setAuth, clearAuth)
 │ ┣ content.store.ts     # 콘텐츠 관련 전역 상태
@@ -221,6 +236,7 @@
 │ ┣ content.ts           # Content, ContentDetail, StackOverflowContentDetail, isStackOverflowContent 등 콘텐츠 타입
 │ ┣ history.ts           # HistoryItem, ActivityItem, HistoryPageData, HistoryParams 등 히스토리 타입
 │ ┣ post.ts              # 커뮤니티 게시글 목록 타입
+│ ┣ quiz.ts              # QuizLevel, ContentQuiz, QuizSubmitRequest, QuizSubmitResult 등 퀴즈 타입
 │ ┣ report.ts            # 주간 리포트 타입
 │ ┗ trends.ts            # TrendKeyword, RankedKeyword, KeywordTier 등 트렌드 타입
 └── public/              # 정적 에셋 (이미지, 폰트)

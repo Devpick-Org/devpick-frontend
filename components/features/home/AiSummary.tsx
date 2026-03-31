@@ -180,24 +180,32 @@ export function AiSummary({ contentId }: AiSummaryProps) {
   const [level, setLevel] = useState<AiSummaryLevel>("JUNIOR");
   const [summary, setSummary] = useState<AiSummaryType | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
+  // 마지막으로 fetch한 레벨 추적 — 같은 레벨로 닫았다 다시 열어도 재호출 방지
+  const [fetchedLevel, setFetchedLevel] = useState<AiSummaryLevel | null>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!isExpanded) return;
+    if (fetchedLevel === level) return; // 이미 해당 레벨 데이터 있음
+
     setIsLoading(true);
     setErrorCode(null);
+    setSummary(null);
     contentsEndpoints
       .getContentSummary(contentId, level)
-      .then((res) => setSummary(res.data))
+      .then((res) => {
+        setSummary(res.data);
+        setFetchedLevel(level);
+      })
       .catch((err) => {
         const { code } = extractApiError(err);
         setErrorCode(code ?? "UNKNOWN");
         setSummary(null);
       })
       .finally(() => setIsLoading(false));
-  }, [contentId, level]);
+  }, [contentId, level, isExpanded, fetchedLevel]);
 
   const handleRetry = useCallback(() => {
     setIsRetrying(true);

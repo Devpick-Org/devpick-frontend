@@ -1,6 +1,6 @@
-# Devpick FE
+# Trace FE
 
-Devpick 캡스톤 프론트엔드 저장소입니다.
+Trace 캡스톤 프론트엔드 저장소입니다.
 
 ## 팀 Git 규칙
 

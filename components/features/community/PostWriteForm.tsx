@@ -197,9 +197,12 @@ export function PostWriteForm({
 
         {/* 본문 */}
         <div>
-          <label className="mb-1.5 block text-sm font-semibold text-foreground">
-            본문 <span className="text-destructive">*</span>
-          </label>
+          <div className="mb-1.5 flex items-center gap-2">
+            <label className="text-sm font-semibold text-foreground">
+              본문 <span className="text-destructive">*</span>
+            </label>
+            <span className="text-xs font-medium text-muted-foreground">마크다운 지원</span>
+          </div>
           <textarea
             value={content}
             onChange={(e) => {
