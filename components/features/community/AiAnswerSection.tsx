@@ -58,7 +58,7 @@ function AiAnswerError({
   isRetrying?: boolean;
 }) {
   return (
-    <div className="flex min-h-[72px] items-center justify-between gap-4">
+    <div className="flex min-h-[72px] items-center justify-center gap-4">
       <p className="text-sm text-muted-foreground font-medium">
         AI 답변을 불러오지 못했습니다.
       </p>
@@ -67,10 +67,10 @@ function AiAnswerError({
           onClick={onRetry}
           disabled={isRetrying}
           className={cn(
-            "flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium transition-colors",
+            "flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer",
             isRetrying
               ? "cursor-not-allowed text-muted-foreground/50"
-              : "text-muted-foreground hover:border-primary/40 hover:text-primary",
+              : "text-muted-foreground hover:text-primary",
           )}
         >
           <RefreshCw className={cn("h-3 w-3", isRetrying && "animate-spin")} />
