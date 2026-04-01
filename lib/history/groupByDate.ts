@@ -17,15 +17,25 @@ export interface DateGroup<T = HistoryItem> {
 }
 
 /**
- * createdAt에서 날짜 키 추출: "YYYY-MM-DDTHH:mm:ss" → "YYYY-MM-DD"
+ * createdAt에서 KST(Asia/Seoul) 기준 날짜 키 추출: "YYYY-MM-DDTHH:mm:ssZ" → "YYYY-MM-DD"
  *
- * [이유] 백엔드가 timezone 없는 서버 로컬 시간(KST)을 반환함.
- * new Date("2026-03-21T10:00:00")는 브라우저 환경에 따라 로컬/UTC 해석이 달라질 수 있으므로
- * Date 객체 생성 없이 문자열 슬라이싱으로 날짜 부분만 추출.
- * → 브라우저 timezone에 무관하게 서버 기준 날짜를 보존.
+ * [이유] 백엔드가 ISO 8601 UTC(Z) 형식으로 반환하므로 단순 슬라이싱 시
+ * KST 자정(UTC 15:00) 전후 아이템이 하루 밀리는 버그가 발생한다.
+ * Intl.DateTimeFormat으로 Asia/Seoul 기준 날짜를 추출해 timezone에 무관하게 정확히 동작한다.
  */
 function toLocalDateKey(dateStr: string): string {
-  return dateStr.slice(0, 10); // "YYYY-MM-DD"
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(dateStr));
+
+  const y = parts.find((p) => p.type === "year")?.value ?? "";
+  const m = parts.find((p) => p.type === "month")?.value ?? "";
+  const d = parts.find((p) => p.type === "day")?.value ?? "";
+
+  return `${y}-${m}-${d}`; // "YYYY-MM-DD"
 }
 
 /** "YYYY-MM-DD" → "2026년 3월 21일" */
@@ -39,12 +49,10 @@ function toLocalDateLabel(dateKey: string): string {
 }
 
 /**
- * period 필터 — createdAt 날짜 부분 기준 문자열 비교 (제네릭: 학습/활동 공용)
+ * period 필터 — KST 기준 날짜 문자열 비교 (제네릭: 학습/활동 공용)
  *
- * [이유] createdAt이 timezone 없는 서버 로컬 시간이므로
- * new Date(createdAt)의 getTime() 비교 대신 날짜 문자열 비교 사용.
- * cutoff는 브라우저 로컬 날짜(한국 사용자 = KST)로 계산하며,
- * 서버 로컬 시간(KST)과 동일 기준이므로 일관된 필터링이 가능함.
+ * [이유] createdAt이 UTC(Z) 형식이므로 toLocalDateKey로 KST 날짜를 추출해 비교한다.
+ * cutoff도 브라우저 로컬 날짜(KST)로 계산하므로 동일 기준으로 일관된 필터링이 가능하다.
  */
 export function filterByPeriod<T extends { createdAt: string }>(
   items: T[],
@@ -55,12 +63,12 @@ export function filterByPeriod<T extends { createdAt: string }>(
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
   cutoff.setHours(0, 0, 0, 0);
-  // 브라우저 로컬 날짜를 "YYYY-MM-DD" 형식으로 변환
+  // 브라우저 로컬 날짜(KST)를 "YYYY-MM-DD" 형식으로 변환
   const y = cutoff.getFullYear();
   const m = String(cutoff.getMonth() + 1).padStart(2, "0");
   const d = String(cutoff.getDate()).padStart(2, "0");
   const cutoffKey = `${y}-${m}-${d}`;
-  return items.filter((item) => item.createdAt.slice(0, 10) >= cutoffKey);
+  return items.filter((item) => toLocalDateKey(item.createdAt) >= cutoffKey);
 }
 
 /** actionType 필터 — 학습 탭 전용 */
