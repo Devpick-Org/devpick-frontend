@@ -39,7 +39,10 @@ function buildMockRefineResult(req: RefinePostRequest): RefinePostData {
   // 본문 구조화: 원문을 "문제 상황" 섹션으로 감싸고 누락 섹션을 plain text로 추가
   const sections: string[] = [`[문제 상황]\n${content.trim()}`];
   if (!hasEnv) sections.push("[환경 정보]\n- 사용 언어 / 프레임워크:\n- 버전:");
-  if (!hasError) sections.push("[에러 메시지]\n(에러 메시지나 예외 내용을 여기에 붙여 주세요)");
+  if (!hasError)
+    sections.push(
+      "[에러 메시지]\n(에러 메시지나 예외 내용을 여기에 붙여 주세요)",
+    );
   if (!hasTried) sections.push("[시도해본 것]\n- ");
   if (!hasExpected) sections.push("[기대하는 결과]\n- ");
 
@@ -51,11 +54,22 @@ function buildMockRefineResult(req: RefinePostRequest): RefinePostData {
 
   // Suggestions: 누락 항목에 대한 개선 제안
   const suggestions: string[] = [];
-  if (!hasEnv) suggestions.push("사용 중인 언어·프레임워크 버전 정보를 추가하면 더 정확한 답변을 받을 수 있어요.");
-  if (!hasError) suggestions.push("발생하는 에러 메시지나 예외 내용을 그대로 붙여 주세요.");
-  if (!hasTried) suggestions.push("이미 시도해본 방법을 함께 적어 주시면 중복 제안을 줄일 수 있어요.");
-  if (!hasExpected) suggestions.push("기대하는 결과를 구체적으로 적어 주시면 질문 의도가 명확해져요.");
-  if (suggestions.length === 0) suggestions.push("질문 구성이 잘 되어 있어요. 그대로 게시해도 좋습니다.");
+  if (!hasEnv)
+    suggestions.push(
+      "사용 중인 언어·프레임워크 버전 정보를 추가하면 더 정확한 답변을 받을 수 있어요.",
+    );
+  if (!hasError)
+    suggestions.push("발생하는 에러 메시지나 예외 내용을 그대로 붙여 주세요.");
+  if (!hasTried)
+    suggestions.push(
+      "이미 시도해본 방법을 함께 적어 주시면 중복 제안을 줄일 수 있어요.",
+    );
+  if (!hasExpected)
+    suggestions.push(
+      "기대하는 결과를 구체적으로 적어 주시면 질문 의도가 명확해져요.",
+    );
+  if (suggestions.length === 0)
+    suggestions.push("질문 구성이 잘 되어 있어요. 그대로 게시해도 좋습니다.");
 
   return { refinedTitle, refinedContent, suggestions };
 }
@@ -67,9 +81,14 @@ function enrichPost(post: (typeof MOCK_POSTS)[number]) {
   const answers = mockAnswerStore.getAll(post.id);
   const answerCount = answers.length;
   const topAnswer =
-    answers.find((a) => a.isAdopted) ?? (answers.length > 0 ? answers[0] : null);
+    answers.find((a) => a.isAdopted) ??
+    (answers.length > 0 ? answers[0] : null);
   const topAnswerPreview = topAnswer
-    ? topAnswer.content.replace(/```[\s\S]*?```/g, "").replace(/[#*`_>]/g, "").trim().slice(0, 120)
+    ? topAnswer.content
+        .replace(/```[\s\S]*?```/g, "")
+        .replace(/[#*`_>]/g, "")
+        .trim()
+        .slice(0, 120)
     : null;
   return { ...post, answerCount, topAnswerPreview };
 }
@@ -87,7 +106,9 @@ export const postsEndpoints = {
     return new Promise((resolve) => {
       setTimeout(() => {
         const start = page * size;
-        const pagedPosts = MOCK_POSTS.slice(start, start + size).map(enrichPost);
+        const pagedPosts = MOCK_POSTS.slice(start, start + size).map(
+          enrichPost,
+        );
         resolve({
           success: true,
           data: {
@@ -186,8 +207,7 @@ export const postsEndpoints = {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const postExists =
-          !!MOCK_POST_STORE[postId] ||
-          MOCK_POSTS.some((p) => p.id === postId);
+          !!MOCK_POST_STORE[postId] || MOCK_POSTS.some((p) => p.id === postId);
         if (!postExists) {
           reject(new Error("게시글을 찾을 수 없습니다"));
           return;
@@ -412,7 +432,11 @@ export const postsEndpoints = {
           answerCount: 0,
           createdAt: newPost.createdAt,
         });
-        resolve({ success: true, data: newPost, message: "질문이 게시되었습니다" });
+        resolve({
+          success: true,
+          data: newPost,
+          message: "질문이 게시되었습니다",
+        });
       }, 700);
     });
   },
