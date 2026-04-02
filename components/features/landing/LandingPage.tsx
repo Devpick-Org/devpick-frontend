@@ -1,3 +1,5 @@
+"use client";
+
 import { Fragment } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,6 +15,91 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+
+// ─── Motion Helpers ───────────────────────────────────────────────────────────
+
+/** 마운트 즉시 아래→위 fade (HeroSection용) */
+function FadeUp({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: reduced ? 0 : 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** 뷰포트 진입 시 아래→위 fade (FeaturesSection 등 스크롤 섹션용) */
+function FadeUpOnView({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: reduced ? 0 : 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** stagger 자식을 감싸는 컨테이너 */
+const staggerContainer = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
+};
+
+/** stagger 개별 아이템 */
+function StaggerItem({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const reduced = useReducedMotion();
+  const itemVariants = {
+    hidden: { opacity: 0, y: reduced ? 0 : 18 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.55,
+        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+      },
+    },
+  };
+  return (
+    <motion.div className={className} variants={itemVariants}>
+      {children}
+    </motion.div>
+  );
+}
 
 // ─── 공통 로고 SVG ────────────────────────────────────────────────────────────
 function TraceLogo({ className }: { className?: string }) {
@@ -129,7 +216,7 @@ function LaptopMockup() {
         </div>
 
         {/* 앱 콘텐츠 */}
-        <div className="flex h-[220px] lg:h-[272px]">
+        <div className="flex h-[260px] lg:h-[320px]">
           {/* 피드 영역 */}
           <div className="flex-1 space-y-2 overflow-hidden p-3">
             {/* 검색바 */}
@@ -197,104 +284,63 @@ function HeroSection() {
       />
 
       <div className="relative mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-6 lg:gap-16">
+        <div className="grid items-start gap-10 md:grid-cols-2 md:gap-6 lg:gap-16">
           {/* ── 좌측: 텍스트 ── */}
           <div className="text-center md:text-left">
             {/* Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-              <Zap className="h-3.5 w-3.5" />
-              개발자 성장형 학습 플랫폼
-            </div>
+            <FadeUp delay={0}>
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+                <Zap className="h-3.5 w-3.5" />
+                개발자 성장형 학습 플랫폼
+              </div>
+            </FadeUp>
 
-            <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              <span className="mb-3 block">흩어진 개발 지식을</span>
-              <span className="text-primary">하나의 학습 흐름으로</span>
-            </h1>
+            <FadeUp delay={0.1}>
+              <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+                <span className="mb-3 block">흩어진 개발 지식을</span>
+                <span className="text-primary">하나의 학습 흐름으로</span>
+              </h1>
+            </FadeUp>
 
-            <p className="mx-auto mb-8 max-w-lg text-lg font-medium leading-relaxed text-muted-foreground md:mx-0">
-              기술 블로그, AI 요약, 커뮤니티, 리포트까지.
-              <br />
-              흩어진 학습을 하나의 흐름으로 연결하세요.
-            </p>
+            <FadeUp delay={0.2}>
+              <p className="mx-auto mb-8 max-w-lg text-lg font-medium leading-relaxed text-muted-foreground md:mx-0">
+                기술 블로그, AI 요약, 커뮤니티, 리포트까지.
+                <br />
+                흩어진 학습을 하나의 흐름으로 연결하세요.
+              </p>
+            </FadeUp>
 
-            <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start">
-              <Button
-                size="lg"
-                asChild
-                className="h-12 rounded-full px-8 has-[>svg]:px-8 text-base"
-              >
-                <Link href="/auth">
-                  로그인하기
-                  <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                asChild
-                className="h-12 rounded-full border-0 px-8 text-base bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground"
-              >
-                <Link href="/home">로그인 없이 둘러보기</Link>
-              </Button>
-            </div>
+            <FadeUp delay={0.3}>
+              <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start">
+                <Button
+                  size="lg"
+                  asChild
+                  className="h-12 rounded-full px-8 has-[>svg]:px-8 text-base"
+                >
+                  <Link href="/auth">
+                    로그인하기
+                    <ArrowRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  asChild
+                  className="h-12 rounded-full border-0 px-8 text-base bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground"
+                >
+                  <Link href="/home">로그인 없이 둘러보기</Link>
+                </Button>
+              </div>
+            </FadeUp>
           </div>
 
           {/* ── 우측: 제품 프리뷰 ── */}
-          <div className="relative hidden md:block">
-            {/* Floating: 트렌드 키워드 카드
-                md: 카드 안쪽에 붙이고 크기 축소 / lg: 바깥으로 삐져나옴 */}
-            <div className="absolute left-0 top-6 z-20 w-28 translate-x-0 rounded-xl border border-border bg-card p-2.5 shadow-lg lg:w-36 lg:-translate-x-1/4 lg:p-3">
-              <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground lg:mb-2 lg:text-[10px]">
-                트렌드 키워드
-              </p>
-              {[
-                { kw: "TypeScript", delta: "+12%" },
-                { kw: "React 19", delta: "+8%" },
-                { kw: "Docker", delta: "+5%" },
-              ].map(({ kw, delta }) => (
-                <div
-                  key={kw}
-                  className="flex items-center justify-between py-0.5"
-                >
-                  <span className="text-[10px] text-foreground">#{kw}</span>
-                  <span className="text-[9px] font-semibold text-green-500 lg:text-[10px]">
-                    {delta}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Floating: AI 요약 카드
-                md: 카드 안쪽에 붙이고 크기 축소 / lg: 바깥으로 삐져나옴 */}
-            <div className="absolute bottom-6 right-0 z-20 w-36 translate-x-0 rounded-xl border border-border bg-card p-2.5 shadow-lg lg:w-44 lg:translate-x-1/4 lg:p-3">
-              <div className="mb-1.5 flex items-center gap-1.5 lg:mb-2">
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10">
-                  <Zap className="h-3 w-3 text-primary" />
-                </div>
-                <span className="text-[10px] font-semibold text-foreground">
-                  AI 요약 완료
-                </span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="h-1.5 w-full rounded-full bg-muted" />
-                <div className="h-1.5 w-4/5 rounded-full bg-muted" />
-                <div className="h-1.5 w-3/5 rounded-full bg-muted" />
-                <div className="mt-2 flex gap-1">
-                  <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] text-primary">
-                    React
-                  </span>
-                  <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] text-primary">
-                    Hooks
-                  </span>
-                </div>
-              </div>
-            </div>
-
+          <FadeUp delay={0.45} className="relative hidden md:block">
             {/* 메인 노트북 목업: md에서 패딩 축소 */}
-            <div className="px-3 pt-3 pb-4 lg:px-8 lg:pt-4 lg:pb-6">
+            <div className="px-0 pt-2 pb-3 lg:px-4 lg:pt-3 lg:pb-4">
               <LaptopMockup />
             </div>
-          </div>
+          </FadeUp>
         </div>
       </div>
     </section>
@@ -385,7 +431,7 @@ function FeaturesSection() {
   return (
     <section className="bg-muted/40 pt-16 pb-24">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="mb-14 text-center">
+        <FadeUpOnView className="mb-14 text-center">
           <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
             Features
           </p>
@@ -395,32 +441,37 @@ function FeaturesSection() {
           <p className="mt-4 text-muted-foreground">
             흩어진 개발 학습 도구를 하나의 플랫폼에서 경험하세요.
           </p>
-        </div>
+        </FadeUpOnView>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div
+          className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-60px" }}
+        >
           {FEATURES.map((feature) => {
             const Icon = feature.icon;
             return (
-              <div
-                key={feature.title}
-                className="rounded-xl bg-card p-6 transition-shadow hover:shadow-md"
-              >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10">
-                  <Icon className="h-5 w-5 text-primary" />
+              <StaggerItem key={feature.title} className="h-full">
+                <div className="h-full rounded-xl bg-card p-6 transition-shadow hover:shadow-md">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="mb-2 font-semibold text-foreground">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm font-medium leading-relaxed text-muted-foreground">
+                    {feature.desc}
+                  </p>
                 </div>
-                <h3 className="mb-2 font-semibold text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="text-sm font-medium leading-relaxed text-muted-foreground">
-                  {feature.desc}
-                </p>
-              </div>
+              </StaggerItem>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* 콘텐츠 소스 — Features 보강 정보 블록 */}
-        <div className="mx-auto mt-12 max-w-4xl pt-10">
+        <FadeUpOnView delay={0.1} className="mx-auto mt-12 max-w-4xl pt-10">
           <p className="mb-12 text-center text-md font-medium text-muted-foreground">
             이런 플랫폼의 기술 콘텐츠를 모아요.
           </p>
@@ -450,7 +501,7 @@ function FeaturesSection() {
               </div>
             ))}
           </div>
-        </div>
+        </FadeUpOnView>
       </div>
     </section>
   );
@@ -468,7 +519,7 @@ function FlowSection() {
   return (
     <section className="bg-background py-24">
       <div className="mx-auto max-w-5xl px-4 lg:px-8">
-        <div className="mb-14 text-center">
+        <FadeUpOnView className="mb-14 text-center">
           <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
             How it works
           </p>
@@ -478,14 +529,20 @@ function FlowSection() {
           <p className="mt-4 text-muted-foreground font-medium">
             탐색부터 기록까지, 개발자 성장의 전 과정을 지원합니다.
           </p>
-        </div>
+        </FadeUpOnView>
 
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-0">
+        <motion.div
+          className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-0"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-60px" }}
+        >
           {FLOW_STEPS.map((step, i) => {
             const Icon = step.icon;
             return (
               <Fragment key={step.label}>
-                <div className="flex flex-1 flex-col items-center text-center">
+                <StaggerItem className="flex flex-1 flex-col items-center text-center">
                   <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
                     <Icon className="h-6 w-6 text-primary" />
                   </div>
@@ -493,7 +550,7 @@ function FlowSection() {
                   <p className="mt-1 text-sm text-muted-foreground font-medium">
                     {step.desc}
                   </p>
-                </div>
+                </StaggerItem>
                 {i < FLOW_STEPS.length - 1 && (
                   <div className="hidden items-center justify-center pt-5 sm:flex">
                     <ChevronRight className="h-5 w-5 text-muted-foreground" />
@@ -502,7 +559,7 @@ function FlowSection() {
               </Fragment>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -532,7 +589,7 @@ function CtaSection() {
             size="lg"
             variant="outline"
             asChild
-            className="h-12 rounded-full border-primary-foreground/30 px-8 text-base text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            className="h-12 rounded-full border-0 px-8 has-[>svg]:px-8 text-base bg-white/15 text-white hover:bg-white/25 hover:text-white"
           >
             <Link href="/auth">
               로그인 시작하기
@@ -551,13 +608,6 @@ function LandingFooter() {
     <footer className="border-t border-border bg-card py-10">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/15">
-              <TraceLogo className="h-4 w-4 text-primary" />
-            </div>
-            <span className="text-base font-bold text-foreground">Trace</span>
-          </Link>
-
           <p className="text-sm text-muted-foreground font-medium">
             © 2026 Trace. 개발자 성장형 통합 플랫폼.
           </p>
