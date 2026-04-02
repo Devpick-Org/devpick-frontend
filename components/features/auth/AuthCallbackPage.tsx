@@ -50,12 +50,12 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
     const error = searchParams.get("error");
 
     if (error === "access_denied") {
-      router.replace(`/?oauthError=${encodeURIComponent(getAuthErrorMessage("AUTH_019"))}`);
+      router.replace(`/auth?oauthError=${encodeURIComponent(getAuthErrorMessage("AUTH_019"))}`);
       return;
     }
 
     if (!code || !state) {
-      router.replace(`/?oauthError=${encodeURIComponent("소셜 로그인 중 오류가 발생했습니다.")}`);
+      router.replace(`/auth?oauthError=${encodeURIComponent("소셜 로그인 중 오류가 발생했습니다.")}`);
       return;
     }
 
@@ -84,7 +84,7 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
           setShowRecoverModal(true);
         } else {
           const errorMsg = getAuthErrorMessage(errCode, message ?? "소셜 로그인 중 오류가 발생했습니다.");
-          router.replace(`/?oauthError=${encodeURIComponent(errorMsg)}`);
+          router.replace(`/auth?oauthError=${encodeURIComponent(errorMsg)}`);
         }
       });
   }, [searchParams, router, setAuth, provider]);
@@ -120,7 +120,7 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
   const handleDialogOpenChange = useCallback(
     (open: boolean) => {
       if (!open && !isRecoveringRef.current) {
-        router.replace("/");
+        router.replace("/auth");
       }
       setShowRecoverModal(open);
     },

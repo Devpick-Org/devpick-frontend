@@ -52,8 +52,8 @@
 
 ```
 ├── app/
-│ ┣ (auth)/              # Route Group — GNB 없는 레이아웃 (로그인/회원가입)
-│ ┃ ┗ page.tsx           # / (로그인·회원가입 통합 페이지)
+│ ┣ (auth)/              # Route Group — GNB 없는 레이아웃 (랜딩 페이지)
+│ ┃ ┗ page.tsx           # / (랜딩 페이지 — LandingPage 컴포넌트)
 │ ┣ (main)/              # Route Group — GNB 있는 레이아웃
 │ ┃ ┣ layout.tsx         # TopNavVariant + QueryClientProvider
 │ ┃ ┣ home/              # 맞춤형 아티클 피드 (메인)
@@ -76,7 +76,8 @@
 │ ┃ ┃ ┗ page.tsx
 │ ┃ ┗ trends/            # 트렌드 키워드 시각화
 │ ┃   ┗ page.tsx
-│ ┣ auth/                # provider별 콜백 라우트 (Route Group 밖)
+│ ┣ auth/                # 인증 관련 라우트 (Route Group 밖)
+│ ┃ ┣ page.tsx           # /auth (로그인·회원가입 통합 페이지 — AuthContainer 재사용)
 │ ┃ ┣ github/
 │ ┃ ┃ ┗ callback/
 │ ┃ ┃   ┗ page.tsx       # GitHub OAuth code/state 수신 → 백엔드 콜백 호출 → 상태 저장 후 이동
@@ -114,13 +115,16 @@
 │ ┃ ┗ TopNavVariant.tsx  # 상단 GNB + 모바일 하단 탭바 (현재 운영)
 │ ┣ features/            # 도메인별 기능 컴포넌트
 │ ┃ ┣ auth/              # 인증 화면 컴포넌트
-│ ┃ ┃ ┣ AuthCallbackPage.tsx  # provider별 OAuth 콜백 공통 처리 UI/로직 (code/state 파싱 → 콜백 API 호출 → 토큰 저장 → 리다이렉트)
-│ ┃ ┃ ┣ AuthContainer.tsx    # 로그인/회원가입 탭 전환 래퍼
-│ ┃ ┃ ┣ AuthInitializer.tsx  # 앱 마운트 시 토큰 복원 및 인증 상태 초기화
-│ ┃ ┃ ┣ EmailSection.tsx     # 이메일 인증 코드 발송·검증 UI
-│ ┃ ┃ ┣ LoginForm.tsx        # 로그인 폼 (react-hook-form + zod)
-│ ┃ ┃ ┣ SignupForm.tsx       # 회원가입 폼 (react-hook-form + zod)
-│ ┃ ┃ ┗ SocialAuthButtons.tsx # GitHub / Google 소셜 로그인 버튼
+│ ┃ ┃ ┣ AuthCallbackPage.tsx      # provider별 OAuth 콜백 공통 처리 UI/로직 (code/state 파싱 → 콜백 API 호출 → 토큰 저장 → 리다이렉트)
+│ ┃ ┃ ┣ AuthContainer.tsx         # 로그인/회원가입 탭 전환 래퍼
+│ ┃ ┃ ┣ AuthInitializer.tsx       # 앱 마운트 시 토큰 복원 및 인증 상태 초기화
+│ ┃ ┃ ┣ EmailSection.tsx          # 이메일 인증 코드 발송·검증 UI
+│ ┃ ┃ ┣ LoginForm.tsx             # 로그인 폼 (react-hook-form + zod)
+│ ┃ ┃ ┣ LoginForm.test.tsx        # 로그인 폼 단위 테스트
+│ ┃ ┃ ┣ LoginPromptDialog.tsx     # 로그인 유도 다이얼로그 (인터랙션 가드용)
+│ ┃ ┃ ┣ LoginRequiredEmptyState.tsx # 로그인 필요 빈 상태 (히스토리/리포트/프로필용)
+│ ┃ ┃ ┣ SignupForm.tsx             # 회원가입 폼 (react-hook-form + zod)
+│ ┃ ┃ ┗ SocialAuthButtons.tsx     # GitHub / Google 소셜 로그인 버튼
 │ ┃ ┣ home/
 │ ┃ ┃ ┣ AiSummary.tsx              # AI 요약 렌더러 (레벨별 요약, 키포인트, 키워드, 스켈레톤, 에러 fallback)
 │ ┃ ┃ ┣ BlogDetailBody.tsx         # 블로그 본문 렌더러 (originalContent + 원문 CTA)
@@ -175,6 +179,8 @@
 │ ┃ ┃ ┗ WeeklyReportPage.tsx # 주간 리포트 대시보드 (바 차트/레이더 차트/PDF 저장/공유)
 │ ┃ ┣ onboarding/
 │ ┃ ┃ ┗ OnboardingForm.tsx   # 온보딩 폼 (초기 성향 파악)
+│ ┃ ┣ landing/            # 랜딩 페이지 컴포넌트
+│ ┃ ┃ ┗ LandingPage.tsx   # / 경로 랜딩 페이지 (Nav + Hero + Features + Flow + CTA + Footer)
 │ ┃ ┗ trends/                # 트렌드 키워드 시각화 컴포넌트
 │ ┃   ┣ TrendPage.tsx            # 트렌드 페이지 메인
 │ ┃   ┣ TrendKeywordsSection.tsx # 키워드 섹션 wrapper (카드 + 헤더)
@@ -242,7 +248,7 @@
 └── public/              # 정적 에셋 (이미지, 폰트)
   ┗ icons/
     ┣ badges/            # 배지 SVG 아이콘 (ANSWER_MASTER, FIRST_QUESTION, FIRST_SCRAP, POINT_100/500/1000, STREAK_7)
-    ┗ tech/              # 기술 스택 SVG 아이콘 (52개 — python, java, react, nextjs, docker 등)
+    ┗ tech/              # 기술 스택 SVG 아이콘 (58개 — python, java, react, nextjs, docker 등)
 ```
 
 > **Route Group 규칙**: 괄호로 묶인 폴더명 `(auth)`, `(main)` 은 URL에 영향을 주지 않음.
