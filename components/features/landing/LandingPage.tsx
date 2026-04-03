@@ -283,32 +283,39 @@ const SOURCES = [
     initial: "V",
   },
   {
-    name: "Medium",
-    sub: "당근 · 직방 · 왓챠",
-    bg: "bg-neutral-900",
+    name: "GitHub",
+    sub: "Trending",
+    bg: "bg-[#24292e]",
     textColor: "text-white",
-    initial: "M",
+    initial: "GH",
   },
   {
-    name: "네이버",
+    name: "Hacker News",
+    sub: "",
+    bg: "bg-[#FF6600]",
+    textColor: "text-white",
+    initial: "HN",
+  },
+  {
+    name: "Kakao",
+    sub: "기술 블로그",
+    bg: "bg-[#FEE500]",
+    textColor: "text-neutral-900",
+    initial: "K",
+  },
+  {
+    name: "Naver D2",
     sub: "기술 블로그",
     bg: "bg-[#03C75A]",
     textColor: "text-white",
     initial: "N",
   },
   {
-    name: "토스",
+    name: "Toss",
     sub: "기술 블로그",
     bg: "bg-[#0064FF]",
     textColor: "text-white",
     initial: "T",
-  },
-  {
-    name: "카카오",
-    sub: "기술 블로그",
-    bg: "bg-[#FEE500]",
-    textColor: "text-neutral-900",
-    initial: "K",
   },
 ];
 
@@ -322,12 +329,12 @@ const FEATURES = [
   {
     icon: Zap,
     title: "AI 요약 & 퀴즈",
-    desc: "긴 글을 레벨에 맞게 요약하고, AI 퀴즈로 이해도를 바로 점검하세요.",
+    desc: "긴 글을 4가지 레벨에 맞게 요약하고, AI 퀴즈로 이해도를 바로 점검하세요.",
   },
   {
     icon: Users,
     title: "개발자 커뮤니티 & AI 질문 개선",
-    desc: "궁금한 것을 질문하고, AI가 다듬어준 질문으로 더 좋은 답변을 받아보세요.",
+    desc: "궁금한 것을 질문하고, AI가 다듬어준 질문으로 사용자들의 더 좋은 답변을 받아보세요. AI가 생성한 1차 답변도 함께 제공됩니다.",
   },
   {
     icon: Flame,
@@ -337,7 +344,7 @@ const FEATURES = [
   {
     icon: History,
     title: "히스토리 & 배지",
-    desc: "읽은 글, 퀴즈 결과, 활동 내역을 타임라인으로 기록하고 배지를 획득하세요.",
+    desc: "읽은 글, 퀴즈 결과, 활동 내역 등을 타임라인으로 기록하고 배지를 획득하세요.",
   },
   {
     icon: BarChart2,
