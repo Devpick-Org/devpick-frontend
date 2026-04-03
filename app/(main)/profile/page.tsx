@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/auth.store";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import { LoginRequiredEmptyState } from "@/components/features/auth/LoginRequiredEmptyState";
 import { ProfileEditForm } from "@/components/features/profile/ProfileEditForm";
 
 export default function Page() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   if (!mounted) return null;
   if (!isAuthenticated)

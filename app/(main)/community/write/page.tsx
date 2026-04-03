@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -32,7 +33,7 @@ export default function CommunityWritePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
 
   // ─── 첨부파일 — source of truth ────────────────────────────────────────────
   // 왼쪽 폼의 현재 파일 목록. 오른쪽 패널에는 refine 시점 스냅샷(savedFiles)을 전달한다.
@@ -68,8 +69,6 @@ export default function CommunityWritePage() {
   });
 
   // ─── 인증 가드 ──────────────────────────────────────────────────────────────
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (mounted && !isAuthenticated) {

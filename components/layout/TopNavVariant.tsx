@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import {
@@ -60,9 +60,7 @@ export function TopNavVariant() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   const displayName = user?.nickname ?? "Guest";
   const displayInitial = displayName.charAt(0).toUpperCase();
@@ -131,7 +129,7 @@ export function TopNavVariant() {
               ) : !user ? (
                 <Link
                   href="/auth"
-                  className="flex h-auto items-center gap-2 rounded-full border border-border/80 bg-background px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+                  className="flex h-auto items-center gap-2 rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   로그인
                 </Link>

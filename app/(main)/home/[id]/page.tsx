@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/auth.store";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
@@ -13,9 +14,7 @@ export default function Page() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   useEffect(() => {
     if (mounted && !isAuthenticated) {

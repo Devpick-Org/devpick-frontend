@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import { useAuthStore } from "@/store/auth.store";
 import { OnboardingForm } from "@/components/features/onboarding/OnboardingForm";
 
 export default function Page() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   useEffect(() => {
     if (mounted && !isAuthenticated) {

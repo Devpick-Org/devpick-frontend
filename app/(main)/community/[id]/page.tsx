@@ -1,7 +1,8 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 import { useAuthStore } from "@/store/auth.store";
 import { CommunityDetailPage } from "@/components/features/community/CommunityDetailPage";
 
@@ -13,9 +14,7 @@ export default function Page({ params }: Props) {
   const { id: postId } = use(params);
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useHydrated();
 
   useEffect(() => {
     if (mounted && !isAuthenticated) {
