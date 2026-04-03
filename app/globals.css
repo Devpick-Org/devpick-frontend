@@ -6,6 +6,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* 1. v0의 디자인 색상 변수 (여기가 핵심 테마입니다) */
+
 :root {
   /* --background: oklch(0.98 0.002 260); */
   --background: oklch(1, 0, 0);
@@ -152,7 +153,7 @@
 /* 3. 기본 레이어 적용 */
 @layer base {
   html {
-    /* 스크롤바 영역을 항상 강제로 확보해서 흔들림 원천 차단 */
+    /* 콘텐츠 길이에 따른 스크롤바 유무 변화로 인한 레이아웃 쉬프트 방지 */
     overflow-y: scroll;
   }
   * {

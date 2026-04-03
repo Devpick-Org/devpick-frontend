@@ -7,17 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn, dedupeTags } from "@/lib/utils";
 import {
   JOB_ROLES,
@@ -167,6 +157,7 @@ export function ProfileEditForm() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   /* 스토어 user가 나중에 채워지는 경우 동기화 (예: 페이지 직접 진입) */
   useEffect(() => {
@@ -448,56 +439,35 @@ export function ProfileEditForm() {
         <p className="mb-5 text-sm text-muted-foreground font-medium">
           계정을 삭제하면 모든 학습 데이터와 활동 기록이 영구적으로 삭제됩니다.
         </p>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="outline"
-              className="gap-2 border-red-500/40 bg-transparent text-red-400 font-medium hover:border-red-500 hover:bg-red-500/5 hover:text-red-500"
-            >
-              <TrashIcon className="h-4 w-4" />
-              계정 삭제
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="border-border bg-card">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-foreground">
-                정말 탈퇴하시겠습니까?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-muted-foreground font-medium">
-                학습 데이터가 모두 삭제됩니다. 7일 안에 재로그인 시 계정이
-                복구됩니다.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            {deleteError && (
-              <p className="flex items-center gap-1.5 text-xs font-medium text-red-500">
-                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                {deleteError}
-              </p>
-            )}
-            <AlertDialogFooter>
-              <AlertDialogCancel
-                disabled={isDeleting}
-                className="border-0 bg-secondary text-foreground hover:bg-muted hover:text-foreground"
-              >
-                취소
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteAccount}
-                disabled={isDeleting}
-                className="border-0 bg-red-500 text-foreground hover:bg-red-600 disabled:opacity-60"
-              >
-                {isDeleting ? (
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
-                    삭제 중...
-                  </span>
-                ) : (
-                  "계정 삭제"
-                )}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <Button
+          variant="outline"
+          className="gap-2 border-red-500/40 bg-transparent text-red-400 font-medium hover:border-red-500 hover:bg-red-500/5 hover:text-red-500"
+          onClick={() => { setDeleteError(null); setShowDeleteModal(true); }}
+        >
+          <TrashIcon className="h-4 w-4" />
+          계정 삭제
+        </Button>
+        <ConfirmModal
+          open={showDeleteModal}
+          onClose={() => { setDeleteError(null); setShowDeleteModal(false); }}
+          title="정말 탈퇴하시겠습니까?"
+          description={
+            <>
+              학습 데이터가 모두 삭제됩니다. 7일 안에 재로그인 시 계정이 복구됩니다.
+              {deleteError && (
+                <span className="mt-2 flex items-center gap-1.5 text-xs font-medium text-red-500">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                  {deleteError}
+                </span>
+              )}
+            </>
+          }
+          cancelText="취소"
+          confirmText="계정 삭제"
+          onConfirm={handleDeleteAccount}
+          variant="danger"
+          isLoading={isDeleting}
+        />
       </section>
     </div>
   );

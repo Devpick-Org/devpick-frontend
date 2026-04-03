@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { MessageCircle, Share2, User } from "lucide-react";
+import { useState } from "react";
 import { cn, copyShareLink } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
+import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 import type { PostSummary, PostLevel } from "@/types/post";
 
 // ─── Level helpers ─────────────────────────────────────────────────────────────
@@ -62,6 +65,16 @@ interface CommunityCardProps {
 }
 
 export function CommunityCard({ post }: CommunityCardProps) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+
+  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setLoginDialogOpen(true);
+    }
+  };
+
   const handleShare = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -69,8 +82,14 @@ export function CommunityCard({ post }: CommunityCardProps) {
   };
 
   return (
-    <Link href={`/community/${post.id}`} className="block">
-      <article className="group border-b border-border/70 py-7 transition-colors">
+    <>
+      <LoginPromptDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
+        message="게시글 상세를 보려면"
+      />
+      <Link href={`/community/${post.id}`} className="block" onClick={handleCardClick}>
+        <article className="group border-b border-border/70 py-7 transition-colors">
         {/* Meta row: author · level · time */}
         <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground font-medium">
           <User className="h-3.5 w-3.5 shrink-0" />
@@ -126,7 +145,8 @@ export function CommunityCard({ post }: CommunityCardProps) {
             </p>
           </div>
         )}
-      </article>
-    </Link>
+        </article>
+      </Link>
+    </>
   );
 }
