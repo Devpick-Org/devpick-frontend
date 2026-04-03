@@ -32,7 +32,7 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
   const [isRecovering, setIsRecovering] = useState(false);
   const [recoverError, setRecoverError] = useState("");
 
-  // AlertDialogAction 클릭 시 onOpenChange가 동시에 호출되어 /로 이동하는 것을 방지
+  // 복구 확인 클릭 시 onClose가 동시에 호출되어 /auth로 이동하는 것을 방지
   const isRecoveringRef = useRef(false);
 
   useEffect(() => {
