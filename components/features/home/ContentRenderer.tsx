@@ -1,147 +1,80 @@
-// ContentDetail 및 Stack Overflow 본문 렌더링에 공통으로 사용하는 마크다운 렌더러
+"use client";
 
-function InlineMarkdown({ text }: { text: string }) {
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
-  return (
-    <>
-      {parts.map((part, i) => {
-        if (part.startsWith("**") && part.endsWith("**")) {
-          return (
-            <strong key={i} className="font-semibold text-foreground">
-              {part.slice(2, -2)}
-            </strong>
-          );
-        }
-        if (part.startsWith("`") && part.endsWith("`")) {
-          return (
-            <code
-              key={i}
-              className="rounded-md bg-secondary px-1.5 py-0.5 font-mono text-sm text-primary"
-            >
-              {part.slice(1, -1)}
-            </code>
-          );
-        }
-        return <span key={i}>{part}</span>;
-      })}
-    </>
-  );
-}
+import { useMemo } from "react";
+import DOMPurify, { type Config } from "dompurify";
+import { cn } from "@/lib/utils";
+import { useHydrated } from "@/lib/hooks/useHydrated";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const DOMPURIFY_CONFIG: Config = {
+  USE_PROFILES: { html: true },
+  FORBID_TAGS: ["script", "style"],
+  FORBID_ATTR: ["onerror", "onload", "onclick", "onmouseover"],
+};
 
 export function ContentRenderer({ content }: { content: string }) {
-  const lines = content.split("\n");
-  const elements: React.ReactNode[] = [];
-  let i = 0;
-  let key = 0;
+  const mounted = useHydrated();
 
-  while (i < lines.length) {
-    const line = lines[i];
+  const sanitized = useMemo(() => {
+    if (!mounted) return "";
+    return DOMPurify.sanitize(content, DOMPURIFY_CONFIG) as string;
+  }, [content, mounted]);
 
-    if (line.trim().startsWith("```")) {
-      const lang = line.trim().replace("```", "").trim();
-      const codeLines: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].trim().startsWith("```")) {
-        codeLines.push(lines[i]);
-        i++;
-      }
-      i++;
-      elements.push(
-        <div
-          key={key++}
-          className="my-6 overflow-hidden rounded-xl border border-border"
-        >
-          {lang && (
-            <div className="flex items-center gap-2 border-b border-border bg-secondary/80 px-4 py-2">
-              <span className="font-mono text-xs font-medium text-muted-foreground">
-                {lang}
-              </span>
-            </div>
-          )}
-          <pre className="overflow-x-auto bg-[#0d1117] p-4">
-            <code className="block font-mono text-sm leading-relaxed text-[#e6edf3]">
-              {codeLines.join("\n")}
-            </code>
-          </pre>
-        </div>,
-      );
-      continue;
-    }
-
-    if (line.startsWith("## ")) {
-      elements.push(
-        <h2
-          key={key++}
-          className="mb-4 mt-10 text-xl font-bold tracking-tight text-foreground first:mt-0 md:text-2xl"
-        >
-          {line.replace("## ", "")}
-        </h2>,
-      );
-      i++;
-      continue;
-    }
-
-    if (line.startsWith("### ")) {
-      elements.push(
-        <h3
-          key={key++}
-          className="mb-3 mt-8 text-lg font-semibold text-foreground"
-        >
-          {line.replace("### ", "")}
-        </h3>,
-      );
-      i++;
-      continue;
-    }
-
-    if (/^\d+\.\s/.test(line.trim())) {
-      const listItems: string[] = [];
-      while (i < lines.length && /^\d+\.\s/.test(lines[i].trim())) {
-        listItems.push(lines[i].trim().replace(/^\d+\.\s/, ""));
-        i++;
-      }
-      elements.push(
-        <ol key={key++} className="my-4 ml-6 list-decimal space-y-2">
-          {listItems.map((item, idx) => (
-            <li key={idx} className="text-base leading-relaxed text-foreground/85">
-              <InlineMarkdown text={item} />
-            </li>
-          ))}
-        </ol>,
-      );
-      continue;
-    }
-
-    if (line.trim().startsWith("- ")) {
-      const listItems: string[] = [];
-      while (i < lines.length && lines[i].trim().startsWith("- ")) {
-        listItems.push(lines[i].trim().replace(/^- /, ""));
-        i++;
-      }
-      elements.push(
-        <ul key={key++} className="my-4 ml-6 list-disc space-y-2">
-          {listItems.map((item, idx) => (
-            <li key={idx} className="text-base leading-relaxed text-foreground/85">
-              <InlineMarkdown text={item} />
-            </li>
-          ))}
-        </ul>,
-      );
-      continue;
-    }
-
-    if (line.trim() === "") {
-      i++;
-      continue;
-    }
-
-    elements.push(
-      <p key={key++} className="my-4 text-base leading-7 text-foreground/85">
-        <InlineMarkdown text={line} />
-      </p>,
-    );
-    i++;
+  if (!content?.trim()) {
+    return <p className="text-sm text-muted-foreground">본문이 없습니다.</p>;
   }
 
-  return <>{elements}</>;
+  if (!mounted) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-[88%]" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-[75%]" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-[82%]" />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "text-foreground/85 leading-7",
+        // 제목
+        "[&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-foreground",
+        "[&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-foreground",
+        "[&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-foreground",
+        "[&_h4]:mt-4 [&_h4]:mb-1.5 [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:text-foreground",
+        // 단락
+        "[&_p]:my-4 [&_p]:leading-7",
+        // 리스트
+        "[&_ul]:my-4 [&_ul]:ml-6 [&_ul]:list-disc [&_ul]:space-y-1.5",
+        "[&_ol]:my-4 [&_ol]:ml-6 [&_ol]:list-decimal [&_ol]:space-y-1.5",
+        "[&_li]:leading-relaxed",
+        // 인용
+        "[&_blockquote]:my-4 [&_blockquote]:border-l-4 [&_blockquote]:border-primary/30 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-muted-foreground",
+        // 인라인 코드
+        "[&_:not(pre)>code]:rounded-md [&_:not(pre)>code]:bg-secondary [&_:not(pre)>code]:px-1.5 [&_:not(pre)>code]:py-0.5 [&_:not(pre)>code]:font-mono [&_:not(pre)>code]:text-sm [&_:not(pre)>code]:text-primary",
+        // 코드 블록
+        "[&_pre]:my-6 [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-[#0d1117] [&_pre]:p-4",
+        "[&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:font-mono [&_pre_code]:text-sm [&_pre_code]:leading-relaxed [&_pre_code]:text-[#e6edf3]",
+        // 링크
+        "[&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 [&_a:hover]:text-primary/80",
+        // 이미지
+        "[&_img]:my-6 [&_img]:max-w-full [&_img]:rounded-lg",
+        // 구분선
+        "[&_hr]:my-8 [&_hr]:border-border",
+        // strong / em
+        "[&_strong]:font-semibold [&_strong]:text-foreground",
+        "[&_em]:italic",
+        // 테이블
+        "[&_table]:my-6 [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm",
+        "[&_th]:border [&_th]:border-border [&_th]:bg-secondary [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold",
+        "[&_td]:border [&_td]:border-border [&_td]:px-3 [&_td]:py-2",
+      )}
+      dangerouslySetInnerHTML={{ __html: sanitized }}
+    />
+  );
 }
