@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -152,120 +153,38 @@ function LandingNav() {
 
 // ─── Hero Section ─────────────────────────────────────────────────────────────
 
-// 목업 내부 피드 카드
-function MockFeedCard({
-  title,
-  source,
-  tags,
-}: {
-  title: string;
-  source: string;
-  tags: string[];
-}) {
+// 맥북 스타일 프리뷰 목업
+function MacbookMockup() {
   return (
-    <div className="rounded-lg border border-border bg-background p-2.5">
-      <p className="mb-1.5 line-clamp-2 text-[11px] font-medium leading-snug text-foreground">
-        {title}
-      </p>
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] text-muted-foreground">{source}</span>
-        <div className="flex gap-1">
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] font-medium text-primary"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 제품 프리뷰 목업
-function LaptopMockup() {
-  return (
-    <div>
-      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
-        {/* 브라우저 크롬 */}
-        <div className="flex items-center gap-1.5 border-b border-border bg-muted/50 px-3 py-2">
-          <div className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
-          <div className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
-          <div className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
-          <div className="ml-2 flex-1 rounded-md border border-border bg-background px-3 py-0.5 text-center text-[11px] text-muted-foreground">
-            trace.dev/home
-          </div>
+    <div className="select-none">
+      {/* 화면 본체 */}
+      <div className="relative rounded-[12px] bg-[#1e1e1e] p-[10px] pb-[8px] shadow-2xl ring-1 ring-black/40">
+        {/* 카메라 노치 */}
+        <div className="absolute top-[4px] left-1/2 -translate-x-1/2 flex items-center justify-center">
+          <div className="h-[6px] w-[6px] rounded-full bg-[#3a3a3a]" />
         </div>
 
-        {/* 앱 네비게이션 바 */}
-        <div className="flex items-center justify-between border-b border-border bg-card px-3 py-1.5">
-          <div className="flex items-center gap-1.5">
-            <div className="h-4 w-4 rounded bg-primary/15" />
-            <span className="text-[10px] font-bold text-foreground">Trace</span>
-          </div>
-          <div className="flex gap-3">
-            {["홈", "커뮤니티", "트렌드"].map((item) => (
-              <span key={item} className="text-[9px] text-muted-foreground">
-                {item}
-              </span>
-            ))}
-          </div>
-          <div className="h-5 w-5 rounded-full bg-muted" />
-        </div>
-
-        {/* 앱 콘텐츠 */}
-        <div className="flex h-[260px] lg:h-[320px]">
-          {/* 피드 영역 */}
-          <div className="flex-1 space-y-2 overflow-hidden p-3">
-            {/* 검색바 */}
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5">
-              <Search className="h-3 w-3 shrink-0 text-muted-foreground" />
-              <span className="text-[11px] text-muted-foreground">
-                기술 키워드, 아티클 검색...
-              </span>
-            </div>
-            {/* 피드 카드 */}
-            <MockFeedCard
-              title="React 19 useTransition 완전 정복"
-              source="Velog"
-              tags={["React", "Frontend"]}
-            />
-            <MockFeedCard
-              title="Next.js App Router 데이터 패칭 전략"
-              source="Medium"
-              tags={["Next.js"]}
-            />
-            <MockFeedCard
-              title="TypeScript 5.x 제네릭 패턴 정리"
-              source="Dev.to"
-              tags={["TypeScript"]}
-            />
-          </div>
-
-          {/* 우측 추천 사이드바: md에서 숨겨 피드 영역 최대 확보 */}
-          <div className="hidden w-[96px] shrink-0 space-y-2 border-l border-border p-2.5 lg:block">
-            <p className="text-[10px] font-semibold text-muted-foreground">
-              추천 콘텐츠
-            </p>
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="space-y-1 rounded-md border border-border p-1.5"
-              >
-                <div className="h-1.5 w-full rounded bg-muted" />
-                <div className="h-1.5 w-3/4 rounded bg-muted" />
-                <div className="mt-1 h-1.5 w-1/2 rounded bg-primary/20" />
-              </div>
-            ))}
-          </div>
+        {/* 스크린 영역 */}
+        <div className="overflow-hidden rounded-[6px] bg-black">
+          <Image
+            src="/preview.png"
+            alt="Trace 앱 미리보기"
+            width={1280}
+            height={800}
+            className="w-full object-cover object-top"
+            priority
+          />
         </div>
       </div>
 
-      {/* 노트북 받침 */}
-      <div className="mx-auto h-2.5 w-[92%] rounded-b-xl border border-t-0 border-border bg-muted" />
-      <div className="mx-auto h-1.5 w-[55%] rounded-b-lg bg-muted/60" />
+      {/* 힌지 */}
+      <div className="mx-auto h-[4px] w-full rounded-none bg-gradient-to-b from-[#c8c8c8] to-[#b0b0b0]" />
+
+      {/* 키보드 베이스 */}
+      <div className="relative mx-auto w-[110%] -translate-x-[4.5%] rounded-b-[10px] bg-gradient-to-b from-[#d4d4d4] to-[#c0c0c0] px-6 pb-2 pt-1.5 shadow-md ring-1 ring-black/10">
+        {/* 트랙패드 */}
+        <div className="mx-auto h-[18px] w-[28%] rounded-[4px] bg-[#b8b8b8] ring-1 ring-black/10" />
+      </div>
     </div>
   );
 }
@@ -338,7 +257,7 @@ function HeroSection() {
           <FadeUp delay={0.45} className="relative hidden md:block">
             {/* 메인 노트북 목업: md에서 패딩 축소 */}
             <div className="px-0 pt-2 pb-3 lg:px-4 lg:pt-3 lg:pb-4">
-              <LaptopMockup />
+              <MacbookMockup />
             </div>
           </FadeUp>
         </div>
@@ -364,32 +283,39 @@ const SOURCES = [
     initial: "V",
   },
   {
-    name: "Medium",
-    sub: "당근 · 직방 · 왓챠",
-    bg: "bg-neutral-900",
+    name: "GitHub",
+    sub: "Trending",
+    bg: "bg-[#24292e]",
     textColor: "text-white",
-    initial: "M",
+    initial: "GH",
   },
   {
-    name: "네이버",
+    name: "Hacker News",
+    sub: "",
+    bg: "bg-[#FF6600]",
+    textColor: "text-white",
+    initial: "HN",
+  },
+  {
+    name: "Kakao",
+    sub: "기술 블로그",
+    bg: "bg-[#FEE500]",
+    textColor: "text-neutral-900",
+    initial: "K",
+  },
+  {
+    name: "Naver D2",
     sub: "기술 블로그",
     bg: "bg-[#03C75A]",
     textColor: "text-white",
     initial: "N",
   },
   {
-    name: "토스",
+    name: "Toss",
     sub: "기술 블로그",
     bg: "bg-[#0064FF]",
     textColor: "text-white",
     initial: "T",
-  },
-  {
-    name: "카카오",
-    sub: "기술 블로그",
-    bg: "bg-[#FEE500]",
-    textColor: "text-neutral-900",
-    initial: "K",
   },
 ];
 
@@ -403,12 +329,12 @@ const FEATURES = [
   {
     icon: Zap,
     title: "AI 요약 & 퀴즈",
-    desc: "긴 글을 레벨에 맞게 요약하고, AI 퀴즈로 이해도를 바로 점검하세요.",
+    desc: "긴 글을 4가지 레벨에 맞게 요약하고, AI 퀴즈로 이해도를 바로 점검하세요.",
   },
   {
     icon: Users,
     title: "개발자 커뮤니티 & AI 질문 개선",
-    desc: "궁금한 것을 질문하고, AI가 다듬어준 질문으로 더 좋은 답변을 받아보세요.",
+    desc: "궁금한 것을 질문하고, AI가 다듬어준 질문으로 사용자들의 더 좋은 답변을 받아보세요. AI가 생성한 1차 답변도 함께 제공됩니다.",
   },
   {
     icon: Flame,
@@ -418,7 +344,7 @@ const FEATURES = [
   {
     icon: History,
     title: "히스토리 & 배지",
-    desc: "읽은 글, 퀴즈 결과, 활동 내역을 타임라인으로 기록하고 배지를 획득하세요.",
+    desc: "읽은 글, 퀴즈 결과, 활동 내역 등을 타임라인으로 기록하고 배지를 획득하세요.",
   },
   {
     icon: BarChart2,
