@@ -1,7 +1,9 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useAuthStore } from "@/store/auth.store";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import { ContentDetail } from "@/components/features/home/ContentDetail";
 import { RecommendedContents } from "@/components/features/home/RecommendedContents";
@@ -9,6 +11,17 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Page() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (mounted && !isAuthenticated) {
+      router.replace("/home");
+    }
+  }, [mounted, isAuthenticated, router]);
 
   const {
     data: contentRes,
@@ -17,16 +30,19 @@ export default function Page() {
   } = useQuery({
     queryKey: ["content", id],
     queryFn: () => contentsEndpoints.getContentById(id),
+    enabled: mounted && isAuthenticated,
   });
 
   const { data: recommendedRes } = useQuery({
     queryKey: ["content-recommendations", id],
     queryFn: () => contentsEndpoints.getContentRecommendations(id),
-    enabled: !!contentRes?.data,
+    enabled: mounted && isAuthenticated && !!contentRes?.data,
   });
 
   const content = contentRes?.data ?? null;
   const recommended = recommendedRes?.data?.contents ?? [];
+
+  if (!mounted || !isAuthenticated) return null;
 
   if (isLoading) {
     return <ContentDetailSkeleton />;

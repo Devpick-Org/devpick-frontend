@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { PenLine } from "lucide-react";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
@@ -9,6 +9,8 @@ import { CommunityCard } from "@/components/features/community/CommunityCard";
 import { CommunitySearch } from "@/components/features/community/CommunitySearch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/auth.store";
+import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 
 const PAGE_SIZE = 6;
 
@@ -55,8 +57,19 @@ function CommunityCardSkeleton() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function CommunityPage() {
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  const handleWriteClick = () => {
+    if (!isAuthenticated) {
+      setLoginDialogOpen(true);
+    } else {
+      router.push("/community/write");
+    }
+  };
 
   const {
     data,
@@ -107,6 +120,12 @@ export default function CommunityPage() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
+    <>
+      <LoginPromptDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
+        message="질문을 작성하려면"
+      />
     <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
@@ -119,12 +138,10 @@ export default function CommunityPage() {
               개발자들과 질문하고 답변을 나눠보세요.
             </p>
           </div>
-          <Button asChild size="sm" className="shrink-0 gap-1.5">
-            <Link href="/community/write">
-              <PenLine className="h-4 w-4" />
-              <span className="hidden sm:inline">질문하기</span>
-              <span className="sm:hidden">질문</span>
-            </Link>
+          <Button size="sm" className="shrink-0 gap-1.5" onClick={handleWriteClick}>
+            <PenLine className="h-4 w-4" />
+            <span className="hidden sm:inline">질문하기</span>
+            <span className="sm:hidden">질문</span>
           </Button>
         </section>
 
@@ -171,5 +188,6 @@ export default function CommunityPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

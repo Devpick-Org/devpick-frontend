@@ -5,16 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
 import {
@@ -131,30 +122,21 @@ export function LoginForm({ isLoading }: LoginFormProps) {
 
   return (
     <>
-      <AlertDialog open={showRecoverModal} onOpenChange={setShowRecoverModal}>
-        <AlertDialogContent
-          size="sm"
-          className="bg-white"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          <AlertDialogHeader>
-            <AlertDialogTitle>계정을 복구할까요?</AlertDialogTitle>
-            <AlertDialogDescription>
-              최근 탈퇴한 계정입니다.
-              <br />
-              재로그인 할 경우 계정이 복구됩니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="border-0 bg-secondary text-foreground hover:bg-secondary/90 hover:text-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
-              아니요
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleRecover}>
-              복구하기
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmModal
+        open={showRecoverModal}
+        onClose={() => setShowRecoverModal(false)}
+        title="계정을 복구할까요?"
+        description={
+          <>
+            최근 탈퇴한 계정입니다.
+            <br />
+            재로그인 할 경우 계정이 복구됩니다.
+          </>
+        }
+        cancelText="아니요"
+        confirmText="복구하기"
+        onConfirm={handleRecover}
+      />
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-2">
           <Label

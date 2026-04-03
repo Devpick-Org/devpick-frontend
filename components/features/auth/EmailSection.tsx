@@ -193,10 +193,10 @@ export function EmailSection({
                 isEmailVerified ||
                 timerSeconds === 0
               }
-              className={`h-11 shrink-0 border transition-all duration-200 disabled:opacity-50 ${
+              className={`h-11 shrink-0 transition-all duration-200 disabled:opacity-50 ${
                 isEmailVerified
-                  ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
-                  : "border-border bg-secondary text-foreground hover:bg-secondary/80 hover:border-primary/40"
+                  ? "border border-emerald-500/50 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                  : "bg-secondary text-foreground hover:bg-secondary/80"
               }`}
             >
               {isVerifying ? (

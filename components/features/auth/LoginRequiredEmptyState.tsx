@@ -1,10 +1,10 @@
-import Link from "next/link"
-import { Lock } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface LoginRequiredEmptyStateProps {
-  title?: string
-  description?: string
+  title?: string;
+  description?: string;
 }
 
 /**
@@ -28,17 +28,19 @@ export function LoginRequiredEmptyState({
 
       <div className="space-y-2">
         <h2 className="text-xl font-semibold text-foreground">{title}</h2>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className="text-sm text-muted-foreground font-medium">
+          {description}
+        </p>
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button asChild>
           <Link href="/auth">로그인 / 회원가입</Link>
         </Button>
-        <Button variant="outline" asChild>
+        <Button variant="outline" className="hover:bg-secondary hover:text-foreground" asChild>
           <Link href="/home">피드 둘러보기</Link>
         </Button>
       </div>
     </div>
-  )
+  );
 }

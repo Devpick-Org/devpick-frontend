@@ -124,10 +124,17 @@ export function TopNavVariant() {
                 );
               })}
             </nav>
-            {/* 2. 드롭다운 */}
+            {/* 2. 프로필 영역 */}
             <div className="flex items-center">
               {!mounted ? (
                 <Skeleton className="h-9 w-9 rounded-full" />
+              ) : !user ? (
+                <Link
+                  href="/auth"
+                  className="flex h-auto items-center gap-2 rounded-full border border-border/80 bg-background px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+                >
+                  로그인
+                </Link>
               ) : (
                 <DropdownMenu modal={false}>
                   {/*
@@ -138,41 +145,29 @@ export function TopNavVariant() {
                     className="flex h-auto items-center gap-2.5 rounded-full border border-border/80 bg-background px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
                     aria-label="User menu"
                   >
-                    {user ? (
-                      <>
-                        <Avatar className="h-7 w-7 ring-1 ring-primary/20">
-                          <AvatarImage
-                            src={user.profileImage ?? ""}
-                            alt={`${displayName} avatar`}
-                          />
-                          <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">
-                            {displayInitial}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="hidden items-center gap-1.5 sm:flex">
-                          <span className="text-sm font-medium text-foreground">
-                            {displayName}
-                          </span>
-                          {displayBadge && (
-                            <Badge
-                              variant="secondary"
-                              className="max-w-[80px] truncate border border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary"
-                            >
-                              {displayBadge}
-                            </Badge>
-                          )}
-                        </div>
-                        <ChevronDown className="hidden h-3.5 w-3.5 text-muted-foreground sm:block" />
-                      </>
-                    ) : (
-                      <>
-                        <div className="h-7 w-7 rounded-full bg-muted" />
-                        <div className="hidden items-center gap-1.5 sm:flex">
-                          <div className="h-4 w-14 rounded bg-muted" />
-                          <div className="h-4 w-10 rounded bg-muted" />
-                        </div>
-                      </>
-                    )}
+                    <Avatar className="h-7 w-7 ring-1 ring-primary/20">
+                      <AvatarImage
+                        src={user.profileImage ?? ""}
+                        alt={`${displayName} avatar`}
+                      />
+                      <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">
+                        {displayInitial}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="hidden items-center gap-1.5 sm:flex">
+                      <span className="text-sm font-medium text-foreground">
+                        {displayName}
+                      </span>
+                      {displayBadge && (
+                        <Badge
+                          variant="secondary"
+                          className="max-w-[80px] truncate border border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary"
+                        >
+                          {displayBadge}
+                        </Badge>
+                      )}
+                    </div>
+                    <ChevronDown className="hidden h-3.5 w-3.5 text-muted-foreground sm:block" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem asChild>

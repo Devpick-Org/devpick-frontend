@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatDate, copyShareLink } from "@/lib/utils";
@@ -11,6 +12,8 @@ import {
   updateContentInteractionCache,
   invalidateContentInteractionQueries,
 } from "@/lib/content/updateContentInteractionCache";
+import { useAuthStore } from "@/store/auth.store";
+import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 import type { Content } from "@/types/content";
 
 // ─── FeedCard ─────────────────────────────────────────────────────────────────
@@ -21,6 +24,15 @@ interface FeedCardProps {
 
 export function FeedCard({ content }: FeedCardProps) {
   const queryClient = useQueryClient();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+
+  const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setLoginDialogOpen(true);
+    }
+  };
 
   // mutate(wasLiked) — 클릭 직전 상태를 variable로 넘겨 onMutate/mutationFn이 같은 기준으로 동작
   const likeMutation = useMutation({
@@ -68,8 +80,14 @@ export function FeedCard({ content }: FeedCardProps) {
   };
 
   return (
-    <Link href={`/home/${content.id}`} className="block">
-      <article className="group border-b border-border/70 py-7 transition-colors">
+    <>
+      <LoginPromptDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
+        message="콘텐츠 상세를 보려면"
+      />
+      <Link href={`/home/${content.id}`} className="block" onClick={handleCardClick}>
+        <article className="group border-b border-border/70 py-7 transition-colors">
         <div className="flex items-start gap-5">
           <div className="min-w-0 flex-1">
             {/* Source & time */}
@@ -160,8 +178,9 @@ export function FeedCard({ content }: FeedCardProps) {
             </div>
           )}
         </div>
-      </article>
-    </Link>
+        </article>
+      </Link>
+    </>
   );
 }
 

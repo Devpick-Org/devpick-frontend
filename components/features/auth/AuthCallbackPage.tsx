@@ -2,16 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { useAuthStore } from "@/store/auth.store";
 import { extractApiError, getAuthErrorMessage } from "@/lib/auth/getAuthErrorMessage";
@@ -132,31 +123,26 @@ function CallbackHandler({ provider }: CallbackHandlerProps) {
   }
 
   return (
-    <AlertDialog open={showRecoverModal} onOpenChange={handleDialogOpenChange}>
-      <AlertDialogContent
-        size="sm"
-        className="bg-white"
-        onOpenAutoFocus={(e) => e.preventDefault()}
-      >
-        <AlertDialogHeader>
-          <AlertDialogTitle>계정을 복구할까요?</AlertDialogTitle>
-          <AlertDialogDescription>
-            최근 탈퇴한 계정입니다.
-            <br />
-            복구하시면 바로 로그인됩니다.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        {recoverError && (
-          <p className="text-sm text-center text-red-500">{recoverError}</p>
-        )}
-        <AlertDialogFooter>
-          <AlertDialogCancel className="border-0 bg-secondary text-foreground hover:bg-secondary/90 hover:text-foreground focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0">
-            아니요
-          </AlertDialogCancel>
-          <AlertDialogAction onClick={handleRecover}>복구하기</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmModal
+      open={showRecoverModal}
+      onClose={() => handleDialogOpenChange(false)}
+      title="계정을 복구할까요?"
+      description={
+        <>
+          최근 탈퇴한 계정입니다.
+          <br />
+          복구하시면 바로 로그인됩니다.
+          {recoverError && (
+            <span className="mt-2 block text-center text-red-500">
+              {recoverError}
+            </span>
+          )}
+        </>
+      }
+      cancelText="아니요"
+      confirmText="복구하기"
+      onConfirm={handleRecover}
+    />
   );
 }
 

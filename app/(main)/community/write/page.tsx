@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/auth.store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
 import { PostWriteForm } from "@/components/features/community/PostWriteForm";
@@ -30,16 +31,12 @@ function filesToAttachments(files: File[]): PostAttachmentDTO[] {
 export default function CommunityWritePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [mounted, setMounted] = useState(false);
 
   // ─── 첨부파일 — source of truth ────────────────────────────────────────────
   // 왼쪽 폼의 현재 파일 목록. 오른쪽 패널에는 refine 시점 스냅샷(savedFiles)을 전달한다.
   const [files, setFiles] = useState<File[]>([]);
-
-  const handleFilesChange = (added: File[]) =>
-    setFiles((prev) => [...prev, ...added]);
-
-  const handleRemoveFile = (name: string) =>
-    setFiles((prev) => prev.filter((f) => f.name !== name));
 
   // ─── 개선 결과 / 원본 스냅샷 ───────────────────────────────────────────────
   // savedDraft/savedFiles는 refine 트리거 시점에 고정 → "원본으로 게시"에 사용
@@ -70,7 +67,25 @@ export default function CommunityWritePage() {
     },
   });
 
+  // ─── 인증 가드 ──────────────────────────────────────────────────────────────
+
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (mounted && !isAuthenticated) {
+      router.replace("/community");
+    }
+  }, [mounted, isAuthenticated, router]);
+
+  if (!mounted || !isAuthenticated) return null;
+
   // ─── 핸들러 ─────────────────────────────────────────────────────────────────
+
+  const handleFilesChange = (added: File[]) =>
+    setFiles((prev) => [...prev, ...added]);
+
+  const handleRemoveFile = (name: string) =>
+    setFiles((prev) => prev.filter((f) => f.name !== name));
 
   /** 왼쪽 폼: AI로 질문 개선하기
    * savedDraft/savedFiles를 mutate 호출 전에 먼저 고정해야
