@@ -4,6 +4,7 @@ import {
   Sparkles,
   Bookmark,
   HelpCircle,
+  Brain,
   Heart,
   MessageSquare,
   MessageCircle,
@@ -37,6 +38,7 @@ export const ACTION_FILTER_OPTIONS: {
   { value: "ai_summary_viewed", label: "AI 요약" },
   { value: "question_created", label: "질문 작성" },
   { value: "scrapped", label: "스크랩" },
+  { value: "ai_quiz_completed", label: "AI 퀴즈" },
 ];
 
 /** 액션 필터 chip 옵션 — 활동 탭 전용
@@ -82,6 +84,12 @@ export const ACTION_META: Record<HistoryActionType, ActionMeta> = {
   question_created: {
     label: "질문을 작성했어요",
     icon: HelpCircle,
+    iconClass: "text-blue-500",
+    iconBgClass: "bg-blue-50",
+  },
+  ai_quiz_completed: {
+    label: "AI 퀴즈를 풀었어요",
+    icon: Brain,
     iconClass: "text-blue-500",
     iconBgClass: "bg-blue-50",
   },

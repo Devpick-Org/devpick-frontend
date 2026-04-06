@@ -5,7 +5,8 @@ export type HistoryActionType =
   | "content_opened"
   | "ai_summary_viewed"
   | "scrapped"
-  | "question_created";
+  | "question_created"
+  | "ai_quiz_completed";
 
 /** GET /history actionType — 활동 탭 (actionTypes 파라미터로 필터) */
 export type ActivityActionType =
