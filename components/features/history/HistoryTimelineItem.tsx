@@ -25,6 +25,8 @@ function getHref(item: HistoryItem): string | null {
       return item.content?.id ? `/home/${item.content.id}` : null;
     case "question_created":
       return item.post?.id ? `/community/${item.post.id}` : null;
+    case "ai_quiz_completed":
+      return item.content?.id ? `/home/${item.content.id}/quiz` : null;
     default:
       return null;
   }
