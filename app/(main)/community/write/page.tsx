@@ -64,7 +64,7 @@ export default function CommunityWritePage() {
       // res를 그대로 선세팅하면 상세 페이지 진입 시 즉시 캐시 히트된다.
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.setQueryData(["post", res.data.id], res);
-      router.push(`/community/${res.data.id}`);
+      router.replace(`/community/${res.data.id}`);
     },
   });
 

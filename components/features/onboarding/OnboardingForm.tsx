@@ -90,7 +90,7 @@ export function OnboardingForm() {
         ),
       });
 
-      router.push("/home");
+      router.replace("/home");
     } finally {
       setIsSubmitting(false);
     }
