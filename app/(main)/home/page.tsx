@@ -94,8 +94,8 @@ export default function HomePage() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
-      <div className="mx-auto max-w-4xl">
+    <div className="w-full px-4 pt-10 pb-6 md:px-6 md:pt-12 md:pb-8">
+      <div className="mx-auto max-w-3xl">
         {/* Greeting */}
         <section className="mb-6 text-center md:mb-8">
           <div className="mb-2 flex items-center justify-center gap-2">
@@ -104,13 +104,13 @@ export default function HomePage() {
             </h1>
             <WaveIcon className="text-xl md:text-3xl" />
           </div>
-          <p className="text-sm text-muted-foreground font-medium md:text-base">
+          <p className="text-sm font-medium text-muted-foreground md:text-base">
             관심 기술과 학습 흐름에 맞춘 개발 콘텐츠를 모아봤어요.
           </p>
         </section>
 
         {/* Search */}
-        <div className="mb-8">
+        <div className="mb-6">
           <FeedSearch onSearch={setSearchQuery} />
         </div>
 

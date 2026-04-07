@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Heart, Share2, ExternalLink } from "lucide-react";
+import { Bookmark, Heart, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,6 +16,59 @@ import { useAuthStore } from "@/store/auth.store";
 import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 import type { Content } from "@/types/content";
 
+// ─── helpers ──────────────────────────────────────────────────────────────────
+
+function isStackOverflow(sourceName: string) {
+  return sourceName.trim().toLowerCase() === "stack overflow";
+}
+
+const SOURCE_BADGE: Record<
+  string,
+  { bg: string; text: string; label: string }
+> = {
+  velog: { bg: "#20C997", text: "#fff", label: "V" },
+  "naver blog": { bg: "#03C75A", text: "#fff", label: "N" },
+  "naver d2": { bg: "#03C75A", text: "#fff", label: "D2" },
+  "kakao tech": { bg: "#FEE500", text: "#3A1D1D", label: "K" },
+  우아한형제들: { bg: "#3399FF", text: "#fff", label: "W" },
+  medium: { bg: "#000000", text: "#fff", label: "M" },
+  "dev.to": { bg: "#0A0A0A", text: "#fff", label: "D" },
+};
+
+function SourceBadge({ sourceName }: { sourceName: string }) {
+  const key = sourceName.trim().toLowerCase();
+  const style = SOURCE_BADGE[key];
+
+  if (isStackOverflow(sourceName)) {
+    return (
+      <span
+        className="flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded text-[8px] font-bold leading-none"
+        style={{ background: "#F48024", color: "#fff" }}
+      >
+        SO
+      </span>
+    );
+  }
+
+  if (style) {
+    return (
+      <span
+        className="flex h-[17px] shrink-0 items-center justify-center rounded px-1 text-[8px] font-bold leading-none"
+        style={{ background: style.bg, color: style.text, minWidth: "17px" }}
+      >
+        {style.label}
+      </span>
+    );
+  }
+
+  // 기본: 이니셜 회색 원형
+  return (
+    <span className="flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-bold text-muted-foreground">
+      {sourceName.charAt(0).toUpperCase()}
+    </span>
+  );
+}
+
 // ─── FeedCard ─────────────────────────────────────────────────────────────────
 
 interface FeedCardProps {
@@ -27,6 +80,7 @@ export function FeedCard({ content }: FeedCardProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogMessage, setLoginDialogMessage] = useState("");
+  const isQA = isStackOverflow(content.sourceName);
 
   const openLoginDialog = (message: string) => {
     setLoginDialogMessage(message);
@@ -46,7 +100,6 @@ export function FeedCard({ content }: FeedCardProps) {
       wasLiked
         ? contentsEndpoints.unlikeContent(content.id)
         : contentsEndpoints.likeContent(content.id),
-    // 상세 + 목록/검색 + 추천 캐시를 동시에 반영
     onMutate: (wasLiked) =>
       updateContentInteractionCache(
         queryClient,
@@ -114,102 +167,113 @@ export function FeedCard({ content }: FeedCardProps) {
       />
       <Link
         href={`/home/${content.id}`}
-        className="block"
+        className="group block cursor-pointer"
         onClick={handleCardClick}
       >
-        <article className="group border-b border-border/70 py-7 transition-colors">
-          <div className="flex items-start gap-5">
-            <div className="min-w-0 flex-1">
-              {/* Source & time */}
-              <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground font-medium">
-                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate font-medium">
-                  {content.sourceName}
-                </span>
+        <article>
+          {/* ── Header + Title + Preview ──────────────────────────────────── */}
+          <div className="px-1 pt-5 pb-3">
+            {/* Header: source badge + name + date + optional Q&A pill */}
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <SourceBadge sourceName={content.sourceName} />
+                <span className="font-semibold">{content.sourceName}</span>
                 <span className="text-muted-foreground/40">·</span>
-                <span className="shrink-0">
-                  {formatDate(content.publishedAt)}
-                </span>
-              </div>
-
-              {/* Title */}
-              <h3 className="mb-2 line-clamp-2 text-[19px] font-semibold leading-snug tracking-[-0.01em] text-foreground transition-opacity sm:text">
-                {content.title}
-              </h3>
-
-              {/* Preview */}
-              <p className="mb-3 line-clamp-2 text-sm leading-6 text-muted-foreground font-medium sm:text-[15px]">
-                {content.preview}
-              </p>
-
-              {/* Tags */}
-              {content.tags.length > 0 && (
-                <p className="mb-4 line-clamp-1 text-sm text-muted-foreground/85 font-medium">
-                  {content.tags.slice(0, 3).join(" · ")}
-                </p>
-              )}
-
-              {/* Action buttons */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={handleLike}
-                  className={cn(
-                    "rounded-md p-1 transition-colors cursor-pointer",
-                    content.isLiked
-                      ? "text-red-500"
-                      : "text-muted-foreground hover:text-foreground",
-                    likeMutation.isPending && "opacity-50",
-                  )}
-                  aria-label={content.isLiked ? "좋아요 취소" : "좋아요"}
-                >
-                  <Heart
-                    className="h-4 w-4"
-                    fill={content.isLiked ? "currentColor" : "none"}
-                  />
-                </button>
-
-                <button
-                  onClick={handleScrap}
-                  className={cn(
-                    "rounded-md p-1 transition-colors cursor-pointer",
-                    content.isScrapped
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground",
-                    scrapMutation.isPending && "opacity-50",
-                  )}
-                  aria-label={content.isScrapped ? "스크랩 해제" : "스크랩"}
-                >
-                  <Bookmark
-                    className="h-4 w-4"
-                    fill={content.isScrapped ? "currentColor" : "none"}
-                  />
-                </button>
-
-                <button
-                  onClick={handleShare}
-                  className="rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
-                  aria-label="공유"
-                >
-                  <Share2 className="h-4 w-4" />
-                </button>
+                <span>{formatDate(content.publishedAt)}</span>
               </div>
             </div>
 
-            {/* 썸네일 — sm 이상에서만 노출, 없으면 렌더링 안 함 */}
-            {content.thumbnailUrl && (
-              <div className="hidden shrink-0 sm:block">
-                <div className="relative h-[190px] w-[200px] overflow-hidden rounded-sm bg-secondary">
-                  <Image
-                    src={content.thumbnailUrl}
-                    alt={content.title}
-                    fill
-                    className="object-cover"
-                    sizes="200px"
-                  />
-                </div>
-              </div>
-            )}
+            {/* Title */}
+            <h3 className="mb-2 line-clamp-2 text-[17px] font-bold leading-snug tracking-[-0.01em] text-foreground">
+              {content.title}
+            </h3>
+
+            {/* Preview */}
+            <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+              {content.preview}
+            </p>
           </div>
+
+          {/* ── Tags ─────────────────────────────────────────────────────── */}
+          {content.tags.length > 0 && (
+            <div className="px-1 pt-1.5 flex flex-wrap gap-1.5">
+              {content.tags.slice(0, 4).map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* ── Thumbnail — blog only, full-width ────────────────────────── */}
+          {!isQA && content.thumbnailUrl && (
+            <div className="overflow-hidden rounded-lg mt-3 mb-1">
+              <div className="relative aspect-square w-full">
+                <Image
+                  src={content.thumbnailUrl}
+                  alt={content.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 740px"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ── ActionBar ────────────────────────────────────────────────── */}
+          <div className="px-1 pt-3 pb-4">
+            {/* ActionBar */}
+            <div className="-ml-3 flex items-center gap-0.5">
+              <button
+                onClick={handleLike}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
+                  content.isLiked
+                    ? "text-red-500"
+                    : "text-muted-foreground hover:text-foreground",
+                  likeMutation.isPending && "pointer-events-none opacity-50",
+                )}
+                aria-label={content.isLiked ? "좋아요 취소" : "좋아요"}
+              >
+                <Heart
+                  className="h-4 w-4"
+                  fill={content.isLiked ? "currentColor" : "none"}
+                />
+                <span>좋아요</span>
+              </button>
+
+              <button
+                onClick={handleScrap}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
+                  content.isScrapped
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground",
+                  scrapMutation.isPending && "pointer-events-none opacity-50",
+                )}
+                aria-label={content.isScrapped ? "스크랩 해제" : "스크랩"}
+              >
+                <Bookmark
+                  className="h-4 w-4"
+                  fill={content.isScrapped ? "currentColor" : "none"}
+                />
+                <span>저장</span>
+              </button>
+
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+                aria-label="공유"
+              >
+                <Share2 className="h-4 w-4" />
+                <span>공유</span>
+              </button>
+            </div>
+          </div>
+          <div className="-mx-1 border-b border-border/60" />
         </article>
       </Link>
     </>
@@ -220,43 +284,47 @@ export function FeedCard({ content }: FeedCardProps) {
 
 export function FeedCardSkeleton() {
   return (
-    <article className="border-b border-border/70 py-7">
-      <div className="flex items-start gap-5">
-        <div className="min-w-0 flex-1">
-          {/* Source & time */}
-          <div className="mb-3 flex items-center gap-2">
-            <Skeleton className="h-3.5 w-3.5 shrink-0 rounded" />
-            <Skeleton className="h-3 w-16 rounded" />
-            <Skeleton className="h-2 w-2 rounded-full" />
-            <Skeleton className="h-3 w-12 rounded" />
-          </div>
-
-          {/* Title */}
-          <div className="mb-2">
-            <Skeleton className="mb-1.5 h-6 w-4/5 rounded-sm" />
-            <Skeleton className="h-6 w-3/5 rounded-sm" />
-          </div>
-
-          {/* Preview */}
-          <div className="mb-3">
-            <Skeleton className="mb-1.5 h-4 w-full rounded-sm" />
-            <Skeleton className="h-4 w-[85%] rounded-sm" />
-          </div>
-
-          {/* Tags */}
-          <Skeleton className="mb-4 h-4 w-40 rounded-sm" />
-
-          {/* Actions */}
-          <div className="flex items-center gap-1.5">
-            <Skeleton className="h-[26px] w-[26px] rounded-md" />
-            <Skeleton className="h-[26px] w-[26px] rounded-md" />
-            <Skeleton className="h-[30px] w-[30px] rounded-md" />
-          </div>
+    <article className="-mx-1 border-b border-border/60">
+      <div className="px-1 pt-5 pb-3">
+        {/* Header */}
+        <div className="mb-3 flex items-center gap-2">
+          <Skeleton className="h-[17px] w-[17px] shrink-0 rounded-full" />
+          <Skeleton className="h-3 w-16 rounded" />
+          <Skeleton className="h-2 w-2 rounded-full" />
+          <Skeleton className="h-3 w-12 rounded" />
         </div>
 
-        {/* 썸네일 */}
-        <div className="hidden shrink-0 sm:block">
-          <Skeleton className="h-[190px] w-[200px] rounded-sm" />
+        {/* Title */}
+        <div className="mb-2">
+          <Skeleton className="mb-1.5 h-5 w-4/5 rounded-sm" />
+          <Skeleton className="h-5 w-2/3 rounded-sm" />
+        </div>
+
+        {/* Preview */}
+        <div>
+          <Skeleton className="mb-1.5 h-4 w-full rounded-sm" />
+          <Skeleton className="h-4 w-[80%] rounded-sm" />
+        </div>
+      </div>
+
+      {/* Thumbnail */}
+      <div className="mt-1 mb-1 overflow-hidden rounded-lg">
+        <Skeleton className="aspect-square w-full rounded-none" />
+      </div>
+
+      <div className="px-1 pt-3 pb-4">
+        {/* Tags */}
+        <div className="mb-3 flex gap-1.5">
+          <Skeleton className="h-5 w-12 rounded-full" />
+          <Skeleton className="h-5 w-16 rounded-full" />
+          <Skeleton className="h-5 w-10 rounded-full" />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-0.5">
+          <Skeleton className="h-[30px] w-[68px] rounded-lg" />
+          <Skeleton className="h-[30px] w-[60px] rounded-lg" />
+          <Skeleton className="h-[30px] w-[52px] rounded-lg" />
         </div>
       </div>
     </article>
