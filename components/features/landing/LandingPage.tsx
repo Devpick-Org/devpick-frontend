@@ -165,7 +165,7 @@ function MacbookMockup() {
         </div>
 
         {/* 스크린 영역 */}
-        <div className="overflow-hidden rounded-[6px] bg-black">
+        <div className="aspect-[16/10] overflow-hidden rounded-[6px] bg-black">
           <Image
             src="/preview.png"
             alt="Trace 앱 미리보기"
