@@ -157,6 +157,15 @@ export function StackOverflowDetailBody({
 
       {/* CTA */}
       <div className="flex justify-center gap-3 pt-4">
+        <a
+          href={canonicalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2.5 rounded-xl bg-secondary px-6 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-secondary/80"
+        >
+          <ExternalLink className="h-4 w-4" />
+          원문 보러 가기
+        </a>
         <Link
           href={`/home/${content.id}/quiz`}
           className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
@@ -164,15 +173,6 @@ export function StackOverflowDetailBody({
           <Brain className="h-4 w-4" />
           AI 퀴즈 풀기
         </Link>
-        <a
-          href={canonicalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 rounded-xl border border-primary px-6 py-3 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary/5"
-        >
-          <ExternalLink className="h-4 w-4" />
-          원문 보러 가기
-        </a>
       </div>
     </>
   );

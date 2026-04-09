@@ -8,13 +8,13 @@ interface BlogDetailBodyProps {
 }
 
 export function BlogDetailBody({ content }: BlogDetailBodyProps) {
-  const body = content.originalContent ?? content.preview;
-
   return (
     <>
-      <section className="mb-12 font-medium">
-        <ContentRenderer content={body} />
-      </section>
+      {content.isOriginalVisible && content.originalContent && (
+        <section className="mb-12 font-medium">
+          <ContentRenderer content={content.originalContent} />
+        </section>
+      )}
 
       <section className="flex flex-col items-center gap-4 rounded-2xl bg-card px-6 py-8">
         <p className="text-sm text-muted-foreground font-medium">
@@ -23,7 +23,7 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
         <div className="flex gap-3">
           <Link
             href={`/home/${content.id}/quiz`}
-            className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
+            className="inline-flex items-center gap-2.5 rounded-xl bg-secondary px-6 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-secondary/80"
           >
             <Brain className="h-4 w-4" />
             AI 퀴즈 풀기
@@ -32,7 +32,7 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
             href={content.canonicalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 rounded-xl border border-primary px-6 py-3 text-sm font-semibold text-primary transition-all duration-200 hover:bg-primary/5"
+            className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
           >
             <ExternalLink className="h-4 w-4" />
             원문 보러 가기

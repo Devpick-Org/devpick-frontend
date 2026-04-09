@@ -233,6 +233,14 @@ function HeroSection() {
               <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start">
                 <Button
                   size="lg"
+                  variant="outline"
+                  asChild
+                  className="h-12 rounded-xl border-0 px-8 text-base bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground"
+                >
+                  <Link href="/home">로그인 없이 둘러보기</Link>
+                </Button>
+                <Button
+                  size="lg"
                   asChild
                   className="h-12 rounded-xl px-8 has-[>svg]:px-8 text-base"
                 >
@@ -240,14 +248,6 @@ function HeroSection() {
                     로그인하기
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </Link>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  asChild
-                  className="h-12 rounded-xl border-0 px-8 text-base bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground"
-                >
-                  <Link href="/home">로그인 없이 둘러보기</Link>
                 </Button>
               </div>
             </FadeUp>
@@ -505,17 +505,17 @@ function CtaSection() {
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center ">
           <Button
             size="lg"
-            variant="secondary"
+            variant="outline"
             asChild
-            className="h-12 px-8 text-base rounded-xl bg-white text-foreground hover:bg-white/90"
+            className="h-12 rounded-xl border-0 px-8 text-base bg-white/15 text-white hover:bg-white/25 hover:text-white"
           >
             <Link href="/home">지금 둘러보기</Link>
           </Button>
           <Button
             size="lg"
-            variant="outline"
+            variant="secondary"
             asChild
-            className="h-12 rounded-xl border-0 px-8 has-[>svg]:px-8 text-base bg-white/15 text-white hover:bg-white/25 hover:text-white"
+            className="h-12 px-8 has-[>svg]:px-8 text-base rounded-xl bg-white text-foreground hover:bg-white/90"
           >
             <Link href="/auth">
               로그인 시작하기
