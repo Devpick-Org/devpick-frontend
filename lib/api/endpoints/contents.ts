@@ -16,89 +16,57 @@ import {
 
 // ─── Stack Overflow mock 본문 ─────────────────────────────────────────────────
 
-const MOCK_SO_QUESTION = `Java 애플리케이션에서 아래 코드를 실행하면 런타임에 \`NullPointerException\`이 발생합니다.
+const MOCK_SO_QUESTION = `<p>Java 애플리케이션에서 아래 코드를 실행하면 런타임에 <code>NullPointerException</code>이 발생합니다.</p>
+<pre><code class="language-java">String text = null;
+System.out.println(text.length());</code></pre>
+<p>개발 환경에서는 변수가 정상적으로 할당되는 것 같은데 프로덕션에서만 오류가 납니다.</p>
+<p>Java에서 <code>NullPointerException</code>이 발생하는 주요 원인과 체계적으로 디버깅하고 수정하는 방법이 궁금합니다.</p>`;
 
-\`\`\`java
-String text = null;
-System.out.println(text.length());
-\`\`\`
+const MOCK_SO_ACCEPTED_ANSWER = `<p><code>NullPointerException</code> (NPE)은 메모리에 아무 위치도 가리키지 않는 참조(null)를 사용하려 할 때 발생합니다.</p>
 
-개발 환경에서는 변수가 정상적으로 할당되는 것 같은데 프로덕션에서만 오류가 납니다.
+<h2>주요 원인</h2>
+<ol>
+  <li><strong>null 객체의 메서드 호출</strong>
+    <pre><code class="language-java">String s = null;
+s.length(); // NPE 발생</code></pre>
+  </li>
+  <li><strong>null 객체의 필드 접근</strong></li>
+  <li><strong>null인 기본형 래퍼 타입의 언박싱</strong></li>
+</ol>
 
-Java에서 \`NullPointerException\`이 발생하는 주요 원인과 체계적으로 디버깅하고 수정하는 방법이 궁금합니다.`;
-
-const MOCK_SO_ACCEPTED_ANSWER = `\`NullPointerException\` (NPE)은 메모리에 아무 위치도 가리키지 않는 참조(null)를 사용하려 할 때 발생합니다.
-
-## 주요 원인
-
-1. **null 객체의 메서드 호출**
-\`\`\`java
-String s = null;
-s.length(); // NPE 발생
-\`\`\`
-2. **null 객체의 필드 접근**
-3. **null인 기본형 래퍼 타입의 언박싱**
-
-## 해결 방법
-
-방어적 null 체크를 사용하세요.
-
-\`\`\`java
-if (text != null) {
+<h2>해결 방법</h2>
+<p>방어적 null 체크를 사용하세요.</p>
+<pre><code class="language-java">if (text != null) {
     System.out.println(text.length());
-}
-\`\`\`
+}</code></pre>
+<p>또는 Java 8 이상에서 <code>Optional</code>을 활용할 수 있습니다.</p>
+<pre><code class="language-java">Optional.ofNullable(text)
+    .ifPresent(t -&gt; System.out.println(t.length()));</code></pre>
+<p>더 깊은 디버깅이 필요하다면 <strong>Helpful NPE</strong> 기능을 활성화하세요 (Java 14+, Java 17부터 기본값).</p>
+<pre><code class="language-bash">-XX:+ShowCodeDetailsInExceptionMessages</code></pre>
+<p>이 옵션을 켜면 <em>"text"가 null이기 때문에 "String.length()"를 호출할 수 없습니다</em> 와 같이 구체적인 메시지가 출력됩니다.</p>`;
 
-또는 Java 8 이상에서 \`Optional\`을 활용할 수 있습니다.
+const MOCK_SO_ANSWER_1 = `<p>Java 14부터 도입된 <strong>Helpful NullPointerException</strong> 기능을 사용하면 어떤 변수가 null인지 정확히 알 수 있습니다.</p>
+<blockquote>"text"가 null이기 때문에 "String.length()"를 호출할 수 없습니다</blockquote>
+<p><strong>Java 17</strong> 이상에서는 기본으로 활성화되어 있고, 이전 버전에서는 아래 옵션을 추가하면 됩니다.</p>
+<pre><code class="language-bash">-XX:+ShowCodeDetailsInExceptionMessages</code></pre>
+<p>스택 트레이스와 함께 사용하면 디버거 없이도 문제 위치를 즉시 파악할 수 있습니다.</p>`;
 
-\`\`\`java
-Optional.ofNullable(text)
-    .ifPresent(t -> System.out.println(t.length()));
-\`\`\`
-
-더 깊은 디버깅이 필요하다면 **Helpful NPE** 기능을 활성화하세요 (Java 14+, Java 17부터 기본값).
-
-\`\`\`bash
--XX:+ShowCodeDetailsInExceptionMessages
-\`\`\`
-
-이 옵션을 켜면 *"text"가 null이기 때문에 "String.length()"를 호출할 수 없습니다* 와 같이 구체적인 메시지가 출력됩니다.`;
-
-const MOCK_SO_ANSWER_1 = `Java 14부터 도입된 **Helpful NullPointerException** 기능을 사용하면 어떤 변수가 null인지 정확히 알 수 있습니다.
-
-> "text"가 null이기 때문에 "String.length()"를 호출할 수 없습니다
-
-**Java 17** 이상에서는 기본으로 활성화되어 있고, 이전 버전에서는 아래 옵션을 추가하면 됩니다.
-
-\`\`\`bash
--XX:+ShowCodeDetailsInExceptionMessages
-\`\`\`
-
-스택 트레이스와 함께 사용하면 디버거 없이도 문제 위치를 즉시 파악할 수 있습니다.`;
-
-const MOCK_SO_ANSWER_2 = `메서드 경계에서 빠른 실패(fail-fast)를 위해 **Objects.requireNonNull()**을 활용해 보세요.
-
-\`\`\`java
-public void process(String text) {
+const MOCK_SO_ANSWER_2 = `<p>메서드 경계에서 빠른 실패(fail-fast)를 위해 <strong>Objects.requireNonNull()</strong>을 활용해 보세요.</p>
+<pre><code class="language-java">public void process(String text) {
     Objects.requireNonNull(text, "text는 null이 될 수 없습니다");
     System.out.println(text.length()); // 여기서는 안전
-}
-\`\`\`
-
-이렇게 하면 로직 깊은 곳이 아닌 진입 시점에 명확한 메시지와 함께 NPE가 발생해 원인 추적이 훨씬 쉬워집니다. \`@NonNull\` 어노테이션과 정적 분석 도구(IntelliJ, SpotBugs)를 함께 사용하면 컴파일 타임에 잠재적인 NPE를 미리 잡을 수 있습니다.`;
+}</code></pre>
+<p>이렇게 하면 로직 깊은 곳이 아닌 진입 시점에 명확한 메시지와 함께 NPE가 발생해 원인 추적이 훨씬 쉬워집니다. <code>@NonNull</code> 어노테이션과 정적 분석 도구(IntelliJ, SpotBugs)를 함께 사용하면 컴파일 타임에 잠재적인 NPE를 미리 잡을 수 있습니다.</p>`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MOCK_ORIGINAL_CONTENT_WITH_CODE = `## 들어가며
+const MOCK_ORIGINAL_CONTENT_WITH_CODE = `<h2>들어가며</h2>
+<p>React의 <code>useEffect</code>는 컴포넌트가 렌더링된 이후 사이드 이펙트를 처리하는 훅입니다. 하지만 의존성 배열을 잘못 관리하면 무한 루프, stale closure 같은 버그가 발생합니다. 이 글에서는 올바른 사용법과 흔한 실수를 코드로 살펴봅니다.</p>
 
-React의 \`useEffect\`는 컴포넌트가 렌더링된 이후 사이드 이펙트를 처리하는 훅입니다. 하지만 의존성 배열을 잘못 관리하면 무한 루프, stale closure 같은 버그가 발생합니다. 이 글에서는 올바른 사용법과 흔한 실수를 코드로 살펴봅니다.
-
-## 기본 구조
-
-\`useEffect\`는 세 가지 형태로 사용됩니다.
-
-\`\`\`tsx
-// 1. 의존성 배열 없음 — 매 렌더링마다 실행
+<h2>기본 구조</h2>
+<p><code>useEffect</code>는 세 가지 형태로 사용됩니다.</p>
+<pre><code class="language-tsx">// 1. 의존성 배열 없음 — 매 렌더링마다 실행
 useEffect(() => {
   console.log("렌더링 후 항상 실행");
 });
@@ -111,15 +79,11 @@ useEffect(() => {
 // 3. 의존성 지정 — 해당 값이 바뀔 때만 실행
 useEffect(() => {
   console.log("count가 바뀔 때 실행:", count);
-}, [count]);
-\`\`\`
+}, [count]);</code></pre>
 
-## stale closure 문제
-
-의존성 배열에서 값을 빠뜨리면 클로저가 오래된 값을 참조하는 문제가 발생합니다.
-
-\`\`\`tsx
-// ❌ 잘못된 예: count가 의존성 배열에 없어서 항상 0을 출력
+<h2>stale closure 문제</h2>
+<p>의존성 배열에서 값을 빠뜨리면 클로저가 오래된 값을 참조하는 문제가 발생합니다.</p>
+<pre><code class="language-tsx">// ❌ 잘못된 예: count가 의존성 배열에 없어서 항상 0을 출력
 function Counter() {
   const [count, setCount] = useState(0);
 
@@ -130,28 +94,20 @@ function Counter() {
     return () => clearInterval(id);
   }, []); // count 누락
 
-  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
-}
-\`\`\`
-
-올바르게 고치려면 \`count\`를 의존성에 추가하거나, 함수형 업데이트를 사용합니다.
-
-\`\`\`tsx
-// ✅ 함수형 업데이트로 stale closure 회피
+  return &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;{count}&lt;/button&gt;;
+}</code></pre>
+<p>올바르게 고치려면 <code>count</code>를 의존성에 추가하거나, 함수형 업데이트를 사용합니다.</p>
+<pre><code class="language-tsx">// ✅ 함수형 업데이트로 stale closure 회피
 useEffect(() => {
   const id = setInterval(() => {
-    setCount(prev => prev + 1); // prev는 항상 최신값
+    setCount(prev =&gt; prev + 1); // prev는 항상 최신값
   }, 1000);
-  return () => clearInterval(id);
-}, []); // 의존성 없이도 안전
-\`\`\`
+  return () =&gt; clearInterval(id);
+}, []); // 의존성 없이도 안전</code></pre>
 
-## 클린업 함수
-
-비동기 요청이나 구독을 등록할 때는 반드시 클린업을 작성해야 합니다.
-
-\`\`\`tsx
-useEffect(() => {
+<h2>클린업 함수</h2>
+<p>비동기 요청이나 구독을 등록할 때는 반드시 클린업을 작성해야 합니다.</p>
+<pre><code class="language-tsx">useEffect(() => {
   let cancelled = false;
 
   async function fetchUser() {
@@ -166,55 +122,48 @@ useEffect(() => {
   return () => {
     cancelled = true;
   };
-}, [userId]);
-\`\`\`
+}, [userId]);</code></pre>
 
-## 마치며
+<h2>마치며</h2>
+<p><code>useEffect</code>의 의존성 배열은 "이 값이 바뀌면 다시 실행해 달라"는 선언이지, 임의로 비워두거나 채우는 용도가 아닙니다. <strong>eslint-plugin-react-hooks</strong>의 <code>exhaustive-deps</code> 규칙을 활성화하면 누락된 의존성을 자동으로 잡아줍니다.</p>`;
 
-\`useEffect\`의 의존성 배열은 "이 값이 바뀌면 다시 실행해 달라"는 선언이지, 임의로 비워두거나 채우는 용도가 아닙니다. **eslint-plugin-react-hooks**의 \`exhaustive-deps\` 규칙을 활성화하면 누락된 의존성을 자동으로 잡아줍니다.`;
+const MOCK_ORIGINAL_CONTENT = `<h2>들어가며</h2>
+<p>현대 소프트웨어 개발에서 이 개념은 점점 더 중요해지고 있습니다. 이 글에서는 핵심 원리부터 실전 활용법까지 단계적으로 살펴보겠습니다.</p>
 
-const MOCK_ORIGINAL_CONTENT = `## 들어가며
+<h2>기본 개념 이해</h2>
+<p>가장 먼저 짚어야 할 것은 <strong>기본 원리</strong>입니다. 많은 개발자들이 표면적인 사용법만 익히고 넘어가다 보면 예상치 못한 버그를 만나게 됩니다.</p>
+<p>핵심 포인트는 다음과 같습니다.</p>
+<ul>
+  <li>실행 순서와 타이밍을 정확히 이해해야 합니다</li>
+  <li>의존성과 사이드 이펙트를 명확히 구분하세요</li>
+  <li>메모리 누수 방지를 위한 클린업을 빠뜨리지 마세요</li>
+</ul>
 
-현대 소프트웨어 개발에서 이 개념은 점점 더 중요해지고 있습니다. 이 글에서는 핵심 원리부터 실전 활용법까지 단계적으로 살펴보겠습니다.
+<h2>주요 패턴과 안티패턴</h2>
+<p>실무에서 자주 마주치는 패턴들을 정리해봤습니다.</p>
 
-## 기본 개념 이해
+<h3>올바른 패턴</h3>
+<ol>
+  <li>관심사를 명확히 분리하여 단일 책임 원칙을 지키세요</li>
+  <li>재사용 가능한 추상화로 중복 코드를 줄이세요</li>
+  <li>에러 처리를 항상 명시적으로 작성하세요</li>
+</ol>
 
-가장 먼저 짚어야 할 것은 **기본 원리**입니다. 많은 개발자들이 표면적인 사용법만 익히고 넘어가다 보면 예상치 못한 버그를 만나게 됩니다.
+<h3>피해야 할 안티패턴</h3>
+<p>의존성을 무분별하게 늘리는 것은 <strong>가장 흔한 실수</strong> 중 하나입니다. 불필요한 의존성은 코드 복잡도를 높이고 테스트를 어렵게 만듭니다.</p>
+<p>또한 암묵적인 전역 상태에 의존하면 컴포넌트 간 결합도가 높아져 유지보수가 어려워집니다.</p>
 
-핵심 포인트는 다음과 같습니다.
+<h2>실전 적용 체크리스트</h2>
+<p>코드 리뷰 전 반드시 확인해야 할 사항들입니다.</p>
+<ul>
+  <li>타입 안전성이 보장되는가?</li>
+  <li>에러 케이스가 모두 처리되는가?</li>
+  <li>불필요한 렌더링이나 재계산이 없는가?</li>
+  <li>테스트 코드가 동작을 충분히 커버하는가?</li>
+</ul>
 
-- 실행 순서와 타이밍을 정확히 이해해야 합니다
-- 의존성과 사이드 이펙트를 명확히 구분하세요
-- 메모리 누수 방지를 위한 클린업을 빠뜨리지 마세요
-
-## 주요 패턴과 안티패턴
-
-실무에서 자주 마주치는 패턴들을 정리해봤습니다.
-
-### 올바른 패턴
-
-1. 관심사를 명확히 분리하여 단일 책임 원칙을 지키세요
-2. 재사용 가능한 추상화로 중복 코드를 줄이세요
-3. 에러 처리를 항상 명시적으로 작성하세요
-
-### 피해야 할 안티패턴
-
-의존성을 무분별하게 늘리는 것은 **가장 흔한 실수** 중 하나입니다. 불필요한 의존성은 코드 복잡도를 높이고 테스트를 어렵게 만듭니다.
-
-또한 암묵적인 전역 상태에 의존하면 컴포넌트 간 결합도가 높아져 유지보수가 어려워집니다.
-
-## 실전 적용 체크리스트
-
-코드 리뷰 전 반드시 확인해야 할 사항들입니다.
-
-- 타입 안전성이 보장되는가?
-- 에러 케이스가 모두 처리되는가?
-- 불필요한 렌더링이나 재계산이 없는가?
-- 테스트 코드가 동작을 충분히 커버하는가?
-
-## 마치며
-
-이 개념을 완전히 이해하면 복잡한 로직도 명확하게 표현할 수 있습니다. 공식 문서와 함께 직접 코드를 작성해보며 익혀두세요.`;
+<h2>마치며</h2>
+<p>이 개념을 완전히 이해하면 복잡한 로직도 명확하게 표현할 수 있습니다. 공식 문서와 함께 직접 코드를 작성해보며 익혀두세요.</p>`;
 
 const MOCK_CONTENTS: Content[] = [
   {
