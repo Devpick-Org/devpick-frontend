@@ -18,6 +18,7 @@ export interface PostDetailDTO {
   level: PostLevel;
   authorId: string;
   authorNickname: string;
+  authorProfileImage?: string | null;
   answerCount: number;
   createdAt: string;
   updatedAt: string;
@@ -32,6 +33,7 @@ export interface CommentDTO {
   content: string;
   userId: string;
   nickname: string;
+  profileImage?: string | null;
   createdAt: string;
 }
 
@@ -41,6 +43,7 @@ export interface AnswerDTO {
   content: string;
   authorId: string;
   authorNickname: string;
+  authorProfileImage?: string | null;
   authorJob?: string | null;
   authorLevel?: string | null;
   isAdopted: boolean;
