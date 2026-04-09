@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-  User,
   Check,
   Trash2,
   Pencil,
@@ -14,6 +13,9 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { formatRelativeDate } from "./CommunityCard";
 import { ContentRenderer } from "./ContentRenderer";
+import { AuthorButton } from "./AuthorButton";
+import { UserProfileModal } from "./UserProfileModal";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { CommunityAnswer, CommentDTO } from "@/types/community";
 
 const JOB_LABELS: Record<string, string> = {
@@ -49,6 +51,7 @@ export function AnswerList({
   onDeleteComment,
 }: AnswerListProps) {
   const { user } = useAuthStore();
+  const [profileInfo, setProfileInfo] = useState<{ userId: string; nickname: string } | null>(null);
   const hasAdopted = answers.some((a) => a.isAdopted);
   const isPostAuthor = user?.userId === postAuthorId;
 
@@ -61,21 +64,29 @@ export function AnswerList({
   }
 
   return (
-    <div className="space-y-5">
-      {answers.map((answer) => (
-        <AnswerItem
-          key={answer.id}
-          answer={answer}
-          currentUserId={user?.userId}
-          canAdopt={isPostAuthor && !hasAdopted && !answer.isAdopted}
-          onAdopt={onAdopt}
-          onDelete={onDeleteAnswer}
-          onUpdate={onUpdateAnswer}
-          onAddComment={onAddComment}
-          onDeleteComment={onDeleteComment}
-        />
-      ))}
-    </div>
+    <>
+      <UserProfileModal
+        userId={profileInfo?.userId ?? null}
+        nickname={profileInfo?.nickname}
+        onClose={() => setProfileInfo(null)}
+      />
+      <div className="space-y-5">
+        {answers.map((answer) => (
+          <AnswerItem
+            key={answer.id}
+            answer={answer}
+            currentUserId={user?.userId}
+            canAdopt={isPostAuthor && !hasAdopted && !answer.isAdopted}
+            onAdopt={onAdopt}
+            onDelete={onDeleteAnswer}
+            onUpdate={onUpdateAnswer}
+            onAddComment={onAddComment}
+            onDeleteComment={onDeleteComment}
+            openUserProfile={(userId, nickname) => setProfileInfo({ userId, nickname })}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -90,6 +101,7 @@ interface AnswerItemProps {
   onUpdate: (answerId: string, content: string) => void;
   onAddComment: (answerId: string, content: string) => void;
   onDeleteComment: (answerId: string, commentId: string) => void;
+  openUserProfile: (userId: string, nickname: string) => void;
 }
 
 function AnswerItem({
@@ -101,6 +113,7 @@ function AnswerItem({
   onUpdate,
   onAddComment,
   onDeleteComment,
+  openUserProfile,
 }: AnswerItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(answer.content);
@@ -147,8 +160,12 @@ function AnswerItem({
       {/* 헤더: 작성자 + 액션 버튼 */}
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-          <User className="h-3.5 w-3.5 shrink-0" />
-          <span className="text-foreground">{answer.authorNickname}</span>
+          <AuthorButton
+            userId={answer.authorId}
+            nickname={answer.authorNickname}
+            profileImage={answer.authorProfileImage}
+            onOpenProfile={(userId) => openUserProfile(userId, answer.authorNickname)}
+          />
           {(answer.authorJob || answer.authorLevel) && (
             <>
               <span className="text-muted-foreground">·</span>
@@ -258,6 +275,7 @@ function AnswerItem({
                   onDelete={(commentId) =>
                     onDeleteComment(answer.id, commentId)
                   }
+                  onOpenProfile={(userId) => openUserProfile(userId, comment.nickname)}
                 />
               ))}
             </div>
@@ -322,18 +340,31 @@ interface CommentItemProps {
   comment: CommentDTO;
   currentUserId: string | undefined;
   onDelete: (commentId: string) => void;
+  onOpenProfile: (userId: string) => void;
 }
 
-function CommentItem({ comment, currentUserId, onDelete }: CommentItemProps) {
+function CommentItem({ comment, currentUserId, onDelete, onOpenProfile }: CommentItemProps) {
   const isMyComment = currentUserId === comment.userId;
 
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex-1 text-xs leading-5">
-        <span className="mr-2 font-semibold text-foreground/80">
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-1 items-center gap-1.5 text-xs leading-5 min-w-0">
+        <button
+          type="button"
+          onClick={() => onOpenProfile(comment.userId)}
+          className="inline-flex shrink-0 items-center gap-1 font-semibold text-foreground/80 hover:opacity-70 cursor-pointer"
+        >
+          <Avatar className="size-4">
+            {comment.profileImage && (
+              <AvatarImage src={comment.profileImage} alt={comment.nickname} />
+            )}
+            <AvatarFallback className="text-[9px]">
+              {comment.nickname.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
           {comment.nickname}
-        </span>
-        <span className="text-muted-foreground">{comment.content}</span>
+        </button>
+        <span className="text-muted-foreground min-w-0 break-words">{comment.content}</span>
       </div>
       {isMyComment && (
         <button

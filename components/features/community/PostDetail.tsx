@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowLeft,
-  User,
   FileDown,
   ImageIcon,
   Paperclip,
@@ -15,6 +14,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatRelativeDate } from "./CommunityCard";
 import { ContentRenderer } from "./ContentRenderer";
+import { AuthorButton } from "./AuthorButton";
+import { UserProfileModal } from "./UserProfileModal";
 import type { PostAttachmentDTO, PostDetailDTO } from "@/types/community";
 import type { PostLevel } from "@/types/post";
 
@@ -82,6 +83,8 @@ function AttachmentItem({ attachment }: { attachment: PostAttachmentDTO }) {
 }
 
 export function PostDetail({ post }: PostDetailProps) {
+  const [profileInfo, setProfileInfo] = useState<{ userId: string; nickname: string } | null>(null);
+
   const handleShare = useCallback(() => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(
@@ -92,6 +95,12 @@ export function PostDetail({ post }: PostDetailProps) {
   }, [post.id]);
 
   return (
+    <>
+    <UserProfileModal
+      userId={profileInfo?.userId ?? null}
+      nickname={profileInfo?.nickname}
+      onClose={() => setProfileInfo(null)}
+    />
     <article className="mb-8">
       <Link
         href="/community"
@@ -115,8 +124,12 @@ export function PostDetail({ post }: PostDetailProps) {
       </div>
 
       <div className="mb-6 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        <User className="h-3.5 w-3.5 shrink-0" />
-        <span>{post.authorNickname}</span>
+        <AuthorButton
+          userId={post.authorId}
+          nickname={post.authorNickname}
+          profileImage={post.authorProfileImage}
+          onOpenProfile={(userId) => setProfileInfo({ userId, nickname: post.authorNickname })}
+        />
         <span className="text-muted-foreground/40">·</span>
         <span className={cn("font-medium", LEVEL_TEXT_COLORS[post.level])}>
           {LEVEL_LABEL[post.level]}
@@ -147,5 +160,6 @@ export function PostDetail({ post }: PostDetailProps) {
 
       <hr className="mt-8 border-border/60" />
     </article>
+    </>
   );
 }

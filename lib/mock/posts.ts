@@ -108,6 +108,7 @@ export const MOCK_POSTS: PostSummary[] = [
     level: "SENIOR",
     authorId: "user-010",
     authorNickname: "시니어프론트",
+    authorProfileImage: "https://i.pravatar.cc/150?img=33",
     answerCount: 1,
     createdAt: "2026-03-16T08:00:00.000Z",
   },

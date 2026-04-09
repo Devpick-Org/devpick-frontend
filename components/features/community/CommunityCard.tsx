@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { MessageCircle, Share2, User } from "lucide-react";
+import { MessageCircle, Share2 } from "lucide-react";
 import { useState } from "react";
 import { cn, copyShareLink } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
+import { AuthorButton } from "./AuthorButton";
+import { UserProfileModal } from "./UserProfileModal";
 import type { PostSummary, PostLevel } from "@/types/post";
 
 // ─── Level helpers ─────────────────────────────────────────────────────────────
@@ -67,6 +69,7 @@ interface CommunityCardProps {
 export function CommunityCard({ post }: CommunityCardProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const [profileInfo, setProfileInfo] = useState<{ userId: string; nickname: string } | null>(null);
 
   const handleCardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!isAuthenticated) {
@@ -88,12 +91,21 @@ export function CommunityCard({ post }: CommunityCardProps) {
         onOpenChange={setLoginDialogOpen}
         message="게시글 상세를 보려면"
       />
+      <UserProfileModal
+        userId={profileInfo?.userId ?? null}
+        nickname={profileInfo?.nickname}
+        onClose={() => setProfileInfo(null)}
+      />
       <Link href={`/community/${post.id}`} className="block" onClick={handleCardClick}>
         <article className="group border-b border-border/70 py-7 transition-colors">
         {/* Meta row: author · level · time */}
         <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground font-medium">
-          <User className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate font-medium">{post.authorNickname}</span>
+          <AuthorButton
+            userId={post.authorId}
+            nickname={post.authorNickname}
+            profileImage={post.authorProfileImage}
+            onOpenProfile={(userId) => setProfileInfo({ userId, nickname: post.authorNickname })}
+          />
           <span className="text-muted-foreground/40">·</span>
           <span className={cn("font-medium", LEVEL_TEXT_COLORS[post.level])}>
             {LEVEL_LABEL[post.level]}

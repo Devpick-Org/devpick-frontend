@@ -9,6 +9,7 @@ export interface PostSummary {
   level: PostLevel;
   authorId: string;
   authorNickname: string;
+  authorProfileImage?: string | null;
   answerCount: number;
   createdAt: string;
   contentPreview: string;
