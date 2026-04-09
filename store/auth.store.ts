@@ -23,20 +23,9 @@ interface AuthStore {
  * - refreshToken: 백엔드가 HttpOnly Cookie로 관리 (프론트에서 직접 접근 불가)
  */
 export const useAuthStore = create<AuthStore>((set) => ({
-  user: {
-    userId: "dev-user",
-    email: "[dev@devpick.kr](mailto:dev@devpick.kr)",
-    nickname: "개발자",
-    job: "FRONTEND",
-    level: "JUNIOR",
-    tags: [],
-    profileImage: null,
-    createdAt: "",
-  } as User,
-
-  accessToken: "dev-token",
-
-  isAuthenticated: true,
+  user: null,
+  accessToken: null,
+  isAuthenticated: false,
 
   setAuth: (user, accessToken) => {
     set({ user, accessToken, isAuthenticated: true });
