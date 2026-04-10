@@ -5,7 +5,7 @@ import { Bookmark, Heart, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Thumbnail } from "@/components/ui/thumbnail";
+import { Thumbnail, getThumbnailMode } from "@/components/ui/thumbnail";
 import { cn, formatDate, copyShareLink } from "@/lib/utils";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import {
@@ -81,6 +81,11 @@ export function FeedCard({ content }: FeedCardProps) {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogMessage, setLoginDialogMessage] = useState("");
   const isQA = isStackOverflow(content.sourceName);
+  const thumbnailMode = getThumbnailMode(content.thumbnailWidth, content.thumbnailHeight);
+  const thumbnailAspectRatio =
+    content.thumbnailWidth != null && content.thumbnailHeight != null
+      ? content.thumbnailWidth / content.thumbnailHeight
+      : undefined;
 
   const openLoginDialog = (message: string) => {
     setLoginDialogMessage(message);
@@ -214,8 +219,8 @@ export function FeedCard({ content }: FeedCardProps) {
               <Thumbnail
                 src={content.thumbnailUrl}
                 alt={content.title}
-                ratio="classic"
-                fit="auto"
+                mode={thumbnailMode}
+                aspectRatio={thumbnailAspectRatio}
               />
             </div>
           )}

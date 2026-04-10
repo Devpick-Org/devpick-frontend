@@ -25,6 +25,8 @@ export interface Content {
   sourceName: string;
   preview: string;
   thumbnailUrl: string | null;
+  thumbnailWidth?: number | null;
+  thumbnailHeight?: number | null;
   canonicalUrl: string;
   tags: string[];
   publishedAt: string;

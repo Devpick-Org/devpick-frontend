@@ -1,57 +1,80 @@
-"use client";
-
 import Image from "next/image";
-import { useState, type SyntheticEvent } from "react";
 import { cn } from "@/lib/utils";
+
+export type ThumbnailMode = "fixed-cover" | "fixed-contain" | "natural";
+
+// ── 분기 상수 ────────────────────────────────────────────────────────────────
+const BASE_RATIO = 4 / 3; // ~1.333
+const SIMILARITY_THRESHOLD = 0.15; // BASE_RATIO + 0.15 ≈ 1.483 이하 → fixed-cover
+const MAX_NATURAL_RATIO = 2.4; // 2.4:1 이상 파노라마 → fixed-cover 폴백
+
+/**
+ * 서버 메타데이터 기반으로 썸네일 렌더링 모드를 결정한다.
+ * - undefined / null → fixed-cover (폴백)
+ * - 세로형 (ratio < 1) → fixed-contain
+ * - 가로형, 4:3과 유사 (ratio ≤ ~1.483) → fixed-cover
+ * - 가로형, 충분히 넓음 (1.483 < ratio < 2.4) → natural
+ * - 파노라마 (ratio ≥ 2.4) → fixed-cover 폴백
+ */
+export function getThumbnailMode(
+  w: number | null | undefined,
+  h: number | null | undefined,
+): ThumbnailMode {
+  if (w == null || h == null) return "fixed-cover";
+  const ratio = w / h;
+  if (ratio < 1) return "fixed-contain";
+  if (ratio >= MAX_NATURAL_RATIO) return "fixed-cover";
+  if (ratio <= BASE_RATIO + SIMILARITY_THRESHOLD) return "fixed-cover";
+  return "natural";
+}
+
+// ── Props ────────────────────────────────────────────────────────────────────
 
 interface ThumbnailProps {
   src: string;
   alt: string;
-  fit?: "cover" | "contain" | "auto";
-  ratio?: "square" | "landscape" | "classic" | "video";
+  mode: ThumbnailMode;
+  /** mode === "natural" 일 때 aspect-ratio 계산에 사용 (w / h) */
+  aspectRatio?: number;
   sizes?: string;
   className?: string;
 }
 
-const RATIO_CLASS: Record<NonNullable<ThumbnailProps["ratio"]>, string> = {
-  square: "aspect-square",
-  landscape: "aspect-[5/4]",
-  classic: "aspect-[4/3]",
-  video: "aspect-video",
-};
+// ── Component ────────────────────────────────────────────────────────────────
 
 export function Thumbnail({
   src,
   alt,
-  fit = "cover",
-  ratio = "landscape",
+  mode,
+  aspectRatio,
   sizes = "(max-width: 768px) 100vw, 740px",
   className,
 }: ThumbnailProps) {
-  const [resolvedFit, setResolvedFit] = useState<"cover" | "contain">(
-    fit === "auto" ? "cover" : fit,
-  );
+  // ── natural: 카드 width 기준, 원본 비율대로 height 결정 ─────────────────
+  if (mode === "natural") {
+    return (
+      <div
+        className={cn("relative w-full overflow-hidden", className)}
+        style={{ aspectRatio: aspectRatio ?? BASE_RATIO }}
+      >
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover"
+          sizes={sizes}
+        />
+      </div>
+    );
+  }
 
-  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
-    if (fit !== "auto") return;
-    const img = e.currentTarget;
-    const imageRatio = img.naturalWidth / img.naturalHeight;
-    setResolvedFit(imageRatio < 1 ? "contain" : "cover");
-  };
-
-  const ratioClass = RATIO_CLASS[ratio];
-  const isContain = resolvedFit === "contain";
-
+  // ── fixed-cover / fixed-contain: 4:3 고정 컨테이너 ──────────────────────
   return (
     <div
-      className={cn(
-        "relative w-full overflow-hidden",
-        ratioClass,
-        className,
-      )}
+      className={cn("relative aspect-[4/3] w-full overflow-hidden", className)}
     >
-      {/* Blurred background — contain일 때만 렌더링 */}
-      {isContain && (
+      {/* blurred background — fixed-contain 전용 */}
+      {mode === "fixed-contain" && (
         <Image
           src={src}
           alt=""
@@ -62,14 +85,14 @@ export function Thumbnail({
         />
       )}
 
-      {/* 원본 이미지 */}
       <Image
         src={src}
         alt={alt}
         fill
-        className={isContain ? "object-contain" : "object-cover"}
+        className={
+          mode === "fixed-contain" ? "object-contain" : "object-cover"
+        }
         sizes={sizes}
-        onLoad={handleLoad}
       />
     </div>
   );

@@ -194,6 +194,8 @@ const MOCK_CONTENTS: Content[] = [
     isLiked: false,
     thumbnailUrl:
       "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=800&fit=crop",
+    thumbnailWidth: 800,
+    thumbnailHeight: 800,
   },
   {
     id: "content-002",
@@ -224,6 +226,8 @@ const MOCK_CONTENTS: Content[] = [
     isLiked: true,
     thumbnailUrl:
       "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=600&fit=crop",
+    thumbnailWidth: 400,
+    thumbnailHeight: 600,
   },
   {
     id: "content-004",
@@ -252,7 +256,9 @@ const MOCK_CONTENTS: Content[] = [
     isScrapped: false,
     isLiked: true,
     thumbnailUrl:
-      "https://images.unsplash.com/photo-1605745341112-85968b19335b?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1605745341112-85968b19335b?w=1280&h=720&fit=crop",
+    thumbnailWidth: 1280,
+    thumbnailHeight: 720,
   },
   {
     id: "content-006",
