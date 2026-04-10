@@ -214,7 +214,7 @@ export function FeedCard({ content }: FeedCardProps) {
               <Thumbnail
                 src={content.thumbnailUrl}
                 alt={content.title}
-                ratio="landscape"
+                ratio="classic"
                 fit="cover"
               />
             </div>

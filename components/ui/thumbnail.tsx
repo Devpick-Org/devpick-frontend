@@ -5,7 +5,7 @@ interface ThumbnailProps {
   src: string;
   alt: string;
   fit?: "cover" | "contain";
-  ratio?: "square" | "landscape" | "video";
+  ratio?: "square" | "landscape" | "classic" | "video";
   sizes?: string;
   className?: string;
 }
@@ -13,6 +13,7 @@ interface ThumbnailProps {
 const RATIO_CLASS: Record<NonNullable<ThumbnailProps["ratio"]>, string> = {
   square: "aspect-square",
   landscape: "aspect-[5/4]",
+  classic: "aspect-[4/3]",
   video: "aspect-video",
 };
 
