@@ -21,7 +21,7 @@ export type AiSummaryResponse = ApiResponse<AiSummary>;
 export interface Content {
   id: string;
   title: string;
-  author: string;
+  author: string | null;
   sourceName: string;
   preview: string;
   thumbnailUrl: string | null;

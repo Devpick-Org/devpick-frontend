@@ -223,7 +223,7 @@ const MOCK_CONTENTS: Content[] = [
     isScrapped: false,
     isLiked: true,
     thumbnailUrl:
-      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=800&fit=crop",
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=600&fit=crop",
   },
   {
     id: "content-004",
@@ -609,7 +609,7 @@ export const contentsEndpoints = {
             normalizedQuery.length === 0 ||
             content.title.toLowerCase().includes(normalizedQuery) ||
             content.preview.toLowerCase().includes(normalizedQuery) ||
-            content.author.toLowerCase().includes(normalizedQuery) ||
+            (content.author?.toLowerCase().includes(normalizedQuery) ?? false) ||
             content.tags.some((tag) =>
               tag.toLowerCase().includes(normalizedQuery),
             );

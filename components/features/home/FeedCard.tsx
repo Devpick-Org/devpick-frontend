@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Heart, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Thumbnail } from "@/components/ui/thumbnail";
 import { cn, formatDate, copyShareLink } from "@/lib/utils";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import {
@@ -211,15 +211,12 @@ export function FeedCard({ content }: FeedCardProps) {
           {/* ── Thumbnail — blog only, full-width ────────────────────────── */}
           {!isQA && content.thumbnailUrl && (
             <div className="overflow-hidden rounded-lg mt-3 mb-1">
-              <div className="relative aspect-square w-full">
-                <Image
-                  src={content.thumbnailUrl}
-                  alt={content.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 740px"
-                />
-              </div>
+              <Thumbnail
+                src={content.thumbnailUrl}
+                alt={content.title}
+                ratio="classic"
+                fit="auto"
+              />
             </div>
           )}
 
@@ -308,8 +305,8 @@ export function FeedCardSkeleton() {
       </div>
 
       {/* Thumbnail */}
-      <div className="mt-1 mb-1 overflow-hidden rounded-lg">
-        <Skeleton className="aspect-square w-full rounded-none" />
+      <div className="mt-3 mb-1 overflow-hidden rounded-lg">
+        <Skeleton className="aspect-[5/4] w-full rounded-none" />
       </div>
 
       <div className="px-1 pt-3 pb-4">
