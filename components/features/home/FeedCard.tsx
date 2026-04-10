@@ -215,7 +215,7 @@ export function FeedCard({ content }: FeedCardProps) {
                 src={content.thumbnailUrl}
                 alt={content.title}
                 ratio="classic"
-                fit="cover"
+                fit="auto"
               />
             </div>
           )}

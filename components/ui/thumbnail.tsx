@@ -1,10 +1,13 @@
+"use client";
+
 import Image from "next/image";
+import { useState, type SyntheticEvent } from "react";
 import { cn } from "@/lib/utils";
 
 interface ThumbnailProps {
   src: string;
   alt: string;
-  fit?: "cover" | "contain";
+  fit?: "cover" | "contain" | "auto";
   ratio?: "square" | "landscape" | "classic" | "video";
   sizes?: string;
   className?: string;
@@ -25,7 +28,19 @@ export function Thumbnail({
   sizes = "(max-width: 768px) 100vw, 740px",
   className,
 }: ThumbnailProps) {
+  const [resolvedFit, setResolvedFit] = useState<"cover" | "contain">(
+    fit === "auto" ? "cover" : fit,
+  );
+
+  const handleLoad = (e: SyntheticEvent<HTMLImageElement>) => {
+    if (fit !== "auto") return;
+    const img = e.currentTarget;
+    const imageRatio = img.naturalWidth / img.naturalHeight;
+    setResolvedFit(imageRatio < 1 ? "contain" : "cover");
+  };
+
   const ratioClass = RATIO_CLASS[ratio];
+  const isContain = resolvedFit === "contain";
 
   return (
     <div
@@ -35,15 +50,26 @@ export function Thumbnail({
         className,
       )}
     >
-      {fit === "contain" && (
-        <div className="absolute inset-0 bg-gradient-to-b from-neutral-50 to-neutral-100/60" />
+      {/* Blurred background — contain일 때만 렌더링 */}
+      {isContain && (
+        <Image
+          src={src}
+          alt=""
+          fill
+          aria-hidden
+          className="object-cover scale-110 blur-xl brightness-50"
+          sizes={sizes}
+        />
       )}
+
+      {/* 원본 이미지 */}
       <Image
         src={src}
         alt={alt}
         fill
-        className={fit === "cover" ? "object-cover" : "object-contain"}
+        className={isContain ? "object-contain" : "object-cover"}
         sizes={sizes}
+        onLoad={handleLoad}
       />
     </div>
   );
