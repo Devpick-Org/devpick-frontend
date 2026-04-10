@@ -609,7 +609,7 @@ export const contentsEndpoints = {
             normalizedQuery.length === 0 ||
             content.title.toLowerCase().includes(normalizedQuery) ||
             content.preview.toLowerCase().includes(normalizedQuery) ||
-            content.author.toLowerCase().includes(normalizedQuery) ||
+            (content.author?.toLowerCase().includes(normalizedQuery) ?? false) ||
             content.tags.some((tag) =>
               tag.toLowerCase().includes(normalizedQuery),
             );

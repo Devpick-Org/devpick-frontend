@@ -22,7 +22,7 @@ export interface PostDetailDTO {
   answerCount: number;
   createdAt: string;
   updatedAt: string;
-  attachments: PostAttachmentDTO[];
+  attachments?: PostAttachmentDTO[];
 }
 
 export type PostDetailResponse = ApiResponse<PostDetailDTO>;

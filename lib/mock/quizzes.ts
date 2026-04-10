@@ -13,7 +13,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
   "so-001": {
     title: "Java NullPointerException 이해 확인",
     estimatedMinutes: 3,
-    passingCount: 3, // 4문제 중 3개 이상 정답
+    passingCount: 2,
     questions: [
       {
         id: "q1",
@@ -24,6 +24,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "null인 기본형 래퍼 타입을 언박싱할 때" },
           { id: "c", text: "정수를 0으로 나눌 때" },
           { id: "d", text: "null 객체의 필드에 접근할 때" },
+          { id: "e", text: "null 배열에서 length를 읽을 때" },
         ],
         correctOptionId: "c",
         explanation:
@@ -38,6 +39,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "Nullable" },
           { id: "c", text: "SafeRef" },
           { id: "d", text: "NullSafe" },
+          { id: "e", text: "NullObject" },
         ],
         correctOptionId: "a",
         explanation:
@@ -52,27 +54,11 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "-XX:+ShowCodeDetailsInExceptionMessages" },
           { id: "c", text: "-XX:+VerboseNullPointer" },
           { id: "d", text: "-XX:+DetailedExceptions" },
+          { id: "e", text: "-XX:+NullPointerDetails" },
         ],
         correctOptionId: "b",
         explanation:
           "-XX:+ShowCodeDetailsInExceptionMessages 옵션을 사용하면 NPE 발생 시 어떤 변수가 null인지 구체적인 메시지를 출력합니다. Java 17부터는 기본 활성화됩니다.",
-      },
-      {
-        id: "q4",
-        question:
-          "메서드 진입 시점에서 즉시 null을 검증하고 명확한 메시지와 함께 NPE를 발생시키는 방법은?",
-        options: [
-          {
-            id: "a",
-            text: "if (param == null) throw new RuntimeException()",
-          },
-          { id: "b", text: "assert param != null" },
-          { id: "c", text: "Objects.requireNonNull(param, \"메시지\")" },
-          { id: "d", text: "Optional.of(param)" },
-        ],
-        correctOptionId: "c",
-        explanation:
-          "Objects.requireNonNull()은 null이면 지정한 메시지와 함께 NullPointerException을 즉시 던집니다. 로직 깊숙한 곳이 아닌 진입 시점에서 빠르게 실패(fail-fast)하므로 원인 추적이 훨씬 쉬워집니다.",
       },
     ],
   },
@@ -90,6 +76,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "컴포넌트가 마운트될 때 한 번만 실행된다" },
           { id: "c", text: "절대 실행되지 않는다" },
           { id: "d", text: "컴포넌트가 언마운트될 때만 실행된다" },
+          { id: "e", text: "props가 변경될 때마다 실행된다" },
         ],
         correctOptionId: "b",
         explanation:
@@ -106,6 +93,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
             text: "이벤트 리스너, 타이머, 구독 등 사이드 이펙트를 해제해야 할 때",
           },
           { id: "d", text: "항상 반환해야 한다" },
+          { id: "e", text: "DOM 업데이트가 필요할 때" },
         ],
         correctOptionId: "c",
         explanation:
@@ -123,6 +111,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           },
           { id: "c", text: "의존성 배열에 count를 넣었기 때문" },
           { id: "d", text: "useEffect는 동기적으로 실행되기 때문" },
+          { id: "e", text: "리액트가 렌더링을 최적화하기 때문" },
         ],
         correctOptionId: "b",
         explanation:
@@ -143,6 +132,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "function identity<T>(arg: T): T { return arg; }" },
           { id: "c", text: "function identity<T>(arg: any): T { return arg; }" },
           { id: "d", text: "function<T> identity(arg: T): T { return arg; }" },
+          { id: "e", text: "function identity(T)(arg: T): T { return arg; }" },
         ],
         correctOptionId: "b",
         explanation:
@@ -156,6 +146,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "extends" },
           { id: "c", text: "of" },
           { id: "d", text: "satisfies" },
+          { id: "e", text: "where" },
         ],
         correctOptionId: "b",
         explanation:
@@ -169,6 +160,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "keyof T는 T의 모든 키 이름을 유니온 타입으로 반환한다" },
           { id: "c", text: "keyof는 제네릭과 함께 사용할 수 없다" },
           { id: "d", text: "keyof T는 항상 string 타입을 반환한다" },
+          { id: "e", text: "keyof T는 T의 첫 번째 키만 반환한다" },
         ],
         correctOptionId: "b",
         explanation:
@@ -189,6 +181,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "networks" },
           { id: "c", text: "depends_on" },
           { id: "d", text: "ports" },
+          { id: "e", text: "links" },
         ],
         correctOptionId: "b",
         explanation:
@@ -202,6 +195,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "의존 서비스 컨테이너가 시작된 후 해당 컨테이너를 시작한다" },
           { id: "c", text: "의존 서비스와 동시에 시작한다" },
           { id: "d", text: "의존 서비스가 종료된 후 시작한다" },
+          { id: "e", text: "의존 서비스가 healthy 상태가 될 때까지 기다린다" },
         ],
         correctOptionId: "b",
         explanation:
@@ -215,6 +209,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "environment" },
           { id: "c", text: "volumes" },
           { id: "d", text: "networks" },
+          { id: "e", text: "expose" },
         ],
         correctOptionId: "c",
         explanation:
@@ -225,7 +220,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
   "mock-001": {
     title: "React useEffect 이해 확인",
     estimatedMinutes: 3,
-    passingCount: 2, // 3문제 중 2개 이상 정답
+    passingCount: 2,
     questions: [
       {
         id: "q1",
@@ -236,6 +231,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           { id: "b", text: "컴포넌트가 마운트될 때 한 번만 실행된다" },
           { id: "c", text: "절대 실행되지 않는다" },
           { id: "d", text: "컴포넌트가 언마운트될 때만 실행된다" },
+          { id: "e", text: "props가 변경될 때마다 실행된다" },
         ],
         correctOptionId: "b",
         explanation:
@@ -252,6 +248,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
             text: "이벤트 리스너, 타이머, 구독 등 사이드 이펙트를 해제해야 할 때",
           },
           { id: "d", text: "항상 반환해야 한다" },
+          { id: "e", text: "DOM 업데이트가 필요할 때" },
         ],
         correctOptionId: "c",
         explanation:
@@ -269,6 +266,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
           },
           { id: "c", text: "의존성 배열에 count를 넣었기 때문" },
           { id: "d", text: "useEffect는 동기적으로 실행되기 때문" },
+          { id: "e", text: "리액트가 렌더링을 최적화하기 때문" },
         ],
         correctOptionId: "b",
         explanation:

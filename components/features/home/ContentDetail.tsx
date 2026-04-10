@@ -145,7 +145,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
         {/* 메타 정보 — SO는 author 추가 노출 */}
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-muted-foreground">
           <span className="font-medium">{content.sourceName}</span>
-          {isSO && <span className="font-medium">{content.author}</span>}
+          {isSO && <span className="font-medium">{content.author ?? "작성자 미상"}</span>}
           <span className="font-medium">{formatDate(content.publishedAt)}</span>
           {content.licenseType && (
             <span className="rounded-md px-1.5 py-0.5 text-xs font-medium">

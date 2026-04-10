@@ -143,15 +143,15 @@ export function PostDetail({ post }: PostDetailProps) {
         className="text-[15px] leading-7 text-foreground/90 font-medium"
       />
 
-      {post.attachments.length > 0 && (
+      {(post.attachments?.length ?? 0) > 0 && (
         <div className="mt-6 space-y-3 rounded-lg p-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <Paperclip className="h-4 w-4 text-muted-foreground" />
             첨부 파일{" "}
-            {post.attachments.length > 1 && `${post.attachments.length}개`}
+            {(post.attachments?.length ?? 0) > 1 && `${post.attachments?.length}개`}
           </div>
           <div className="flex flex-wrap gap-3">
-            {post.attachments.map((attachment, index) => (
+            {post.attachments?.map((attachment, index) => (
               <AttachmentItem key={index} attachment={attachment} />
             ))}
           </div>
