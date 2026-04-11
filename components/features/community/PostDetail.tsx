@@ -8,7 +8,9 @@ import {
   FileDown,
   ImageIcon,
   Paperclip,
+  Pencil,
   Share2,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -35,6 +37,10 @@ const LEVEL_TEXT_COLORS: Record<PostLevel, string> = {
 
 interface PostDetailProps {
   post: PostDetailDTO;
+  isAuthor: boolean;
+  onEdit: () => void;
+  onDelete: () => void;
+  isDeleting?: boolean;
 }
 
 function AttachmentItem({ attachment }: { attachment: PostAttachmentDTO }) {
@@ -82,7 +88,7 @@ function AttachmentItem({ attachment }: { attachment: PostAttachmentDTO }) {
   );
 }
 
-export function PostDetail({ post }: PostDetailProps) {
+export function PostDetail({ post, isAuthor, onEdit, onDelete, isDeleting }: PostDetailProps) {
   const [profileInfo, setProfileInfo] = useState<{ userId: string; nickname: string } | null>(null);
 
   const handleShare = useCallback(() => {
@@ -114,13 +120,34 @@ export function PostDetail({ post }: PostDetailProps) {
         <h1 className="flex-1 text-2xl font-bold leading-snug tracking-[-0.01em] text-foreground">
           {post.title}
         </h1>
-        <button
-          onClick={handleShare}
-          className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:text-foreground cursor-pointer"
-          aria-label="공유"
-        >
-          <Share2 className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          {isAuthor && (
+            <>
+              <button
+                onClick={onEdit}
+                className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:text-foreground cursor-pointer"
+                aria-label="수정"
+              >
+                <Pencil className="h-5 w-5" />
+              </button>
+              <button
+                onClick={onDelete}
+                disabled={isDeleting}
+                className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:text-destructive cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="삭제"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </>
+          )}
+          <button
+            onClick={handleShare}
+            className="rounded-lg p-2 text-muted-foreground transition-all duration-200 hover:text-foreground cursor-pointer"
+            aria-label="공유"
+          >
+            <Share2 className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       <div className="mb-6 flex items-center gap-2 text-xs font-medium text-muted-foreground">

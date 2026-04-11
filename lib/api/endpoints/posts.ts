@@ -9,6 +9,8 @@ import type {
   SimilarPostListResponse,
   CreatePostRequest,
   CreatePostResponse,
+  UpdatePostRequest,
+  UpdatePostResponse,
   RefinePostRequest,
   RefinePostResponse,
   RefinePostData,
@@ -438,6 +440,47 @@ export const postsEndpoints = {
           message: "질문이 게시되었습니다",
         });
       }, 700);
+    });
+  },
+
+  /**
+   * PUT /posts/{postId} — 게시글 수정 (mock)
+   * 실제 API 연동 시: `return apiClient.put<UpdatePostResponse>(\`/posts/\${postId}\`, req)` 로 교체
+   */
+  updatePost: (
+    postId: string,
+    req: UpdatePostRequest,
+  ): Promise<UpdatePostResponse> => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const post = MOCK_POST_STORE[postId];
+        if (!post) {
+          reject(new Error("게시글을 찾을 수 없습니다"));
+          return;
+        }
+        const updated = {
+          ...post,
+          title: req.title,
+          content: req.content,
+          level: req.level,
+          updatedAt: new Date().toISOString(),
+        };
+        MOCK_POST_STORE[postId] = updated;
+        // 목록 캐시도 동기화
+        const idx = MOCK_POSTS.findIndex((p) => p.id === postId);
+        if (idx !== -1) {
+          MOCK_POSTS[idx] = {
+            ...MOCK_POSTS[idx],
+            title: req.title,
+            level: req.level,
+          };
+        }
+        resolve({
+          success: true,
+          data: { ...updated, answerCount: mockAnswerStore.getAll(postId).length },
+          message: "게시글이 수정되었습니다",
+        });
+      }, 400);
     });
   },
 

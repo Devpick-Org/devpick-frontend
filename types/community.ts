@@ -82,6 +82,7 @@ export interface RefinePostData {
 }
 
 export type CreatePostResponse = ApiResponse<PostDetailDTO>;
+export type UpdatePostResponse = ApiResponse<PostDetailDTO>;
 export type RefinePostResponse = ApiResponse<RefinePostData>;
 
 export interface UpdatePostRequest {
