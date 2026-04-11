@@ -26,6 +26,12 @@ const LEVEL_TEXT_COLORS: Record<PostLevel, string> = {
   SENIOR: "text-red-400",
 };
 
+const JOB_LABEL: Record<string, string> = {
+  FRONTEND: "프론트엔드",
+  BACKEND: "백엔드",
+  FULLSTACK: "풀스택",
+};
+
 export function formatRelativeDate(createdAt: string): string {
   const now = Date.now();
   const target = new Date(createdAt).getTime();
@@ -106,6 +112,12 @@ export function CommunityCard({ post }: CommunityCardProps) {
             profileImage={post.authorProfileImage}
             onOpenProfile={(userId) => setProfileInfo({ userId, nickname: post.authorNickname })}
           />
+          {post.authorJob && (
+            <>
+              <span className="text-muted-foreground/40">·</span>
+              <span>{JOB_LABEL[post.authorJob] ?? post.authorJob}</span>
+            </>
+          )}
           <span className="text-muted-foreground/40">·</span>
           <span className={cn("font-medium", LEVEL_TEXT_COLORS[post.level])}>
             {LEVEL_LABEL[post.level]}
