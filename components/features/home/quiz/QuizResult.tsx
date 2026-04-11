@@ -6,12 +6,16 @@ import {
   Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { calculateQuizResult } from "@/lib/quiz/quizResult";
-import type { ContentQuiz, QuizAnswer, QuizSubmitResult } from "@/types/quiz";
+import { calculateQuizResult, isQuestionCorrect } from "@/lib/quiz/quizResult";
+import type {
+  ContentQuiz,
+  QuizAnswers,
+  QuizSubmitResult,
+} from "@/types/quiz";
 
 interface QuizResultProps {
   quiz: ContentQuiz;
-  answers: QuizAnswer[];
+  answers: QuizAnswers;
   submitResult: QuizSubmitResult | null;
   onRetry: () => void;
   onBack: () => void;
@@ -80,25 +84,20 @@ export function QuizResult({
       {/* 문제별 정오답 */}
       <div className="space-y-3">
         {quiz.questions.map((q, idx) => {
-          const answer = answers.find((a) => a.questionId === q.id);
-          const isCorrect = answer?.selectedOptionId === q.correctOptionId;
-          const selectedOption = q.options.find(
-            (o) => o.id === answer?.selectedOptionId,
-          );
-          const correctOption = q.options.find(
-            (o) => o.id === q.correctOptionId,
-          );
+          const answer = answers[q.id];
+          const correct = isQuestionCorrect(q, answer);
 
           return (
             <div
               key={q.id}
               className={cn(
                 "rounded-xl p-4 space-y-2",
-                isCorrect ? "bg-green-500/5" : "bg-red-500/5",
+                correct ? "bg-green-500/5" : "bg-red-500/5",
               )}
             >
+              {/* 문제 텍스트 */}
               <div className="flex items-start gap-2">
-                {isCorrect ? (
+                {correct ? (
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
                 ) : (
                   <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
@@ -108,17 +107,46 @@ export function QuizResult({
                 </p>
               </div>
 
-              {!isCorrect && (
+              {/* 오답 상세 */}
+              {!correct && (
                 <div className="ml-6 space-y-1 text-xs font-medium">
-                  <p className="text-red-600 dark:text-red-400">
-                    내 답: {selectedOption?.text ?? "미선택"}
-                  </p>
-                  <p className="text-green-600 dark:text-green-400">
-                    정답: {correctOption?.text}
-                  </p>
+                  {q.type === "multiple_choice" ? (
+                    <>
+                      <p className="text-red-600 dark:text-red-400">
+                        내 답:{" "}
+                        {answer?.type === "multiple_choice" && answer.selectedOptionId
+                          ? q.options.find((o) => o.id === answer.selectedOptionId)?.text ?? "미선택"
+                          : "미선택"}
+                      </p>
+                      <p className="text-green-600 dark:text-green-400">
+                        정답:{" "}
+                        {q.options.find((o) => o.id === q.correctOptionId)?.text}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-red-600 dark:text-red-400">
+                        내 답:{" "}
+                        {answer?.type === "short_answer" && answer.answerText.trim()
+                          ? answer.answerText.trim()
+                          : "미입력"}
+                      </p>
+                      <p className="text-green-600 dark:text-green-400">
+                        정답: {q.correctAnswer}
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
 
+              {/* 주관식 정답 시에도 정답 표시 */}
+              {correct && q.type === "short_answer" && (
+                <div className="ml-6 text-xs font-medium text-muted-foreground">
+                  입력한 답: {answer?.type === "short_answer" ? answer.answerText.trim() : ""}
+                </div>
+              )}
+
+              {/* 해설 */}
               <p className="ml-6 text-xs text-muted-foreground font-medium leading-relaxed">
                 {q.explanation}
               </p>
@@ -131,7 +159,7 @@ export function QuizResult({
       <div className="flex flex-col gap-3 sm:flex-row">
         <button
           onClick={onBack}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-muted/40 cursor-pointer"
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl border-0 bg-secondary px-6 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-secondary/80 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           본문으로 돌아가기
