@@ -490,61 +490,6 @@ DP-{티켓번호}: {작업 내용}
 - `PUT` 요청 (선택적 필드): `{"nickname": "...", "profileImage": "...", "job": "BACKEND", "level": "MIDDLE", "tags": ["Spring", "Docker"]}`
 - 제약사항: `job` (FRONTEND|BACKEND|FULLSTACK), `level` (BEGINNER|JUNIOR|MIDDLE|SENIOR), `nickname` (2~20자)
 
-**_ GET /users/me 응답 예시 _**
-
-```json
-{
-  "success": true,
-  "data": {
-    "userId": "uuid-1234",
-    "email": "hong@devpick.kr",
-    "nickname": "홍근",
-    "profileImage": "https://...",
-    "job": "BACKEND",
-    "level": "JUNIOR",
-    "tags": ["Spring", "Java"],
-    "createdAt": "2026-02-24T09:00:00"
-  },
-  "message": "요청이 성공했습니다"
-}
-```
-
-**_ PUT /users/me 요청 예시 _**
-
-```json
-{
-  "nickname": "홍근2",
-  "profileImage": "https://...",
-  "job": "BACKEND",
-  "level": "MIDDLE",
-  "tags": ["Spring", "Docker"]
-}
-```
-
-**_ PUT /users/me 응답 예시 _**
-
-```json
-{
-  "success": true,
-  "data": {
-    "userId": "uuid-1234",
-    "email": "hong@devpick.kr",
-    "nickname": "홍근2",
-    "profileImage": "https://...",
-    "job": "BACKEND",
-    "level": "MIDDLE",
-    "tags": ["Spring", "Docker"],
-    "createdAt": "2026-02-24T09:00:00"
-  },
-  "message": "요청이 성공했습니다"
-}
-```
-
-**회원 탈퇴**
-
-- DELETE /users/me
-- 응답: 204 No Content
-
 **7. 소셜 로그인 흐름 (GitHub: `DP-183`, Google: `DP-184`)**
 
 ### OAuth 시작 URL 발급
@@ -655,57 +600,6 @@ DP-{티켓번호}: {작업 내용}
 | GET    | `/contents/{contentId}/summary`       | 레벨별 AI 요약 조회 | O    | `/home/[id]` | 200      |
 | POST   | `/contents/{contentId}/summary/retry` | AI 요약 재시도      | O    | `/home/[id]` | 200      |
 
-**API 스펙 참고:**
-GET /contents/{contentId}/summary
-query param: level = BEGINNER | JUNIOR | MIDDLE | SENIOR (default JUNIOR)
-Authorization: Bearer token
-
-응답 데이터 shape:
-
-```ts
-{
-  contentId: string;
-  level: "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
-  coreSummary: string;
-  keyPoints: string[];
-  keywords: string[];
-  difficulty: string;
-  nextRecommendation: string;
-  confidence: number;
-  additionalQuestions: string[];
-  cachedAt: string;
-  expiresAt: string;
-}
-```
-
-**재시도 API 스펙 참고:**
-POST /contents/{contentId}/summary/retry
-설명: 캐시를 무시하고 FastAPI에서 새로 생성
-query param:
-
-- level: BEGINNER | JUNIOR | MIDDLE | SENIOR (default JUNIOR)
-  Authorization: Bearer token
-
-응답 데이터 shape:
-
-```ts
-  success: true,
-  data: {
-    contentId: string;
-    level: "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
-    coreSummary: string;
-    keyPoints: string[];
-    keywords: string[];
-    difficulty: string;
-    nextRecommendation: string;
-    confidence: number;
-    additionalQuestions: string[];
-    cachedAt: string;
-    expiresAt: string;
-  }
-}
-```
-
 ### Epic D — 질문/커뮤니티
 
 | Method | Endpoint                                                  | 설명                           | 인증 | 관련 페이지        | 응답코드 |
@@ -745,8 +639,12 @@ query param:
 | GET   | `/reports/weekly/share/{token}`      | 공유 토큰으로 리포트 조회 | x    | `/report`   | 201      |
 
 
-#### 사용자 프로필 모달
-GET /users/{userId}/profile
+### Epic G — 사용자 프로필 모달
+
+| Method | Endpoint                    | 설명              | 인증 | 관련 페이지            | 응답코드 |
+| ------ | --------------------------- | ----------------- | ---- | ---------------------- | -------- |
+| GET    | `/users/{userId}/profile`   | 사용자 프로필 조회 | O    | `/community`, `/community/[id]` | 200      |
+
 ---
 
 ## 09. 테스트 전략
