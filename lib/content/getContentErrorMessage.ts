@@ -5,22 +5,25 @@ const CONTENT_ERROR_MESSAGES: Record<string, string> = {
   CONTENT_004: "이미 좋아요한 콘텐츠입니다.",
   CONTENT_005: "좋아요하지 않은 콘텐츠입니다.",
   CONTENT_006: "콘텐츠 소스를 찾을 수 없습니다.",
+  CONTENT_007: "AI가 아직 콘텐츠를 처리하지 않았습니다. 잠시 후 다시 시도해 주세요.",
   AI_001: "AI 서버 오류가 발생했습니다.",
   AI_002: "AI 서버 응답 시간이 초과되었습니다.",
   AI_003: "AI 요약을 찾을 수 없습니다.",
 };
 
-export type AiSummaryErrorKind = "empty" | "timeout" | "error";
+export type AiSummaryErrorKind = "empty" | "timeout" | "error" | "preparing";
 
 /**
  * 에러 코드를 AI 요약 UI 상태로 분류한다.
- * - AI_003 → empty  (아직 요약 없음)
- * - AI_002 → timeout (응답 시간 초과)
- * - 그 외  → error  (서버 오류 및 기타)
+ * - AI_003      → empty     (아직 요약 없음)
+ * - AI_002      → timeout   (응답 시간 초과)
+ * - CONTENT_007 → preparing (AI 처리 대기 중)
+ * - 그 외        → error     (서버 오류 및 기타)
  */
 export function getAiSummaryErrorKind(code?: string | null): AiSummaryErrorKind {
   if (code === "AI_003") return "empty";
   if (code === "AI_002") return "timeout";
+  if (code === "CONTENT_007") return "preparing";
   return "error";
 }
 

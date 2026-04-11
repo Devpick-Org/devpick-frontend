@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Loader2,
   AlertCircle,
+  Clock,
+  RefreshCw,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { quizzesEndpoints } from "@/lib/api/endpoints/quizzes";
+import { extractApiError } from "@/lib/api/extractApiError";
 import { calculateQuizResult } from "@/lib/quiz/quizResult";
 import type {
   QuizStage,
@@ -40,13 +43,41 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   // ─── 서버 상태 ───────────────────────────────────────────────────────────────
   const [level, setLevel] = useState<QuizLevel>("JUNIOR");
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching, error, refetch } = useQuery({
     queryKey: ["quiz", contentId, level],
     queryFn: () => quizzesEndpoints.getContentQuiz(contentId, level),
     placeholderData: (prev) => prev,
   });
 
   const quiz = data?.data ?? null;
+
+  const isPreparingState =
+    isError && extractApiError(error).code === "CONTENT_007";
+  const [prepCountdown, setPrepCountdown] = useState(30);
+  const prepFiredRef = useRef(false);
+
+  // kind 변경(isPreparingState on/off) 시 countdown / guard 리셋
+  useEffect(() => {
+    if (isPreparingState) {
+      setPrepCountdown(30);
+      prepFiredRef.current = false;
+    }
+  }, [isPreparingState]);
+
+  // 카운트다운 + 자동 재시도 (1회 guard)
+  useEffect(() => {
+    if (!isPreparingState) return;
+    if (prepCountdown <= 0) {
+      if (!prepFiredRef.current) {
+        prepFiredRef.current = true;
+        void refetch();
+      }
+      return;
+    }
+    prepFiredRef.current = false;
+    const timer = setTimeout(() => setPrepCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [isPreparingState, prepCountdown, refetch]);
 
   // ─── 로컬 상태 ───────────────────────────────────────────────────────────────
   const [stage, setStage] = useState<QuizStage>("intro");
@@ -130,6 +161,44 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (isPreparingState) {
+    return (
+      <div className="flex min-h-[40vh] flex-col items-center justify-center gap-4 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+          <Clock className="h-5 w-5 text-primary" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-md font-semibold text-foreground">
+            퀴즈를 준비하고 있어요
+          </p>
+          <p className="text-sm text-muted-foreground font-medium">
+            AI가 콘텐츠를 분석 중이에요.
+          </p>
+          {prepCountdown > 0 && (
+            <p className="text-sm text-muted-foreground font-medium">
+              {prepCountdown}초 후 자동으로 다시 시도합니다.
+            </p>
+          )}
+        </div>
+        <button
+          onClick={() => {
+            setPrepCountdown(30);
+            void refetch();
+          }}
+          disabled={isFetching}
+          className="flex items-center gap-1.5 rounded-xl border border-border px-5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {isFetching ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
+          )}
+          {isFetching ? "확인 중..." : "지금 다시 시도"}
+        </button>
       </div>
     );
   }
