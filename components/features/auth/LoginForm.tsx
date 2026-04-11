@@ -158,19 +158,13 @@ export function LoginForm({ isLoading }: LoginFormProps) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <Label
               htmlFor="login-password"
               className="text-foreground font-semibold"
             >
               {"비밀번호"}
             </Label>
-            <button
-              type="button"
-              className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-            >
-              {"비밀번호 찾기"}
-            </button>
           </div>
           <Input
             id="login-password"

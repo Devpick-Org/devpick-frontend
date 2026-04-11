@@ -97,7 +97,7 @@ function LoadingState() {
 
 function ErrorState() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 gap-3 text-foreground">
+    <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-foreground">
       <AlertCircle className="w-8 h-8" />
       <p className="text-md font-medium">학습 기록을 불러오지 못했습니다.</p>
     </div>
@@ -106,7 +106,7 @@ function ErrorState() {
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 gap-3 text-foreground">
+    <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-foreground">
       <BookOpen className="w-8 h-8" />
       <p className="text-md font-medium">아직 학습 기록이 없어요</p>
       <p className="text-sm font-medium text-muted-foreground">

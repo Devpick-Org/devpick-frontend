@@ -159,7 +159,7 @@ export function TopNavVariant() {
                       {displayBadge && (
                         <Badge
                           variant="secondary"
-                          className="max-w-[80px] truncate border border-primary/20 bg-primary/10 text-[10px] font-semibold text-primary"
+                          className="max-w-[80px] truncate border-0 bg-primary/10 text-[11px] font-semibold text-primary px-2.5 py-[3px] leading-none"
                         >
                           {displayBadge}
                         </Badge>

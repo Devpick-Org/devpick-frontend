@@ -7,7 +7,7 @@ import {
   Share2,
   Download,
   AlertCircle,
-  FileText,
+  CalendarClock,
   ChevronDown,
   Check,
 } from "lucide-react";
@@ -30,15 +30,16 @@ export default function WeeklyReportPage() {
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const { data: listRes } = useQuery({
+  const { data: listRes, isLoading: isListLoading } = useQuery({
     queryKey: REPORT_QUERY_KEYS.weeklyList,
     queryFn: () => reportsEndpoints.getWeeklyReportList(),
   });
   const reportList = listRes?.data ?? [];
+  const hasReport = listRes !== undefined && reportList.length > 0;
 
   const {
     data: reportRes,
-    isLoading,
+    isLoading: isReportLoading,
     isError,
   } = useQuery({
     queryKey: selectedReportId
@@ -47,6 +48,7 @@ export default function WeeklyReportPage() {
     queryFn: selectedReportId
       ? () => reportsEndpoints.getWeeklyReportById(selectedReportId)
       : () => reportsEndpoints.getWeeklyReport(),
+    enabled: hasReport,
   });
 
   const shareMutation = useMutation({
@@ -75,25 +77,13 @@ export default function WeeklyReportPage() {
     },
   });
 
-  if (isLoading) return <LoadingState />;
+  if (isListLoading) return <LoadingState />;
+  if (!hasReport) return <NoReportState />;
+  if (isReportLoading) return <LoadingState />;
   if (isError || !reportRes?.data) return <ErrorState />;
 
   const report = reportRes.data;
   const activity = report.activities[0];
-
-  if (report.status === "EMPTY" || !activity) {
-    return (
-      <div className="space-y-4 pt-2">
-        <WeekHeader
-          report={report}
-          reportList={reportList}
-          selectedReportId={selectedReportId}
-          onSelect={setSelectedReportId}
-        />
-        <EmptyActivityState />
-      </div>
-    );
-  }
 
   return (
     <>
@@ -211,13 +201,13 @@ function WeekHeader({
   );
 }
 
-function EmptyActivityState() {
+function NoReportState() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 gap-3 text-foreground">
-      <FileText className="w-8 h-8" />
-      <p className="text-sm font-medium">이번 주 활동 내역이 없습니다</p>
-      <p className="text-xs font-medium">
-        콘텐츠를 읽거나 질문을 작성하면 리포트가 생성됩니다.
+    <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-foreground">
+      <CalendarClock className="w-8 h-8" />
+      <p className="text-md font-medium">아직 생성된 리포트가 없어요</p>
+      <p className="text-sm font-medium text-muted-foreground">
+        매주 월요일에 지난 주 학습 리포트가 자동으로 생성됩니다.
       </p>
     </div>
   );
