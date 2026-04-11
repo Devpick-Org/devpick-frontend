@@ -35,12 +35,14 @@ interface PostWriteFormProps {
   files: File[];
   onFilesChange: (added: File[]) => void;
   onRemoveFile: (name: string) => void;
-  onRefine: (draft: PostDraft) => void;
+  /** 미전달 시 AI 개선 버튼 숨김 (수정 폼에서 사용) */
+  onRefine?: (draft: PostDraft) => void;
   onSubmit: (draft: PostDraft) => void;
-  isRefining: boolean;
+  isRefining?: boolean;
   isSubmitting: boolean;
   refineError?: string | null;
   submitError?: string | null;
+  submitLabel?: string;
 }
 
 // ─── 컴포넌트 ──────────────────────────────────────────────────────────────
@@ -52,10 +54,11 @@ export function PostWriteForm({
   onRemoveFile,
   onRefine,
   onSubmit,
-  isRefining,
+  isRefining = false,
   isSubmitting,
   refineError,
   submitError,
+  submitLabel,
 }: PostWriteFormProps) {
   const [title, setTitle] = useState(initialDraft?.title ?? "");
   const [content, setContent] = useState(initialDraft?.content ?? "");
@@ -301,27 +304,29 @@ export function PostWriteForm({
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <Button
           type="button"
-          variant="outline"
+          variant={onRefine ? "outline" : "default"}
           onClick={() => {
             if (validate()) onSubmit(draft);
           }}
           disabled={isPending}
-          className="flex-1 gap-2 hover:bg-secondary hover:text-secondary-foreground"
+          className={cn("flex-1 gap-2", onRefine && "hover:bg-secondary hover:text-secondary-foreground")}
         >
           <Send className="h-4 w-4" />
-          {isSubmitting ? "게시 중..." : "바로 게시하기"}
+          {isSubmitting ? "저장 중..." : (submitLabel ?? "바로 게시하기")}
         </Button>
-        <Button
-          type="button"
-          onClick={() => {
-            if (validate()) onRefine(draft);
-          }}
-          disabled={isPending}
-          className="flex-1 gap-2"
-        >
-          <Sparkles className="h-4 w-4" />
-          {isRefining ? "AI가 개선 중..." : "AI로 질문 개선하기"}
-        </Button>
+        {onRefine && (
+          <Button
+            type="button"
+            onClick={() => {
+              if (validate()) onRefine(draft);
+            }}
+            disabled={isPending}
+            className="flex-1 gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            {isRefining ? "AI가 개선 중..." : "AI로 질문 개선하기"}
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -58,9 +58,9 @@ export default function WeeklyReportPage() {
       const token = data.data?.shareToken;
       const shareUrl = `${window.location.origin}/report/share/${token}`;
       navigator.clipboard.writeText(shareUrl).catch(() => {});
-      toast.success("공유 링크가 클립보드에 복사되었습니다");
+      toast.success("공유 링크가 클립보드에 복사되었습니다.");
     },
-    onError: () => toast.error("공유 링크 생성에 실패했습니다"),
+    onError: () => toast.error("공유 링크 생성에 실패했습니다."),
   });
 
   const exportMutation = useMutation({
@@ -70,10 +70,10 @@ export default function WeeklyReportPage() {
         return Promise.reject(new Error("저장할 영역을 찾을 수 없습니다"));
       return exportReportAsPdf(contentRef.current, weekStart);
     },
-    onSuccess: () => toast.success("리포트가 저장되었습니다 (PDF)"),
+    onSuccess: () => toast.success("리포트가 저장되었습니다. (PDF)"),
     onError: (error) => {
       console.error("PDF export error:", error);
-      toast.error("저장에 실패했습니다");
+      toast.error("저장에 실패했습니다.");
     },
   });
 

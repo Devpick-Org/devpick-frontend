@@ -43,8 +43,8 @@ useEffect(() => {
 
 두 케이스의 실행 시점이 어떻게 다른지, 그리고 언제 어떤 걸 써야 하는지 명확한 기준을 알고 싶습니다.`,
   level: "BEGINNER",
-  authorId: "user-001",
-  authorNickname: "코딩입문자",
+  authorId: "dev-user",
+  authorNickname: "개발자",
   answerCount: 2,
   createdAt: "2026-03-17T08:30:00.000Z",
   updatedAt: "2026-03-17T08:30:00.000Z",

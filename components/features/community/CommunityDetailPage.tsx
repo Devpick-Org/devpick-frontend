@@ -1,7 +1,12 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
+import { useAuthStore } from "@/store/auth.store";
+import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { PostDetail } from "./PostDetail";
 import { AiAnswerSection } from "./AiAnswerSection";
 import { AnswerSection } from "./AnswerSection";
@@ -13,6 +18,11 @@ interface Props {
 }
 
 export function CommunityDetailPage({ postId }: Props) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const userId = useAuthStore((s) => s.user?.userId);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
   const {
     data: postRes,
     isLoading: isPostLoading,
@@ -20,6 +30,18 @@ export function CommunityDetailPage({ postId }: Props) {
   } = useQuery({
     queryKey: ["post", postId],
     queryFn: () => postsEndpoints.getPostDetail(postId),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => postsEndpoints.deletePost(postId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      toast.success("게시글이 삭제되었습니다.");
+      router.replace("/community");
+    },
+    onError: () => {
+      toast.error("삭제 중 문제가 발생했습니다. 다시 시도해 주세요.");
+    },
   });
 
   const { data: answersRes } = useQuery({
@@ -50,6 +72,10 @@ export function CommunityDetailPage({ postId }: Props) {
   const post = postRes?.data;
   const answers = answersRes?.data?.answers ?? [];
   const similarPosts = similarRes?.data?.posts ?? [];
+  const isAuthor = !!userId && !!post && userId === post.authorId;
+
+  const handleEdit = () => router.push(`/community/${postId}/edit`);
+  const handleDelete = () => setDeleteConfirmOpen(true);
 
   const aiStatus = isAiLoading
     ? "loading"
@@ -75,11 +101,28 @@ export function CommunityDetailPage({ postId }: Props) {
   }
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
+    <>
+      <ConfirmModal
+        open={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        title="게시글을 삭제하시겠습니까?"
+        description="삭제한 게시글은 복구할 수 없습니다."
+        confirmText="삭제"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+        onConfirm={() => deleteMutation.mutate()}
+      />
+      <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* 메인 콘텐츠 */}
         <main className="min-w-0">
-          <PostDetail post={post} />
+          <PostDetail
+            post={post}
+            isAuthor={isAuthor}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            isDeleting={deleteMutation.isPending}
+          />
           <AiAnswerSection
             status={aiStatus}
             content={aiContent}
@@ -106,6 +149,7 @@ export function CommunityDetailPage({ postId }: Props) {
         <SimilarPosts posts={similarPosts} />
       </div>
     </div>
+    </>
   );
 }
 
