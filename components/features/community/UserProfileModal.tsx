@@ -48,7 +48,7 @@ export function UserProfileModal({
   const { data, isLoading, isError } = useQuery({
     queryKey: ["userProfile", userId],
     queryFn: () =>
-      usersEndpoints.getUserProfile(userId!, nickname ?? undefined),
+      usersEndpoints.getUserProfile(userId!),
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
   });
