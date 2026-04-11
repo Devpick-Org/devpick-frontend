@@ -13,6 +13,7 @@ const LEARNING_ACTION_TYPES = [
   "ai_summary_viewed",
   "scrapped",
   "question_created",
+  "ai_quiz_completed",
 ];
 
 const ACTIVITY_ACTION_TYPES = [
@@ -35,7 +36,7 @@ export const HISTORY_QUERY_KEYS = {
 export const historyEndpoints = {
   /**
    * 학습 히스토리 조회
-   * GET /history?actionTypes=content_opened,ai_summary_viewed,scrapped,question_created
+   * GET /history?actionTypes=content_opened,ai_summary_viewed,scrapped,question_created,ai_quiz_completed
    */
   getHistoryList: (params: HistoryParams = {}): Promise<HistoryPageResponse> => {
     return apiClient
