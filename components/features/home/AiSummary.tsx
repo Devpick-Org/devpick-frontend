@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Sparkles,
   ChevronDown,
@@ -66,7 +66,16 @@ const FALLBACK_CONFIG: Record<AiSummaryErrorKind, FallbackConfig> = {
       "AI 서버에 일시적인 오류가 발생했습니다.\n잠시 후 다시 시도해 주세요.",
     buttonLabel: "다시 시도하기",
   },
+  preparing: {
+    icon: Clock,
+    title: "요약을 준비하고 있어요",
+    description:
+      "AI가 콘텐츠를 분석 중이에요.\n잠시 후 자동으로 다시 시도합니다.",
+    buttonLabel: "지금 다시 시도",
+  },
 };
+
+const PREPARING_COUNTDOWN_SEC = 30;
 
 // ─── 스켈레톤 ─────────────────────────────────────────────────────────────────
 
@@ -138,19 +147,61 @@ function AiSummaryFallback({
 }: AiSummaryFallbackProps) {
   const { icon: Icon, title, description, buttonLabel } = FALLBACK_CONFIG[kind];
 
+  const [countdown, setCountdown] = useState(
+    kind === "preparing" ? PREPARING_COUNTDOWN_SEC : 0,
+  );
+  const retryFiredRef = useRef(false);
+
+  // 조건 1: retryFiredRef로 countdown = 0 구간 중복 호출 방지
+  // 조건 3: 부모가 key prop으로 remount시켜 countdown 초기화 보장 (setState-in-effect 없음)
+  useEffect(() => {
+    if (kind !== "preparing") return;
+    if (countdown <= 0) {
+      if (!retryFiredRef.current) {
+        retryFiredRef.current = true;
+        onRetry();
+      }
+      return;
+    }
+    retryFiredRef.current = false; // 다음 사이클 대비 guard 초기화
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [kind, countdown, onRetry]);
+
+  // 조건 2: 수동 클릭 시 countdown 리셋 → 언마운트 전 auto-retry 이중 발화 방지
+  function handleButtonClick() {
+    if (kind === "preparing") setCountdown(PREPARING_COUNTDOWN_SEC);
+    onRetry();
+  }
+
   return (
     <div className="flex flex-col items-center gap-4 rounded-xl bg-background px-6 py-8 text-center">
-      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary">
-        <Icon className="h-5 w-5 text-muted-foreground" />
+      <div
+        className={cn(
+          "flex h-11 w-11 items-center justify-center rounded-full",
+          kind === "preparing" ? "bg-primary/10" : "bg-secondary",
+        )}
+      >
+        <Icon
+          className={cn(
+            "h-5 w-5",
+            kind === "preparing" ? "text-primary" : "text-muted-foreground",
+          )}
+        />
       </div>
       <div className="space-y-1.5">
         <p className="text-sm font-semibold text-foreground">{title}</p>
         <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground font-medium">
           {description}
         </p>
+        {kind === "preparing" && countdown > 0 && (
+          <p className="text-xs text-muted-foreground">
+            {countdown}초 후 자동으로 다시 시도합니다
+          </p>
+        )}
       </div>
       <button
-        onClick={onRetry}
+        onClick={handleButtonClick}
         disabled={isRetrying}
         className={cn(
           "flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150",
@@ -185,6 +236,8 @@ export function AiSummary({ contentId }: AiSummaryProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   // 마지막으로 fetch한 레벨 추적 — 같은 레벨로 닫았다 다시 열어도 재호출 방지
   const [fetchedLevel, setFetchedLevel] = useState<AiSummaryLevel | null>(null);
+  // 재시도마다 증가 → AiSummaryFallback key 변경으로 remount (countdown 초기화 보장)
+  const [refetchKey, setRefetchKey] = useState(0);
 
   useEffect(() => {
     if (!isExpanded) return;
@@ -209,6 +262,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
   const handleRetry = useCallback(() => {
     setIsRetrying(true);
     setErrorCode(null);
+    setRefetchKey((k) => k + 1);
     contentsEndpoints
       .retryContentSummary(contentId, level)
       .then((res) => setSummary(res.data))
@@ -218,6 +272,25 @@ export function AiSummary({ contentId }: AiSummaryProps) {
         setSummary(null);
       })
       .finally(() => setIsRetrying(false));
+  }, [contentId, level]);
+
+  // preparing 상태 전용: POST retry가 아닌 GET 재조회
+  const handleRefetch = useCallback(() => {
+    setIsLoading(true);
+    setErrorCode(null);
+    setSummary(null);
+    setRefetchKey((k) => k + 1);
+    contentsEndpoints
+      .getContentSummary(contentId, level)
+      .then((res) => {
+        setSummary(res.data);
+        setFetchedLevel(level);
+      })
+      .catch((err) => {
+        const { code } = extractApiError(err);
+        setErrorCode(code ?? "UNKNOWN");
+      })
+      .finally(() => setIsLoading(false));
   }, [contentId, level]);
 
   return (
@@ -300,9 +373,14 @@ export function AiSummary({ contentId }: AiSummaryProps) {
             <AiSummarySkeleton />
           ) : errorCode ? (
             <AiSummaryFallback
+              key={`${errorCode ?? "none"}-${refetchKey}`}
               kind={getAiSummaryErrorKind(errorCode)}
               isRetrying={isRetrying}
-              onRetry={handleRetry}
+              onRetry={
+                getAiSummaryErrorKind(errorCode) === "preparing"
+                  ? handleRefetch
+                  : handleRetry
+              }
             />
           ) : summary ? (
             <div className="space-y-8">

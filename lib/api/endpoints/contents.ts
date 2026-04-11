@@ -56,10 +56,14 @@ export const contentsEndpoints = {
     level: AiSummaryLevel = "JUNIOR",
   ): Promise<AiSummaryResponse> => {
     return apiClient
-      .get<AiSummaryResponse>(`/contents/${contentId}/summary`, {
-        params: { level },
-      })
-      .then((r) => r.data);
+      .get(`/contents/${contentId}/summary`, { params: { level } })
+      .then((r) => {
+        // 202: AI 처리 대기 중 (success: false) → reject으로 에러 흐름에 합류
+        if (!(r.data as { success: boolean }).success) {
+          return Promise.reject({ response: r });
+        }
+        return r.data as AiSummaryResponse;
+      });
   },
 
   /** POST /contents/:contentId/summary/retry?level=... — AI 요약 재시도 */
