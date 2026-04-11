@@ -728,21 +728,25 @@ query param:
 
 ### Epic E — 학습 히스토리
 
-| Method | Endpoint            | 설명                    | 인증 | 관련 페이지 |
-| ------ | ------------------- | ----------------------- | ---- | ----------- |
-| GET    | `/history`          | 학습/활동 히스토리 조회      | O    | `/profile`  |
-| GET    | `/history/badges` | 전체 배지 목록 조회 | O    | `/profile`  |
-| GET    | `/history/points` | 포인트 요약 조회 | O    | `/profile`  |
+| Method | Endpoint            | 설명                    | 인증 | 관련 페이지 | 응답코드 |
+| ------ | ------------------- | ----------------------- | ---- | ----------- | -------- |
+| GET    | `/history`          | 학습/활동 히스토리 조회      | O    | `/profile`  | 200      |
+| GET    | `/history/badges` | 전체 배지 목록 조회 | O    | `/profile`  | 200      |
+| GET    | `/history/points` | 포인트 요약 조회 | O    | `/profile`  | 200      |
+
 ### Epic F — 주간 리포트
 
-| Method | Endpoint                     | 설명           | 인증 | 관련 페이지 |
-| ------ | ---------------------------- | -------------- | ---- | ----------- |
-| GET    | `/reports/weekly/list`            | 리포트 목록 조회 | O    | `/report`   |
-| GET    | `/reports/weekly`            | 이번 주 리포트 | O    | `/report`   |
-| GET    | `/reports/weekly/{reportId}` | 특정 주 리포트 | O    | `/report`   |
-| POST   | `/reports/weekly/share`      | 공유 링크 생성 | O    | `/report`   |
-| POST   | `/reports/weekly/share/{token}`      | 공유 토큰으로 리포트 조회 | x    | `/report`   |
+| Method | Endpoint                     | 설명           | 인증 | 관련 페이지 | 응답코드 |
+| ------ | ---------------------------- | -------------- | ---- | ----------- | -------- |
+| GET    | `/reports/weekly/list`            | 리포트 목록 조회 | O    | `/report`   | 200      |
+| GET    | `/reports/weekly`            | 이번 주 리포트 | O    | `/report`   | 200      |
+| GET    | `/reports/weekly/{reportId}` | 특정 주 리포트 | O    | `/report`   | 200      |
+| POST   | `/reports/weekly/share`      | 공유 링크 생성 | O    | `/report`   | 201      |
+| GET   | `/reports/weekly/share/{token}`      | 공유 토큰으로 리포트 조회 | x    | `/report`   | 201      |
 
+
+#### 사용자 프로필 모달
+GET /users/{userId}/profile
 ---
 
 ## 09. 테스트 전략
