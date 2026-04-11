@@ -142,6 +142,7 @@ function AnswerItem({
 
   return (
     <div
+      id={`answer-${answer.id}`}
       className={cn(
         "rounded-xl p-5",
         answer.isAdopted

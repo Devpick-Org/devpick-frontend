@@ -14,9 +14,7 @@ interface Props {
 /**
  * actionType별 이동 경로
  * - content_liked → /home/{content.id}
- * - answer_written / comment_created → /community/{post.id}
- *   TODO: answer.id 앵커 스크롤 — 게시글 상세 페이지에 #answer-{answer.id} 구현 후 아래 활성화
- *         if (item.answer?.id) return `/community/${item.post.id}#answer-${item.answer.id}`;
+ * - answer_written / comment_created / answer_adopted → /community/{post.id}#answer-{answer.id}
  * - 참조 항목이 null(삭제됨)이면 null 반환 → 클릭 비활성화
  */
 function getHref(item: ActivityItem): string | null {
@@ -26,8 +24,7 @@ function getHref(item: ActivityItem): string | null {
   if (item.actionType === "daily_login") return null;
   // answer_written / answer_adopted / comment_created
   if (!item.post?.id) return null;
-  // TODO: 답변 앵커 스크롤 활성화 시 아래 주석 해제
-  // if (item.answer?.id) return `/community/${item.post.id}#answer-${item.answer.id}`;
+  if (item.answer?.id) return `/community/${item.post.id}#answer-${item.answer.id}`;
   return `/community/${item.post.id}`;
 }
 
