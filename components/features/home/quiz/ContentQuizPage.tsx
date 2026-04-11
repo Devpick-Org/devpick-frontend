@@ -14,6 +14,7 @@ import { calculateQuizResult } from "@/lib/quiz/quizResult";
 import type {
   QuizStage,
   QuizAnswer,
+  QuizAnswers,
   QuizLevel,
   QuizSubmitResult,
 } from "@/types/quiz";
@@ -24,6 +25,12 @@ import { QuizResult } from "./QuizResult";
 
 interface ContentQuizPageProps {
   contentId: string;
+}
+
+function isAnswered(answer: QuizAnswer | undefined): boolean {
+  if (!answer) return false;
+  if (answer.type === "multiple_choice") return answer.selectedOptionId !== null;
+  return answer.answerText.trim() !== "";
 }
 
 export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
@@ -44,7 +51,7 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   // ─── 로컬 상태 ───────────────────────────────────────────────────────────────
   const [stage, setStage] = useState<QuizStage>("intro");
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<QuizAnswer[]>([]);
+  const [answers, setAnswers] = useState<QuizAnswers>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<QuizSubmitResult | null>(null);
   const [submitError, setSubmitError] = useState(false);
@@ -57,17 +64,12 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   function handleStart() {
     setStage("quiz");
     setCurrentIndex(0);
-    setAnswers([]);
+    setAnswers({});
     setSubmitResult(null);
   }
 
-  function handleSelect(optionId: string) {
-    if (!quiz) return;
-    const questionId = quiz.questions[currentIndex].id;
-    setAnswers((prev) => {
-      const others = prev.filter((a) => a.questionId !== questionId);
-      return [...others, { questionId, selectedOptionId: optionId }];
-    });
+  function handleAnswer(answer: QuizAnswer) {
+    setAnswers((prev) => ({ ...prev, [answer.questionId]: answer }));
   }
 
   function handlePrev() {
@@ -113,7 +115,7 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   function handleRetry() {
     setStage("intro");
     setCurrentIndex(0);
-    setAnswers([]);
+    setAnswers({});
     setSubmitResult(null);
     setSubmitError(false);
   }
@@ -151,11 +153,9 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   }
 
   const currentQuestion = quiz.questions[currentIndex];
-  const currentAnswer = answers.find((a) => a.questionId === currentQuestion?.id);
+  const currentAnswer = answers[currentQuestion?.id];
   const isLast = currentIndex === quiz.questions.length - 1;
-  const allAnswered = quiz.questions.every((q) =>
-    answers.some((a) => a.questionId === q.id),
-  );
+  const allAnswered = quiz.questions.every((q) => isAnswered(answers[q.id]));
 
   return (
     <div className="space-y-8">
@@ -177,8 +177,8 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
 
           <QuizQuestionCard
             question={currentQuestion}
-            selectedOptionId={currentAnswer?.selectedOptionId ?? null}
-            onSelect={handleSelect}
+            answer={currentAnswer}
+            onAnswer={handleAnswer}
           />
 
           {/* 제출 에러 */}
@@ -214,7 +214,7 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
             ) : (
               <button
                 onClick={handleNext}
-                disabled={!currentAnswer}
+                disabled={!isAnswered(currentAnswer)}
                 className="flex items-center gap-1.5 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 다음

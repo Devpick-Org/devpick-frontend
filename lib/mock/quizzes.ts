@@ -9,6 +9,7 @@ export interface MockQuizBase {
   estimatedMinutes: number;
 }
 
+// 문항 구성: q1·q2 = 객관식(5지선다), q3 = 주관식(단답형)
 export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
   "so-001": {
     title: "Java NullPointerException 이해 확인",
@@ -17,6 +18,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
     questions: [
       {
         id: "q1",
+        type: "multiple_choice",
         question:
           "NullPointerException(NPE)이 발생하는 원인으로 올바르지 않은 것은?",
         options: [
@@ -32,6 +34,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q2",
+        type: "multiple_choice",
         question:
           "Java 8 이상에서 null을 안전하게 처리하기 위해 사용할 수 있는 클래스는?",
         options: [
@@ -47,16 +50,10 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q3",
+        type: "short_answer",
         question:
-          "Java 14에서 도입된 Helpful NullPointerException을 Java 17 이전 버전에서 활성화하는 JVM 옵션은?",
-        options: [
-          { id: "a", text: "-XX:+EnableHelpfulNPE" },
-          { id: "b", text: "-XX:+ShowCodeDetailsInExceptionMessages" },
-          { id: "c", text: "-XX:+VerboseNullPointer" },
-          { id: "d", text: "-XX:+DetailedExceptions" },
-          { id: "e", text: "-XX:+NullPointerDetails" },
-        ],
-        correctOptionId: "b",
+          "Java 14에서 도입된 Helpful NullPointerException을 Java 17 이전 버전에서 활성화하는 JVM 옵션을 쓰세요.",
+        correctAnswer: "-XX:+ShowCodeDetailsInExceptionMessages",
         explanation:
           "-XX:+ShowCodeDetailsInExceptionMessages 옵션을 사용하면 NPE 발생 시 어떤 변수가 null인지 구체적인 메시지를 출력합니다. Java 17부터는 기본 활성화됩니다.",
       },
@@ -69,6 +66,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
     questions: [
       {
         id: "q1",
+        type: "multiple_choice",
         question:
           "useEffect의 의존성 배열을 빈 배열([])로 전달하면 어떻게 동작하나요?",
         options: [
@@ -84,6 +82,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q2",
+        type: "multiple_choice",
         question: "useEffect에서 cleanup 함수를 반환해야 하는 경우는?",
         options: [
           { id: "a", text: "API 호출을 할 때" },
@@ -101,21 +100,12 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q3",
+        type: "short_answer",
         question:
-          "아래 코드에서 무한 루프가 발생하는 이유는?\n\nuseEffect(() => { setCount(count + 1); }, [count]);",
-        options: [
-          { id: "a", text: "setCount를 useEffect 안에서 호출했기 때문" },
-          {
-            id: "b",
-            text: "count가 변경될 때마다 effect가 실행되고, effect가 count를 변경하는 순환이 발생하기 때문",
-          },
-          { id: "c", text: "의존성 배열에 count를 넣었기 때문" },
-          { id: "d", text: "useEffect는 동기적으로 실행되기 때문" },
-          { id: "e", text: "리액트가 렌더링을 최적화하기 때문" },
-        ],
-        correctOptionId: "b",
+          "useEffect에서 이벤트 리스너·타이머 등 사이드 이펙트 해제를 위해 반환하는 함수를 무엇이라고 하나요?",
+        correctAnswer: "cleanup",
         explanation:
-          "count를 의존성으로 등록하면 count 변경 시 effect가 실행됩니다. effect가 setCount로 count를 변경하면 다시 effect가 실행되는 무한 루프가 발생합니다.",
+          "cleanup 함수는 컴포넌트 언마운트 또는 다음 effect 실행 직전에 호출됩니다. return () => { ... } 형태로 useEffect 내부에서 반환합니다.",
       },
     ],
   },
@@ -126,6 +116,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
     questions: [
       {
         id: "q1",
+        type: "multiple_choice",
         question: "다음 중 제네릭 함수의 올바른 선언 방법은?",
         options: [
           { id: "a", text: "function identity(arg: T): T { return arg; }" },
@@ -140,6 +131,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q2",
+        type: "multiple_choice",
         question: "제네릭 타입 제약(constraints)을 사용하는 키워드는?",
         options: [
           { id: "a", text: "implements" },
@@ -154,17 +146,12 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q3",
-        question: "keyof 연산자와 제네릭을 함께 사용할 때의 설명으로 옳은 것은?",
-        options: [
-          { id: "a", text: "keyof T는 T의 모든 값 타입을 유니온으로 반환한다" },
-          { id: "b", text: "keyof T는 T의 모든 키 이름을 유니온 타입으로 반환한다" },
-          { id: "c", text: "keyof는 제네릭과 함께 사용할 수 없다" },
-          { id: "d", text: "keyof T는 항상 string 타입을 반환한다" },
-          { id: "e", text: "keyof T는 T의 첫 번째 키만 반환한다" },
-        ],
-        correctOptionId: "b",
+        type: "short_answer",
+        question:
+          "TypeScript에서 제네릭 타입 제약을 선언할 때 사용하는 키워드를 쓰세요. (예: <T ___ SomeType>)",
+        correctAnswer: "extends",
         explanation:
-          "keyof T는 T의 모든 키 이름을 문자열 리터럴 유니온 타입으로 반환합니다. 예: keyof { a: number; b: string }은 'a' | 'b'가 됩니다.",
+          "<T extends SomeType>처럼 extends를 사용해 T가 특정 타입의 구조를 만족해야 한다는 제약을 걸 수 있습니다. keyof와 함께 <K extends keyof T> 형태로도 자주 사용됩니다.",
       },
     ],
   },
@@ -175,6 +162,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
     questions: [
       {
         id: "q1",
+        type: "multiple_choice",
         question: "docker-compose.yml에서 여러 컨테이너 간 통신을 가능하게 하는 설정은?",
         options: [
           { id: "a", text: "volumes" },
@@ -189,6 +177,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q2",
+        type: "multiple_choice",
         question: "depends_on 옵션의 동작으로 올바른 것은?",
         options: [
           { id: "a", text: "의존 서비스가 완전히 준비될 때까지 기다린 후 시작한다" },
@@ -203,15 +192,10 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q3",
-        question: "호스트 디렉토리를 컨테이너에 마운트하는 설정은?",
-        options: [
-          { id: "a", text: "ports" },
-          { id: "b", text: "environment" },
-          { id: "c", text: "volumes" },
-          { id: "d", text: "networks" },
-          { id: "e", text: "expose" },
-        ],
-        correctOptionId: "c",
+        type: "short_answer",
+        question:
+          "docker-compose.yml에서 호스트 디렉토리를 컨테이너에 마운트할 때 사용하는 설정 키를 쓰세요.",
+        correctAnswer: "volumes",
         explanation:
           "volumes를 사용해 ./host-dir:/container-dir 형식으로 호스트 경로를 컨테이너에 마운트할 수 있습니다. 코드 변경 사항을 컨테이너에 실시간 반영할 때 주로 사용합니다.",
       },
@@ -224,6 +208,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
     questions: [
       {
         id: "q1",
+        type: "multiple_choice",
         question:
           "useEffect의 의존성 배열을 빈 배열([])로 전달하면 어떻게 동작하나요?",
         options: [
@@ -239,6 +224,7 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q2",
+        type: "multiple_choice",
         question: "useEffect에서 cleanup 함수를 반환해야 하는 경우는?",
         options: [
           { id: "a", text: "API 호출을 할 때" },
@@ -256,21 +242,12 @@ export const MOCK_QUIZ_BASES: Record<string, MockQuizBase> = {
       },
       {
         id: "q3",
+        type: "short_answer",
         question:
-          "아래 코드에서 무한 루프가 발생하는 이유는?\n\nuseEffect(() => { setCount(count + 1); }, [count]);",
-        options: [
-          { id: "a", text: "setCount를 useEffect 안에서 호출했기 때문" },
-          {
-            id: "b",
-            text: "count가 변경될 때마다 effect가 실행되고, effect가 count를 변경하는 순환이 발생하기 때문",
-          },
-          { id: "c", text: "의존성 배열에 count를 넣었기 때문" },
-          { id: "d", text: "useEffect는 동기적으로 실행되기 때문" },
-          { id: "e", text: "리액트가 렌더링을 최적화하기 때문" },
-        ],
-        correctOptionId: "b",
+          "useEffect 콜백 내에서 정리 작업을 수행하기 위해 반환하는 함수를 무엇이라고 부르나요?",
+        correctAnswer: "cleanup",
         explanation:
-          "count를 의존성으로 등록하면 count 변경 시 effect가 실행됩니다. effect가 setCount로 count를 변경하면 다시 effect가 실행되는 무한 루프가 발생합니다.",
+          "cleanup 함수는 컴포넌트 언마운트 또는 다음 effect 실행 직전에 호출됩니다. return () => { ... } 형태로 useEffect 내부에서 반환합니다.",
       },
     ],
   },

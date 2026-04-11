@@ -1,19 +1,32 @@
 import type { ApiResponse } from "./api";
 
 export type QuizLevel = "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
+export type QuizQuestionType = "multiple_choice" | "short_answer";
 
 export interface QuizOption {
   id: string;
   text: string;
 }
 
-export interface QuizQuestion {
+interface BaseQuizQuestion {
   id: string;
+  type: QuizQuestionType;
   question: string;
-  options: QuizOption[];
-  correctOptionId: string;
   explanation: string;
 }
+
+export interface MultipleChoiceQuestion extends BaseQuizQuestion {
+  type: "multiple_choice";
+  options: QuizOption[];
+  correctOptionId: string;
+}
+
+export interface ShortAnswerQuestion extends BaseQuizQuestion {
+  type: "short_answer";
+  correctAnswer: string;
+}
+
+export type QuizQuestion = MultipleChoiceQuestion | ShortAnswerQuestion;
 
 export interface ContentQuiz {
   contentId: string;
@@ -54,7 +67,8 @@ export type QuizSubmitResponse = ApiResponse<QuizSubmitResult>;
 
 export type QuizStage = "intro" | "quiz" | "result";
 
-export interface QuizAnswer {
-  questionId: string;
-  selectedOptionId: string;
-}
+export type QuizAnswer =
+  | { type: "multiple_choice"; questionId: string; selectedOptionId: string | null }
+  | { type: "short_answer"; questionId: string; answerText: string };
+
+export type QuizAnswers = Record<string, QuizAnswer>;
