@@ -163,16 +163,20 @@ function CommunityDetailSkeleton() {
           {/* 뒤로가기 */}
           <Skeleton className="mb-6 h-4 w-24" />
 
-          {/* 메타: 작성자 · 레벨 · 시간 */}
-          <div className="mb-4 flex items-center gap-2">
+          {/* 제목 + 액션 버튼 */}
+          <div className="mb-4 mt-5 flex items-start justify-between gap-4">
+            <Skeleton className="h-7 w-4/5" />
+            <Skeleton className="h-9 w-9 shrink-0 rounded-lg" />
+          </div>
+
+          {/* 메타: 작성자 · 직무 · 레벨 · 시간 */}
+          <div className="mb-6 flex items-center gap-2">
             <Skeleton className="h-3.5 w-3.5 rounded-full" />
             <Skeleton className="h-3.5 w-16" />
+            <Skeleton className="h-3.5 w-14" />
             <Skeleton className="h-3.5 w-10" />
             <Skeleton className="h-3.5 w-14" />
           </div>
-
-          {/* 제목 */}
-          <Skeleton className="mb-6 h-7 w-4/5" />
 
           {/* 본문 */}
           <div className="mb-8 space-y-2.5">

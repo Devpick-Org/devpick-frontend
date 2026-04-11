@@ -1,5 +1,6 @@
 import type { PostLevel } from "./post";
 import type { ApiResponse } from "./api";
+import type { UserJob } from "./userProfile";
 
 // ─── 백엔드 확정 DTO ──────────────────────────────────────────────────────────
 
@@ -19,6 +20,7 @@ export interface PostDetailDTO {
   authorId: string;
   authorNickname: string;
   authorProfileImage?: string | null;
+  authorJob?: UserJob | null;
   answerCount: number;
   createdAt: string;
   updatedAt: string;

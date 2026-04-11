@@ -1,4 +1,5 @@
 import type { ApiResponse } from "./api";
+import type { UserJob } from "./userProfile";
 
 export type PostLevel = "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
 
@@ -10,6 +11,7 @@ export interface PostSummary {
   authorId: string;
   authorNickname: string;
   authorProfileImage?: string | null;
+  authorJob?: UserJob | null;
   answerCount: number;
   createdAt: string;
   contentPreview: string;
