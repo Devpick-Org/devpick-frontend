@@ -32,7 +32,8 @@ const SOURCE_BADGE: Record<
   "kakao tech": { bg: "#FEE500", text: "#3A1D1D", label: "K" },
   우아한형제들: { bg: "#3399FF", text: "#fff", label: "W" },
   medium: { bg: "#000000", text: "#fff", label: "M" },
-  "dev.to": { bg: "#0A0A0A", text: "#fff", label: "D" },
+  "toss tech": { bg: "#0064FF", text: "#fff", label: "T" },
+  "oliveyoung tech": { bg: "#3A7D44", text: "#fff", label: "O" },
 };
 
 function SourceBadge({ sourceName }: { sourceName: string }) {
