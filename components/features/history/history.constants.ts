@@ -36,9 +36,9 @@ export const ACTION_FILTER_OPTIONS: {
 }[] = [
   { value: "content_opened", label: "글 읽기" },
   { value: "ai_summary_viewed", label: "AI 요약" },
+  { value: "ai_quiz_completed", label: "AI 퀴즈" },
   { value: "question_created", label: "질문 작성" },
   { value: "scrapped", label: "스크랩" },
-  { value: "ai_quiz_completed", label: "AI 퀴즈" },
 ];
 
 /** 액션 필터 chip 옵션 — 활동 탭 전용

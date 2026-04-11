@@ -11,7 +11,7 @@ import {
   getAuthErrorMessage,
 } from "@/lib/auth/getAuthErrorMessage";
 
-const TIMER_DURATION = 180; // 3분
+const TIMER_DURATION = 300; // 5분
 
 interface EmailSectionProps {
   email: string;

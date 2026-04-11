@@ -193,10 +193,10 @@ function BadgeGrid({ badges }: { badges: BadgeItem[] }) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-      <p className="text-sm font-medium text-muted-foreground">
+      <p className="text-md font-medium text-foreground">
         아직 획득한 배지가 없습니다.
       </p>
-      <p className="text-xs text-muted-foreground/60">
+      <p className="text-sm text-muted-foreground">
         학습 활동을 통해 배지를 모아보세요.
       </p>
     </div>

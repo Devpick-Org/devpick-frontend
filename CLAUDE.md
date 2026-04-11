@@ -280,9 +280,9 @@ cd ../devpick-infra && docker-compose up --build
 ### 브랜치
 
 ```bash
-# develop에서 시작 (main 직접 작업 금지)
-git checkout develop
-git pull origin develop
+# developV2에서 시작 (main 직접 작업 금지)
+git checkout developV2
+git pull origin developV2
 git checkout -b feature/DP-{티켓번호}-{기능명}
 
 # 예시
@@ -292,7 +292,7 @@ git checkout -b feature/DP-138-init-frontend
 | 브랜치                       | 용도                        |
 | ---------------------------- | --------------------------- |
 | `main`                       | 배포용. 직접 push 절대 금지 |
-| `develop`                    | 개발 통합. PR 머지 대상     |
+| `developV2`                    | 개발 통합. PR 머지 대상     |
 | `feature/DP-{번호}-{기능명}` | 기능 개발                   |
 | `hotfix/DP-{번호}-{설명}`    | 긴급 버그 수정              |
 
@@ -646,139 +646,6 @@ DP-{티켓번호}: {작업 내용}
 | POST   | `/contents/{contentId}/like`            | 좋아요              | O    | `/home`, `/home/[id]` | 201      |
 | DELETE | `/contents/{contentId}/like`            | 좋아요 취소         | O    | `/home`, `/home/[id]` | 204      |
 
-#### [참고] 콘텐츠 피드 API 요청/응답 구조
-
-**1. GET /contents (개인화 피드 조회)**
-
-- 요청: `GET /contents?page=0&size=20` (기본값)
-- 응답 (200 OK):
-
-```json
-{
-  "success": true,
-  "data": {
-    "contents": [
-      {
-        "id": "uuid-5678",
-        "title": "React useEffect 완전 정복",
-        "author": "홍근",
-        "sourceName": "Velog",
-        "preview": "useEffect는 컴포넌트가 렌더링된 후...",
-        "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-        "canonicalUrl": "[https://velog.io/@hong/](https://velog.io/@hong/)...",
-        "tags": ["React", "Frontend"],
-        "publishedAt": "2026-02-24T09:00:00",
-        "isScrapped": false,
-        "isLiked": false
-      }
-    ],
-    "page": 0,
-    "size": 20,
-    "totalElements": 100,
-    "totalPages": 5
-  },
-  "message": "피드를 불러왔습니다"
-}
-```
-
-**2. GET /contents/{contentId} (글 상세 조회)**
-
-- 응답 (200 OK):
-
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid-5678",
-    "title": "React useEffect 완전 정복",
-    "author": "홍근",
-    "sourceName": "Velog",
-    "preview": "useEffect는 컴포넌트가 렌더링된 후...",
-    "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-    "canonicalUrl": "[https://velog.io/@hong/](https://velog.io/@hong/)...",
-    "originalContent": "전체 본문...",
-    "isOriginalVisible": true,
-    "licenseType": "CC BY",
-    "publishedAt": "2026-02-24T09:00:00",
-    "tags": ["React", "Frontend"],
-    "isScrapped": false,
-    "isLiked": false,
-    "sourceName": "Velog"
-  },
-  "message": "요청이 성공했습니다"
-}
-```
-
-**3. GET /contents/{contentId}/recommendations (글 상세 추천 콘텐츠)**
-
-- 요청: `GET /contents/{contentId}/recommendations?size=5`
-- 응답 (200 OK):
-
-```json
-{
-  "success": true,
-  "data": {
-    "contents": [
-      {
-        "id": "uuid-9012",
-        "title": "Next.js App Router 데이터 패칭 전략",
-        "author": "김개발",
-        "sourceName": "Velog",
-        "preview": "App Router에서는 서버 컴포넌트에서 데이터를 패칭하고...",
-        "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-        "canonicalUrl": "https://velog.io/@dev/nextjs-app-router-data-fetching",
-        "tags": ["Next.js", "React", "Frontend"],
-        "publishedAt": "2026-03-10T12:30:00",
-        "isScrapped": false,
-        "isLiked": true
-      }
-    ],
-    "page": 0,
-    "size": 0,
-    "totalElements": 0,
-    "totalPages": 0
-  },
-  "error": {
-    "code": "string",
-    "message": "string",
-    "detail": {}
-  }
-}
-```
-
-**4. GET /contents/search (글 검색)**
-
-- 요청: `GET /contents/search?query=useEffect&tags=React&tags=Frontend&page=0&size=20`
-- 응답 (200 OK):
-
-```json
-{
-  "success": true,
-  "data": {
-    "contents": [
-      {
-        "id": "uuid-5678",
-        "title": "React useEffect 완전 정복",
-        "author": "홍근",
-        "sourceName": "Velog",
-        "preview": "useEffect는 컴포넌트가 렌더링된 후...",
-        "thumbnailUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-        "canonicalUrl": "[https://velog.io/@hong/](https://velog.io/@hong/)...",
-        "tags": ["React", "Frontend"],
-        "publishedAt": "2026-02-24T09:00:00",
-        "isScrapped": false,
-        "isLiked": false
-      }
-    ],
-    "page": 0,
-    "size": 20,
-    "totalElements": 100,
-    "totalPages": 5
-  },
-  "message": "피드를 불러왔습니다"
-}
-```
-
 ### Epic C — AI 요약
 
 > 데이터 구조는 API 응답 필드를 기준으로 사용한다.
@@ -841,37 +708,40 @@ query param:
 
 ### Epic D — 질문/커뮤니티
 
-| Method | Endpoint                                                  | 설명                           | 인증 | 관련 페이지        |
-| ------ | --------------------------------------------------------- | ------------------------------ | ---- | ------------------ |
-| POST   | `/posts`                                                  | 질문 작성 + 커뮤니티 동시 게시 | O    | `/community/write` |
-| GET    | `/posts`                                                  | 게시글 목록                    | O    | `/community`       |
-| GET    | `/posts/{postId}`                                         | 게시글 상세                    | O    | `/community/[id]`  |
-| PUT    | `/posts/{postId}`                                         | 게시글 수정                    | O    | `/community/[id]`  |
-| DELETE | `/posts/{postId}`                                         | 게시글 삭제                    | O    | `/community/[id]`  |
-| POST   | `/posts/refine`                                           | AI 질문 개선                   | O    | `/community/write` |
-| GET    | `/posts/{postId}/similar`                                 | 유사 질문 조회                 | O    | `/community/[id]`  |
-| POST   | `/posts/{postId}/ai-answer`                               | AI 답변 생성                   | O    | `/community/[id]`  |
-| POST   | `/posts/{postId}/answers`                                 | 답변 작성                      | O    | `/community/[id]`  |
-| PUT    | `/posts/{postId}/answers/{answerId}`                      | 답변 수정                      | O    | `/community/[id]`  |
-| DELETE | `/posts/{postId}/answers/{answerId}`                      | 답변 삭제                      | O    | `/community/[id]`  |
-| POST   | `/posts/{postId}/answers/{answerId}/adopt`                | 답변 채택                      | O    | `/community/[id]`  |
-| POST   | `/posts/{postId}/answers/{answerId}/comments`             | 댓글 작성                      | O    | `/community/[id]`  |
-| DELETE | `/posts/{postId}/answers/{answerId}/comments/{commentId}` | 댓글 삭제                      | O    | `/community/[id]`  |
+| Method | Endpoint                                                  | 설명                           | 인증 | 관련 페이지        | 응답코드 |
+| ------ | --------------------------------------------------------- | ------------------------------ | ---- | ------------------ | -------- |
+| POST   | `/posts`                                                  | 질문 작성 + 커뮤니티 동시 게시 | O    | `/community/write` | 201      |
+| GET    | `/posts`                                                  | 게시글 목록                    | O    | `/community`       | 200      |
+| GET    | `/posts/{postId}`                                         | 게시글 상세                    | O    | `/community/[id]`  | 200      |
+| PUT    | `/posts/{postId}`                                         | 게시글 수정                    | O    | `/community/[id]`  | 200      |
+| DELETE | `/posts/{postId}`                                         | 게시글 삭제                    | O    | `/community/[id]`  | 204      |
+| POST   | `/posts/refine`                                           | AI 질문 개선                   | O    | `/community/write` | 200      |
+| GET    | `/posts/{postId}/similar`                                 | 유사 질문 조회                 | O    | `/community/[id]`  | 200      |
+| POST   | `/posts/{postId}/ai-answer`                               | AI 답변 생성                   | O    | `/community/[id]`  | 200      |
+| GET    | `/posts/{postId}/answers`                                 | 답변 및 댓글 통합 조회         | O    | `/community/[id]`  | 200      |
+| POST   | `/posts/{postId}/answers`                                 | 답변 작성                      | O    | `/community/[id]`  | 201      |
+| PUT    | `/posts/{postId}/answers/{answerId}`                      | 답변 수정                      | O    | `/community/[id]`  | 200      |
+| DELETE | `/posts/{postId}/answers/{answerId}`                      | 답변 삭제                      | O    | `/community/[id]`  | 204      |
+| POST   | `/posts/{postId}/answers/{answerId}/adopt`                | 답변 채택                      | O    | `/community/[id]`  | 200      |
+| POST   | `/posts/{postId}/answers/{answerId}/comments`             | 댓글 작성                      | O    | `/community/[id]`  | 201      |
+| DELETE | `/posts/{postId}/answers/{answerId}/comments/{commentId}` | 댓글 삭제                      | O    | `/community/[id]`  | 204      |
 
 ### Epic E — 학습 히스토리
 
 | Method | Endpoint            | 설명                    | 인증 | 관련 페이지 |
 | ------ | ------------------- | ----------------------- | ---- | ----------- |
-| GET    | `/history`          | 학습 히스토리 조회      | O    | `/profile`  |
-| GET    | `/history/activity` | 활동 내역 (좋아요 포함) | O    | `/profile`  |
-
+| GET    | `/history`          | 학습/활동 히스토리 조회      | O    | `/profile`  |
+| GET    | `/history/badges` | 전체 배지 목록 조회 | O    | `/profile`  |
+| GET    | `/history/points` | 포인트 요약 조회 | O    | `/profile`  |
 ### Epic F — 주간 리포트
 
 | Method | Endpoint                     | 설명           | 인증 | 관련 페이지 |
 | ------ | ---------------------------- | -------------- | ---- | ----------- |
+| GET    | `/reports/weekly/list`            | 리포트 목록 조회 | O    | `/report`   |
 | GET    | `/reports/weekly`            | 이번 주 리포트 | O    | `/report`   |
 | GET    | `/reports/weekly/{reportId}` | 특정 주 리포트 | O    | `/report`   |
 | POST   | `/reports/weekly/share`      | 공유 링크 생성 | O    | `/report`   |
+| POST   | `/reports/weekly/share/{token}`      | 공유 토큰으로 리포트 조회 | x    | `/report`   |
 
 ---
 
@@ -953,19 +823,6 @@ test("사용자는 성공적으로 로그인할 수 있다", async ({ page }) =>
 
 ## 12. CI/CD 자동화 구조
 
-### 전체 워크플로 (Claude Code 자동화)
-
-```
-/feature-dev DP-158 입력
-→ Jira 티켓 자동 읽기 (제목/설명/AC) + In Progress 전환
-→ feature/DP-158-routing-structure 브랜치 생성 (GitHub API)
-→ AC 기반 Next.js 컴포넌트 작성 + 테스트 작성
-→ PR 생성 (Jira 링크 자동 삽입 + AI 코드 리뷰)
-→ PR에 'automerge' 라벨 부착 (자동 병합 트리거)
-→ CI 실행: Lint + Build 테스트 (ci.yml)
-→ CI 통과 및 라벨 확인 시 developV2 자동 squash 머지 (automerge.yml) + Jira Done
-```
-
 ### GitHub Actions 워크플로우
 
 | 파일            | 트리거              | 역할                                                 |
@@ -980,45 +837,3 @@ test("사용자는 성공적으로 로그인할 수 있다", async ({ page }) =>
 | `feature/DP-{번호}-{기능명}` | Claude Code/ 개발자 | 자동 squash 머지                    | `automerge` 라벨 + CI 통과 |
 | `feature/DP-{번호}-{기능명}` | 개발자 직접         | 라벨 없을 시 팀원 리뷰 후 직접 머지 |
 | `hotfix/DP-{번호}-{설명}`    | 개발자 직접         | 긴급 버그 수정 및 수동 승인         |
-
-### Claude Code 스킬 (`/feature-dev`)
-
-```
-# 사용법 예시
-/feature-dev DP-158
-```
-
-자동으로 하는 것:
-
-- Jira 연동: MCP를 통해 티켓의 제목, 상세 설명, 인수 조건(AC) 추출
-- 상태 관리: Jira 티켓 상태를 To Do → In Progress → Done으로 자동 갱신
-- `feature/DP-{번호}-{기능명}` 브랜치 생성
-- 코드 생성: Next.js 16(App Router) 및 Tailwind 4 컨벤션에 맞는 코드 작성
-- PR 자동화: PR 본문에 Jira 티켓 링크 포함 및 automerge 라벨 자동 추가
-- PR diff 기반 코드 자동 리뷰
-- 자동 머지 대기: ci.yml 통과 및 라벨 체크 후 자동 병합 프로세스 완료.
-
-### 실제 워크플로 예시
-
-```
-1. Claude Code에서 입력: /feature-dev DP-158
-
-2. 자동 실행:
-   - Jira DP-158 읽기 → "Next.js 라우팅 구조 구현"
-   - 티켓 상태 변경: To Do → In Progress
-   - 브랜치 생성: feature/DP-158-routing-structure
-   - Next.js 16 및 Tailwind 4 기반의 페이지/컴포넌트 작성
-   - 컴포넌트 유닛 테스트 작성 및 로컬 검증
-   - PR 생성 및 라벨링:
-    - PR 제목: "[DP-158] Next.js 라우팅 구조 구현"
-    - PR 본문: 작업 내용 요약, Jira 티켓 링크, AC 충족 여부 체크리스트 포함
-   - 라벨 부착: 'automerge' 라벨 자동 추가 (자동 병합 트리거)
-
-3. CI 자동 실행 (~5분):
-   - GitHub Actions 실행: Lint 체크 → Type Check → Next.js Build 테스트
-
-4. develop 자동 squash 머지
-    - 'automerge' 라벨 확인 + CI Pass 확인 → developV2으로 자동 병합
-
-5. Jira DP-158 티켓 → Done 자동 전환
-```
