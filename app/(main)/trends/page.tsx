@@ -1,6 +1,11 @@
+import { redirect } from "next/navigation";
 import { TrendPage } from "@/components/features/trends/TrendPage";
 
 export default function Page() {
+  if (process.env.NEXT_PUBLIC_FEATURE_TRENDS !== "true") {
+    redirect("/home");
+  }
+
   return (
     <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
       <div className="mx-auto max-w-4xl">

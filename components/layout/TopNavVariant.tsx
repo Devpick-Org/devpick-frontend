@@ -47,13 +47,19 @@ function TraceLogo({ className }: { className?: string }) {
 }
 
 // 사이드바에 있던 메뉴들을 이쪽으로 가져옵니다.
-const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
+const TRENDS_ENABLED = process.env.NEXT_PUBLIC_FEATURE_TRENDS === "true";
+
+const ALL_NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/home", label: "홈", icon: Home },
   { href: "/community", label: "커뮤니티", icon: Users },
   { href: "/trends", label: "트렌드", icon: Flame },
   { href: "/history", label: "히스토리", icon: BookOpen },
   { href: "/report", label: "리포트", icon: TrendingUp },
 ];
+
+const NAV_ITEMS = ALL_NAV_ITEMS.filter(
+  (item) => item.href !== "/trends" || TRENDS_ENABLED,
+);
 
 export function TopNavVariant() {
   const router = useRouter();
