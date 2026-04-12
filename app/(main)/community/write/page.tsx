@@ -8,6 +8,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
+import { extractApiError } from "@/lib/api/extractApiError";
 import { PostWriteForm } from "@/components/features/community/PostWriteForm";
 import { PostRefinePanel } from "@/components/features/community/PostRefinePanel";
 import type {
@@ -180,7 +181,9 @@ export default function CommunityWritePage() {
               }
               submitError={
                 createMutation.isError
-                  ? "게시 중 문제가 발생했습니다. 다시 시도해 주세요."
+                  ? extractApiError(createMutation.error).code === "COMMUNITY_013"
+                    ? "잠시 후 다시 시도해 주세요."
+                    : "게시 중 문제가 발생했습니다. 다시 시도해 주세요."
                   : null
               }
             />
@@ -200,7 +203,9 @@ export default function CommunityWritePage() {
               isSubmitting={createMutation.isPending}
               submitError={
                 createMutation.isError
-                  ? "게시 중 문제가 발생했습니다. 다시 시도해 주세요."
+                  ? extractApiError(createMutation.error).code === "COMMUNITY_013"
+                    ? "잠시 후 다시 시도해 주세요."
+                    : "게시 중 문제가 발생했습니다. 다시 시도해 주세요."
                   : null
               }
               onSubmitRefined={handleSubmitRefined}

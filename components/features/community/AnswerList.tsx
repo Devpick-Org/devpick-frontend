@@ -244,14 +244,14 @@ function AnswerItem({
           <div className="mt-2 flex justify-end gap-2">
             <button
               onClick={handleCancelEdit}
-              className="rounded-lg px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+              className="cursor-pointer rounded-lg px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground"
             >
               취소
             </button>
             <button
               onClick={handleSaveEdit}
               disabled={!editContent.trim()}
-              className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40 hover:opacity-90"
+              className="cursor-pointer rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-40 hover:opacity-90"
             >
               저장
             </button>
@@ -348,8 +348,8 @@ function CommentItem({ comment, currentUserId, onDelete, onOpenProfile }: Commen
   const isMyComment = currentUserId === comment.userId;
 
   return (
-    <div className="flex items-center justify-between gap-3">
-      <div className="flex flex-1 items-center gap-1.5 text-xs leading-5 min-w-0">
+    <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-1 items-start gap-1.5 text-xs leading-5 min-w-0">
         <button
           type="button"
           onClick={() => onOpenProfile(comment.userId)}
