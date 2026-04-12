@@ -148,6 +148,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
           <Input
             id="login-email"
             type="email"
+            autoComplete="username"
             placeholder="name@google.com"
             value={email}
             onChange={handleEmailChange}
