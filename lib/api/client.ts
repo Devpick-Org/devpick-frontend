@@ -105,6 +105,8 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest);
     } catch (refreshError) {
       processQueue(refreshError as AxiosError, null);
+      // refresh 401 — 백엔드가 hasSession 쿠키를 삭제하지 않으므로 프론트에서 직접 삭제
+      document.cookie = "hasSession=; max-age=0; path=/";
       useAuthStore.getState().clearAuth();
       return Promise.reject(refreshError);
     } finally {

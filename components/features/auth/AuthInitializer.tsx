@@ -31,6 +31,9 @@ export function AuthInitializer() {
     // 이미 accessToken이 있으면 세션 복원 불필요 (로그인/회원가입 직후 상태)
     if (useAuthStore.getState().accessToken) return;
 
+    // hasSession 쿠키 없으면 비로그인 상태 — refresh 시도하지 않음
+    if (!document.cookie.includes("hasSession=true")) return;
+
     async function restoreSession() {
       try {
         // withCredentials: true 로 HttpOnly Cookie(refreshToken)를 자동 첨부
@@ -45,7 +48,8 @@ export function AuthInitializer() {
         const { data: meData } = await authEndpoints.getMe();
         initAuth(meData.data, newAccessToken);
       } catch {
-        // 쿠키 없음 or 만료 — 로그인 필요 상태 유지
+        // refresh 401 — 백엔드가 hasSession 쿠키를 삭제하지 않으므로 프론트에서 직접 삭제
+        document.cookie = "hasSession=; max-age=0; path=/";
         clearAuth();
       }
     }
