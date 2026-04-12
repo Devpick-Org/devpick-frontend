@@ -195,7 +195,7 @@ export function EmailSection({
               }
               className={`h-11 shrink-0 transition-all duration-200 disabled:opacity-50 ${
                 isEmailVerified
-                  ? "border border-emerald-500/50 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                  ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
                   : "bg-secondary text-foreground hover:bg-secondary/80"
               }`}
             >
