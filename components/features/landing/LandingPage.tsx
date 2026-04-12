@@ -9,7 +9,6 @@ import {
   BarChart2,
   BookOpen,
   ChevronRight,
-  Flame,
   History,
   MessageSquare,
   Search,
@@ -333,13 +332,13 @@ const FEATURES = [
   },
   {
     icon: Users,
-    title: "개발자 커뮤니티 & AI 질문 개선",
-    desc: "궁금한 것을 질문하고, AI가 다듬어준 질문으로 사용자들의 더 좋은 답변을 받아보세요. AI가 생성한 1차 답변도 함께 제공됩니다.",
+    title: "개발자 커뮤니티",
+    desc: "궁금한 것을 질문하고 사용자들의 답변을 받아보세요. AI가 생성한 1차 답변도 함께 제공됩니다.",
   },
   {
-    icon: Flame,
-    title: "트렌드 키워드",
-    desc: "지금 개발 생태계에서 가장 주목받는 기술 키워드를 한눈에 확인하세요.",
+    icon: MessageSquare,
+    title: "AI 질문 개선",
+    desc: "AI가 질문을 다듬어 더 좋은 답변을 받을 수 있도록 도와드립니다.",
   },
   {
     icon: History,
