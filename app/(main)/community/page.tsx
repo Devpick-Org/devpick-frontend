@@ -138,7 +138,7 @@ export default function CommunityPage() {
               개발자들과 질문하고 답변을 나눠보세요.
             </p>
           </div>
-          <Button size="sm" className="shrink-0 gap-1.5" onClick={handleWriteClick}>
+          <Button size="sm" className="shrink-0 gap-1.5 rounded-lg" onClick={handleWriteClick}>
             <PenLine className="h-4 w-4" />
             <span className="hidden sm:inline">질문하기</span>
             <span className="sm:hidden">질문</span>
