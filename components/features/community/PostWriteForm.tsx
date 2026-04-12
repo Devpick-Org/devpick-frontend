@@ -294,10 +294,11 @@ export function PostWriteForm({
       {/* 입력 필드 카드 끝 */}
 
       {/* 에러 */}
-      {(refineError ?? submitError) && (
-        <p className="rounded-xl bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
-          {refineError ?? submitError}
-        </p>
+      {refineError && (
+        <p className="text-sm font-medium text-destructive">{refineError}</p>
+      )}
+      {submitError && (
+        <p className="text-sm font-medium text-destructive">{submitError}</p>
       )}
 
       {/* 액션 버튼 */}

@@ -98,23 +98,29 @@ export default function CommunityWritePage() {
 
   /** 왼쪽 폼: 바로 게시하기 — 현재 files 기준 */
   const handleSubmitDirect = (draft: PostDraft) => {
-    createMutation.mutate({ ...draft, attachments: filesToAttachments(files) });
+    const attachments = filesToAttachments(files);
+    createMutation.mutate({
+      ...draft,
+      ...(attachments.length > 0 && { attachments }),
+    });
   };
 
   /** 오른쪽 패널: 개선안으로 게시 — savedFiles 기준 */
   const handleSubmitRefined = (draft: PostDraft) => {
+    const attachments = filesToAttachments(savedFiles);
     createMutation.mutate({
       ...draft,
-      attachments: filesToAttachments(savedFiles),
+      ...(attachments.length > 0 && { attachments }),
     });
   };
 
   /** 오른쪽 패널: 원본으로 게시 — savedDraft + savedFiles 기준 */
   const handleSubmitOriginal = () => {
     if (!savedDraft) return;
+    const attachments = filesToAttachments(savedFiles);
     createMutation.mutate({
       ...savedDraft,
-      attachments: filesToAttachments(savedFiles),
+      ...(attachments.length > 0 && { attachments }),
     });
   };
 
