@@ -81,7 +81,12 @@ const PREPARING_COUNTDOWN_SEC = 30;
 
 function AiSummarySkeleton() {
   return (
-    <div className="animate-pulse space-y-8">
+    <div className="space-y-8">
+      <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        AI가 요약을 생성하고 있어요...
+      </p>
+      <div className="animate-pulse space-y-8">
       {/* 난이도 · 신뢰도 뱃지 */}
       <div className="flex gap-2">
         <div className="h-6 w-24 rounded-full bg-secondary" />
@@ -128,6 +133,7 @@ function AiSummarySkeleton() {
         <div className="h-10 w-full rounded-lg bg-secondary" />
         <div className="h-10 w-full rounded-lg bg-secondary" />
       </div>
+    </div>
     </div>
   );
 }
@@ -207,7 +213,7 @@ function AiSummaryFallback({
           "flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150",
           isRetrying
             ? "cursor-not-allowed bg-primary/50 text-primary-foreground"
-            : "bg-primary text-primary-foreground hover:bg-primary/90",
+            : "cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90",
         )}
       >
         {isRetrying ? (
