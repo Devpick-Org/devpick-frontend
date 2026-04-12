@@ -309,7 +309,7 @@ export function PostWriteForm({
             if (validate()) onSubmit(draft);
           }}
           disabled={isPending}
-          className={cn("flex-1 gap-2", onRefine && "hover:bg-secondary hover:text-secondary-foreground")}
+          className={cn("flex-1 gap-2 border-0 bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground")}
         >
           <Send className="h-4 w-4" />
           {isSubmitting ? "저장 중..." : (submitLabel ?? "바로 게시하기")}

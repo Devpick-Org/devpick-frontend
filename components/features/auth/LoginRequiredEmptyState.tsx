@@ -37,7 +37,7 @@ export function LoginRequiredEmptyState({
         <Button asChild>
           <Link href="/auth">로그인 / 회원가입</Link>
         </Button>
-        <Button variant="outline" className="hover:bg-secondary hover:text-foreground" asChild>
+        <Button className="border-0 bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground" asChild>
           <Link href="/home">피드 둘러보기</Link>
         </Button>
       </div>

@@ -245,7 +245,7 @@ export function PostRefinePanel({
           variant="outline"
           onClick={onSubmitOriginal}
           disabled={isSubmitting}
-          className="flex-1 gap-2 hover:bg-secondary hover:text-secondary-foreground"
+          className="flex-1 gap-2 border-0 bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground"
         >
           <Send className="h-4 w-4" />
           원본으로 게시

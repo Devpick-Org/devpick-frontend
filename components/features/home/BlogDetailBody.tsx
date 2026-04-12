@@ -17,9 +17,11 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
       )}
 
       <section className="flex flex-col items-center gap-4 rounded-2xl bg-card px-6 py-8">
-        <p className="text-sm text-muted-foreground font-medium">
-          저작권 보호를 위해 본문의 일부만 제공됩니다.
-        </p>
+        {!content.originalContent && (
+          <p className="text-sm text-muted-foreground font-medium">
+            저작권 보호를 위해 본문이 제공되지 않습니다.
+          </p>
+        )}
         <div className="flex gap-3">
           <Link
             href={`/home/${content.id}/quiz`}
