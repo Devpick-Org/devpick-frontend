@@ -27,18 +27,20 @@ const SOURCE_BADGE: Record<
   { bg: string; text: string; label: string }
 > = {
   velog: { bg: "#20C997", text: "#fff", label: "V" },
-  "naver blog": { bg: "#03C75A", text: "#fff", label: "N" },
-  "naver d2": { bg: "#03C75A", text: "#fff", label: "D2" },
-  "kakao tech": { bg: "#FEE500", text: "#3A1D1D", label: "K" },
+  naver_d2: { bg: "#03C75A", text: "#fff", label: "D2" },
+  kakao_tech: { bg: "#FEE500", text: "#3A1D1D", label: "K" },
   우아한형제들: { bg: "#3399FF", text: "#fff", label: "W" },
-  medium: { bg: "#000000", text: "#fff", label: "M" },
-  "toss tech": { bg: "#0064FF", text: "#fff", label: "T" },
-  "oliveyoung tech": { bg: "#3A7D44", text: "#fff", label: "O" },
+  toss_tech: { bg: "#0064FF", text: "#fff", label: "T" },
+  oliveyoung_tech: { bg: "#3A7D44", text: "#fff", label: "O" },
 };
 
 function SourceBadge({ sourceName }: { sourceName: string }) {
   const key = sourceName.trim().toLowerCase();
-  const style = SOURCE_BADGE[key];
+
+  // Medium_ 접두사로 시작하는 소스는 모두 Medium 배지로 표시
+  const style = key.startsWith("medium")
+    ? { bg: "#000000", text: "#fff", label: "M" }
+    : SOURCE_BADGE[key];
 
   if (isStackOverflow(sourceName)) {
     return (
