@@ -202,7 +202,7 @@ function AnswerItem({
           {canAdopt && (
             <button
               onClick={() => onAdopt(answer.id)}
-              className="rounded-md border border-primary/30 px-2.5 py-1 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+              className="cursor-pointer rounded-md bg-primary px-2.5 py-1 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               채택
             </button>
@@ -214,14 +214,14 @@ function AnswerItem({
                   setEditContent(answer.content);
                   setIsEditing(true);
                 }}
-                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
                 aria-label="답변 수정"
               >
                 <Pencil className="h-3.5 w-3.5" />
               </button>
               <button
                 onClick={() => onDelete(answer.id)}
-                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:text-destructive"
+                className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:text-destructive"
                 aria-label="답변 삭제"
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -370,7 +370,7 @@ function CommentItem({ comment, currentUserId, onDelete, onOpenProfile }: Commen
       {isMyComment && (
         <button
           onClick={() => onDelete(comment.id)}
-          className="shrink-0 text-muted-foreground/50 transition-colors hover:text-destructive"
+          className="cursor-pointer shrink-0 text-muted-foreground/50 transition-colors hover:text-destructive"
           aria-label="댓글 삭제"
         >
           <Trash2 className="h-3 w-3" />
