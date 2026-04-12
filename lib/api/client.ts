@@ -72,6 +72,11 @@ apiClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // 비로그인 상태(accessToken 없음)에서 401이면 리프레시 시도하지 않음
+    if (!useAuthStore.getState().accessToken) {
+      return Promise.reject(error);
+    }
+
     // 이미 토큰 갱신 중이면 큐에 추가하고 대기
     if (isRefreshing) {
       return new Promise<string>((resolve, reject) => {
