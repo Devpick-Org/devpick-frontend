@@ -185,6 +185,7 @@ export function SignupForm() {
         <Input
           id="signup-password"
           type="password"
+          autoComplete="new-password"
           placeholder="8~20자, 영문·숫자·특수문자 포함"
           value={password}
           onChange={(e) => handlePasswordChange(e.target.value)}
@@ -204,6 +205,7 @@ export function SignupForm() {
         <Input
           id="signup-confirm"
           type="password"
+          autoComplete="new-password"
           placeholder="비밀번호를 다시 입력해 주세요"
           value={confirmPassword}
           onChange={(e) => handleConfirmPasswordChange(e.target.value)}

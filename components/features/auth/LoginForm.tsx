@@ -169,6 +169,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
           <Input
             id="login-password"
             type="password"
+            autoComplete="current-password"
             placeholder="••••••••"
             value={password}
             onChange={handlePasswordChange}
