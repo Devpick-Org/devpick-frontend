@@ -127,6 +127,14 @@ export default function HomePage() {
             </p>
           )}
 
+          {!isLoading && !isError && contents.length === 0 && (
+            <p className="py-10 text-center text-sm font-medium text-muted-foreground">
+              {searchQuery.trim()
+                ? `"${searchQuery}"에 대한 검색 결과가 없습니다.`
+                : "콘텐츠가 없습니다."}
+            </p>
+          )}
+
           {!isLoading &&
             !isError &&
             contents.map((content) => (
