@@ -1,9 +1,11 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/auth.store";
 import {
   ArrowRight,
   BarChart2,
@@ -571,6 +573,17 @@ function LandingFooter() {
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 export function LandingPage() {
+  const router = useRouter();
+  const { isAuthenticated, isInitialized } = useAuthStore();
+
+  useEffect(() => {
+    if (isInitialized && isAuthenticated) {
+      router.replace("/home");
+    }
+  }, [isInitialized, isAuthenticated, router]);
+
+  if (!isInitialized) return null;
+
   return (
     <div className="min-h-screen">
       <LandingNav />

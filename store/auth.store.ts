@@ -5,6 +5,8 @@ interface AuthStore {
   user: User | null;
   accessToken: string | null;
   isAuthenticated: boolean;
+  /** AuthInitializer의 세션 복원 시도 완료 여부 */
+  isInitialized: boolean;
 
   /** 로그인 성공 시 — 사용자 정보와 accessToken을 메모리에 저장 */
   setAuth: (user: User, accessToken: string) => void;
@@ -26,17 +28,18 @@ export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   accessToken: null,
   isAuthenticated: false,
+  isInitialized: false,
 
   setAuth: (user, accessToken) => {
     set({ user, accessToken, isAuthenticated: true });
   },
 
   clearAuth: () => {
-    set({ user: null, accessToken: null, isAuthenticated: false });
+    set({ user: null, accessToken: null, isAuthenticated: false, isInitialized: true });
   },
 
   initAuth: (user, accessToken) =>
-    set({ user, accessToken, isAuthenticated: true }),
+    set({ user, accessToken, isAuthenticated: true, isInitialized: true }),
 
   updateUser: (data) =>
     set((state) => ({

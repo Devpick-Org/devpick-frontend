@@ -46,7 +46,6 @@ export function AuthInitializer() {
         initAuth(meData.data, newAccessToken);
       } catch {
         clearAuth();
-        window.location.href = "/auth";
       }
     }
 

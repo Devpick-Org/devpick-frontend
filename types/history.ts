@@ -38,13 +38,20 @@ export interface HistoryPostRef {
 /** 히스토리 아이템이 참조하는 답변 (answer_written / comment_created 시 존재) */
 export interface HistoryAnswerRef {
   id: string;
+  preview: string | null;
+}
+
+/** 히스토리 아이템이 참조하는 댓글 (comment_created 시 존재) */
+export interface HistoryCommentRef {
+  id: string;
+  preview: string | null;
 }
 
 /**
  * GET /history 단일 행동 기록 — 학습 탭
  * createdAt: "YYYY-MM-DDTHH:mm:ssZ" — UTC ISO 8601 (KST = UTC+9)
  * 삭제된 참조 항목은 해당 필드가 null로 반환됨
- * points: 해당 행동으로 적립된 포인트 (미지원 시 null)
+ * points: 해당 행동으로 적립된 포인트 (ai_summary_viewed는 필드 없음)
  */
 export interface HistoryItem {
   id: string;
@@ -53,7 +60,7 @@ export interface HistoryItem {
   post: HistoryPostRef | null;
   answer: HistoryAnswerRef | null;
   createdAt: string;
-  points: number | null;
+  points?: number | null;
 }
 
 /**
@@ -68,8 +75,9 @@ export interface ActivityItem {
   content: HistoryContentRef | null;
   post: HistoryPostRef | null;
   answer: HistoryAnswerRef | null;
+  comment: HistoryCommentRef | null;
   createdAt: string;
-  points: number | null;
+  points?: number | null;
 }
 
 /** 배지 ID — 서버 정의 값 */
@@ -123,9 +131,6 @@ export interface ActivityPageData {
  * - actionTypes: 콤마 구분 문자열로 join해서 전달 (생략 시 전체 반환)
  * - startDate / endDate: ISO 8601 Z 포함 ("2026-03-01T00:00:00Z")
  * - page: 0-based 정수, size: 기본 20, 최대 100
- *
- * mock 단계에서는 actionTypes / startDate / endDate 무시됨
- * (로컬 filterByPeriod / filterByActions 로 대체)
  */
 export interface HistoryParams {
   actionTypes?: string[];

@@ -50,7 +50,7 @@ interface PostDetailProps {
 }
 
 function AttachmentItem({ attachment }: { attachment: PostAttachmentDTO }) {
-  if (attachment.type === "IMAGE") {
+  if (attachment.type === "image") {
     return (
       <a
         href={attachment.url}

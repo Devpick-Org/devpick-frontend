@@ -99,7 +99,9 @@ export function FeedCard({ content }: FeedCardProps) {
     if (!isAuthenticated) {
       e.preventDefault();
       openLoginDialog("콘텐츠 상세를 보려면");
+      return;
     }
+    sessionStorage.setItem("homeScrollY", String(window.scrollY));
   };
 
   // mutate(wasLiked) — 클릭 직전 상태를 variable로 넘겨 onMutate/mutationFn이 같은 기준으로 동작

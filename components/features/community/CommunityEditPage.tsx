@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -10,7 +10,7 @@ import { useHydrated } from "@/lib/hooks/useHydrated";
 import { useAuthStore } from "@/store/auth.store";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
 import { PostWriteForm } from "./PostWriteForm";
-import type { PostDraft } from "@/types/community";
+import type { PostAttachmentDTO, PostDraft } from "@/types/community";
 
 interface Props {
   postId: string;
@@ -23,6 +23,7 @@ export function CommunityEditPage({ postId }: Props) {
   const mounted = useHydrated();
 
   const [files, setFiles] = useState<File[]>([]);
+  const [removedUrls, setRemovedUrls] = useState<string[]>([]);
 
   const { data: postRes, isLoading, isError } = useQuery({
     queryKey: ["post", postId],
@@ -31,13 +32,27 @@ export function CommunityEditPage({ postId }: Props) {
 
   const post = postRes?.data;
 
+  const existingAttachments = useMemo(
+    () => (post?.attachments ?? []).filter((a) => !removedUrls.includes(a.url)),
+    [post?.attachments, removedUrls],
+  );
+
   const updateMutation = useMutation({
-    mutationFn: (draft: PostDraft) =>
-      postsEndpoints.updatePost(postId, {
+    mutationFn: async (draft: PostDraft) => {
+      const newUrls = await Promise.all(
+        files.map((file) => postsEndpoints.uploadAttachment(file).then((r) => r.url)),
+      );
+      const attachmentUrls = [
+        ...existingAttachments.map((a) => a.url),
+        ...newUrls,
+      ];
+      return postsEndpoints.updatePost(postId, {
         title: draft.title,
         content: draft.content,
         level: draft.level,
-      }),
+        attachmentUrls,
+      });
+    },
     onSuccess: (res) => {
       queryClient.setQueryData(["post", postId], res);
       queryClient.invalidateQueries({ queryKey: ["posts"] });
@@ -63,6 +78,7 @@ export function CommunityEditPage({ postId }: Props) {
       router.replace(`/community/${postId}`);
     }
   }, [post, user, postId, router]);
+
 
   if (!mounted || !user) return null;
 
@@ -120,6 +136,10 @@ export function CommunityEditPage({ postId }: Props) {
           onFilesChange={(added) => setFiles((prev) => [...prev, ...added])}
           onRemoveFile={(name) =>
             setFiles((prev) => prev.filter((f) => f.name !== name))
+          }
+          existingAttachments={existingAttachments}
+          onRemoveExistingAttachment={(url) =>
+            setRemovedUrls((prev) => [...prev, url])
           }
           onSubmit={(draft) => updateMutation.mutate(draft)}
           isSubmitting={updateMutation.isPending}

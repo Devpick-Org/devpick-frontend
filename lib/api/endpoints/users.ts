@@ -21,7 +21,22 @@ export interface UpdateMeResponse {
   createdAt?: string;
 }
 
+export interface UploadProfileImageResponse {
+  profileImage: string;
+}
+
 export const usersEndpoints = {
+  /** POST /users/me/profile-image — 프로필 이미지 S3 업로드 */
+  uploadProfileImage: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiClient.post<ApiResponse<UploadProfileImageResponse>>(
+      "/users/me/profile-image",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
+
   /** PUT /users/me — 내 프로필 수정 */
   updateMe: (data: UpdateMeRequest) =>
     apiClient.put<ApiResponse<UpdateMeResponse>>("/users/me", data),
