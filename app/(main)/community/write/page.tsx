@@ -11,21 +11,16 @@ import { postsEndpoints } from "@/lib/api/endpoints/posts";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { PostWriteForm } from "@/components/features/community/PostWriteForm";
 import { PostRefinePanel } from "@/components/features/community/PostRefinePanel";
-import type {
-  PostAttachmentDTO,
-  PostDraft,
-  RefinePostData,
-} from "@/types/community";
+import type { PostDraft, RefinePostData } from "@/types/community";
 
-// ─── 첨부파일 변환 ────────────────────────────────────────────────────────────
-// mock 단계: File 객체를 PostAttachmentDTO로 변환한다.
-// 실제 API 연동 시 이 함수만 "파일 업로드 → 서버 URL 반환" 로직으로 교체하면 된다.
-function filesToAttachments(files: File[]): PostAttachmentDTO[] {
-  return files.map((file) => ({
-    type: file.type.startsWith("image/") ? "IMAGE" : "FILE",
-    url: URL.createObjectURL(file),
-    fileName: file.name,
-  }));
+// ─── 첨부파일 업로드 ──────────────────────────────────────────────────────────
+// 파일 배열을 S3에 업로드하고 URL 배열을 반환한다.
+async function uploadFiles(files: File[]): Promise<string[]> {
+  if (files.length === 0) return [];
+  const results = await Promise.all(
+    files.map((file) => postsEndpoints.uploadAttachment(file)),
+  );
+  return results.map((r) => r.url);
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -98,31 +93,22 @@ export default function CommunityWritePage() {
   };
 
   /** 왼쪽 폼: 바로 게시하기 — 현재 files 기준 */
-  const handleSubmitDirect = (draft: PostDraft) => {
-    const attachments = filesToAttachments(files);
-    createMutation.mutate({
-      ...draft,
-      ...(attachments.length > 0 && { attachments }),
-    });
+  const handleSubmitDirect = async (draft: PostDraft) => {
+    const attachmentUrls = await uploadFiles(files);
+    createMutation.mutate({ ...draft, attachmentUrls });
   };
 
   /** 오른쪽 패널: 개선안으로 게시 — savedFiles 기준 */
-  const handleSubmitRefined = (draft: PostDraft) => {
-    const attachments = filesToAttachments(savedFiles);
-    createMutation.mutate({
-      ...draft,
-      ...(attachments.length > 0 && { attachments }),
-    });
+  const handleSubmitRefined = async (draft: PostDraft) => {
+    const attachmentUrls = await uploadFiles(savedFiles);
+    createMutation.mutate({ ...draft, attachmentUrls });
   };
 
   /** 오른쪽 패널: 원본으로 게시 — savedDraft + savedFiles 기준 */
-  const handleSubmitOriginal = () => {
+  const handleSubmitOriginal = async () => {
     if (!savedDraft) return;
-    const attachments = filesToAttachments(savedFiles);
-    createMutation.mutate({
-      ...savedDraft,
-      ...(attachments.length > 0 && { attachments }),
-    });
+    const attachmentUrls = await uploadFiles(savedFiles);
+    createMutation.mutate({ ...savedDraft, attachmentUrls });
   };
 
   // ─── 렌더 ───────────────────────────────────────────────────────────────────

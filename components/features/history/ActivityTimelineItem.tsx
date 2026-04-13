@@ -36,7 +36,7 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
     item.content?.title ??
     item.post?.title ??
     (item.actionType === "daily_login" ? "출석을 완료했어요" : null);
-  const preview = item.content?.preview ?? null;
+  const preview = item.content?.preview ?? item.answer?.preview ?? item.comment?.preview ?? null;
 
   const card = (
     <div

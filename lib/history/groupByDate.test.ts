@@ -42,6 +42,7 @@ function makeActivityItem(
     content: null,
     post: null,
     answer: null,
+    comment: null,
     points: null,
     ...overrides,
   };

@@ -142,6 +142,7 @@ export function ProfileEditForm() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     user?.profileImage ?? null,
   );
+  const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const [selectedRole, setSelectedRole] = useState<JobRoleId | null>(
     (user?.job as JobRoleId) ?? null,
   );
@@ -181,8 +182,8 @@ export function ProfileEditForm() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setAvatarPreview(url);
+    setPendingImageFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
   };
 
   const handleSave = async () => {
@@ -190,12 +191,20 @@ export function ProfileEditForm() {
     setSaveError(null);
 
     try {
+      let profileImageUrl = avatarPreview ?? undefined;
+
+      if (pendingImageFile) {
+        const { data: uploadData } = await usersEndpoints.uploadProfileImage(pendingImageFile);
+        profileImageUrl = uploadData.data.profileImage;
+        setPendingImageFile(null);
+      }
+
       const { data } = await usersEndpoints.updateMe({
         nickname: nickname.trim(),
         job: selectedRole ?? undefined,
         level: selectedLevel ?? undefined,
         tags: selectedTags,
-        profileImage: avatarPreview ?? undefined,
+        profileImage: profileImageUrl,
       });
 
       const updatedUser = data.data;

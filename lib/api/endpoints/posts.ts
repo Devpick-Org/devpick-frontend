@@ -2,6 +2,7 @@ import { apiClient } from "../client";
 import type { PostListResponse } from "@/types/post";
 import type {
   PostDetailResponse,
+  PostAttachmentDTO,
   AnswerListResponse,
   CommunityAnswer,
   CommentDTO,
@@ -17,6 +18,18 @@ import type {
 import type { ApiResponse } from "@/types/api";
 
 export const postsEndpoints = {
+  // ─── 첨부파일 업로드 ────────────────────────────────────────────────────────
+
+  /** POST /attachments — 파일을 S3에 업로드하고 URL 반환 */
+  uploadAttachment: (file: File): Promise<PostAttachmentDTO> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return apiClient
+      .post<ApiResponse<PostAttachmentDTO>>("/attachments", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((r) => r.data.data);
+  },
   // ─── 게시글 목록 ────────────────────────────────────────────────────────────
 
   /** GET /posts — 게시글 목록 */

@@ -6,7 +6,7 @@ import type { UserJob } from "./userProfile";
 
 /** 첨부 파일 DTO */
 export interface PostAttachmentDTO {
-  type: "IMAGE" | "FILE";
+  type: "image" | "file";
   url: string;
   fileName: string;
 }
@@ -67,7 +67,7 @@ export interface CreatePostRequest {
   title: string;
   content: string;
   level: PostLevel;
-  attachments?: PostAttachmentDTO[];
+  attachmentUrls?: string[];
 }
 
 export interface RefinePostRequest {
@@ -91,6 +91,7 @@ export interface UpdatePostRequest {
   title: string;
   content: string;
   level: PostLevel;
+  attachmentUrls?: string[];
 }
 
 export interface CreateAnswerRequest {

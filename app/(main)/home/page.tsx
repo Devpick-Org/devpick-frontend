@@ -33,6 +33,14 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => {
+    const savedY = sessionStorage.getItem("homeScrollY");
+    if (savedY) {
+      window.scrollTo(0, Number(savedY));
+      sessionStorage.removeItem("homeScrollY");
+    }
+  }, []);
+
   const {
     data,
     isLoading,

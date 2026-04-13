@@ -11,10 +11,8 @@ import {
   invalidateContentInteractionQueries,
 } from "@/lib/content/updateContentInteractionCache";
 import type { ContentDetail as ContentDetailType, ContentDetailResponse } from "@/types/content";
-import { isStackOverflowContent } from "@/types/content";
 import { AiSummary } from "./AiSummary";
 import { BlogDetailBody } from "./BlogDetailBody";
-import { StackOverflowDetailBody, SOStats } from "./StackOverflowDetailBody";
 import { toast } from "sonner";
 
 interface ContentDetailProps {
@@ -76,8 +74,6 @@ export function ContentDetail({ content }: ContentDetailProps) {
       toast.success("링크가 복사되었습니다.");
     }
   }, [content.id]);
-
-  const isSO = isStackOverflowContent(content);
 
   return (
     <article className="pb-20">
@@ -142,10 +138,9 @@ export function ContentDetail({ content }: ContentDetailProps) {
           </div>
         </div>
 
-        {/* 메타 정보 — SO는 author 추가 노출 */}
+        {/* 메타 정보 */}
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-muted-foreground">
           <span className="font-medium">{content.sourceName}</span>
-          {isSO && <span className="font-medium">{content.author ?? "작성자 미상"}</span>}
           <span className="font-medium">{formatDate(content.publishedAt)}</span>
           {content.licenseType && (
             <span className="rounded-md px-1.5 py-0.5 text-xs font-medium">
@@ -154,22 +149,12 @@ export function ContentDetail({ content }: ContentDetailProps) {
           )}
         </div>
 
-        {/* 태그 + SO 통계 — 같은 줄, 태그 왼쪽 / 통계 오른쪽 */}
-        {(content.tags.length > 0 || isSO) && (
-          <div className="mt-4 flex items-center justify-between gap-4">
-            {content.tags.length > 0 && (
-              <p className="text-sm text-muted-foreground/85 font-medium">
-                {content.tags.join(" · ")}
-              </p>
-            )}
-            {isStackOverflowContent(content) && (
-              <SOStats
-                score={content.score}
-                viewCount={content.viewCount}
-                answerCount={(content.acceptedAnswer ? 1 : 0) + (content.topAnswers?.length ?? 0)}
-                isAnswered={content.isAnswered}
-              />
-            )}
+        {/* 태그 */}
+        {content.tags.length > 0 && (
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground/85 font-medium">
+              {content.tags.join(" · ")}
+            </p>
           </div>
         )}
       </header>
@@ -177,12 +162,8 @@ export function ContentDetail({ content }: ContentDetailProps) {
       {/* AI 요약 */}
       <AiSummary contentId={content.id} />
 
-      {/* 본문 분기 — type predicate로 narrowing되어 타입 단언 불필요 */}
-      {isStackOverflowContent(content) ? (
-        <StackOverflowDetailBody content={content} />
-      ) : (
-        <BlogDetailBody content={content} />
-      )}
+      {/* 본문 */}
+      <BlogDetailBody content={content} />
     </article>
   );
 }

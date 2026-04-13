@@ -2,9 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
-  Sparkles,
-  ChevronDown,
-  ChevronUp,
   RefreshCw,
   Loader2,
   FileQuestion,
@@ -81,59 +78,47 @@ const PREPARING_COUNTDOWN_SEC = 30;
 
 function AiSummarySkeleton() {
   return (
-    <div className="space-y-8">
-      <p className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        AI가 요약을 생성하고 있어요...
-      </p>
-      <div className="animate-pulse space-y-8">
-      {/* 난이도 · 신뢰도 뱃지 */}
-      <div className="flex gap-2">
-        <div className="h-6 w-24 rounded-full bg-secondary" />
-        <div className="h-6 w-20 rounded-full bg-secondary" />
-      </div>
-
-      {/* 핵심 요약 */}
-      <div className="space-y-2">
-        <div className="h-3 w-16 rounded-md bg-secondary" />
-        <div className="h-3 w-full rounded-md bg-secondary" />
-        <div className="h-3 w-5/6 rounded-md bg-secondary" />
-        <div className="h-3 w-4/6 rounded-md bg-secondary" />
-      </div>
-
-      {/* 핵심 포인트 */}
-      <div className="space-y-2">
-        <div className="h-3 w-20 rounded-md bg-secondary" />
-        <div className="h-3 w-full rounded-md bg-secondary" />
-        <div className="h-3 w-5/6 rounded-md bg-secondary" />
-        <div className="h-3 w-4/5 rounded-md bg-secondary" />
-      </div>
-
+    <div className="animate-pulse space-y-8">
       {/* 키워드 */}
-      <div className="space-y-2">
-        <div className="h-3 w-12 rounded-md bg-secondary" />
+      <div className="space-y-3">
+        <div className="h-4 w-12 rounded-md bg-secondary" />
         <div className="flex flex-wrap gap-1.5">
-          <div className="h-6 w-14 rounded-md bg-secondary" />
-          <div className="h-6 w-20 rounded-md bg-secondary" />
-          <div className="h-6 w-16 rounded-md bg-secondary" />
-          <div className="h-6 w-12 rounded-md bg-secondary" />
+          <div className="h-7 w-14 rounded-md bg-secondary" />
+          <div className="h-7 w-20 rounded-md bg-secondary" />
+          <div className="h-7 w-16 rounded-md bg-secondary" />
+          <div className="h-7 w-12 rounded-md bg-secondary" />
         </div>
       </div>
 
+      {/* 핵심 요약 */}
+      <div className="space-y-3">
+        <div className="h-4 w-16 rounded-md bg-secondary" />
+        <div className="h-4 w-full rounded-md bg-secondary" />
+        <div className="h-4 w-5/6 rounded-md bg-secondary" />
+        <div className="h-4 w-4/6 rounded-md bg-secondary" />
+      </div>
+
+      {/* 핵심 포인트 */}
+      <div className="space-y-3">
+        <div className="h-4 w-20 rounded-md bg-secondary" />
+        <div className="h-4 w-full rounded-md bg-secondary" />
+        <div className="h-4 w-5/6 rounded-md bg-secondary" />
+        <div className="h-4 w-4/5 rounded-md bg-secondary" />
+      </div>
+
       {/* 다음 추천 */}
-      <div className="space-y-2">
-        <div className="h-3 w-16 rounded-md bg-secondary" />
-        <div className="h-3 w-full rounded-md bg-secondary" />
-        <div className="h-3 w-3/4 rounded-md bg-secondary" />
+      <div className="space-y-3">
+        <div className="h-4 w-16 rounded-md bg-secondary" />
+        <div className="h-4 w-full rounded-md bg-secondary" />
+        <div className="h-4 w-3/4 rounded-md bg-secondary" />
       </div>
 
       {/* 추가 질문 */}
       <div className="space-y-2">
-        <div className="h-3 w-24 rounded-md bg-secondary" />
-        <div className="h-10 w-full rounded-lg bg-secondary" />
-        <div className="h-10 w-full rounded-lg bg-secondary" />
+        <div className="h-4 w-24 rounded-md bg-secondary" />
+        <div className="h-12 w-full rounded-lg bg-secondary" />
+        <div className="h-12 w-full rounded-lg bg-secondary" />
       </div>
-    </div>
     </div>
   );
 }
@@ -158,8 +143,6 @@ function AiSummaryFallback({
   );
   const retryFiredRef = useRef(false);
 
-  // 조건 1: retryFiredRef로 countdown = 0 구간 중복 호출 방지
-  // 조건 3: 부모가 key prop으로 remount시켜 countdown 초기화 보장 (setState-in-effect 없음)
   useEffect(() => {
     if (kind !== "preparing") return;
     if (countdown <= 0) {
@@ -169,34 +152,23 @@ function AiSummaryFallback({
       }
       return;
     }
-    retryFiredRef.current = false; // 다음 사이클 대비 guard 초기화
+    retryFiredRef.current = false;
     const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(timer);
   }, [kind, countdown, onRetry]);
 
-  // 조건 2: 수동 클릭 시 countdown 리셋 → 언마운트 전 auto-retry 이중 발화 방지
   function handleButtonClick() {
     if (kind === "preparing") setCountdown(PREPARING_COUNTDOWN_SEC);
     onRetry();
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 rounded-xl bg-background px-6 py-8 text-center">
-      <div
-        className={cn(
-          "flex h-11 w-11 items-center justify-center rounded-full",
-          kind === "preparing" ? "bg-primary/10" : "bg-secondary",
-        )}
-      >
-        <Icon
-          className={cn(
-            "h-5 w-5",
-            kind === "preparing" ? "text-primary" : "text-muted-foreground",
-          )}
-        />
+    <div className="flex flex-col items-center gap-4 py-8 text-center">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary">
+        <Icon className="h-5 w-5 text-muted-foreground" />
       </div>
       <div className="space-y-1.5">
-        <p className="text-sm font-semibold text-foreground">{title}</p>
+        <p className="text-md font-semibold text-foreground">{title}</p>
         <p className="whitespace-pre-line text-sm leading-6 text-muted-foreground font-medium">
           {description}
         </p>
@@ -239,23 +211,16 @@ export function AiSummary({ contentId }: AiSummaryProps) {
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  // 마지막으로 fetch한 레벨 추적 — 같은 레벨로 닫았다 다시 열어도 재호출 방지
-  const [fetchedLevel, setFetchedLevel] = useState<AiSummaryLevel | null>(null);
-  // 재시도마다 증가 → AiSummaryFallback key 변경으로 remount (countdown 초기화 보장)
   const [refetchKey, setRefetchKey] = useState(0);
 
   useEffect(() => {
-    if (!isExpanded) return;
-    if (fetchedLevel === level) return; // 이미 해당 레벨 데이터 있음
-
     void (async () => {
       setIsLoading(true);
       setErrorCode(null);
+      setSummary(null);
       try {
         const res = await contentsEndpoints.getContentSummary(contentId, level);
         setSummary(res.data);
-        setFetchedLevel(level);
       } catch (err) {
         const { code } = extractApiError(err);
         setErrorCode(code ?? "UNKNOWN");
@@ -263,7 +228,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
         setIsLoading(false);
       }
     })();
-  }, [contentId, level, isExpanded, fetchedLevel]);
+  }, [contentId, level]);
 
   const handleRetry = useCallback(() => {
     setIsRetrying(true);
@@ -280,7 +245,6 @@ export function AiSummary({ contentId }: AiSummaryProps) {
       .finally(() => setIsRetrying(false));
   }, [contentId, level]);
 
-  // preparing 상태 전용: POST retry가 아닌 GET 재조회
   const handleRefetch = useCallback(() => {
     setIsLoading(true);
     setErrorCode(null);
@@ -288,10 +252,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
     setRefetchKey((k) => k + 1);
     contentsEndpoints
       .getContentSummary(contentId, level)
-      .then((res) => {
-        setSummary(res.data);
-        setFetchedLevel(level);
-      })
+      .then((res) => setSummary(res.data))
       .catch((err) => {
         const { code } = extractApiError(err);
         setErrorCode(code ?? "UNKNOWN");
@@ -300,192 +261,141 @@ export function AiSummary({ contentId }: AiSummaryProps) {
   }, [contentId, level]);
 
   return (
-    <section className="mb-10 overflow-hidden rounded-2xl bg-primary/5">
+    <section className="mb-10">
       {/* 헤더 */}
-      <div
-        className={cn(
-          "flex flex-wrap items-center justify-between gap-3 px-5 py-4",
-          isExpanded && "border-b border-primary/15",
-        )}
-      >
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 shrink-0 text-primary" />
-          <span className="text-md font-semibold text-foreground">AI 요약</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* 레벨 탭 */}
-          <div className="flex rounded-lg bg-background p-0.5">
-            {LEVELS.map((l) => (
-              <button
-                key={l}
-                onClick={() => setLevel(l)}
-                className={cn(
-                  "rounded-md px-2.5 py-1 text-sm font-medium transition-all duration-150 cursor-pointer",
-                  level === l
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {LEVEL_LABELS[l]}
-              </button>
-            ))}
-          </div>
-
-          {/* 구분선 */}
-          <div className="h-5 w-px bg-border" />
-
-          {/* 다시 생성 — success 상태에서만 표시 */}
-          {!errorCode && (
-            <button
-              onClick={handleRetry}
-              disabled={isLoading || isRetrying}
-              className={cn(
-                "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150",
-                isLoading || isRetrying
-                  ? "cursor-not-allowed text-muted-foreground/40"
-                  : "cursor-pointer text-muted-foreground hover:text-foreground",
-              )}
-              aria-label="AI 요약 다시 생성"
-            >
-              {isRetrying ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-              {isRetrying ? "생성 중..." : "다시 생성"}
-            </button>
+      <div className="mb-6 flex items-end justify-between border-b border-border">
+        <div className="flex items-center gap-2 pb-3">
+          <span className="text-lg font-semibold text-foreground">AI 요약</span>
+          {summary && !isLoading && (
+            <>
+              <span className="ml-1 text-xs font-medium text-muted-foreground">
+                난이도 · {summary.difficulty}
+              </span>
+              <span className="text-muted-foreground/40">·</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                신뢰도 · {Math.round(summary.confidence * 100)}%
+              </span>
+            </>
           )}
-
-          {/* 접기/펼치기 */}
-          <button
-            onClick={() => setIsExpanded((prev) => !prev)}
-            className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
-            aria-label={isExpanded ? "접기" : "펼치기"}
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
+        </div>
+        <div className="flex gap-6">
+          {LEVELS.map((l) => (
+            <button
+              key={l}
+              onClick={() => setLevel(l)}
+              className={cn(
+                "rounded-none border-b-2 px-3 pb-3 pt-1 text-sm font-semibold transition-colors cursor-pointer",
+                level === l
+                  ? "border-primary text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {LEVEL_LABELS[l]}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* 본문 */}
-      {isExpanded && (
-        <div className="px-5 py-5">
-          {isLoading || isRetrying ? (
-            <AiSummarySkeleton />
-          ) : errorCode ? (
-            <AiSummaryFallback
-              key={`${errorCode ?? "none"}-${refetchKey}`}
-              kind={getAiSummaryErrorKind(errorCode)}
-              isRetrying={isRetrying}
-              onRetry={
-                getAiSummaryErrorKind(errorCode) === "preparing"
-                  ? handleRefetch
-                  : handleRetry
-              }
-            />
-          ) : summary ? (
-            <div className="space-y-8">
-              {/* 난이도 · 신뢰도 뱃지 */}
-              <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-0.5 text-xs font-medium text-foreground">
-                  난이도 · {summary.difficulty}
-                </span>
-                <span className="inline-flex items-center rounded-full border border-border bg-background px-2.5 py-0.5 text-xs font-medium text-foreground">
-                  신뢰도 · {Math.round(summary.confidence * 100)}%
-                </span>
+      {isLoading || isRetrying ? (
+        <AiSummarySkeleton />
+      ) : errorCode ? (
+        <AiSummaryFallback
+          key={`${errorCode ?? "none"}-${refetchKey}`}
+          kind={getAiSummaryErrorKind(errorCode)}
+          isRetrying={isRetrying}
+          onRetry={
+            getAiSummaryErrorKind(errorCode) === "preparing"
+              ? handleRefetch
+              : handleRetry
+          }
+        />
+      ) : summary ? (
+        <div className="space-y-8">
+          {/* 키워드 */}
+          {summary.keywords.length > 0 && (
+            <div>
+              <p className="mb-2 text-md font-semibold uppercase tracking-wide text-foreground">
+                키워드
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {summary.keywords.map((kw) => (
+                  <span
+                    key={kw}
+                    className="rounded-md bg-primary/10 px-2.5 py-1 text-sm font-medium text-primary"
+                  >
+                    {kw}
+                  </span>
+                ))}
               </div>
-
-              {/* 핵심 요약 */}
-              <div>
-                <p className="mb-1.5 text-sm font-semibold uppercase tracking-wide text-primary">
-                  핵심 요약
-                </p>
-                <p className="text-sm leading-7 text-foreground/85 font-medium">
-                  {summary.coreSummary}
-                </p>
-              </div>
-
-              {/* 핵심 포인트 */}
-              {summary.keyPoints.length > 0 && (
-                <div>
-                  <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-primary">
-                    핵심 포인트
-                  </p>
-                  <ul className="space-y-1.5">
-                    {summary.keyPoints.map((point, i) => (
-                      <li
-                        key={i}
-                        className="flex items-start gap-2 text-sm leading-6 text-foreground/85 font-medium"
-                      >
-                        <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* 키워드 */}
-              {summary.keywords.length > 0 && (
-                <div>
-                  <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-primary">
-                    키워드
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {summary.keywords.map((kw) => (
-                      <span
-                        key={kw}
-                        className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
-                      >
-                        {kw}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 다음 추천 */}
-              {summary.nextRecommendation && (
-                <div>
-                  <p className="mb-1 text-sm font-semibold uppercase tracking-wide text-primary">
-                    다음 추천
-                  </p>
-                  <p className="text-sm leading-6 text-foreground/85 font-medium">
-                    {summary.nextRecommendation}
-                  </p>
-                </div>
-              )}
-
-              {/* 추가 질문 */}
-              {summary.additionalQuestions.length > 0 && (
-                <div>
-                  <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-primary">
-                    더 생각해볼 질문
-                  </p>
-                  <ol className="space-y-2">
-                    {summary.additionalQuestions.map((q, i) => (
-                      <li
-                        key={i}
-                        className="rounded-lg bg-secondary/50 px-4 py-2.5 text-sm leading-6 text-foreground/85 font-medium"
-                      >
-                        <span className="mr-2 font-semibold text-primary">
-                          Q{i + 1}.
-                        </span>
-                        {q}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
             </div>
-          ) : null}
+          )}
+
+          {/* 핵심 요약 */}
+          <div>
+            <p className="mb-1.5 text-md font-semibold uppercase tracking-wide text-foreground">
+              핵심 요약
+            </p>
+            <p className="text-foreground/85 font-medium leading-7 whitespace-pre-line">
+              {summary.coreSummary}
+            </p>
+          </div>
+
+          {/* 핵심 포인트 */}
+          {summary.keyPoints.length > 0 && (
+            <div>
+              <p className="mb-2 text-md font-semibold uppercase tracking-wide text-foreground">
+                핵심 포인트
+              </p>
+              <ul className="space-y-1.5">
+                {summary.keyPoints.map((point, i) => (
+                  <li
+                    key={i}
+                    className="flex items-start gap-2 leading-7 text-foreground/85 font-medium"
+                  >
+                    <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* 다음 추천 */}
+          {summary.nextRecommendation && (
+            <div>
+              <p className="mb-1 text-md font-semibold uppercase tracking-wide text-foreground">
+                다음 추천
+              </p>
+              <p className="leading-7 text-foreground/85 font-medium">
+                {summary.nextRecommendation}
+              </p>
+            </div>
+          )}
+
+          {/* 추가 질문 */}
+          {summary.additionalQuestions.length > 0 && (
+            <div>
+              <p className="mb-2 text-md font-semibold uppercase tracking-wide text-foreground">
+                더 생각해볼 질문
+              </p>
+              <ol className="space-y-2">
+                {summary.additionalQuestions.map((q, i) => (
+                  <li
+                    key={i}
+                    className="rounded-lg bg-secondary/50 px-4 py-2.5 leading-7 text-foreground/85 font-medium"
+                  >
+                    <span className="mr-2 font-semibold text-primary">
+                      Q{i + 1}.
+                    </span>
+                    {q}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
-      )}
+      ) : null}
     </section>
   );
 }
