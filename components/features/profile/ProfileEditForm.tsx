@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -136,6 +137,7 @@ export function ProfileEditForm() {
   const user = useAuthStore((s) => s.user);
   const updateUser = useAuthStore((s) => s.updateUser);
   const clearAuth = useAuthStore((s) => s.clearAuth);
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [nickname, setNickname] = useState(user?.nickname ?? "");
@@ -217,6 +219,7 @@ export function ProfileEditForm() {
         profileImage: updatedUser.profileImage ?? undefined,
       });
 
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       toast.success("프로필이 저장되었습니다.");
     } catch (error) {
       console.error(error);

@@ -47,7 +47,7 @@ export default function CommunityWritePage() {
   const refineMutation = useMutation({
     mutationFn: postsEndpoints.refinePost,
     onSuccess: (res) => {
-      setRefineResult(res.data);
+      setRefineResult(res);
       setRefineKey((k) => k + 1);
     },
   });
@@ -59,6 +59,7 @@ export default function CommunityWritePage() {
       // getPostDetail 쿼리와 shape가 동일(PostDetailResponse = ApiResponse<PostDetailDTO>)하므로
       // res를 그대로 선세팅하면 상세 페이지 진입 시 즉시 캐시 히트된다.
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       queryClient.setQueryData(["post", res.data.id], res);
       router.replace(`/community/${res.data.id}`);
     },

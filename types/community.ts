@@ -76,16 +76,23 @@ export interface RefinePostRequest {
   level: PostLevel;
 }
 
+/** 백엔드 API 응답 원형 (snake_case) — API boundary 전용 */
+export interface RefinePostRawData {
+  refined_title: string;
+  refined_content: string;
+  suggestions: string[];
+}
+
+/** 프론트 내부 사용 타입 (camelCase) */
 export interface RefinePostData {
   refinedTitle: string;
   refinedContent: string;
-  /** 질문 품질 향상을 위한 보완 제안 목록 */
   suggestions: string[];
 }
 
 export type CreatePostResponse = ApiResponse<PostDetailDTO>;
 export type UpdatePostResponse = ApiResponse<PostDetailDTO>;
-export type RefinePostResponse = ApiResponse<RefinePostData>;
+export type RefinePostRawResponse = ApiResponse<RefinePostRawData>;
 
 export interface UpdatePostRequest {
   title: string;

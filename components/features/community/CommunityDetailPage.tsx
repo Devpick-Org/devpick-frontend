@@ -36,6 +36,7 @@ export function CommunityDetailPage({ postId }: Props) {
     mutationFn: () => postsEndpoints.deletePost(postId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       toast.success("게시글이 삭제되었습니다.");
       router.replace("/community");
     },

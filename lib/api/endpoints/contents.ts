@@ -4,9 +4,15 @@ import type {
   ContentDetail,
   ContentDetailResponse,
   ContentFeedResponse,
+  AiSummary,
   AiSummaryLevel,
   AiSummaryResponse,
 } from "@/types/content";
+
+/** GET /summary 응답 discriminated union */
+type SummaryResult =
+  | { ready: true; summary: AiSummary }
+  | { ready: false };
 
 export const contentsEndpoints = {
   /** GET /contents — 개인화 피드 목록 */
@@ -50,34 +56,21 @@ export const contentsEndpoints = {
       .then((r) => r.data);
   },
 
-  /** GET /contents/:contentId/summary?level=... — AI 요약 조회 */
+  /** GET /contents/:contentId/summary?level=... — AI 요약 조회
+   * 202 (success: false) → { ready: false } — 폴링 대상
+   * 200 (success: true)  → { ready: true, summary }
+   */
   getContentSummary: (
     contentId: string,
     level: AiSummaryLevel = "JUNIOR",
-  ): Promise<AiSummaryResponse> => {
+  ): Promise<SummaryResult> => {
     return apiClient
       .get(`/contents/${contentId}/summary`, { params: { level } })
       .then((r) => {
-        // 202: AI 처리 대기 중 (success: false) → reject으로 에러 흐름에 합류
-        if (!(r.data as { success: boolean }).success) {
-          return Promise.reject({ response: r });
-        }
-        return r.data as AiSummaryResponse;
+        const body = r.data as AiSummaryResponse;
+        if (!body.success) return { ready: false } as const;
+        return { ready: true, summary: body.data } as const;
       });
-  },
-
-  /** POST /contents/:contentId/summary/retry?level=... — AI 요약 재시도 */
-  retryContentSummary: (
-    contentId: string,
-    level: AiSummaryLevel = "JUNIOR",
-  ): Promise<AiSummaryResponse> => {
-    return apiClient
-      .post<AiSummaryResponse>(
-        `/contents/${contentId}/summary/retry`,
-        null,
-        { params: { level } },
-      )
-      .then((r) => r.data);
   },
 
   /** POST /contents/:contentId/scrap */

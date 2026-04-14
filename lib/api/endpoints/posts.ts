@@ -13,8 +13,18 @@ import type {
   UpdatePostRequest,
   UpdatePostResponse,
   RefinePostRequest,
-  RefinePostResponse,
+  RefinePostRawResponse,
+  RefinePostRawData,
+  RefinePostData,
 } from "@/types/community";
+
+function mapRefinePostData(raw: RefinePostRawData): RefinePostData {
+  return {
+    refinedTitle: raw.refined_title,
+    refinedContent: raw.refined_content,
+    suggestions: raw.suggestions,
+  };
+}
 import type { ApiResponse } from "@/types/api";
 
 export const postsEndpoints = {
@@ -183,9 +193,9 @@ export const postsEndpoints = {
   // ─── AI 질문 개선 ────────────────────────────────────────────────────────────
 
   /** POST /posts/refine — AI 질문 개선 */
-  refinePost: (req: RefinePostRequest): Promise<RefinePostResponse> => {
+  refinePost: (req: RefinePostRequest): Promise<RefinePostData> => {
     return apiClient
-      .post<RefinePostResponse>("/posts/refine", req)
-      .then((r) => r.data);
+      .post<RefinePostRawResponse>("/posts/refine", req)
+      .then((r) => mapRefinePostData(r.data.data));
   },
 };

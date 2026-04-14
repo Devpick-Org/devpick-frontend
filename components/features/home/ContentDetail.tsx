@@ -153,7 +153,7 @@ export function ContentDetail({ content }: ContentDetailProps) {
         {content.tags.length > 0 && (
           <div className="mt-4">
             <p className="text-sm text-muted-foreground/85 font-medium">
-              {content.tags.join(" · ")}
+              {[...new Set(content.tags)].join(" · ")}
             </p>
           </div>
         )}

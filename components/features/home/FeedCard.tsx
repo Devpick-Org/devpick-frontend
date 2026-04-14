@@ -207,10 +207,10 @@ export function FeedCard({ content }: FeedCardProps) {
           {/* ── Tags ─────────────────────────────────────────────────────── */}
           {content.tags.length > 0 && (
             <div className="px-1 pt-1.5 flex flex-wrap gap-1.5">
-              {content.tags.slice(0, 4).map((tag) => (
+              {[...new Set(content.tags)].map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground"
+                  className="rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground break-all"
                 >
                   {tag}
                 </span>
