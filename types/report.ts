@@ -5,10 +5,10 @@ export interface WeeklyActivity {
   contentsRead: number;
   questionsCreated: number;
   scrapsCount: number;
-  /** 쉼표 구분 태그 문자열 (예: "React,Next.js,TypeScript") */
-  topTags: string;
-  /** 전주 대비 활동량 문자열 (예: "+20%", "-10%", "동일") */
-  prevWeekComparison: string;
+  /** JSON 배열 문자열 또는 쉼표 구분 — 백엔드에서 null 가능 */
+  topTags: string | null;
+  /** 전주 대비 — 미계산 시 null */
+  prevWeekComparison: string | null;
 }
 
 /** 요일별 활동량 — chartData.dailyActivities 항목 */

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import type { WeeklyActivity, ChartData, AiInsight } from "@/types/report";
+import { parseReportTopTags } from "@/lib/report/parseTopTags";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -40,13 +41,11 @@ export default function ReportContent({
   chartData,
   aiInsight,
 }: Props) {
-  const topTags = activity.topTags
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
+  const topTags = parseReportTopTags(activity.topTags);
 
-  const isPositiveTrend = activity.prevWeekComparison.startsWith("+");
-  const isNegativeTrend = activity.prevWeekComparison.startsWith("-");
+  const prevCmp = activity.prevWeekComparison ?? "";
+  const isPositiveTrend = prevCmp.startsWith("+");
+  const isNegativeTrend = prevCmp.startsWith("-");
 
   return (
     <div className="space-y-8">
@@ -92,7 +91,7 @@ export default function ReportContent({
                 isNegativeTrend && "text-red-500",
               )}
             >
-              {activity.prevWeekComparison || "-"}
+              {prevCmp || "-"}
             </p>
           </div>
         </div>
