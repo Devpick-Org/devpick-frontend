@@ -14,6 +14,7 @@ import {
 import { quizzesEndpoints } from "@/lib/api/endpoints/quizzes";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { calculateQuizResult } from "@/lib/quiz/quizResult";
+import { useAuthStore } from "@/store/auth.store";
 import type {
   QuizStage,
   QuizAnswer,
@@ -41,7 +42,22 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   const queryClient = useQueryClient();
 
   // ─── 서버 상태 ───────────────────────────────────────────────────────────────
-  const [level, setLevel] = useState<QuizLevel>("JUNIOR");
+  const QUIZ_LEVELS: QuizLevel[] = ["BEGINNER", "JUNIOR", "MIDDLE", "SENIOR"];
+  const userLevel = useAuthStore((s) => s.user?.level);
+  const defaultLevel: QuizLevel =
+    userLevel && (QUIZ_LEVELS as readonly string[]).includes(userLevel)
+      ? (userLevel as QuizLevel)
+      : "JUNIOR";
+
+  // contentId가 다르면 사용자 선택이 없는 것으로 간주 → defaultLevel(프로필 수준)로 폴백
+  const [userSelected, setUserSelected] = useState<{
+    forContentId: string;
+    level: QuizLevel;
+  } | null>(null);
+  const level =
+    userSelected?.forContentId === contentId
+      ? userSelected.level
+      : defaultLevel;
 
   const { data, isLoading, isError, isFetching, error, refetch } = useQuery({
     queryKey: ["quiz", contentId, level],
@@ -89,7 +105,7 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
 
   // ─── 핸들러 ──────────────────────────────────────────────────────────────────
   function handleLevelChange(newLevel: QuizLevel) {
-    setLevel(newLevel);
+    setUserSelected({ forContentId: contentId, level: newLevel });
   }
 
   function handleStart() {
