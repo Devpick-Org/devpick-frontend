@@ -62,9 +62,14 @@ export function formatTime(dateStr: string): string {
  * "2026-03-14" → "2026년 3월 3주차"
  * 월요일 기준 주차 계산 (ISO 방식과 유사)
  * 월의 첫날 요일 offset을 보정해 해당 날짜가 몇 번째 월~일 구간에 속하는지 반환
+ *
+ * API는 `2026-04-13`(날짜만) 또는 `2026-04-13T00:00:00Z`(Instant) 둘 다 줄 수 있음.
+ * 후자에 `T00:00:00`를 또 붙이면 Invalid Date → NaN 주차가 되므로 분기함.
  */
 export function formatWeekLabel(weekStart: string): string {
-  const date = new Date(weekStart + "T00:00:00");
+  const date = weekStart.includes("T")
+    ? new Date(weekStart)
+    : new Date(`${weekStart}T00:00:00`);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
 
