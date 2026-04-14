@@ -37,18 +37,22 @@ export default function CommunityWritePage() {
 
   // ─── 개선 결과 / 원본 스냅샷 ───────────────────────────────────────────────
   // savedDraft/savedFiles는 refine 트리거 시점에 고정 → "원본으로 게시"에 사용
-  const [refineKey, setRefineKey] = useState(0);
+  // refineKey와 refineResult를 하나의 state로 묶어 단일 렌더에서 업데이트.
+  // key와 result가 항상 동시에 바뀌므로, PostRefinePanel의 useState 초기값이
+  // 올바른 refineResult를 받아 초기화된다.
+  const [refineState, setRefineState] = useState<{
+    key: number;
+    result: RefinePostData | null;
+  }>({ key: 0, result: null });
   const [savedDraft, setSavedDraft] = useState<PostDraft | null>(null);
   const [savedFiles, setSavedFiles] = useState<File[]>([]);
-  const [refineResult, setRefineResult] = useState<RefinePostData | null>(null);
 
   // ─── Mutations ──────────────────────────────────────────────────────────────
 
   const refineMutation = useMutation({
     mutationFn: postsEndpoints.refinePost,
     onSuccess: (res) => {
-      setRefineResult(res);
-      setRefineKey((k) => k + 1);
+      setRefineState((prev) => ({ key: prev.key + 1, result: res }));
     },
   });
 
@@ -182,8 +186,8 @@ export default function CommunityWritePage() {
               AI 개선 결과
             </h2>
             <PostRefinePanel
-              key={refineKey}
-              refineResult={refineResult}
+              key={refineState.key}
+              refineResult={refineState.result}
               originalLevel={savedDraft?.level ?? "JUNIOR"}
               originalFiles={savedFiles}
               isLoading={refineMutation.isPending}

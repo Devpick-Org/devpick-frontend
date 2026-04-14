@@ -8,6 +8,7 @@ import type {
   AiSummaryLevel,
 } from "@/types/content";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
 
 // ─── 상수 ────────────────────────────────────────────────────────────────────
 
@@ -265,7 +266,23 @@ type SummaryMeta = {
 } | null;
 
 export function AiSummary({ contentId }: AiSummaryProps) {
-  const [level, setLevel] = useState<AiSummaryLevel>("JUNIOR");
+  const userLevel = useAuthStore((s) => s.user?.level);
+  const resolvedLevel: AiSummaryLevel =
+    userLevel && (LEVELS as readonly string[]).includes(userLevel)
+      ? (userLevel as AiSummaryLevel)
+      : "JUNIOR";
+
+  // { forContentId, level } 형태로 저장 — forContentId가 현재 contentId와 다르면
+  // 사용자 선택이 없는 것으로 간주하고 resolvedLevel로 폴백한다.
+  // 이를 통해 contentId 변경 시 자동으로 프로필 기준 탭으로 초기화된다.
+  const [userSelected, setUserSelected] = useState<{
+    forContentId: string;
+    level: AiSummaryLevel;
+  } | null>(null);
+  const level =
+    userSelected?.forContentId === contentId
+      ? userSelected.level
+      : resolvedLevel;
   const [meta, setMeta] = useState<SummaryMeta>(null);
 
   const contentKey = `${contentId}-${level}`;
@@ -301,7 +318,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
           {LEVELS.map((l) => (
             <button
               key={l}
-              onClick={() => setLevel(l)}
+              onClick={() => setUserSelected({ forContentId: contentId, level: l })}
               className={cn(
                 "rounded-none border-b-2 pb-3 pt-1 text-sm font-semibold transition-colors cursor-pointer",
                 level === l
