@@ -39,10 +39,10 @@ export const reportsEndpoints = {
       .then((r) => r.data);
   },
 
-  /** POST /reports/weekly/share — 공유 링크 생성 */
+  /** POST /reports/weekly/{reportId}/share — 공유 링크 생성 */
   createWeeklyReportShare: (reportId: string): Promise<WeeklyShareCreateResponse> => {
     return apiClient
-      .post<WeeklyShareCreateResponse>("/reports/weekly/share", { reportId })
+      .post<WeeklyShareCreateResponse>(`/reports/weekly/${reportId}/share`)
       .then((r) => r.data);
   },
 
