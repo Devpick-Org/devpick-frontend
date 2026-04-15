@@ -189,6 +189,11 @@ export function ProfileEditForm() {
   };
 
   const handleSave = async () => {
+    if (selectedTags.length === 0) {
+      toast.error("관심 태그를 1개 이상 선택해 주세요.");
+      return;
+    }
+
     setIsSaving(true);
     setSaveError(null);
 

@@ -77,7 +77,9 @@ export function LoginForm({ isLoading }: LoginFormProps) {
       const { data: meData } = await authEndpoints.getMe();
       setAuth(meData.data, accessToken);
 
-      router.push("/home");
+      const u = meData.data;
+      const onboardingDone = !!u.job && !!u.level && !!(u.tags?.length);
+      router.push(onboardingDone ? "/home" : "/onboarding");
     } catch (err) {
       const { code, message } = extractApiError(err);
       if (code === "AUTH_024") {
@@ -106,7 +108,9 @@ export function LoginForm({ isLoading }: LoginFormProps) {
       const { data: meData } = await authEndpoints.getMe();
       setAuth(meData.data, accessToken);
 
-      router.push("/home");
+      const u = meData.data;
+      const onboardingDone = !!u.job && !!u.level && !!(u.tags?.length);
+      router.push(onboardingDone ? "/home" : "/onboarding");
     } catch (err) {
       const { code, message } = extractApiError(err);
       setAuthError(

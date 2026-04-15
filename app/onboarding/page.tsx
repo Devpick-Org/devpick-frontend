@@ -10,15 +10,25 @@ export default function Page() {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isInitialized = useAuthStore((s) => s.isInitialized);
+  const user = useAuthStore((s) => s.user);
   const mounted = useHydrated();
 
-  useEffect(() => {
-    if (mounted && isInitialized && !isAuthenticated) {
-      router.replace("/auth");
-    }
-  }, [mounted, isInitialized, isAuthenticated, router]);
+  const isOnboardingComplete = !!user?.job && !!user?.level && !!(user?.tags?.length);
 
-  if (!mounted || !isInitialized || !isAuthenticated) return null;
+  useEffect(() => {
+    if (!mounted || !isInitialized) return;
+
+    if (!isAuthenticated) {
+      router.replace("/auth");
+      return;
+    }
+
+    if (isOnboardingComplete) {
+      router.replace("/home");
+    }
+  }, [mounted, isInitialized, isAuthenticated, isOnboardingComplete, router]);
+
+  if (!mounted || !isInitialized || !isAuthenticated || isOnboardingComplete) return null;
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-12">
