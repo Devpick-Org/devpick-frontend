@@ -3,6 +3,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, FileText, LinkIcon } from "lucide-react";
 
+import { formatDate } from "@/lib/utils";
+
 import {
   reportsEndpoints,
   REPORT_QUERY_KEYS,
@@ -66,7 +68,7 @@ function Header({
       </div>
       <h1 className="text-2xl font-bold">주간 리포트</h1>
       <p className="text-sm text-muted-foreground">
-        {weekStart} ~ {weekEnd}
+        {formatDate(weekStart)} ~ {formatDate(weekEnd)}
       </p>
     </div>
   );

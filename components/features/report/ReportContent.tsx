@@ -30,9 +30,7 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   activity: WeeklyActivity;
-  // TODO: 실제 API 연동 시 교체 예정
   chartData: ChartData;
-  // TODO: 실제 API 연동 시 교체 예정 — 현재 백엔드도 null 반환
   aiInsight: AiInsight | null;
 }
 
@@ -117,7 +115,6 @@ export default function ReportContent({
       </section>
 
       {/* 섹션 2: 차트 */}
-      {/* TODO: 실제 API 연동 시 chartData는 API 응답으로 교체 예정 */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">활동 분석</h2>
         <div className="grid md:grid-cols-2 gap-4">
@@ -189,7 +186,6 @@ export default function ReportContent({
       </section>
 
       {/* 섹션 3: AI 인사이트 */}
-      {/* TODO: 실제 API 연동 시 aiInsight는 API 응답으로 교체 예정 */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">AI 인사이트</h2>
         {aiInsight === null ||

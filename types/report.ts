@@ -29,10 +29,7 @@ export interface ChartData {
   tagActivities: TagActivity[];
 }
 
-/**
- * AI 인사이트
- * TODO: 실제 API 연동 시 교체 예정 — 현재 백엔드도 null 반환
- */
+/** AI 인사이트 */
 export interface AiInsight {
   wellDone: string | null;
   lacking: string | null;
@@ -47,9 +44,7 @@ export interface WeeklyReport {
   status: string;
   isShared: boolean;
   activities: WeeklyActivity[];
-  // TODO: 실제 API 연동 시 교체 예정
   chartData: ChartData;
-  // TODO: 실제 API 연동 시 교체 예정 — 현재 백엔드도 null 반환
   aiInsight: AiInsight | null;
 }
 
