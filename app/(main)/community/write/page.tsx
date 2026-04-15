@@ -29,6 +29,7 @@ export default function CommunityWritePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const mounted = useHydrated();
 
   // ─── 첨부파일 — source of truth ────────────────────────────────────────────
@@ -72,12 +73,12 @@ export default function CommunityWritePage() {
   // ─── 인증 가드 ──────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (mounted && isInitialized && !isAuthenticated) {
       router.replace("/community");
     }
-  }, [mounted, isAuthenticated, router]);
+  }, [mounted, isInitialized, isAuthenticated, router]);
 
-  if (!mounted || !isAuthenticated) return null;
+  if (!mounted || !isInitialized || !isAuthenticated) return null;
 
   // ─── 핸들러 ─────────────────────────────────────────────────────────────────
 
