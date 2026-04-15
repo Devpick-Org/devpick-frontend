@@ -16,7 +16,7 @@ import {
   reportsEndpoints,
   REPORT_QUERY_KEYS,
 } from "@/lib/api/endpoints/reports";
-import { formatWeekLabel } from "@/lib/utils";
+import { formatWeekLabel, formatDate } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -131,7 +131,7 @@ export default function WeeklyReportPage() {
               {formatWeekLabel(report.weekStart)}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              {report.weekStart} ~ {report.weekEnd}
+              {formatDate(report.weekStart)} ~ {formatDate(report.weekEnd)}
             </p>
           </div>
 
@@ -195,7 +195,7 @@ function WeekHeader({
         <p className="font-semibold">{formatWeekLabel(report.weekStart)}</p>
       )}
       <p className="text-sm text-muted-foreground mt-0.5">
-        {report.weekStart} ~ {report.weekEnd}
+        {formatDate(report.weekStart)} ~ {formatDate(report.weekEnd)}
       </p>
     </div>
   );

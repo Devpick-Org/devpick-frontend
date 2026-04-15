@@ -89,9 +89,16 @@ export function ContentDetail({ content }: ContentDetailProps) {
       {/* 헤더 */}
       <header className="mb-8">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="flex-1 text-2xl font-bold leading-snug tracking-tight text-foreground md:text-3xl">
-            {content.title}
-          </h1>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold leading-snug tracking-tight text-foreground md:text-3xl">
+              {content.translatedTitle ?? content.title}
+            </h1>
+            {content.translatedTitle && (
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                {content.title}
+              </p>
+            )}
+          </div>
           <div className="flex shrink-0 items-center gap-1">
             <button
               onClick={() => {

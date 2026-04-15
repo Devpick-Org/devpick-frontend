@@ -26,6 +26,7 @@ export default function ActivityPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: HISTORY_QUERY_KEYS.activityList({ page: PAGE, size: PAGE_SIZE }),
     queryFn: () => historyEndpoints.getActivityList({ page: PAGE, size: PAGE_SIZE }),
+    staleTime: 0,
   });
 
   const allItems = data?.data.items ?? [];

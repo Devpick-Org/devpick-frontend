@@ -289,7 +289,7 @@ function InsightCard({
     <div className="bg-card border border-border rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">
         <Icon className={cn("w-4 h-4", iconClass)} />
-        <p className="text-sm font-medium">{title}</p>
+        <p className="text-[15px] font-medium">{title}</p>
       </div>
       <p className="pl-6 text-sm text-muted-foreground font-medium leading-relaxed">
         {content}

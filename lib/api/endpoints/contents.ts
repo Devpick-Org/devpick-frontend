@@ -100,6 +100,13 @@ export const contentsEndpoints = {
       .delete(`/contents/${contentId}/like`)
       .then(() => undefined);
   },
+
+  /** POST /contents/:contentId/read-original — 원문 확인 기록 */
+  readOriginal: (contentId: string): Promise<void> => {
+    return apiClient
+      .post(`/contents/${contentId}/read-original`)
+      .then(() => undefined);
+  },
 };
 
 // re-export — 컴포넌트에서 타입 import 경로 유지

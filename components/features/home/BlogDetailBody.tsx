@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { ExternalLink, Brain } from "lucide-react";
 import { ContentRenderer } from "./ContentRenderer";
+import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import type { ContentDetail } from "@/types/content";
 
 interface BlogDetailBodyProps {
@@ -8,6 +11,10 @@ interface BlogDetailBodyProps {
 }
 
 export function BlogDetailBody({ content }: BlogDetailBodyProps) {
+  const handleReadOriginal = () => {
+    contentsEndpoints.readOriginal(content.id).catch(() => {});
+  };
+
   return (
     <>
       {content.isOriginalVisible && content.originalContent && (
@@ -34,6 +41,7 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
             href={content.canonicalUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handleReadOriginal}
             className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
           >
             <ExternalLink className="h-4 w-4" />

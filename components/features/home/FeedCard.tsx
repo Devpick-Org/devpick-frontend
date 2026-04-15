@@ -195,7 +195,7 @@ export function FeedCard({ content }: FeedCardProps) {
 
             {/* Title */}
             <h3 className="mb-2 line-clamp-2 text-[17px] font-bold leading-snug tracking-[-0.01em] text-foreground">
-              {content.title}
+              {content.translatedTitle ?? content.title}
             </h3>
 
             {/* Preview */}

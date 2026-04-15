@@ -64,7 +64,7 @@ export function formatTime(dateStr: string): string {
  * 월의 첫날 요일 offset을 보정해 해당 날짜가 몇 번째 월~일 구간에 속하는지 반환
  */
 export function formatWeekLabel(weekStart: string): string {
-  const date = new Date(weekStart + "T00:00:00");
+  const date = new Date(weekStart);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
 
