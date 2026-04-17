@@ -112,4 +112,8 @@ describe("formatWeekLabel", () => {
   it("월이 바뀌는 경우 해당 월 기준 주차를 반환한다", () => {
     expect(formatWeekLabel("2026-03-16")).toBe("2026년 3월 4주차");
   });
+
+  it("풀 ISO instant(UTC Z) 문자열도 올바른 주차를 반환한다 (NaN 방지)", () => {
+    expect(formatWeekLabel("2026-04-13T00:00:00Z")).toBe("2026년 4월 3주차");
+  });
 });

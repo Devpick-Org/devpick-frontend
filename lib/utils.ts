@@ -62,9 +62,17 @@ export function formatTime(dateStr: string): string {
  * "2026-03-14" → "2026년 3월 3주차"
  * 월요일 기준 주차 계산 (ISO 방식과 유사)
  * 월의 첫날 요일 offset을 보정해 해당 날짜가 몇 번째 월~일 구간에 속하는지 반환
+ *
+ * DP-327: 풀 ISO(`...T...Z`)는 그대로 instant 파싱. `YYYY-MM-DD`만 오면 로컬 자정으로 파싱(기존 동작).
+ * 잘못된 문자열에 `T00:00:00`를 이중으로 붙이면 NaN 주차가 되던 문제 방지.
  */
 export function formatWeekLabel(weekStart: string): string {
-  const date = new Date(weekStart);
+  const date = weekStart.includes("T")
+    ? new Date(weekStart)
+    : new Date(`${weekStart}T00:00:00`);
+  if (Number.isNaN(date.getTime())) {
+    return weekStart;
+  }
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
 
