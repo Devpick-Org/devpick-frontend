@@ -2,9 +2,15 @@
 
 import Link from "next/link";
 import { ExternalLink, Brain } from "lucide-react";
-import { ContentRenderer } from "./ContentRenderer";
+import { ContentRenderer as HtmlContentRenderer } from "./ContentRenderer";
+import { ContentRenderer as MarkdownContentRenderer } from "@/components/features/community/ContentRenderer";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import type { ContentDetail } from "@/types/content";
+
+/** Velog GraphQL `body`는 마크다운 — HTML sanitizer 경로로 넣으면 깨짐 (DP-313) */
+function isVelogSource(sourceName: string) {
+  return sourceName.trim().toLowerCase() === "velog";
+}
 
 interface BlogDetailBodyProps {
   content: ContentDetail;
@@ -15,11 +21,21 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
     contentsEndpoints.readOriginal(content.id).catch(() => {});
   };
 
+  const useMarkdown = isVelogSource(content.sourceName);
+
   return (
     <>
       {content.isOriginalVisible && content.originalContent && (
-        <section className="mb-12 font-medium">
-          <ContentRenderer content={content.originalContent} />
+        <section className="mb-12">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">원문</h2>
+          {useMarkdown ? (
+            <MarkdownContentRenderer
+              content={content.originalContent}
+              className="text-base leading-7 text-foreground/85 font-medium"
+            />
+          ) : (
+            <HtmlContentRenderer content={content.originalContent} />
+          )}
         </section>
       )}
 
