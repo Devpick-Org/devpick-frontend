@@ -4,12 +4,8 @@ import Link from "next/link";
 import { ExternalLink, Brain } from "lucide-react";
 import { ContentRenderer as HtmlContentRenderer } from "./ContentRenderer";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
+import { hideInlineOriginalSource } from "@/lib/content/sourceGuards";
 import type { ContentDetail } from "@/types/content";
-
-/** 기획: Velog 원문은 인라인 노출하지 않음 — 외부 링크로만 확인 (DP-313) */
-function isVelogSource(sourceName: string) {
-  return sourceName.trim().toLowerCase() === "velog";
-}
 
 interface BlogDetailBodyProps {
   content: ContentDetail;
@@ -20,11 +16,11 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
     contentsEndpoints.readOriginal(content.id).catch(() => {});
   };
 
-  const hideVelogInlineOriginal = isVelogSource(content.sourceName);
+  const hideInlineOriginal = hideInlineOriginalSource(content.sourceName);
   const original = content.originalContent;
   const showOriginalSection =
-    content.isOriginalVisible && Boolean(original) && !hideVelogInlineOriginal;
-  const showNoInlineBodyNotice = !original || hideVelogInlineOriginal;
+    content.isOriginalVisible && Boolean(original) && !hideInlineOriginal;
+  const showNoInlineBodyNotice = !original || hideInlineOriginal;
 
   return (
     <>

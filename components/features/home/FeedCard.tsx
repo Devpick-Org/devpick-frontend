@@ -15,12 +15,9 @@ import {
 import { useAuthStore } from "@/store/auth.store";
 import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 import type { Content } from "@/types/content";
+import { isStackOverflowSource } from "@/lib/content/sourceGuards";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
-
-function isStackOverflow(sourceName: string) {
-  return sourceName.trim().toLowerCase() === "stack overflow";
-}
 
 const SOURCE_BADGE: Record<
   string,
@@ -42,7 +39,7 @@ function SourceBadge({ sourceName }: { sourceName: string }) {
     ? { bg: "#000000", text: "#fff", label: "M" }
     : SOURCE_BADGE[key];
 
-  if (isStackOverflow(sourceName)) {
+  if (isStackOverflowSource(sourceName)) {
     return (
       <span
         className="flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded text-[8px] font-bold leading-none"
@@ -83,7 +80,7 @@ export function FeedCard({ content }: FeedCardProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogMessage, setLoginDialogMessage] = useState("");
-  const isQA = isStackOverflow(content.sourceName);
+  const isQA = isStackOverflowSource(content.sourceName);
   const thumbnailMode = getThumbnailMode(content.thumbnailWidth, content.thumbnailHeight);
   const thumbnailAspectRatio =
     content.thumbnailWidth != null && content.thumbnailHeight != null
