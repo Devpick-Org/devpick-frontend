@@ -92,11 +92,16 @@ type SummaryStatus = "preparing" | "notReady" | "error" | "success";
 
 interface AiSummaryContentProps {
   contentId: string;
-  level: AiSummaryLevel;
+  /** null이면 `level` 쿼리 생략 — 백엔드가 프로필 경력 수준으로 조회 (DP-352) */
+  requestedLevel: AiSummaryLevel | null;
   onSuccess: (summary: AiSummaryType) => void;
 }
 
-function AiSummaryContent({ contentId, level, onSuccess }: AiSummaryContentProps) {
+function AiSummaryContent({
+  contentId,
+  requestedLevel,
+  onSuccess,
+}: AiSummaryContentProps) {
   const [status, setStatus] = useState<SummaryStatus>("preparing");
   const [summary, setSummary] = useState<AiSummaryType | null>(null);
 
@@ -112,7 +117,7 @@ function AiSummaryContent({ contentId, level, onSuccess }: AiSummaryContentProps
 
   useEffect(() => {
     contentsEndpoints
-      .getContentSummary(contentId, level)
+      .getContentSummary(contentId, requestedLevel ?? undefined)
       .then((result) => {
         if (result.ready) {
           setSummary(result.summary);
@@ -130,7 +135,7 @@ function AiSummaryContent({ contentId, level, onSuccess }: AiSummaryContentProps
             return;
           }
           contentsEndpoints
-            .getContentSummary(contentId, level)
+            .getContentSummary(contentId, requestedLevel ?? undefined)
             .then((r) => {
               if (r.ready) {
                 stopPolling();
@@ -153,7 +158,7 @@ function AiSummaryContent({ contentId, level, onSuccess }: AiSummaryContentProps
       });
 
     return () => stopPolling();
-  }, [contentId, level, stopPolling, onSuccess]);
+  }, [contentId, requestedLevel, stopPolling, onSuccess]);
 
   if (status === "preparing") return <AiSummaryPreparing />;
   if (status === "notReady") return <AiSummaryNotReady />;
@@ -279,21 +284,32 @@ export function AiSummary({ contentId }: AiSummaryProps) {
     forContentId: string;
     level: AiSummaryLevel;
   } | null>(null);
-  const level =
+
+  /** 사용자가 탭을 직접 고른 경우에만 명시 — 아니면 API에서 level 쿼리 생략 (서버가 프로필 기준) */
+  const explicitLevel: AiSummaryLevel | null =
+    userSelected?.forContentId === contentId ? userSelected.level : null;
+
+  /** 탭 하이라이트: 직접 선택 없으면 클라이언트 프로필 기준(서버 첫 응답과 일치해야 함) */
+  const tabLevel =
     userSelected?.forContentId === contentId
       ? userSelected.level
       : resolvedLevel;
+
   const [meta, setMeta] = useState<SummaryMeta>(null);
 
-  const contentKey = `${contentId}-${level}`;
+  const contentKey = `${contentId}-${tabLevel}`;
   // forKey가 현재 contentKey와 다르면 stale — 표시하지 않는다
   const visibleMeta = meta?.forKey === contentKey ? meta : null;
 
   const handleSuccess = useCallback(
     (s: AiSummaryType) => {
-      setMeta({ forKey: `${contentId}-${level}`, difficulty: s.difficulty, confidence: s.confidence });
+      setMeta({
+        forKey: `${contentId}-${tabLevel}`,
+        difficulty: s.difficulty,
+        confidence: s.confidence,
+      });
     },
-    [contentId, level],
+    [contentId, tabLevel],
   );
 
   return (
@@ -321,7 +337,7 @@ export function AiSummary({ contentId }: AiSummaryProps) {
               onClick={() => setUserSelected({ forContentId: contentId, level: l })}
               className={cn(
                 "rounded-none border-b-2 pb-3 pt-1 text-sm font-semibold transition-colors cursor-pointer",
-                level === l
+                tabLevel === l
                   ? "border-primary text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground",
               )}
@@ -334,9 +350,9 @@ export function AiSummary({ contentId }: AiSummaryProps) {
 
       {/* 본문 — contentId·level 변경 시 리마운트 */}
       <AiSummaryContent
-        key={`${contentId}-${level}`}
+        key={`${contentId}-${explicitLevel ?? "server"}`}
         contentId={contentId}
-        level={level}
+        requestedLevel={explicitLevel}
         onSuccess={handleSuccess}
       />
     </section>

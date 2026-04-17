@@ -1,4 +1,5 @@
 import { apiClient } from "../client";
+import { normalizeAiLevel } from "@/lib/content/normalizeAiLevel";
 import type {
   Content,
   ContentDetail,
@@ -60,20 +61,29 @@ export const contentsEndpoints = {
       .then((r) => r.data);
   },
 
-  /** GET /contents/:contentId/summary?level=... — AI 요약 조회
+  /**
+   * GET /contents/:contentId/summary — AI 요약 조회 (DP-352)
+   * - `level` 생략 시 백엔드가 프로필 경력 수준으로 해석 (비로그인은 JUNIOR).
+   * - 탭에서 레벨을 고르면 해당 `level`을 명시해 요청한다.
    * 202 (success: false) → { ready: false } — 폴링 대상
    * 200 (success: true)  → { ready: true, summary }
    */
   getContentSummary: (
     contentId: string,
-    level: AiSummaryLevel = "JUNIOR",
+    level?: AiSummaryLevel,
   ): Promise<SummaryResult> => {
     return apiClient
-      .get(`/contents/${contentId}/summary`, { params: { level } })
+      .get(`/contents/${contentId}/summary`, {
+        ...(level !== undefined ? { params: { level } } : {}),
+      })
       .then((r) => {
         const body = r.data as AiSummaryResponse;
         if (!body.success) return { ready: false } as const;
-        return { ready: true, summary: body.data } as const;
+        const summary: AiSummary = {
+          ...body.data,
+          level: normalizeAiLevel(body.data.level),
+        };
+        return { ready: true, summary } as const;
       });
   },
 
