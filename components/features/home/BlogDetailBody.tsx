@@ -3,11 +3,10 @@
 import Link from "next/link";
 import { ExternalLink, Brain } from "lucide-react";
 import { ContentRenderer as HtmlContentRenderer } from "./ContentRenderer";
-import { ContentRenderer as MarkdownContentRenderer } from "@/components/features/community/ContentRenderer";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import type { ContentDetail } from "@/types/content";
 
-/** Velog GraphQL `body`는 마크다운 — HTML sanitizer 경로로 넣으면 깨짐 (DP-313) */
+/** 기획: Velog 원문은 인라인 노출하지 않음 — 외부 링크로만 확인 (DP-313) */
 function isVelogSource(sourceName: string) {
   return sourceName.trim().toLowerCase() === "velog";
 }
@@ -21,26 +20,23 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
     contentsEndpoints.readOriginal(content.id).catch(() => {});
   };
 
-  const useMarkdown = isVelogSource(content.sourceName);
+  const hideVelogInlineOriginal = isVelogSource(content.sourceName);
+  const original = content.originalContent;
+  const showOriginalSection =
+    content.isOriginalVisible && Boolean(original) && !hideVelogInlineOriginal;
+  const showNoInlineBodyNotice = !original || hideVelogInlineOriginal;
 
   return (
     <>
-      {content.isOriginalVisible && content.originalContent && (
+      {showOriginalSection && original && (
         <section className="mb-12">
           <h2 className="mb-4 text-lg font-semibold text-foreground">원문</h2>
-          {useMarkdown ? (
-            <MarkdownContentRenderer
-              content={content.originalContent}
-              className="text-base leading-7 text-foreground/85 font-medium"
-            />
-          ) : (
-            <HtmlContentRenderer content={content.originalContent} />
-          )}
+          <HtmlContentRenderer content={original} />
         </section>
       )}
 
       <section className="flex flex-col items-center gap-4 rounded-2xl bg-card px-6 py-8">
-        {!content.originalContent && (
+        {showNoInlineBodyNotice && (
           <p className="text-sm text-muted-foreground font-medium">
             저작권 보호를 위해 본문이 제공되지 않습니다.
           </p>
