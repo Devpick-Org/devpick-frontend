@@ -44,7 +44,11 @@ export const contentsEndpoints = {
       .then((r) => r.data);
   },
 
-  /** GET /contents/search — 글 검색 */
+  /**
+   * GET /contents/search — 글 검색 (DP-315)
+   * - 비로그인 호출 가능 (Authorization 없이 요청 가능).
+   * - accessToken이 있으면 인터셉터가 Bearer를 붙이고, 응답의 스크랩·좋아요 여부가 사용자 기준으로 반영됨.
+   */
   searchContents: (params: {
     query: string;
     tags?: string[];
