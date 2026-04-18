@@ -83,7 +83,14 @@ describe("LoginForm", () => {
     });
     (authEndpoints.getMe as jest.Mock).mockResolvedValue({
       data: {
-        data: { userId: "1", email: "test@test.com", nickname: "테스터" },
+        data: {
+          userId: "1",
+          email: "test@test.com",
+          nickname: "테스터",
+          job: "BACKEND",
+          level: "JUNIOR",
+          tags: ["React"],
+        },
       },
     });
 

@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
+    "test:changed": "jest --onlyChanged",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },
