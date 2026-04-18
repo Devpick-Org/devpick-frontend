@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { ExternalLink, Brain } from "lucide-react";
-import { ContentRenderer } from "./ContentRenderer";
+import { ContentRenderer as HtmlContentRenderer } from "./ContentRenderer";
+import { contentsEndpoints } from "@/lib/api/endpoints/contents";
+import { hideInlineOriginalSource } from "@/lib/content/sourceGuards";
 import type { ContentDetail } from "@/types/content";
 
 interface BlogDetailBodyProps {
@@ -8,16 +12,27 @@ interface BlogDetailBodyProps {
 }
 
 export function BlogDetailBody({ content }: BlogDetailBodyProps) {
+  const handleReadOriginal = () => {
+    contentsEndpoints.readOriginal(content.id).catch(() => {});
+  };
+
+  const hideInlineOriginal = hideInlineOriginalSource(content.sourceName);
+  const original = content.originalContent;
+  const showOriginalSection =
+    content.isOriginalVisible && Boolean(original) && !hideInlineOriginal;
+  const showNoInlineBodyNotice = !original || hideInlineOriginal;
+
   return (
     <>
-      {content.isOriginalVisible && content.originalContent && (
-        <section className="mb-12 font-medium">
-          <ContentRenderer content={content.originalContent} />
+      {showOriginalSection && original && (
+        <section className="mb-12">
+          <h2 className="mb-4 text-lg font-semibold text-foreground">원문</h2>
+          <HtmlContentRenderer content={original} />
         </section>
       )}
 
       <section className="flex flex-col items-center gap-4 rounded-2xl bg-card px-6 py-8">
-        {!content.originalContent && (
+        {showNoInlineBodyNotice && (
           <p className="text-sm text-muted-foreground font-medium">
             저작권 보호를 위해 본문이 제공되지 않습니다.
           </p>
@@ -34,6 +49,7 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
             href={content.canonicalUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={handleReadOriginal}
             className="inline-flex items-center gap-2.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:brightness-110"
           >
             <ExternalLink className="h-4 w-4" />

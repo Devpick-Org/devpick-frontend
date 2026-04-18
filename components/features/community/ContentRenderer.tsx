@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import type { ReactElement } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -25,7 +26,7 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
             return <p className="mb-3 last:mb-0">{children}</p>;
           },
           pre({ children }) {
-            const codeChild = children as ReactElement<{ className?: string }>;
+            const codeChild = children as ReactElement<{ className?: string; children?: React.ReactNode }>;
             const langClass = codeChild?.props?.className ?? "";
             const lang = langClass.startsWith("language-")
               ? langClass.slice(9)
@@ -40,14 +41,16 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
                   </div>
                 )}
                 <pre className="overflow-x-auto bg-[#0d1117] px-4 py-3 text-xs font-mono leading-6 text-[#e6edf3]">
-                  {children}
+                  <code className="font-mono text-[#e6edf3]">
+                    {codeChild?.props?.children}
+                  </code>
                 </pre>
               </div>
             );
           },
           code({ className: langClass, children, ...props }) {
-            const isBlock = langClass?.startsWith("language-");
-            if (isBlock) {
+            // pre 안의 블록 코드는 pre 컴포넌트에서 직접 처리하므로 여기는 인라인 코드만 담당
+            if (langClass?.startsWith("language-")) {
               return (
                 <code className="font-mono text-[#e6edf3]" {...props}>
                   {children}

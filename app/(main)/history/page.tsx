@@ -7,9 +7,10 @@ import HistoryTabsPage from "@/components/features/history/HistoryTabsPage";
 
 export default function Page() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const mounted = useHydrated();
 
-  if (!mounted) return null;
+  if (!mounted || !isInitialized) return null;
   if (!isAuthenticated)
     return (
       <LoginRequiredEmptyState

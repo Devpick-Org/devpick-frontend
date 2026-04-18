@@ -23,7 +23,7 @@ export function AiAnswerSection({
       <div className="mb-3 flex items-center gap-2">
         <h2 className="text-lg font-bold text-foreground">AI 1차 답변</h2>
       </div>
-      <div className="rounded-xl bg-primary/5 p-5">
+      <div className="rounded-xl border border-border bg-card p-5">
         {status === "loading" && <AiAnswerLoading />}
         {status === "success" && content && (
           <ContentRenderer

@@ -34,7 +34,7 @@ export const ACTION_FILTER_OPTIONS: {
   value: HistoryActionType;
   label: string;
 }[] = [
-  { value: "content_opened", label: "글 읽기" },
+  { value: "content_opened", label: "원문 확인" },
   { value: "ai_summary_viewed", label: "AI 요약" },
   { value: "ai_quiz_completed", label: "AI 퀴즈" },
   { value: "question_created", label: "질문 작성" },
@@ -64,7 +64,7 @@ export const PERIOD_OPTIONS: { value: PeriodFilter; label: string }[] = [
 /** 액션 메타 — 학습 탭 */
 export const ACTION_META: Record<HistoryActionType, ActionMeta> = {
   content_opened: {
-    label: "콘텐츠를 읽었어요",
+    label: "원문을 확인했어요",
     icon: BookOpen,
     iconClass: "text-blue-600",
     iconBgClass: "bg-blue-50",

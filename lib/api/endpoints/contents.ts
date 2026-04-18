@@ -1,12 +1,19 @@
 import { apiClient } from "../client";
+import { normalizeAiLevel } from "@/lib/content/normalizeAiLevel";
 import type {
   Content,
   ContentDetail,
   ContentDetailResponse,
   ContentFeedResponse,
+  AiSummary,
   AiSummaryLevel,
   AiSummaryResponse,
 } from "@/types/content";
+
+/** GET /summary 응답 discriminated union */
+type SummaryResult =
+  | { ready: true; summary: AiSummary }
+  | { ready: false };
 
 export const contentsEndpoints = {
   /** GET /contents — 개인화 피드 목록 */
@@ -38,7 +45,11 @@ export const contentsEndpoints = {
       .then((r) => r.data);
   },
 
-  /** GET /contents/search — 글 검색 */
+  /**
+   * GET /contents/search — 글 검색 (DP-315)
+   * - 비로그인 호출 가능 (Authorization 없이 요청 가능).
+   * - accessToken이 있으면 인터셉터가 Bearer를 붙이고, 응답의 스크랩·좋아요 여부가 사용자 기준으로 반영됨.
+   */
   searchContents: (params: {
     query: string;
     tags?: string[];
@@ -50,34 +61,30 @@ export const contentsEndpoints = {
       .then((r) => r.data);
   },
 
-  /** GET /contents/:contentId/summary?level=... — AI 요약 조회 */
+  /**
+   * GET /contents/:contentId/summary — AI 요약 조회 (DP-352)
+   * - `level` 생략 시 백엔드가 프로필 경력 수준으로 해석 (비로그인은 JUNIOR).
+   * - 탭에서 레벨을 고르면 해당 `level`을 명시해 요청한다.
+   * 202 (success: false) → { ready: false } — 폴링 대상
+   * 200 (success: true)  → { ready: true, summary }
+   */
   getContentSummary: (
     contentId: string,
-    level: AiSummaryLevel = "JUNIOR",
-  ): Promise<AiSummaryResponse> => {
+    level?: AiSummaryLevel,
+  ): Promise<SummaryResult> => {
     return apiClient
-      .get(`/contents/${contentId}/summary`, { params: { level } })
+      .get(`/contents/${contentId}/summary`, {
+        ...(level !== undefined ? { params: { level } } : {}),
+      })
       .then((r) => {
-        // 202: AI 처리 대기 중 (success: false) → reject으로 에러 흐름에 합류
-        if (!(r.data as { success: boolean }).success) {
-          return Promise.reject({ response: r });
-        }
-        return r.data as AiSummaryResponse;
+        const body = r.data as AiSummaryResponse;
+        if (!body.success) return { ready: false } as const;
+        const summary: AiSummary = {
+          ...body.data,
+          level: normalizeAiLevel(body.data.level),
+        };
+        return { ready: true, summary } as const;
       });
-  },
-
-  /** POST /contents/:contentId/summary/retry?level=... — AI 요약 재시도 */
-  retryContentSummary: (
-    contentId: string,
-    level: AiSummaryLevel = "JUNIOR",
-  ): Promise<AiSummaryResponse> => {
-    return apiClient
-      .post<AiSummaryResponse>(
-        `/contents/${contentId}/summary/retry`,
-        null,
-        { params: { level } },
-      )
-      .then((r) => r.data);
   },
 
   /** POST /contents/:contentId/scrap */
@@ -105,6 +112,13 @@ export const contentsEndpoints = {
   unlikeContent: (contentId: string): Promise<void> => {
     return apiClient
       .delete(`/contents/${contentId}/like`)
+      .then(() => undefined);
+  },
+
+  /** POST /contents/:contentId/read-original — 원문 확인 기록 */
+  readOriginal: (contentId: string): Promise<void> => {
+    return apiClient
+      .post(`/contents/${contentId}/read-original`)
       .then(() => undefined);
   },
 };

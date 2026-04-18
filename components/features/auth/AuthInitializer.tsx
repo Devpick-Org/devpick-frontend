@@ -28,6 +28,8 @@ export function AuthInitializer() {
     if (hasRun.current) return;
     hasRun.current = true;
 
+    // 이미 초기화된 경우 (다른 레이아웃의 AuthInitializer가 먼저 실행됨) 스킵
+    if (useAuthStore.getState().isInitialized) return;
     // 이미 accessToken이 있으면 세션 복원 불필요 (로그인/회원가입 직후 상태)
     if (useAuthStore.getState().accessToken) return;
 

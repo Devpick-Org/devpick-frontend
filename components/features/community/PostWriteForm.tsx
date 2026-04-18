@@ -17,6 +17,8 @@ const LEVELS: { id: PostLevel; label: string; desc: string }[] = [
 ];
 
 const TITLE_MAX = 500;
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB (백엔드 max-file-size 기준)
+const MAX_REQUEST_SIZE_BYTES = 12 * 1024 * 1024; // 12MB (백엔드 max-request-size 기준)
 
 const CONTENT_PLACEHOLDER = `어떤 문제가 발생했는지 구체적으로 설명해 주세요.
 
@@ -76,6 +78,7 @@ export function PostWriteForm({
     level?: string;
   }>({});
   const [isDragging, setIsDragging] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // dragLeave flickering 방지: 자식 요소 진입/이탈 시 카운터로 실제 드롭 존 이탈 여부 판단
   const dragCounterRef = useRef(0);
@@ -94,8 +97,32 @@ export function PostWriteForm({
   const addFiles = (fileList: FileList | null) => {
     if (!fileList) return;
     const selected = Array.from(fileList);
+
+    const oversized = selected.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
+    const validSelected = selected.filter((f) => f.size <= MAX_FILE_SIZE_BYTES);
+
+    // 중복 제거
     const existingNames = new Set(files.map((f) => f.name));
-    const deduped = selected.filter((f) => !existingNames.has(f.name));
+    const deduped = validSelected.filter((f) => !existingNames.has(f.name));
+
+    // 전체 요청 크기 검증 (기존 파일 + 새로 추가될 파일)
+    const totalSize = [...files, ...deduped].reduce(
+      (sum, f) => sum + f.size,
+      0,
+    );
+    if (totalSize > MAX_REQUEST_SIZE_BYTES) {
+      setFileError("전체 첨부 용량은 12MB를 초과할 수 없습니다.");
+      return;
+    }
+
+    if (oversized.length > 0) {
+      setFileError(
+        `10MB 초과 파일 제외됨: ${oversized.map((f) => f.name).join(", ")}`,
+      );
+    } else {
+      setFileError(null);
+    }
+
     if (deduped.length > 0) onFilesChange(deduped);
   };
 
@@ -317,6 +344,11 @@ export function PostWriteForm({
             <Paperclip className="h-4 w-4" />
             {isDragging ? "여기에 놓으세요" : "파일 추가"}
           </div>
+          {fileError && (
+            <p className="mt-1.5 text-xs font-medium text-destructive">
+              {fileError}
+            </p>
+          )}
         </div>
       </div>
       {/* 입력 필드 카드 끝 */}

@@ -4,7 +4,8 @@ import type { ApiErrorResponse, ApiResponse } from "@/types/api";
 import type { RefreshTokenResponse } from "@/types/auth";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.devpick.kr/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "https://3-39-96-126.sslip.io/v1";
 
 /**
  * 메인 API 클라이언트

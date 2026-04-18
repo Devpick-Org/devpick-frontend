@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:local": "NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/v1 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
+    "test:changed": "jest --onlyChanged",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },

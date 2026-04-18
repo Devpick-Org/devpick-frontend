@@ -14,6 +14,7 @@ import {
 import { quizzesEndpoints } from "@/lib/api/endpoints/quizzes";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { calculateQuizResult } from "@/lib/quiz/quizResult";
+import { useAuthStore } from "@/store/auth.store";
 import type {
   QuizStage,
   QuizAnswer,
@@ -41,11 +42,30 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   const queryClient = useQueryClient();
 
   // ─── 서버 상태 ───────────────────────────────────────────────────────────────
-  const [level, setLevel] = useState<QuizLevel>("JUNIOR");
+  const QUIZ_LEVELS: QuizLevel[] = ["BEGINNER", "JUNIOR", "MIDDLE", "SENIOR"];
+  const userLevel = useAuthStore((s) => s.user?.level);
+  const defaultLevel: QuizLevel =
+    userLevel && (QUIZ_LEVELS as readonly string[]).includes(userLevel)
+      ? (userLevel as QuizLevel)
+      : "JUNIOR";
+
+  // contentId가 다르면 사용자 선택이 없는 것으로 간주 → defaultLevel(프로필 수준)로 폴백
+  const [userSelected, setUserSelected] = useState<{
+    forContentId: string;
+    level: QuizLevel;
+  } | null>(null);
+
+  /** 인트로에서 난이도를 바꾼 경우에만 명시 — 아니면 GET 쿼리에서 level 생략(서버가 프로필 기준, DP-352) */
+  const explicitQuizLevel: QuizLevel | null =
+    userSelected?.forContentId === contentId ? userSelected.level : null;
 
   const { data, isLoading, isError, isFetching, error, refetch } = useQuery({
-    queryKey: ["quiz", contentId, level],
-    queryFn: () => quizzesEndpoints.getContentQuiz(contentId, level),
+    queryKey: ["quiz", contentId, explicitQuizLevel ?? "server"],
+    queryFn: () =>
+      quizzesEndpoints.getContentQuiz(
+        contentId,
+        explicitQuizLevel ?? undefined,
+      ),
     placeholderData: (prev) => prev,
   });
 
@@ -89,7 +109,7 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
 
   // ─── 핸들러 ──────────────────────────────────────────────────────────────────
   function handleLevelChange(newLevel: QuizLevel) {
-    setLevel(newLevel);
+    setUserSelected({ forContentId: contentId, level: newLevel });
   }
 
   function handleStart() {
@@ -127,14 +147,16 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
 
     try {
       const res = await quizzesEndpoints.submitQuiz(contentId, {
-        level,
+        level: quiz.level,
         score: correctCount,
         totalQuestions: quiz.questions.length,
         passed,
       });
       setSubmitResult(res.data);
       // 인트로로 돌아올 때 hasAttempted 반영되도록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: ["quiz", contentId, level] });
+      queryClient.invalidateQueries({
+        queryKey: ["quiz", contentId, explicitQuizLevel ?? "server"],
+      });
       setStage("result");
     } catch {
       setSubmitError(true);
@@ -226,12 +248,15 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
   const isLast = currentIndex === quiz.questions.length - 1;
   const allAnswered = quiz.questions.every((q) => isAnswered(answers[q.id]));
 
+  const selectedLevelForIntro =
+    explicitQuizLevel ?? quiz.level ?? defaultLevel;
+
   return (
     <div className="space-y-8">
       {stage === "intro" && (
         <QuizIntro
           quiz={quiz}
-          selectedLevel={level}
+          selectedLevel={selectedLevelForIntro}
           onLevelChange={handleLevelChange}
           onStart={handleStart}
         />

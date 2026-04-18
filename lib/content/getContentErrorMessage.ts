@@ -11,19 +11,19 @@ const CONTENT_ERROR_MESSAGES: Record<string, string> = {
   AI_003: "AI 요약을 찾을 수 없습니다.",
 };
 
-export type AiSummaryErrorKind = "empty" | "timeout" | "error" | "preparing";
+export type AiSummaryErrorKind = "empty" | "timeout" | "error";
 
 /**
  * 에러 코드를 AI 요약 UI 상태로 분류한다.
- * - AI_003      → empty     (아직 요약 없음)
- * - AI_002      → timeout   (응답 시간 초과)
- * - CONTENT_007 → preparing (AI 처리 대기 중)
- * - 그 외        → error     (서버 오류 및 기타)
+ * - AI_003 → empty   (요약 없음)
+ * - AI_002 → timeout (서버 응답 시간 초과)
+ * - 그 외   → error  (서버 오류 및 기타)
+ *
+ * 202 준비 중 상태는 AiSummary 컴포넌트의 폴링 로직에서 별도 처리한다.
  */
 export function getAiSummaryErrorKind(code?: string | null): AiSummaryErrorKind {
   if (code === "AI_003") return "empty";
   if (code === "AI_002") return "timeout";
-  if (code === "CONTENT_007") return "preparing";
   return "error";
 }
 

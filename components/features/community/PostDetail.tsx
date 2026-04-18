@@ -56,7 +56,7 @@ function AttachmentItem({ attachment }: { attachment: PostAttachmentDTO }) {
         href={attachment.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="group block w-36 rounded-lg border border-border bg-muted"
+        className="group block w-36 rounded-lg border border-border bg-card"
         title={attachment.fileName}
       >
         <div className="relative h-24 w-full overflow-hidden rounded-t-lg">

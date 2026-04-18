@@ -29,6 +29,8 @@ function WaveIcon({ className }: { className?: string }) {
 
 export default function HomePage() {
   const user = useAuthStore((s) => s.user);
+  /** 검색·피드 응답의 스크랩/좋아요는 로그인 시에만 의미 있음 — 로그인 전환 시 목록 재조회 */
+  const isAuthenticated = useAuthStore((s) => !!s.accessToken);
   const nickname = user?.nickname ?? "김데브";
   const [searchQuery, setSearchQuery] = useState("");
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -49,7 +51,9 @@ export default function HomePage() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: searchQuery.trim() ? ["contents", searchQuery] : ["contents"],
+    queryKey: searchQuery.trim()
+      ? ["contents", "search", searchQuery, isAuthenticated]
+      : ["contents", isAuthenticated],
     initialPageParam: 0,
     queryFn: ({ pageParam }) => {
       if (searchQuery.trim()) {

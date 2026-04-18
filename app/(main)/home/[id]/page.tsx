@@ -14,13 +14,14 @@ export default function Page() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const mounted = useHydrated();
 
   useEffect(() => {
-    if (mounted && !isAuthenticated) {
+    if (mounted && isInitialized && !isAuthenticated) {
       router.replace("/home");
     }
-  }, [mounted, isAuthenticated, router]);
+  }, [mounted, isInitialized, isAuthenticated, router]);
 
   const {
     data: contentRes,
@@ -41,7 +42,7 @@ export default function Page() {
   const content = contentRes?.data ?? null;
   const recommended = recommendedRes?.data?.contents ?? [];
 
-  if (!mounted || !isAuthenticated) return null;
+  if (!mounted || !isInitialized || !isAuthenticated) return null;
 
   if (isLoading) {
     return <ContentDetailSkeleton />;

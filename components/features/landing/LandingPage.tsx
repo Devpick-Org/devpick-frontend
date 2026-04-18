@@ -582,7 +582,10 @@ export function LandingPage() {
     }
   }, [isInitialized, isAuthenticated, router]);
 
+  // 초기화 전 — 인증 여부 불명확, 아무것도 렌더하지 않음
   if (!isInitialized) return null;
+  // 로그인 상태 — useEffect에서 /home 이동 대기, 랜딩 UI 노출 차단
+  if (isAuthenticated) return null;
 
   return (
     <div className="min-h-screen">

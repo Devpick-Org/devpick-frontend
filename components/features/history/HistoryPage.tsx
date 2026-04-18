@@ -26,6 +26,7 @@ export default function HistoryPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: HISTORY_QUERY_KEYS.list({ page: PAGE, size: PAGE_SIZE }),
     queryFn: () => historyEndpoints.getHistoryList({ page: PAGE, size: PAGE_SIZE }),
+    staleTime: 0,
   });
 
   const allItems = data?.data.items ?? [];

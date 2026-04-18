@@ -28,6 +28,9 @@ export function AnswerSection({
   const invalidatePost = () =>
     queryClient.invalidateQueries({ queryKey: ["post", postId] });
 
+  const invalidateUserProfile = () =>
+    queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+
   const createAnswerMutation = useMutation({
     mutationFn: (content: string) =>
       postsEndpoints.createAnswer(postId, content),
@@ -35,6 +38,7 @@ export function AnswerSection({
       setNewAnswerContent("");
       invalidateAnswers();
       invalidatePost();
+      invalidateUserProfile();
       toast.success("답변이 등록되었습니다.");
     },
     onError: () => toast.error("답변 등록에 실패했습니다."),
@@ -61,6 +65,7 @@ export function AnswerSection({
     onSuccess: () => {
       invalidateAnswers();
       invalidatePost();
+      invalidateUserProfile();
       toast.success("답변이 삭제되었습니다.");
     },
     onError: () => toast.error("답변 삭제에 실패했습니다."),
