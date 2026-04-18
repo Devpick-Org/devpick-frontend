@@ -108,11 +108,10 @@ export default function WeeklyReportPage() {
             </button>
             <button
               onClick={() => shareMutation.mutate(report.reportId)}
-              disabled={shareMutation.isPending}
-              className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors cursor-pointer"
             >
               <Share2 className="w-4 h-4 shrink-0" />
-              {shareMutation.isPending ? "공유 중..." : "공유"}
+              공유
             </button>
           </div>
         </div>

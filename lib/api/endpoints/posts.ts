@@ -35,7 +35,9 @@ export const postsEndpoints = {
     const formData = new FormData();
     formData.append("file", file);
     return apiClient
-      .post<ApiResponse<PostAttachmentDTO>>("/attachments", formData)
+      .post<ApiResponse<PostAttachmentDTO>>("/attachments", formData, {
+        headers: { "Content-Type": undefined },
+      })
       .then((r) => r.data.data);
   },
   // ─── 게시글 목록 ────────────────────────────────────────────────────────────

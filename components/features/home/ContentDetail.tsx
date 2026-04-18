@@ -93,11 +93,6 @@ export function ContentDetail({ content }: ContentDetailProps) {
             <h1 className="text-2xl font-bold leading-snug tracking-tight text-foreground md:text-3xl">
               {content.translatedTitle ?? content.title}
             </h1>
-            {content.translatedTitle && (
-              <p className="mt-1.5 text-sm text-muted-foreground">
-                {content.title}
-              </p>
-            )}
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <button
