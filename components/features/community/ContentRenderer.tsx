@@ -125,24 +125,27 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
           },
           h1({ children }) {
             return (
-              <h1 className="mb-2 text-base font-bold text-foreground">
+              <h1 className="mt-6 mb-2 text-base font-bold text-foreground first:mt-0">
                 {children}
               </h1>
             );
           },
           h2({ children }) {
             return (
-              <h2 className="mb-2 text-sm font-bold text-foreground">
+              <h2 className="mt-5 mb-2 text-sm font-bold text-foreground first:mt-0">
                 {children}
               </h2>
             );
           },
           h3({ children }) {
             return (
-              <h3 className="mb-1 text-sm font-semibold text-foreground">
+              <h3 className="mt-4 mb-1 text-sm font-semibold text-foreground first:mt-0">
                 {children}
               </h3>
             );
+          },
+          hr() {
+            return <hr className="my-5 border-border" />;
           },
         }}
       >

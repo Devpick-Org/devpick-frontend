@@ -10,7 +10,7 @@ import { useHydrated } from "@/lib/hooks/useHydrated";
 import { useAuthStore } from "@/store/auth.store";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
 import { PostWriteForm } from "./PostWriteForm";
-import type { PostAttachmentDTO, PostDraft } from "@/types/community";
+import type { LocalFileItem, PostAttachmentDTO, PostDraft } from "@/types/community";
 
 interface Props {
   postId: string;
@@ -22,7 +22,7 @@ export function CommunityEditPage({ postId }: Props) {
   const user = useAuthStore((s) => s.user);
   const mounted = useHydrated();
 
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<LocalFileItem[]>([]);
   const [removedUrls, setRemovedUrls] = useState<string[]>([]);
 
   const { data: postRes, isLoading, isError } = useQuery({
@@ -40,7 +40,7 @@ export function CommunityEditPage({ postId }: Props) {
   const updateMutation = useMutation({
     mutationFn: async (draft: PostDraft) => {
       const newUrls = await Promise.all(
-        files.map((file) => postsEndpoints.uploadAttachment(file).then((r) => r.url)),
+        files.map((item) => postsEndpoints.uploadAttachment(item.file).then((r) => r.url)),
       );
       const attachmentUrls = [
         ...existingAttachments.map((a) => a.url),
@@ -134,8 +134,8 @@ export function CommunityEditPage({ postId }: Props) {
           initialDraft={initialDraft}
           files={files}
           onFilesChange={(added) => setFiles((prev) => [...prev, ...added])}
-          onRemoveFile={(name) =>
-            setFiles((prev) => prev.filter((f) => f.name !== name))
+          onRemoveFile={(id) =>
+            setFiles((prev) => prev.filter((f) => f.id !== id))
           }
           existingAttachments={existingAttachments}
           onRemoveExistingAttachment={(url) =>

@@ -11,14 +11,14 @@ import { postsEndpoints } from "@/lib/api/endpoints/posts";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { PostWriteForm } from "@/components/features/community/PostWriteForm";
 import { PostRefinePanel } from "@/components/features/community/PostRefinePanel";
-import type { PostDraft, RefinePostData } from "@/types/community";
+import type { LocalFileItem, PostDraft, RefinePostData } from "@/types/community";
 
 // ─── 첨부파일 업로드 ──────────────────────────────────────────────────────────
 // 파일 배열을 S3에 업로드하고 URL 배열을 반환한다.
-async function uploadFiles(files: File[]): Promise<string[]> {
-  if (files.length === 0) return [];
+async function uploadFiles(items: LocalFileItem[]): Promise<string[]> {
+  if (items.length === 0) return [];
   const results = await Promise.all(
-    files.map((file) => postsEndpoints.uploadAttachment(file)),
+    items.map((item) => postsEndpoints.uploadAttachment(item.file)),
   );
   return results.map((r) => r.url);
 }
@@ -34,7 +34,7 @@ export default function CommunityWritePage() {
 
   // ─── 첨부파일 — source of truth ────────────────────────────────────────────
   // 왼쪽 폼의 현재 파일 목록. 오른쪽 패널에는 refine 시점 스냅샷(savedFiles)을 전달한다.
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<LocalFileItem[]>([]);
 
   // ─── 개선 결과 / 원본 스냅샷 ───────────────────────────────────────────────
   // savedDraft/savedFiles는 refine 트리거 시점에 고정 → "원본으로 게시"에 사용
@@ -46,7 +46,7 @@ export default function CommunityWritePage() {
     result: RefinePostData | null;
   }>({ key: 0, result: null });
   const [savedDraft, setSavedDraft] = useState<PostDraft | null>(null);
-  const [savedFiles, setSavedFiles] = useState<File[]>([]);
+  const [savedFiles, setSavedFiles] = useState<LocalFileItem[]>([]);
 
   // ─── Mutations ──────────────────────────────────────────────────────────────
 
@@ -82,11 +82,11 @@ export default function CommunityWritePage() {
 
   // ─── 핸들러 ─────────────────────────────────────────────────────────────────
 
-  const handleFilesChange = (added: File[]) =>
+  const handleFilesChange = (added: LocalFileItem[]) =>
     setFiles((prev) => [...prev, ...added]);
 
-  const handleRemoveFile = (name: string) =>
-    setFiles((prev) => prev.filter((f) => f.name !== name));
+  const handleRemoveFile = (id: string) =>
+    setFiles((prev) => prev.filter((f) => f.id !== id));
 
   /** 왼쪽 폼: AI로 질문 개선하기
    * savedDraft/savedFiles를 mutate 호출 전에 먼저 고정해야
@@ -104,9 +104,9 @@ export default function CommunityWritePage() {
     createMutation.mutate({ ...draft, attachmentUrls });
   };
 
-  /** 오른쪽 패널: 개선안으로 게시 — savedFiles 기준 */
-  const handleSubmitRefined = async (draft: PostDraft) => {
-    const attachmentUrls = await uploadFiles(savedFiles);
+  /** 오른쪽 패널: 개선안으로 게시 — 패널에서 수정된 files 기준 */
+  const handleSubmitRefined = async ({ draft, files: refinedFiles }: { draft: PostDraft; files: LocalFileItem[] }) => {
+    const attachmentUrls = await uploadFiles(refinedFiles);
     createMutation.mutate({ ...draft, attachmentUrls });
   };
 

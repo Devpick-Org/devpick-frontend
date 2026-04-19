@@ -2,6 +2,14 @@ import type { PostLevel } from "./post";
 import type { ApiResponse } from "./api";
 import type { UserJob } from "./userProfile";
 
+// ─── 프론트 전용 로컬 타입 ────────────────────────────────────────────────────
+
+/** 첨부 파일 로컬 관리용 — name 대신 id로 식별해 동명 파일 충돌 방지 */
+export type LocalFileItem = {
+  id: string;
+  file: File;
+};
+
 // ─── 백엔드 확정 DTO ──────────────────────────────────────────────────────────
 
 /** 첨부 파일 DTO */
