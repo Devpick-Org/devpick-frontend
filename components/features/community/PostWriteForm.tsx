@@ -4,7 +4,7 @@ import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { Paperclip, Send, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import type { PostAttachmentDTO, PostDraft } from "@/types/community";
+import type { LocalFileItem, PostAttachmentDTO, PostDraft } from "@/types/community";
 import type { PostLevel } from "@/types/post";
 
 // ─── 상수 ──────────────────────────────────────────────────────────────────
@@ -33,10 +33,10 @@ const CONTENT_PLACEHOLDER = `어떤 문제가 발생했는지 구체적으로 �
 
 interface PostWriteFormProps {
   initialDraft?: PostDraft;
-  /** page.tsx가 소유하는 첨부파일 목록 (신규 File 객체) */
-  files: File[];
-  onFilesChange: (added: File[]) => void;
-  onRemoveFile: (name: string) => void;
+  /** page.tsx가 소유하는 첨부파일 목록 */
+  files: LocalFileItem[];
+  onFilesChange: (added: LocalFileItem[]) => void;
+  onRemoveFile: (id: string) => void;
   /** 수정 시 기존 S3 첨부파일 목록 */
   existingAttachments?: PostAttachmentDTO[];
   onRemoveExistingAttachment?: (url: string) => void;
@@ -101,15 +101,13 @@ export function PostWriteForm({
     const oversized = selected.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
     const validSelected = selected.filter((f) => f.size <= MAX_FILE_SIZE_BYTES);
 
-    // 중복 제거
-    const existingNames = new Set(files.map((f) => f.name));
-    const deduped = validSelected.filter((f) => !existingNames.has(f.name));
+    const fileKey = (f: File) => `${f.name}__${f.size}__${f.lastModified}`;
+    const existingKeys = new Set(files.map((item) => fileKey(item.file)));
+    const deduped = validSelected.filter((f) => !existingKeys.has(fileKey(f)));
 
-    // 전체 요청 크기 검증 (기존 파일 + 새로 추가될 파일)
-    const totalSize = [...files, ...deduped].reduce(
-      (sum, f) => sum + f.size,
-      0,
-    );
+    const totalSize =
+      files.reduce((sum, item) => sum + item.file.size, 0) +
+      deduped.reduce((sum, f) => sum + f.size, 0);
     if (totalSize > MAX_REQUEST_SIZE_BYTES) {
       setFileError("전체 첨부 용량은 12MB를 초과할 수 없습니다.");
       return;
@@ -123,7 +121,13 @@ export function PostWriteForm({
       setFileError(null);
     }
 
-    if (deduped.length > 0) onFilesChange(deduped);
+    if (deduped.length > 0) {
+      const newItems: LocalFileItem[] = deduped.map((file) => ({
+        id: crypto.randomUUID(),
+        file,
+      }));
+      onFilesChange(newItems);
+    }
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -299,20 +303,20 @@ export function PostWriteForm({
                   )}
                 </li>
               ))}
-              {files.map((f) => (
+              {files.map((item) => (
                 <li
-                  key={f.name}
+                  key={item.id}
                   className="flex items-center justify-between rounded-lg border border-border bg-secondary/40 px-3 py-2"
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                     <span className="truncate text-xs font-medium text-foreground">
-                      {f.name}
+                      {item.file.name}
                     </span>
                   </div>
                   <button
                     type="button"
-                    onClick={() => onRemoveFile(f.name)}
+                    onClick={() => onRemoveFile(item.id)}
                     className="ml-2 shrink-0 rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"
                     aria-label="파일 제거"
                   >

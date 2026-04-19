@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { CheckCircle2, Paperclip, Send, Sparkles } from "lucide-react";
+import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import { CheckCircle2, Paperclip, Send, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { PostDraft, RefinePostData } from "@/types/community";
+import type { LocalFileItem, PostDraft, RefinePostData } from "@/types/community";
 import type { PostLevel } from "@/types/post";
 
 // ─── 상수 ──────────────────────────────────────────────────────────────────
 
 const TITLE_MAX = 500;
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_REQUEST_SIZE_BYTES = 12 * 1024 * 1024;
 
 const LEVEL_LABELS: Record<PostLevel, string> = {
   BEGINNER: "입문",
@@ -26,12 +28,12 @@ interface PostRefinePanelProps {
   /** 원본 레벨 — 개선안에 그대로 사용, read-only 표시 */
   originalLevel: PostLevel;
   /** 원본 첨부파일 — 개선안에 그대로 표시 */
-  originalFiles: File[];
+  originalFiles: LocalFileItem[];
   isLoading: boolean;
   isSubmitting: boolean;
   submitError?: string | null;
-  /** 개선안으로 게시: 현재 편집된 값 전달 */
-  onSubmitRefined: (draft: PostDraft) => void;
+  /** 개선안으로 게시: 편집된 draft + 패널에서 수정된 파일 목록을 객체로 전달 */
+  onSubmitRefined: (source: { draft: PostDraft; files: LocalFileItem[] }) => void;
   /** 원본으로 게시: page가 savedDraft를 사용 */
   onSubmitOriginal: () => void;
 }
@@ -58,6 +60,13 @@ export function PostRefinePanel({
     {},
   );
 
+  // 패널에서 독립적으로 관리하는 파일 목록 — originalFiles 스냅샷으로 초기화
+  const [refinedFiles, setRefinedFiles] = useState<LocalFileItem[]>([...originalFiles]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragCounterRef = useRef(0);
+
   const validateRefined = (): boolean => {
     const next: { title?: string; content?: string } = {};
     if (!editedTitle.trim()) next.title = "제목을 입력해 주세요.";
@@ -66,6 +75,61 @@ export function PostRefinePanel({
     if (!editedContent.trim()) next.content = "본문을 입력해 주세요.";
     setErrors(next);
     return Object.keys(next).length === 0;
+  };
+
+  const addFiles = (fileList: FileList | null) => {
+    if (!fileList) return;
+    const selected = Array.from(fileList);
+    const oversized = selected.filter((f) => f.size > MAX_FILE_SIZE_BYTES);
+    const validSelected = selected.filter((f) => f.size <= MAX_FILE_SIZE_BYTES);
+    const fileKey = (f: File) => `${f.name}__${f.size}__${f.lastModified}`;
+    const existingKeys = new Set(refinedFiles.map((item) => fileKey(item.file)));
+    const deduped = validSelected.filter((f) => !existingKeys.has(fileKey(f)));
+    const totalSize =
+      refinedFiles.reduce((sum, item) => sum + item.file.size, 0) +
+      deduped.reduce((sum, f) => sum + f.size, 0);
+    if (totalSize > MAX_REQUEST_SIZE_BYTES) {
+      setFileError("전체 첨부 용량은 12MB를 초과할 수 없습니다.");
+      return;
+    }
+    setFileError(
+      oversized.length > 0
+        ? `10MB 초과 파일 제외됨: ${oversized.map((f) => f.name).join(", ")}`
+        : null,
+    );
+    if (deduped.length > 0) {
+      const newItems: LocalFileItem[] = deduped.map((file) => ({
+        id: crypto.randomUUID(),
+        file,
+      }));
+      setRefinedFiles((prev) => [...prev, ...newItems]);
+    }
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    addFiles(e.target.files);
+    e.target.value = "";
+  };
+
+  const handleDragEnter = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    dragCounterRef.current += 1;
+    setIsDragging(true);
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => { e.preventDefault(); };
+
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current === 0) setIsDragging(false);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    dragCounterRef.current = 0;
+    setIsDragging(false);
+    addFiles(e.dataTransfer.files);
   };
 
   // ─── 로딩 ──────────────────────────────────────────────────────────────
@@ -187,27 +251,66 @@ export function PostRefinePanel({
           )}
         </div>
 
-        {/* 첨부파일 — 원본 그대로 표시 */}
-        {originalFiles.length > 0 && (
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-foreground">
-              첨부파일
-            </label>
-            <ul className="space-y-1.5">
-              {originalFiles.map((f) => (
+        {/* 첨부파일 — 편집 가능 */}
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-foreground">
+            첨부파일
+            <span className="ml-1.5 text-xs font-normal text-muted-foreground">(선택)</span>
+          </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,.pdf,.txt,.zip"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+          {refinedFiles.length > 0 && (
+            <ul className="mb-2 space-y-1.5">
+              {refinedFiles.map((item) => (
                 <li
-                  key={f.name}
-                  className="flex items-center gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2"
+                  key={item.id}
+                  className="flex items-center justify-between rounded-lg border border-border bg-secondary/40 px-3 py-2"
                 >
-                  <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                  <span className="truncate text-xs font-medium text-foreground">
-                    {f.name}
-                  </span>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Paperclip className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    <span className="truncate text-xs font-medium text-foreground">{item.file.name}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setRefinedFiles((prev) => prev.filter((p) => p.id !== item.id))}
+                    className="ml-2 shrink-0 rounded p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+                    aria-label="파일 제거"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
                 </li>
               ))}
             </ul>
+          )}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click(); }}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={cn(
+              "flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed px-4 py-2.5 text-sm font-medium transition-colors",
+              isDragging
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground",
+            )}
+          >
+            <Paperclip className="h-4 w-4" />
+            {isDragging ? "여기에 놓으세요" : "파일 추가"}
           </div>
-        )}
+          {fileError && (
+            <p className="mt-1.5 text-xs font-medium text-destructive">{fileError}</p>
+          )}
+        </div>
       </div>
       {/* 입력 필드 카드 끝 */}
 
@@ -255,9 +358,8 @@ export function PostRefinePanel({
           onClick={() => {
             if (validateRefined()) {
               onSubmitRefined({
-                title: editedTitle,
-                content: editedContent,
-                level: originalLevel,
+                draft: { title: editedTitle, content: editedContent, level: originalLevel },
+                files: refinedFiles,
               });
             }
           }}
