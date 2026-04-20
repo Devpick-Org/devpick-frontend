@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Flame,
   BookOpen,
+  Briefcase,
   type LucideIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -52,6 +53,7 @@ const TRENDS_ENABLED = process.env.NEXT_PUBLIC_FEATURE_TRENDS === "true";
 const ALL_NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/home", label: "홈", icon: Home },
   { href: "/community", label: "커뮤니티", icon: Users },
+  { href: "/jobs", label: "채용", icon: Briefcase },
   { href: "/trends", label: "트렌드", icon: Flame },
   { href: "/history", label: "히스토리", icon: BookOpen },
   { href: "/report", label: "리포트", icon: TrendingUp },

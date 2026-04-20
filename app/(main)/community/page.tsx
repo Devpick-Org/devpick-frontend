@@ -165,7 +165,9 @@ export default function CommunityPage() {
 
           {!isLoading && !isError && posts.length === 0 && (
             <p className="py-10 text-center text-sm font-medium text-muted-foreground">
-              게시글이 없습니다.
+              {searchQuery.trim()
+                ? `"${searchQuery}"에 대한 게시글이 없습니다.`
+                : "게시글이 없습니다."}
             </p>
           )}
 
