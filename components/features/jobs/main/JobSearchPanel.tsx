@@ -138,7 +138,7 @@ export function JobSearchPanel({
         />
       </div>
 
-      {/* Row 2: 직무 / 경력 / 지역 */}
+      {/* Row 2: 직무 / 경력 / 근무지 */}
       <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
         {/* 직무 */}
         <DropdownMenu modal={false}>
@@ -204,12 +204,12 @@ export function JobSearchPanel({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* 지역 */}
+        {/* 근무지 */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <FilterCell
               icon={MapPin}
-              label="지역"
+              label="근무지"
               value={locationLabel}
               active={filters.location !== "ALL"}
             />

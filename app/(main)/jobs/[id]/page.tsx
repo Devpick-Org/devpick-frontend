@@ -1,7 +1,10 @@
-export default function JobDetailPage() {
-  return (
-    <div className="flex items-center justify-center min-h-[40vh]">
-      <p className="text-sm text-muted-foreground">공고 상세 페이지입니다.</p>
-    </div>
-  );
+import { JobDetailPage } from "@/components/features/jobs/detail/JobDetailPage";
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  return <JobDetailPage id={id} />;
 }
