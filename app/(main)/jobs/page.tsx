@@ -1,4 +1,4 @@
-import { JobPage } from "@/components/features/jobs/JobPage";
+import { JobPage } from "@/components/features/jobs/main/JobPage";
 
 export default function Page() {
   return (

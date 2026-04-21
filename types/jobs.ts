@@ -17,3 +17,45 @@ export interface Job {
   matchedTags: string[];
   missingTags: string[];
 }
+
+export type MatchItemStatus = "MET" | "UNMET" | "PARTIAL";
+
+export interface MatchItem {
+  label: string;
+  status: MatchItemStatus;
+}
+
+export interface MatchSubSection {
+  score: number;
+  maxScore: number;
+  summary: string;
+  items: MatchItem[];
+}
+
+export interface MatchBreakdown {
+  requirements: MatchSubSection;
+  preferred: MatchSubSection;
+  experience: MatchSubSection;
+}
+
+export interface QAItem {
+  question: string;
+  answer: string;
+  followUps: string[];
+}
+
+export interface QACategory {
+  title: string;
+  items: QAItem[];
+}
+
+export interface JobDetail extends Job {
+  salary: string;
+  applyUrl: string;
+  responsibilities: string[];
+  requirements: string[];
+  preferredQualifications: string[];
+  benefits: string[];
+  hiringProcess: string[];
+  matchBreakdown: MatchBreakdown;
+}
