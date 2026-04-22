@@ -267,7 +267,12 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
           </JobDetailSection>
 
           <div className="mt-3 border-t pt-8">
-            <JobQASection jobId={id} />
+            <JobQASection
+              jobId={id}
+              companyName={job.companyName}
+              jobTitle={job.title}
+              matchScore={job.matchScore}
+            />
           </div>
         </main>
 
