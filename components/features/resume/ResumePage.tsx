@@ -6,6 +6,7 @@ import { MOCK_RESUME } from "@/lib/mock/resume";
 import type { ResumeData, ResumeBasicInfo } from "@/types/resume";
 import { ResumeUploadSection } from "./ResumeUploadSection";
 import { ResumeSummarySection } from "./ResumeSummarySection";
+import { ResumeQATab } from "./ResumeQATab";
 
 const MOCK_PARSE_FAIL = false;
 
@@ -16,7 +17,7 @@ const TRIGGER_CLASS =
   "data-[state=active]:bg-transparent data-[state=active]:shadow-none " +
   "hover:text-foreground";
 
-export function ResumePage() {
+export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const [hasResume, setHasResume] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const [resume, setResume] = useState<ResumeData | null>(null);
@@ -72,7 +73,7 @@ export function ResumePage() {
   };
 
   return (
-    <Tabs defaultValue="resume">
+    <Tabs defaultValue={defaultTab}>
       <TabsList className="mb-6 h-auto w-full justify-start gap-0 rounded-none border-b border-border bg-transparent p-0">
         <TabsTrigger value="resume" className={TRIGGER_CLASS}>
           이력서
@@ -106,9 +107,7 @@ export function ResumePage() {
       </TabsContent>
 
       <TabsContent value="qa">
-        <div className="flex min-h-[30vh] items-center justify-center text-sm text-muted-foreground">
-          면접 Q&A 기능은 준비 중입니다.
-        </div>
+        <ResumeQATab />
       </TabsContent>
     </Tabs>
   );

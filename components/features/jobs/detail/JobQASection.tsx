@@ -2,21 +2,40 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Download, Loader2, RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Bookmark,
+  BookmarkCheck,
+  Download,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
+import { toast } from "sonner";
 import { MOCK_JOB_QA_SETS } from "@/lib/mock/jobs";
 import { exportQAAsPdf } from "@/lib/jobs/exportQAPdf";
 import type { QACategory } from "@/types/jobs";
+import { saveQA, isQASaved } from "@/lib/mock/resume-qa";
 import { JobDetailSection } from "./JobDetailSection";
 import { JobQACategory } from "./JobQACategory";
 
 // mock: 이력서 등록 여부
-const HAS_RESUME = false;
+const HAS_RESUME = true;
 
 interface JobQASectionProps {
   jobId: string;
+  companyName?: string;
+  jobTitle?: string;
+  matchScore?: number;
 }
 
-export function JobQASection({ jobId }: JobQASectionProps) {
+export function JobQASection({
+  jobId,
+  companyName = "",
+  jobTitle = "",
+  matchScore = 0,
+}: JobQASectionProps) {
+  const router = useRouter();
+  const [isSaved, setIsSaved] = useState(() => isQASaved(jobId));
   const [isGenerated, setIsGenerated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -26,6 +45,7 @@ export function JobQASection({ jobId }: JobQASectionProps) {
   const generate = async () => {
     setIsLoading(true);
     setIsGenerated(false);
+    setIsSaved(false);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     const nextIdx = (currentSetIdx + 1) % MOCK_JOB_QA_SETS.length;
     setCurrentSetIdx(nextIdx);
@@ -43,13 +63,45 @@ export function JobQASection({ jobId }: JobQASectionProps) {
     }
   };
 
+  const handleSave = () => {
+    if (isSaved) return;
+    saveQA({
+      jobId,
+      companyName,
+      jobTitle,
+      matchScore,
+      qaCategories: currentQA,
+    });
+    setIsSaved(true);
+    toast.success("면접 Q&A가 저장되었습니다.", {
+      action: {
+        label: "Q&A 보기",
+        onClick: () => router.push("/my-resume?tab=qa"),
+      },
+      actionButtonStyle: {
+        backgroundColor: "#16a34a", // green-600
+        color: "white",
+      },
+    });
+  };
+
   const sectionAction = isGenerated ? (
     <div className="flex items-center gap-3">
       <button
         type="button"
+        onClick={generate}
+        disabled={isLoading || isExporting}
+        className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <RefreshCw className="h-3.5 w-3.5" />
+        재생성하기
+      </button>
+
+      <button
+        type="button"
         onClick={handleDownloadPdf}
         disabled={isLoading || isExporting}
-        className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+        className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isExporting ? (
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -59,15 +111,21 @@ export function JobQASection({ jobId }: JobQASectionProps) {
         PDF 다운로드
       </button>
 
-      <button
-        type="button"
-        onClick={generate}
-        disabled={isLoading || isExporting}
-        className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-      >
-        <RefreshCw className="h-3.5 w-3.5" />
-        재생성하기
-      </button>
+      {isSaved ? (
+        <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+          <BookmarkCheck className="h-3.5 w-3.5" />
+          저장됨
+        </span>
+      ) : (
+        <button
+          type="button"
+          onClick={handleSave}
+          className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Bookmark className="h-3.5 w-3.5" />
+          저장하기
+        </button>
+      )}
     </div>
   ) : undefined;
 
