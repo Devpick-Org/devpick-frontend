@@ -113,9 +113,9 @@ function SectionError({
   return (
     <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border bg-card py-10 text-center">
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
-        <AlertCircle className="h-5 w-5 text-muted-foreground" />
+        <AlertCircle className="h-5 w-5 text-foreground" />
       </div>
-      <p className="text-sm font-medium text-muted-foreground">{message}</p>
+      <p className="text-sm font-medium text-foreground">{message}</p>
       <button
         onClick={onRetry}
         className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground cursor-pointer"

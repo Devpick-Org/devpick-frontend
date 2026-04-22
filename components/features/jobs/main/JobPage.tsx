@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 import { fetchJobsPaginated, type JobSortBy } from "@/lib/mock/jobs";
@@ -54,11 +54,15 @@ function JobListSkeleton() {
   );
 }
 
-function JobErrorState() {
+function JobErrorState({ searchQuery }: { searchQuery: string }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-foreground">
       <AlertCircle className="w-8 h-8" />
-      <p className="text-sm font-medium">채용 공고를 불러오지 못했습니다.</p>
+      <p className="text-sm font-medium">
+        {searchQuery.trim()
+          ? "검색 결과를 불러오지 못했습니다."
+          : "채용 공고를 불러오지 못했습니다."}
+      </p>
     </div>
   );
 }
@@ -77,23 +81,29 @@ function JobResults({
   searchQuery,
 }: JobResultsProps) {
   if (isLoading) return <JobListSkeleton />;
-  if (isError) return <JobErrorState />;
+  if (isError) return <JobErrorState searchQuery={searchQuery} />;
   return <JobList jobs={jobs} searchQuery={searchQuery} />;
 }
 
 export function JobPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [filters, setFilters] = useState<JobFilters>(DEFAULT_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<JobSortBy>("MATCH");
 
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["jobs", currentPage, searchQuery, filters, sortBy],
+    queryKey: ["jobs", currentPage, debouncedQuery, filters, sortBy],
     queryFn: () =>
       fetchJobsPaginated({
         page: currentPage - 1,
         size: PAGE_SIZE,
-        searchQuery,
+        searchQuery: debouncedQuery,
         category: filters.category,
         experienceLevel: filters.experienceLevel,
         location: filters.location,

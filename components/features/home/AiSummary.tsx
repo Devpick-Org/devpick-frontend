@@ -67,7 +67,7 @@ function AiSummaryError() {
   return (
     <div className="flex flex-col items-center gap-4 py-8 text-center">
       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary">
-        <AlertCircle className="h-5 w-5 text-muted-foreground" />
+        <AlertCircle className="h-5 w-5 text-foreground" />
       </div>
       <div className="space-y-1.5">
         <p className="text-md font-semibold text-foreground">
