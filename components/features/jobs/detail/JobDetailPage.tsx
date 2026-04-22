@@ -163,7 +163,7 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
 
   if (isError || !job) {
     return (
-      <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-muted-foreground">
+      <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-foreground">
         <AlertCircle className="h-8 w-8" />
         <p className="text-sm font-medium">공고를 불러오지 못했습니다.</p>
       </div>

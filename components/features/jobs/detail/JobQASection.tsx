@@ -38,6 +38,7 @@ export function JobQASection({
   const [isSaved, setIsSaved] = useState(() => isQASaved(jobId));
   const [isGenerated, setIsGenerated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [currentQA, setCurrentQA] = useState<QACategory[]>(MOCK_JOB_QA_SETS[0]);
   const [currentSetIdx, setCurrentSetIdx] = useState(0);
@@ -46,12 +47,18 @@ export function JobQASection({
     setIsLoading(true);
     setIsGenerated(false);
     setIsSaved(false);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    const nextIdx = (currentSetIdx + 1) % MOCK_JOB_QA_SETS.length;
-    setCurrentSetIdx(nextIdx);
-    setCurrentQA(MOCK_JOB_QA_SETS[nextIdx]);
-    setIsLoading(false);
-    setIsGenerated(true);
+    setIsError(false);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const nextIdx = (currentSetIdx + 1) % MOCK_JOB_QA_SETS.length;
+      setCurrentSetIdx(nextIdx);
+      setCurrentQA(MOCK_JOB_QA_SETS[nextIdx]);
+      setIsGenerated(true);
+    } catch {
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDownloadPdf = async () => {
@@ -150,7 +157,7 @@ export function JobQASection({
         </div>
       )}
 
-      {HAS_RESUME && !isGenerated && !isLoading && (
+      {HAS_RESUME && !isGenerated && !isLoading && !isError && (
         <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="text-sm font-medium text-muted-foreground">
             이 공고를 기반으로 면접 예상 질문과 모범 답변을 생성할 수 있어요.
@@ -169,6 +176,21 @@ export function JobQASection({
         <div className="flex items-center gap-2.5 rounded-lg bg-muted/50 px-4 py-3.5 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           면접 질문을 생성하고 있어요...
+        </div>
+      )}
+
+      {isError && (
+        <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <p className="text-sm font-medium text-muted-foreground">
+            면접 질문 생성에 실패했습니다. 다시 시도해 주세요.
+          </p>
+          <button
+            type="button"
+            onClick={generate}
+            className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            다시 시도
+          </button>
         </div>
       )}
 

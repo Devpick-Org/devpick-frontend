@@ -20,6 +20,7 @@ const TRIGGER_CLASS =
 
 export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const router = useRouter();
+  // TODO: API 연동 시 useQuery로 기존 이력서 조회 후 hasResume/resume 초기값 설정 필요
   const [hasResume, setHasResume] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const [resume, setResume] = useState<ResumeData | null>(null);
