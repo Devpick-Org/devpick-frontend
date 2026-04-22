@@ -16,7 +16,7 @@ export function ResumeQADetail({ qa, onDelete }: ResumeQADetailProps) {
 
   if (!qa) {
     return (
-      <div className="flex min-h-[12rem] items-center justify-center rounded-xl border border-border bg-muted/20 text-sm text-muted-foreground font-medium">
+      <div className="flex min-h-[12rem] items-center justify-center rounded-xl bg-muted/30 text-sm text-muted-foreground font-medium">
         저장된 Q&A를 선택해 주세요
       </div>
     );

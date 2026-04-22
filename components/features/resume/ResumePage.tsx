@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MOCK_RESUME } from "@/lib/mock/resume";
 import type { ResumeData, ResumeBasicInfo } from "@/types/resume";
@@ -18,6 +19,7 @@ const TRIGGER_CLASS =
   "hover:text-foreground";
 
 export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
+  const router = useRouter();
   const [hasResume, setHasResume] = useState(false);
   const [isParsing, setIsParsing] = useState(false);
   const [resume, setResume] = useState<ResumeData | null>(null);
@@ -73,7 +75,13 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   };
 
   return (
-    <Tabs defaultValue={defaultTab}>
+    <Tabs
+      defaultValue={defaultTab}
+      onValueChange={(value) => {
+        const url = value === "qa" ? "/my-resume?tab=qa" : "/my-resume";
+        router.replace(url, { scroll: false });
+      }}
+    >
       <TabsList className="mb-6 h-auto w-full justify-start gap-0 rounded-none border-b border-border bg-transparent p-0">
         <TabsTrigger value="resume" className={TRIGGER_CLASS}>
           이력서
