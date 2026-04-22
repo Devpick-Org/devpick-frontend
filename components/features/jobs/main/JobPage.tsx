@@ -4,13 +4,17 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 import { fetchJobsPaginated, type JobSortBy } from "@/lib/mock/jobs";
+import { MOCK_RESUME } from "@/lib/mock/resume";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type JobFilters } from "./JobFilterBar";
 import { JobSearchPanel } from "./JobSearchPanel";
 import { JobSortBar } from "./JobSortBar";
 import { JobList } from "./JobList";
 import { JobPagination } from "./JobPagination";
+import { ResumeSummaryBanner } from "./ResumeSummaryBanner";
 import type { Job } from "@/types/jobs";
+
+const HAS_RESUME = true;
 
 const PAGE_SIZE = 9;
 
@@ -128,6 +132,10 @@ export function JobPage() {
 
   return (
     <div className="flex flex-col gap-5">
+      <ResumeSummaryBanner
+        hasResume={HAS_RESUME}
+        resume={HAS_RESUME ? MOCK_RESUME : undefined}
+      />
       <JobSearchPanel
         searchQuery={searchQuery}
         onSearch={handleSearch}

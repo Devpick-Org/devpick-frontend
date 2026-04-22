@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Download, Loader2, RefreshCw } from "lucide-react";
 import { MOCK_JOB_QA_SETS } from "@/lib/mock/jobs";
 import { exportQAAsPdf } from "@/lib/jobs/exportQAPdf";
@@ -82,12 +83,12 @@ export function JobQASection({ jobId }: JobQASectionProps) {
             이력서를 등록하면 이 공고에 맞춤화된 면접 예상 질문과 모범 답변을
             생성할 수 있어요.
           </p>
-          <button
-            type="button"
-            className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          <Link
+            href="/my-resume"
+            className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             이력서 등록하기
-          </button>
+          </Link>
         </div>
       )}
 
@@ -99,7 +100,7 @@ export function JobQASection({ jobId }: JobQASectionProps) {
           <button
             type="button"
             onClick={generate}
-            className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             면접 질문 생성하기
           </button>
