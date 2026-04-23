@@ -16,58 +16,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 import type { Content } from "@/types/content";
 import { isStackOverflowSource } from "@/lib/content/sourceGuards";
-
-// ─── helpers ──────────────────────────────────────────────────────────────────
-
-const SOURCE_BADGE: Record<
-  string,
-  { bg: string; text: string; label: string }
-> = {
-  velog: { bg: "#20C997", text: "#fff", label: "V" },
-  naver_d2: { bg: "#03C75A", text: "#fff", label: "D2" },
-  kakao_tech: { bg: "#FEE500", text: "#3A1D1D", label: "K" },
-  우아한형제들: { bg: "#3399FF", text: "#fff", label: "W" },
-  toss_tech: { bg: "#0064FF", text: "#fff", label: "T" },
-  oliveyoung_tech: { bg: "#3A7D44", text: "#fff", label: "O" },
-};
-
-function SourceBadge({ sourceName }: { sourceName: string }) {
-  const key = sourceName.trim().toLowerCase();
-
-  // Medium_ 접두사로 시작하는 소스는 모두 Medium 배지로 표시
-  const style = key.startsWith("medium")
-    ? { bg: "#000000", text: "#fff", label: "M" }
-    : SOURCE_BADGE[key];
-
-  if (isStackOverflowSource(sourceName)) {
-    return (
-      <span
-        className="flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded text-[8px] font-bold leading-none"
-        style={{ background: "#F48024", color: "#fff" }}
-      >
-        SO
-      </span>
-    );
-  }
-
-  if (style) {
-    return (
-      <span
-        className="flex h-[17px] shrink-0 items-center justify-center rounded px-1 text-[8px] font-bold leading-none"
-        style={{ background: style.bg, color: style.text, minWidth: "17px" }}
-      >
-        {style.label}
-      </span>
-    );
-  }
-
-  // 기본: 이니셜 회색 원형
-  return (
-    <span className="flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-bold text-muted-foreground">
-      {sourceName.charAt(0).toUpperCase()}
-    </span>
-  );
-}
+import { SourceLogo } from "@/components/features/home/SourceLogo";
 
 // ─── FeedCard ─────────────────────────────────────────────────────────────────
 
@@ -183,7 +132,7 @@ export function FeedCard({ content }: FeedCardProps) {
             {/* Header: source badge + name + date + optional Q&A pill */}
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                <SourceBadge sourceName={content.sourceName} />
+                <SourceLogo sourceName={content.sourceName} />
                 <span className="font-semibold">{content.sourceName}</span>
                 <span className="text-muted-foreground/40">·</span>
                 <span>{formatDate(content.publishedAt)}</span>

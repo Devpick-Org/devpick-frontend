@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { SearchResultItem } from "@/types/search";
+import { SourceLogo } from "@/components/features/home/SourceLogo";
 
 interface HomeSearchResultAccordionItemProps {
   item: SearchResultItem;
@@ -21,9 +22,7 @@ export function HomeSearchResultAccordionItem({
         onClick={onToggle}
         className="flex w-full cursor-pointer items-center gap-3 py-3 text-left"
       >
-        <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-          {item.sourceName}
-        </span>
+        <SourceLogo sourceName={item.sourceName} size={20} />
         <span className="flex-1 truncate text-sm font-medium text-foreground">
           {item.title}
         </span>
