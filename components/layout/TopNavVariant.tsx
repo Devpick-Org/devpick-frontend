@@ -13,6 +13,7 @@ import {
   Flame,
   BookOpen,
   Briefcase,
+  LayoutDashboard,
   type LucideIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -57,6 +58,7 @@ const ALL_NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/trends", label: "트렌드", icon: Flame },
   { href: "/history", label: "히스토리", icon: BookOpen },
   { href: "/report", label: "리포트", icon: TrendingUp },
+  { href: "/my-page", label: "마이페이지", icon: LayoutDashboard },
 ];
 
 const NAV_ITEMS = ALL_NAV_ITEMS.filter(
