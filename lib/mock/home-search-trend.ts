@@ -65,16 +65,16 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
       "오늘은 React 서버 컴포넌트와 TypeScript 5.4 관련 글이 조회수 1위를 다투고 있습니다. AWS 서버리스 구축 가이드와 Tailwind CSS v4 마이그레이션 글도 빠르게 조회수가 오르고 있으며, PostgreSQL 인덱스 최적화 글이 백엔드 개발자들 사이에서 주목받고 있습니다.",
     collectionSummary: "",
     trendingKeywords: [
-      { rank: 1, keyword: "React" },
-      { rank: 2, keyword: "TypeScript" },
-      { rank: 3, keyword: "AWS" },
-      { rank: 4, keyword: "Next.js" },
-      { rank: 5, keyword: "Tailwind" },
-      { rank: 6, keyword: "PostgreSQL" },
-      { rank: 7, keyword: "Python" },
-      { rank: 8, keyword: "Docker" },
-      { rank: 9, keyword: "Kotlin" },
-      { rank: 10, keyword: "Redis" },
+      { rank: 1, keyword: "React", count: 124, deltaType: "up", deltaValue: 3, isMyInterest: true },
+      { rank: 2, keyword: "TypeScript", count: 98, deltaType: "new", isMyInterest: true },
+      { rank: 3, keyword: "AWS", count: 84, deltaType: "down", deltaValue: 2 },
+      { rank: 4, keyword: "Next.js", count: 79, deltaType: "same" },
+      { rank: 5, keyword: "Tailwind", count: 63, deltaType: "up", deltaValue: 1 },
+      { rank: 6, keyword: "PostgreSQL", count: 58, deltaType: "new" },
+      { rank: 7, keyword: "Python", count: 52, deltaType: "up", deltaValue: 5 },
+      { rank: 8, keyword: "Docker", count: 47, deltaType: "down", deltaValue: 1 },
+      { rank: 9, keyword: "Kotlin", count: 38, deltaType: "same" },
+      { rank: 10, keyword: "Redis", count: 31, deltaType: "up", deltaValue: 2 },
     ],
   },
 
@@ -142,21 +142,21 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
     collectionSummary:
       "이번 주 총 312개의 새로운 콘텐츠가 수집되었습니다. Velog 출처가 38%로 가장 많았으며, Naver D2와 Kakao Tech 블로그의 심층 기술 글이 고르게 수집되었습니다. AI·DevOps 분야 콘텐츠가 전주 대비 23% 증가했으며, Rust와 Go 관련 글도 꾸준히 유입되고 있습니다.",
     trendingKeywords: [
-      { rank: 1, keyword: "React" },
-      { rank: 2, keyword: "TypeScript" },
-      { rank: 3, keyword: "Next.js" },
-      { rank: 4, keyword: "AI" },
-      { rank: 5, keyword: "Docker" },
-      { rank: 6, keyword: "Kubernetes" },
-      { rank: 7, keyword: "Python" },
-      { rank: 8, keyword: "Spring" },
-      { rank: 9, keyword: "AWS" },
-      { rank: 10, keyword: "LLM" },
-      { rank: 11, keyword: "Kotlin" },
-      { rank: 12, keyword: "Monorepo" },
-      { rank: 13, keyword: "PostgreSQL" },
-      { rank: 14, keyword: "Redis" },
-      { rank: 15, keyword: "GraphQL" },
+      { rank: 1, keyword: "React", count: 841, deltaType: "up", deltaValue: 2 },
+      { rank: 2, keyword: "TypeScript", count: 762, deltaType: "same" },
+      { rank: 3, keyword: "Next.js", count: 695, deltaType: "up", deltaValue: 1 },
+      { rank: 4, keyword: "AI", count: 643, deltaType: "up", deltaValue: 4 },
+      { rank: 5, keyword: "Docker", count: 521, deltaType: "down", deltaValue: 1 },
+      { rank: 6, keyword: "Kubernetes", count: 482, deltaType: "new" },
+      { rank: 7, keyword: "Python", count: 438, deltaType: "up", deltaValue: 3 },
+      { rank: 8, keyword: "Spring", count: 401, deltaType: "down", deltaValue: 2 },
+      { rank: 9, keyword: "AWS", count: 378, deltaType: "up", deltaValue: 1 },
+      { rank: 10, keyword: "LLM", count: 325, deltaType: "new" },
+      { rank: 11, keyword: "Kotlin", count: 287, deltaType: "same" },
+      { rank: 12, keyword: "Monorepo", count: 241, deltaType: "up", deltaValue: 2 },
+      { rank: 13, keyword: "PostgreSQL", count: 198, deltaType: "down", deltaValue: 3 },
+      { rank: 14, keyword: "Redis", count: 154, deltaType: "same" },
+      { rank: 15, keyword: "GraphQL", count: 121, deltaType: "down", deltaValue: 1 },
     ],
   },
 
@@ -224,32 +224,46 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
     collectionSummary:
       "이번 달 총 1,284개의 새로운 콘텐츠가 수집되었습니다. AI/ML 분야 콘텐츠가 전월 대비 41% 급증하며 가장 빠른 성장세를 보였습니다. Next.js, TypeScript 관련 글은 꾸준한 생산량을 유지하고 있으며, Rust와 MLOps 분야 콘텐츠가 새롭게 증가하고 있습니다. 국내 기업 기술 블로그 출처 비율이 처음으로 45%를 넘었습니다.",
     trendingKeywords: [
-      { rank: 1, keyword: "AI" },
-      { rank: 2, keyword: "React" },
-      { rank: 3, keyword: "Next.js" },
-      { rank: 4, keyword: "TypeScript" },
-      { rank: 5, keyword: "Docker" },
-      { rank: 6, keyword: "AWS" },
-      { rank: 7, keyword: "Python" },
-      { rank: 8, keyword: "Kubernetes" },
-      { rank: 9, keyword: "Spring" },
-      { rank: 10, keyword: "LLM" },
-      { rank: 11, keyword: "MLOps" },
-      { rank: 12, keyword: "Rust" },
-      { rank: 13, keyword: "GraphQL" },
-      { rank: 14, keyword: "Redis" },
-      { rank: 15, keyword: "PostgreSQL" },
-      { rank: 16, keyword: "Kafka" },
-      { rank: 17, keyword: "MSA" },
-      { rank: 18, keyword: "Kotlin" },
-      { rank: 19, keyword: "Flutter" },
-      { rank: 20, keyword: "Svelte" },
+      { rank: 1, keyword: "AI", count: 5241, deltaType: "up", deltaValue: 2 },
+      { rank: 2, keyword: "React", count: 4827, deltaType: "same" },
+      { rank: 3, keyword: "Next.js", count: 4312, deltaType: "up", deltaValue: 1 },
+      { rank: 4, keyword: "TypeScript", count: 3987, deltaType: "up", deltaValue: 1 },
+      { rank: 5, keyword: "Docker", count: 3621, deltaType: "down", deltaValue: 1 },
+      { rank: 6, keyword: "AWS", count: 3284, deltaType: "up", deltaValue: 2 },
+      { rank: 7, keyword: "Python", count: 2951, deltaType: "up", deltaValue: 1 },
+      { rank: 8, keyword: "Kubernetes", count: 2614, deltaType: "new" },
+      { rank: 9, keyword: "Spring", count: 2341, deltaType: "down", deltaValue: 3 },
+      { rank: 10, keyword: "LLM", count: 2087, deltaType: "up", deltaValue: 5 },
+      { rank: 11, keyword: "MLOps", count: 1854, deltaType: "new" },
+      { rank: 12, keyword: "Rust", count: 1621, deltaType: "up", deltaValue: 3 },
+      { rank: 13, keyword: "GraphQL", count: 1387, deltaType: "down", deltaValue: 2 },
+      { rank: 14, keyword: "Redis", count: 1154, deltaType: "same" },
+      { rank: 15, keyword: "PostgreSQL", count: 987, deltaType: "down", deltaValue: 1 },
+      { rank: 16, keyword: "Kafka", count: 824, deltaType: "up", deltaValue: 2 },
+      { rank: 17, keyword: "MSA", count: 741, deltaType: "down", deltaValue: 4 },
+      { rank: 18, keyword: "Kotlin", count: 654, deltaType: "same" },
+      { rank: 19, keyword: "Flutter", count: 521, deltaType: "down", deltaValue: 2 },
+      { rank: 20, keyword: "Svelte", count: 387, deltaType: "up", deltaValue: 1 },
     ],
   },
 };
 
+function getDayDateLabel(): string {
+  const now = new Date();
+  const hour = now.getHours();
+  const batchHour = hour < 8 ? 0 : hour < 16 ? 8 : 16;
+  const batchTime = `${String(batchHour).padStart(2, "0")}:00`;
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day} ${batchTime} 기준`;
+}
+
 /** 탭 전환 시 로딩 상태가 보이도록 딜레이 포함 */
 export async function fetchHomeTrend(range: TrendRange): Promise<HomeTrendData> {
   await new Promise((resolve) => setTimeout(resolve, 500));
+  if (range === "day") {
+    return { ...MOCK_HOME_TREND.day, dateLabel: getDayDateLabel() };
+  }
   return MOCK_HOME_TREND[range];
 }

@@ -1,43 +1,86 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import type { TrendKeywordItem } from "@/lib/mock/home-search-trend";
+"use client";
 
-const SKELETON_WIDTHS = [
-  "w-16", "w-24", "w-20", "w-14", "w-28",
-  "w-16", "w-20", "w-24", "w-14", "w-18",
-];
+import { Skeleton } from "@/components/ui/skeleton";
+import type { TrendKeywordItem, TrendKeywordDeltaType } from "@/types/search";
 
 interface HomeTrendingKeywordsSectionProps {
   keywords: TrendKeywordItem[];
   isLoading: boolean;
   rangeLabel: string;
+  onKeywordClick: (keyword: string) => void;
+}
+
+function DeltaBadge({
+  deltaType,
+  deltaValue,
+}: {
+  deltaType: TrendKeywordDeltaType;
+  deltaValue?: number;
+}) {
+  if (deltaType === "new") {
+    return <span className="text-[10px] font-bold leading-none text-red-500">NEW</span>;
+  }
+  if (deltaType === "up" && deltaValue) {
+    return <span className="text-[10px] font-bold leading-none text-red-500">▲{deltaValue}</span>;
+  }
+  if (deltaType === "down" && deltaValue) {
+    return <span className="text-[10px] font-bold leading-none text-green-500">▼{deltaValue}</span>;
+  }
+  if (deltaType === "same") {
+    return <span className="text-[10px] font-bold leading-none text-muted-foreground">-</span>;
+  }
+  return null;
 }
 
 export function HomeTrendingKeywordsSection({
   keywords,
   isLoading,
   rangeLabel,
+  onKeywordClick,
 }: HomeTrendingKeywordsSectionProps) {
+
   return (
     <section>
       <h2 className="mb-3 text-sm font-semibold text-foreground">{rangeLabel} 트렌딩 키워드</h2>
       {isLoading ? (
-        <div className="flex flex-wrap gap-2">
-          {SKELETON_WIDTHS.map((w, i) => (
-            <Skeleton key={i} className={`h-8 rounded-full ${w}`} />
+        <div className="columns-1 gap-x-10 sm:columns-2 md:columns-3">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex break-inside-avoid items-center gap-2 border-b border-border py-3"
+            >
+              <Skeleton className="h-3.5 w-4 shrink-0" />
+              <Skeleton className="h-3.5 flex-1" />
+              <Skeleton className="h-3.5 w-10 shrink-0" />
+            </div>
           ))}
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="columns-1 gap-x-10 sm:columns-2 md:columns-3">
           {keywords.map((item) => (
-            <span
+            <button
               key={item.keyword}
-              className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground"
+              onClick={() => onKeywordClick(item.keyword)}
+              className={[
+                "flex w-full break-inside-avoid cursor-pointer items-center gap-2 border-b border-border py-3 text-sm transition-colors",
+                item.isMyInterest
+                  ? "text-primary"
+                  : "text-foreground",
+              ].join(" ")}
             >
-              <span className="w-4 text-center text-xs font-bold text-primary">
+              <span className="w-5 shrink-0 text-center text-xs font-bold opacity-50">
                 {item.rank}
               </span>
-              {item.keyword}
-            </span>
+              <span className="flex-1 text-left font-medium">{item.keyword}</span>
+              <div className="flex w-24 shrink-0 items-center justify-end gap-1.5">
+                {item.count !== undefined && (
+                  <span className="text-xs text-muted-foreground">({item.count})</span>
+                )}
+                {item.deltaType && (
+                  <DeltaBadge deltaType={item.deltaType} deltaValue={item.deltaValue} />
+                )}
+              </div>
+            </button>
           ))}
         </div>
       )}

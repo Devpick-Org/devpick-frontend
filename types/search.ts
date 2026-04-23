@@ -13,9 +13,15 @@ export interface TrendTopPost {
   changeRate: number;
 }
 
+export type TrendKeywordDeltaType = "new" | "up" | "down" | "same";
+
 export interface TrendKeywordItem {
   keyword: string;
   rank: number;
+  count?: number;
+  deltaType?: TrendKeywordDeltaType;
+  deltaValue?: number;
+  isMyInterest?: boolean;
 }
 
 export interface HomeTrendData {
