@@ -166,6 +166,28 @@ const MOCK_SEARCH_RESULTS: SearchResultItem[] = [
     tags: ["React", "Zustand", "Frontend", "State"],
     url: "/home/sr-015",
   },
+  {
+    id: "sr-016",
+    title: "Why is my JavaScript async function not returning the expected value?",
+    sourceName: "stack overflow",
+    publishedAt: "2026-03-30",
+    thumbnailUrl: null,
+    summary:
+      "A deep dive into how async/await works under the hood and why returning a value from an async function always wraps it in a Promise. Top-voted answers explain the event loop and common pitfalls.",
+    tags: ["JavaScript", "Async", "Frontend"],
+    url: "/home/sr-016",
+  },
+  {
+    id: "sr-017",
+    title: "The Pragmatic Engineer's Guide to System Design in 2026",
+    sourceName: "medium",
+    publishedAt: "2026-03-28",
+    thumbnailUrl: null,
+    summary:
+      "A practical walkthrough of system design principles covering scalability, availability, and consistency trade-offs. Includes real-world examples from distributed systems at scale.",
+    tags: ["SystemDesign", "Backend", "Architecture"],
+    url: "/home/sr-017",
+  },
 ];
 
 export function searchMockResults(query: string): SearchResultItem[] {
