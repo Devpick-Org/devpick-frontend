@@ -105,35 +105,34 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
         <X className="h-5 w-5" />
       </button>
 
-      {/* max-w-5xl 중앙 정렬 콘텐츠 래퍼 — 좌우 여백 확보 */}
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden">
-        {/* 검색 헤더 — flex 정렬로 아이콘·placeholder 수평 맞춤 */}
-        <div className="shrink-0 px-6 pb-0 pt-10 md:px-8 md:pt-14">
-          <div className="border-b-2 border-foreground pb-3 pr-10">
-            <div className="flex items-center gap-3">
-              <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="관심 주제나 기술을 검색해 보세요..."
-                className="flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground md:text-lg"
-              />
-            </div>
+      {/* 검색 헤더 — max-w-5xl 중앙 정렬 */}
+      <div className="mx-auto w-full max-w-5xl shrink-0 px-6 pb-0 pt-10 md:px-8 md:pt-14">
+        <div className="border-b-2 border-foreground pb-3 pr-10">
+          <div className="flex items-center gap-3">
+            <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="관심 주제나 기술을 검색해 보세요..."
+              className="flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground md:text-lg"
+            />
           </div>
         </div>
+      </div>
 
-        {/* 기간 탭 */}
-        <HomeRangeTabs
-          range={range}
-          onChange={handleRangeChange}
-          dateLabel={data?.dateLabel ?? ""}
-          className="px-6 md:px-8"
-        />
+      {/* 기간 탭 — max-w-5xl 중앙 정렬 */}
+      <HomeRangeTabs
+        range={range}
+        onChange={handleRangeChange}
+        dateLabel={data?.dateLabel ?? ""}
+        className="mx-auto w-full max-w-5xl px-6 md:px-8"
+      />
 
-        {/* 스크롤 가능한 트렌드 콘텐츠 — 스크롤바 숨김 */}
-        <div className="flex-1 overflow-x-hidden overflow-y-auto px-6 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:px-8 md:py-6">
+      {/* 스크롤 영역 — 전체 너비로 확장해 여백 포함 스크롤 가능 */}
+      <div className="flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mx-auto max-w-5xl px-6 py-2 md:px-8 md:py-6">
           <div className="flex flex-col gap-10">
             <HomeTopPostsSection
               posts={data?.topPosts ?? []}
