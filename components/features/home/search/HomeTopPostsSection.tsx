@@ -91,7 +91,7 @@ export function HomeTopPostsSection({
 }: HomeTopPostsSectionProps) {
   return (
     <section>
-      <h2 className="mb-3 text-sm font-semibold text-foreground">
+      <h2 className="mb-3 text-md font-semibold text-foreground">
         {rangeLabel} 조회수 Top 5
       </h2>
       {/* 스크롤 컨테이너와 flex 행 분리 — 동일 요소에 flex+overflow-x-auto를 쓰면

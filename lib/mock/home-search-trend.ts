@@ -1,4 +1,9 @@
-import type { TrendRange, TrendTopPost, TrendKeywordItem, HomeTrendData } from "@/types/search";
+import type {
+  TrendRange,
+  TrendTopPost,
+  TrendKeywordItem,
+  HomeTrendData,
+} from "@/types/search";
 export type { TrendRange, TrendTopPost, TrendKeywordItem, HomeTrendData };
 
 const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
@@ -65,14 +70,26 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
       "오늘은 React 서버 컴포넌트와 TypeScript 5.4 관련 글이 조회수 1위를 다투고 있습니다. AWS 서버리스 구축 가이드와 Tailwind CSS v4 마이그레이션 글도 빠르게 조회수가 오르고 있으며, PostgreSQL 인덱스 최적화 글이 백엔드 개발자들 사이에서 주목받고 있습니다.",
     collectionSummary: "",
     trendingKeywords: [
-      { rank: 1, keyword: "React", count: 124, deltaType: "up", deltaValue: 3, isMyInterest: true },
-      { rank: 2, keyword: "TypeScript", count: 98, deltaType: "new", isMyInterest: true },
+      { rank: 1, keyword: "React", count: 124, deltaType: "up", deltaValue: 3 },
+      { rank: 2, keyword: "TypeScript", count: 98, deltaType: "new" },
       { rank: 3, keyword: "AWS", count: 84, deltaType: "down", deltaValue: 2 },
       { rank: 4, keyword: "Next.js", count: 79, deltaType: "same" },
-      { rank: 5, keyword: "Tailwind", count: 63, deltaType: "up", deltaValue: 1 },
+      {
+        rank: 5,
+        keyword: "Tailwind",
+        count: 63,
+        deltaType: "up",
+        deltaValue: 1,
+      },
       { rank: 6, keyword: "PostgreSQL", count: 58, deltaType: "new" },
       { rank: 7, keyword: "Python", count: 52, deltaType: "up", deltaValue: 5 },
-      { rank: 8, keyword: "Docker", count: 47, deltaType: "down", deltaValue: 1 },
+      {
+        rank: 8,
+        keyword: "Docker",
+        count: 47,
+        deltaType: "down",
+        deltaValue: 1,
+      },
       { rank: 9, keyword: "Kotlin", count: 38, deltaType: "same" },
       { rank: 10, keyword: "Redis", count: 31, deltaType: "up", deltaValue: 2 },
     ],
@@ -144,19 +161,61 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
     trendingKeywords: [
       { rank: 1, keyword: "React", count: 841, deltaType: "up", deltaValue: 2 },
       { rank: 2, keyword: "TypeScript", count: 762, deltaType: "same" },
-      { rank: 3, keyword: "Next.js", count: 695, deltaType: "up", deltaValue: 1 },
+      {
+        rank: 3,
+        keyword: "Next.js",
+        count: 695,
+        deltaType: "up",
+        deltaValue: 1,
+      },
       { rank: 4, keyword: "AI", count: 643, deltaType: "up", deltaValue: 4 },
-      { rank: 5, keyword: "Docker", count: 521, deltaType: "down", deltaValue: 1 },
+      {
+        rank: 5,
+        keyword: "Docker",
+        count: 521,
+        deltaType: "down",
+        deltaValue: 1,
+      },
       { rank: 6, keyword: "Kubernetes", count: 482, deltaType: "new" },
-      { rank: 7, keyword: "Python", count: 438, deltaType: "up", deltaValue: 3 },
-      { rank: 8, keyword: "Spring", count: 401, deltaType: "down", deltaValue: 2 },
+      {
+        rank: 7,
+        keyword: "Python",
+        count: 438,
+        deltaType: "up",
+        deltaValue: 3,
+      },
+      {
+        rank: 8,
+        keyword: "Spring",
+        count: 401,
+        deltaType: "down",
+        deltaValue: 2,
+      },
       { rank: 9, keyword: "AWS", count: 378, deltaType: "up", deltaValue: 1 },
       { rank: 10, keyword: "LLM", count: 325, deltaType: "new" },
       { rank: 11, keyword: "Kotlin", count: 287, deltaType: "same" },
-      { rank: 12, keyword: "Monorepo", count: 241, deltaType: "up", deltaValue: 2 },
-      { rank: 13, keyword: "PostgreSQL", count: 198, deltaType: "down", deltaValue: 3 },
+      {
+        rank: 12,
+        keyword: "Monorepo",
+        count: 241,
+        deltaType: "up",
+        deltaValue: 2,
+      },
+      {
+        rank: 13,
+        keyword: "PostgreSQL",
+        count: 198,
+        deltaType: "down",
+        deltaValue: 3,
+      },
       { rank: 14, keyword: "Redis", count: 154, deltaType: "same" },
-      { rank: 15, keyword: "GraphQL", count: 121, deltaType: "down", deltaValue: 1 },
+      {
+        rank: 15,
+        keyword: "GraphQL",
+        count: 121,
+        deltaType: "down",
+        deltaValue: 1,
+      },
     ],
   },
 
@@ -226,24 +285,96 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
     trendingKeywords: [
       { rank: 1, keyword: "AI", count: 5241, deltaType: "up", deltaValue: 2 },
       { rank: 2, keyword: "React", count: 4827, deltaType: "same" },
-      { rank: 3, keyword: "Next.js", count: 4312, deltaType: "up", deltaValue: 1 },
-      { rank: 4, keyword: "TypeScript", count: 3987, deltaType: "up", deltaValue: 1 },
-      { rank: 5, keyword: "Docker", count: 3621, deltaType: "down", deltaValue: 1 },
+      {
+        rank: 3,
+        keyword: "Next.js",
+        count: 4312,
+        deltaType: "up",
+        deltaValue: 1,
+      },
+      {
+        rank: 4,
+        keyword: "TypeScript",
+        count: 3987,
+        deltaType: "up",
+        deltaValue: 1,
+      },
+      {
+        rank: 5,
+        keyword: "Docker",
+        count: 3621,
+        deltaType: "down",
+        deltaValue: 1,
+      },
       { rank: 6, keyword: "AWS", count: 3284, deltaType: "up", deltaValue: 2 },
-      { rank: 7, keyword: "Python", count: 2951, deltaType: "up", deltaValue: 1 },
+      {
+        rank: 7,
+        keyword: "Python",
+        count: 2951,
+        deltaType: "up",
+        deltaValue: 1,
+      },
       { rank: 8, keyword: "Kubernetes", count: 2614, deltaType: "new" },
-      { rank: 9, keyword: "Spring", count: 2341, deltaType: "down", deltaValue: 3 },
+      {
+        rank: 9,
+        keyword: "Spring",
+        count: 2341,
+        deltaType: "down",
+        deltaValue: 3,
+      },
       { rank: 10, keyword: "LLM", count: 2087, deltaType: "up", deltaValue: 5 },
       { rank: 11, keyword: "MLOps", count: 1854, deltaType: "new" },
-      { rank: 12, keyword: "Rust", count: 1621, deltaType: "up", deltaValue: 3 },
-      { rank: 13, keyword: "GraphQL", count: 1387, deltaType: "down", deltaValue: 2 },
+      {
+        rank: 12,
+        keyword: "Rust",
+        count: 1621,
+        deltaType: "up",
+        deltaValue: 3,
+      },
+      {
+        rank: 13,
+        keyword: "GraphQL",
+        count: 1387,
+        deltaType: "down",
+        deltaValue: 2,
+      },
       { rank: 14, keyword: "Redis", count: 1154, deltaType: "same" },
-      { rank: 15, keyword: "PostgreSQL", count: 987, deltaType: "down", deltaValue: 1 },
-      { rank: 16, keyword: "Kafka", count: 824, deltaType: "up", deltaValue: 2 },
-      { rank: 17, keyword: "MSA", count: 741, deltaType: "down", deltaValue: 4 },
+      {
+        rank: 15,
+        keyword: "PostgreSQL",
+        count: 987,
+        deltaType: "down",
+        deltaValue: 1,
+      },
+      {
+        rank: 16,
+        keyword: "Kafka",
+        count: 824,
+        deltaType: "up",
+        deltaValue: 2,
+      },
+      {
+        rank: 17,
+        keyword: "MSA",
+        count: 741,
+        deltaType: "down",
+        deltaValue: 4,
+      },
       { rank: 18, keyword: "Kotlin", count: 654, deltaType: "same" },
-      { rank: 19, keyword: "Flutter", count: 521, deltaType: "down", deltaValue: 2 },
-      { rank: 20, keyword: "Svelte", count: 387, deltaType: "up", deltaValue: 1 },
+      {
+        rank: 19,
+        keyword: "Flutter",
+        count: 521,
+        deltaType: "down",
+        deltaValue: 2,
+      },
+      {
+        rank: 20,
+        keyword: "Svelte",
+        count: 387,
+        deltaType: "up",
+        deltaValue: 1,
+      },
     ],
   },
 };
@@ -260,7 +391,9 @@ function getDayDateLabel(): string {
 }
 
 /** 탭 전환 시 로딩 상태가 보이도록 딜레이 포함 */
-export async function fetchHomeTrend(range: TrendRange): Promise<HomeTrendData> {
+export async function fetchHomeTrend(
+  range: TrendRange,
+): Promise<HomeTrendData> {
   await new Promise((resolve) => setTimeout(resolve, 500));
   if (range === "day") {
     return { ...MOCK_HOME_TREND.day, dateLabel: getDayDateLabel() };
