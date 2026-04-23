@@ -108,7 +108,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
         />
 
         {/* 스크롤 가능한 트렌드 콘텐츠 — 스크롤바 숨김 */}
-        <div className="flex-1 overflow-y-auto px-6 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:px-8 md:py-6">
+        <div className="flex-1 overflow-x-hidden overflow-y-auto px-6 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:px-8 md:py-6">
           <div className="flex flex-col gap-10">
             <HomeTopPostsSection
               posts={data?.topPosts ?? []}
