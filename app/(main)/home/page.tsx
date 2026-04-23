@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import {
@@ -8,6 +8,7 @@ import {
   FeedCardSkeleton,
 } from "@/components/features/home/FeedCard";
 import { FeedSearch } from "@/components/features/home/FeedSearch";
+import { HomeSearchOverlay } from "@/components/features/home/search/HomeSearchOverlay";
 import { useAuthStore } from "@/store/auth.store";
 
 const PAGE_SIZE = 6;
@@ -33,6 +34,9 @@ export default function HomePage() {
   const isAuthenticated = useAuthStore((s) => !!s.accessToken);
   const nickname = user?.nickname ?? "김데브";
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const handleOpenSearch = useCallback(() => setIsSearchOpen(true), []);
+  const handleCloseSearch = useCallback(() => setIsSearchOpen(false), []);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -123,7 +127,7 @@ export default function HomePage() {
 
         {/* Search */}
         <div className="mb-6">
-          <FeedSearch onSearch={setSearchQuery} />
+          <FeedSearch onSearch={setSearchQuery} onOpen={handleOpenSearch} />
         </div>
 
         {/* Feed list */}
@@ -167,6 +171,8 @@ export default function HomePage() {
           <div ref={loadMoreRef} className="h-4" />
         </div>
       </div>
+
+      <HomeSearchOverlay isOpen={isSearchOpen} onClose={handleCloseSearch} />
     </div>
   );
 }
