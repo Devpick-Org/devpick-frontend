@@ -9,7 +9,6 @@ import { searchMockResults } from "@/lib/mock/home-search-results";
 import { useAuthStore } from "@/store/auth.store";
 import { HomeRangeTabs } from "./HomeRangeTabs";
 import { HomeTopPostsSection } from "./HomeTopPostsSection";
-import { HomeTopPostsSummarySection } from "./HomeTopPostsSummarySection";
 import { HomeCollectionSummarySection } from "./HomeCollectionSummarySection";
 import { HomeTrendingKeywordsSection } from "./HomeTrendingKeywordsSection";
 import { HomeSearchResultsSection } from "./HomeSearchResultsSection";
@@ -136,7 +135,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
 
       {/* 검색 헤더 — max-w-5xl 중앙 정렬 */}
       <div className="mx-auto w-full max-w-5xl shrink-0 px-6 pb-0 pt-10 md:px-8 md:pt-14">
-        <div className="border-b-2 border-foreground pb-3 pr-10">
+        <div className="border-b-2 border-foreground pb-3">
           <div className="flex items-center gap-3">
             <Search className="h-5 w-5 shrink-0 text-muted-foreground" />
             <input
@@ -163,13 +162,15 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
         </div>
       </div>
 
-      {/* 기간 탭 — max-w-5xl 중앙 정렬 */}
-      <HomeRangeTabs
-        range={range}
-        onChange={handleRangeChange}
-        dateLabel={data?.dateLabel ?? ""}
-        className="mx-auto w-full max-w-5xl px-6 md:px-8"
-      />
+      {/* 기간 탭 — 검색 중에는 숨김 */}
+      {!isSearching && (
+        <HomeRangeTabs
+          range={range}
+          onChange={handleRangeChange}
+          dateLabel={data?.dateLabel ?? ""}
+          className="mx-auto w-full max-w-5xl px-6 md:px-8"
+        />
+      )}
 
       {/* 스크롤 영역 — 전체 너비로 확장해 여백 포함 스크롤 가능 */}
       <div className="flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -188,12 +189,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
                 posts={data?.topPosts ?? []}
                 isLoading={isLoading}
                 rangeLabel={rangeLabel}
-              />
-
-              <HomeTopPostsSummarySection
-                summary={data?.topPostsSummary ?? ""}
-                isLoading={isLoading}
-                rangeLabel={rangeLabel}
+                summary={data?.topPostsSummary}
               />
 
               {showCollectionSummary && (
