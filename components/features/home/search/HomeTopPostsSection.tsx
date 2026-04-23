@@ -82,18 +82,34 @@ interface HomeTopPostsSectionProps {
   posts: TrendTopPost[];
   isLoading: boolean;
   rangeLabel: string;
+  summary?: string;
 }
 
 export function HomeTopPostsSection({
   posts,
   isLoading,
   rangeLabel,
+  summary,
 }: HomeTopPostsSectionProps) {
   return (
     <section>
       <h2 className="mb-3 text-md font-semibold text-foreground">
         {rangeLabel} 조회수 Top 5
       </h2>
+      {/* 동향 요약 */}
+      <div className="mb-3">
+        {isLoading ? (
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-3.5 w-full rounded" />
+            <Skeleton className="h-3.5 w-11/12 rounded" />
+            <Skeleton className="h-3.5 w-4/5 rounded" />
+          </div>
+        ) : (
+          summary && (
+            <p className="text-sm leading-relaxed text-foreground">{summary}</p>
+          )
+        )}
+      </div>
       {/* 스크롤 컨테이너와 flex 행 분리 — 동일 요소에 flex+overflow-x-auto를 쓰면
           브라우저가 flex 내재 너비(max-content)로 컨테이너 크기를 계산해 스크롤이 발동하지 않음 */}
       <div className="w-full overflow-x-auto pb-1 [scrollbar-gutter:stable] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/30 [&::-webkit-scrollbar-track]:bg-transparent">
