@@ -292,7 +292,7 @@ git checkout -b feature/DP-138-init-frontend
 | 브랜치                       | 용도                        |
 | ---------------------------- | --------------------------- |
 | `main`                       | 배포용. 직접 push 절대 금지 |
-| `developV2`                    | 개발 통합. PR 머지 대상     |
+| `developV2`                  | 개발 통합. PR 머지 대상     |
 | `feature/DP-{번호}-{기능명}` | 기능 개발                   |
 | `hotfix/DP-{번호}-{설명}`    | 긴급 버그 수정              |
 
@@ -320,11 +320,11 @@ DP-{티켓번호}: {작업 내용}
 
 ### Base URL
 
-| 환경 | Base URL |
-| ---- | -------- |
-| local (`npm run dev:local` 또는 `.env.local`) | `http://localhost:8080/v1` |
-| 기본 (환경변수 미설정) | `https://3-39-96-126.sslip.io/v1` |
-| 운영 도메인 (예정) | `https://api.devpick.kr/v1` |
+| 환경                                          | Base URL                          |
+| --------------------------------------------- | --------------------------------- |
+| local (`npm run dev:local` 또는 `.env.local`) | `http://localhost:8080/v1`        |
+| 기본 (환경변수 미설정)                        | `https://3-39-96-126.sslip.io/v1` |
+| 운영 도메인 (예정)                            | `https://api.devpick.kr/v1`       |
 
 ### 인증 방식
 
@@ -603,48 +603,83 @@ DP-{티켓번호}: {작업 내용}
 
 ### Epic D — 질문/커뮤니티
 
-| Method | Endpoint                                                  | 설명                           | 인증 | 관련 페이지        | 응답코드 |
-| ------ | --------------------------------------------------------- | ------------------------------ | ---- | ------------------ | -------- |
-| POST   | `/posts`                                                  | 질문 작성 + 커뮤니티 동시 게시 | O    | `/community/write` | 201      |
-| GET    | `/posts`                                                  | 게시글 목록                    | O    | `/community`       | 200      |
-| GET    | `/posts/{postId}`                                         | 게시글 상세                    | O    | `/community/[id]`  | 200      |
-| PUT    | `/posts/{postId}`                                         | 게시글 수정                    | O    | `/community/[id]`  | 200      |
-| DELETE | `/posts/{postId}`                                         | 게시글 삭제                    | O    | `/community/[id]`  | 204      |
-| POST   | `/posts/refine`                                           | AI 질문 개선                   | O    | `/community/write` | 200      |
-| GET    | `/posts/{postId}/similar`                                 | 유사 질문 조회                 | O    | `/community/[id]`  | 200      |
-| POST   | `/posts/{postId}/ai-answer`                               | AI 답변 생성                   | O    | `/community/[id]`  | 200      |
-| GET    | `/posts/{postId}/answers`                                 | 답변 및 댓글 통합 조회         | O    | `/community/[id]`  | 200      |
-| POST   | `/posts/{postId}/answers`                                 | 답변 작성                      | O    | `/community/[id]`  | 201      |
-| PUT    | `/posts/{postId}/answers/{answerId}`                      | 답변 수정                      | O    | `/community/[id]`  | 200      |
-| DELETE | `/posts/{postId}/answers/{answerId}`                      | 답변 삭제                      | O    | `/community/[id]`  | 204      |
-| POST   | `/posts/{postId}/answers/{answerId}/adopt`                | 답변 채택                      | O    | `/community/[id]`  | 200      |
-| POST   | `/posts/{postId}/answers/{answerId}/comments`             | 댓글 작성                      | O    | `/community/[id]`  | 201      |
-| DELETE | `/posts/{postId}/answers/{answerId}/comments/{commentId}` | 댓글 삭제                      | O    | `/community/[id]`  | 204      |
+| Method | Endpoint                                                  | 설명                           | 인증 | 관련 페이지                     | 응답코드 |
+| ------ | --------------------------------------------------------- | ------------------------------ | ---- | ------------------------------- | -------- |
+| POST   | `/posts`                                                  | 질문 작성 + 커뮤니티 동시 게시 | O    | `/community/write`              | 201      |
+| GET    | `/posts`                                                  | 게시글 목록                    | O    | `/community`                    | 200      |
+| GET    | `/posts/{postId}`                                         | 게시글 상세                    | O    | `/community/[id]`               | 200      |
+| PUT    | `/posts/{postId}`                                         | 게시글 수정                    | O    | `/community/[id]`               | 200      |
+| DELETE | `/posts/{postId}`                                         | 게시글 삭제                    | O    | `/community/[id]`               | 204      |
+| POST   | `/posts/refine`                                           | AI 질문 개선                   | O    | `/community/write`              | 200      |
+| GET    | `/posts/{postId}/similar`                                 | 유사 질문 조회                 | O    | `/community/[id]`               | 200      |
+| POST   | `/posts/{postId}/ai-answer`                               | AI 답변 생성                   | O    | `/community/[id]`               | 200      |
+| GET    | `/posts/{postId}/answers`                                 | 답변 및 댓글 통합 조회         | O    | `/community/[id]`               | 200      |
+| POST   | `/posts/{postId}/answers`                                 | 답변 작성                      | O    | `/community/[id]`               | 201      |
+| PUT    | `/posts/{postId}/answers/{answerId}`                      | 답변 수정                      | O    | `/community/[id]`               | 200      |
+| DELETE | `/posts/{postId}/answers/{answerId}`                      | 답변 삭제                      | O    | `/community/[id]`               | 204      |
+| POST   | `/posts/{postId}/answers/{answerId}/adopt`                | 답변 채택                      | O    | `/community/[id]`               | 200      |
+| POST   | `/posts/{postId}/answers/{answerId}/comments`             | 댓글 작성                      | O    | `/community/[id]`               | 201      |
+| DELETE | `/posts/{postId}/answers/{answerId}/comments/{commentId}` | 댓글 삭제                      | O    | `/community/[id]`               | 204      |
+| GET    | `/users/{userId}/profile`                                 | 사용자 프로필 조회             | O    | `/community`, `/community/[id]` | 200      |
 
 ### Epic E — 학습 히스토리
 
-| Method | Endpoint            | 설명                    | 인증 | 관련 페이지 | 응답코드 |
-| ------ | ------------------- | ----------------------- | ---- | ----------- | -------- |
-| GET    | `/history`          | 학습/활동 히스토리 조회      | O    | `/profile`  | 200      |
-| GET    | `/history/badges` | 전체 배지 목록 조회 | O    | `/profile`  | 200      |
-| GET    | `/history/points` | 포인트 요약 조회 | O    | `/profile`  | 200      |
+| Method | Endpoint          | 설명                    | 인증 | 관련 페이지 | 응답코드 |
+| ------ | ----------------- | ----------------------- | ---- | ----------- | -------- |
+| GET    | `/history`        | 학습/활동 히스토리 조회 | O    | `/profile`  | 200      |
+| GET    | `/history/badges` | 전체 배지 목록 조회     | O    | `/profile`  | 200      |
+| GET    | `/history/points` | 포인트 요약 조회        | O    | `/profile`  | 200      |
 
 ### Epic F — 주간 리포트
 
-| Method | Endpoint                     | 설명           | 인증 | 관련 페이지 | 응답코드 |
-| ------ | ---------------------------- | -------------- | ---- | ----------- | -------- |
-| GET    | `/reports/weekly/list`            | 리포트 목록 조회 | O    | `/report`   | 200      |
-| GET    | `/reports/weekly`            | 이번 주 리포트 | O    | `/report`   | 200      |
-| GET    | `/reports/weekly/{reportId}` | 특정 주 리포트 | O    | `/report`   | 200      |
-| POST   | `/reports/weekly/share`      | 공유 링크 생성 | O    | `/report`   | 201      |
-| GET   | `/reports/weekly/share/{token}`      | 공유 토큰으로 리포트 조회 | x    | `/report`   | 201      |
+| Method | Endpoint                        | 설명                      | 인증 | 관련 페이지 | 응답코드 |
+| ------ | ------------------------------- | ------------------------- | ---- | ----------- | -------- |
+| GET    | `/reports/weekly/list`          | 리포트 목록 조회          | O    | `/report`   | 200      |
+| GET    | `/reports/weekly`               | 이번 주 리포트            | O    | `/report`   | 200      |
+| GET    | `/reports/weekly/{reportId}`    | 특정 주 리포트            | O    | `/report`   | 200      |
+| POST   | `/reports/weekly/share`         | 공유 링크 생성            | O    | `/report`   | 201      |
+| GET    | `/reports/weekly/share/{token}` | 공유 토큰으로 리포트 조회 | x    | `/report`   | 201      |
 
+### Epic G. 구인 구직
 
-### Epic G — 사용자 프로필 모달
+### API 연동 예상 체크리스트 (채용/이력서)
 
-| Method | Endpoint                    | 설명              | 인증 | 관련 페이지            | 응답코드 |
-| ------ | --------------------------- | ----------------- | ---- | ---------------------- | -------- |
-| GET    | `/users/{userId}/profile`   | 사용자 프로필 조회 | O    | `/community`, `/community/[id]` | 200      |
+> 현재 mock 데이터로 UI 완성. API 연동 시 아래 항목을 순서대로 작업.
+
+### 1. 새로 만들어야 할 파일
+
+| 파일                          | 내용                   |
+| ----------------------------- | ---------------------- |
+| `lib/api/endpoints/jobs.ts`   | 채용공고 전체 API 함수 |
+| `lib/api/endpoints/resume.ts` | 이력서 전체 API 함수   |
+
+### 2. useQuery 교체 (조회)
+
+| 파일                                                | 현재                        | 교체 내용                           |
+| --------------------------------------------------- | --------------------------- | ----------------------------------- |
+| `components/features/jobs/main/JobPage.tsx`         | `fetchJobsPaginated` (mock) | 실제 API 함수로 교체                |
+| `components/features/jobs/detail/JobDetailPage.tsx` | `fetchJobDetailById` (mock) | 실제 API 함수로 교체                |
+| `components/features/resume/ResumePage.tsx`         | `useState(false)`           | 마운트 시 이력서 조회 useQuery 추가 |
+| `components/features/resume/ResumeQATab.tsx`        | `getSavedQAs()` (인메모리)  | 저장된 Q&A 목록 useQuery로 교체     |
+
+### 3. useMutation 교체 (쓰기)
+
+| 파일                                               | 현재                            | 교체 내용            | 낙관적 업데이트 |
+| -------------------------------------------------- | ------------------------------- | -------------------- | --------------- |
+| `components/features/jobs/main/JobCard.tsx`        | `useState(scrapped)`            | 스크랩 추가/취소     | **필요**        |
+| `components/features/jobs/detail/JobQASection.tsx` | `generate()` setTimeout         | AI Q&A 생성          | 불필요          |
+| `components/features/jobs/detail/JobQASection.tsx` | `handleSave()` mock             | Q&A 저장             | 불필요          |
+| `components/features/resume/ResumePage.tsx`        | `handleFileSelect()` setTimeout | 이력서 업로드/파싱   | 불필요          |
+| `components/features/resume/ResumePage.tsx`        | `handleSave()` setState         | 이력서 기본정보 수정 | **필요**        |
+| `components/features/resume/ResumeQATab.tsx`       | `handleDelete()` 인메모리       | Q&A 삭제             | **필요**        |
+
+### 4. 낙관적 업데이트 필요 지점
+
+홈 피드(`updateContentInteractionCache`)와 같은 패턴으로 구현.
+
+- `JobCard` — 스크랩 추가/취소
+- `ResumePage` — 이력서 기본정보 수정
+- `ResumeQATab` — Q&A 삭제
 
 ---
 

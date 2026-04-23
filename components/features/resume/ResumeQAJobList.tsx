@@ -16,7 +16,7 @@ export function ResumeQAJobList({
 }: ResumeQAJobListProps) {
   if (items.length === 0) {
     return (
-      <div className="flex min-h-[12rem] items-center justify-center rounded-xl bg-muted/30 text-sm text-muted-foreground font-medium">
+      <div className="flex min-h-[12rem] items-center justify-center rounded-xl bg-muted/30아 text-sm text-muted-foreground font-medium">
         저장된 Q&A가 없습니다
       </div>
     );
