@@ -7,6 +7,10 @@ export interface TrendTopPost {
   sourceName: string;
   tags: string[];
   viewCount: number;
+  thumbnailUrl: string | null;
+  category: string;
+  /** 전 기간 대비 조회수 증감률 (%). 양수: 증가, 음수: 감소, 0: 변화 없음 */
+  changeRate: number;
 }
 
 export interface TrendKeywordItem {

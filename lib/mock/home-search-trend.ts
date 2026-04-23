@@ -12,6 +12,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "velog",
         tags: ["React", "Next.js"],
         viewCount: 1247,
+        thumbnailUrl: "https://picsum.photos/seed/react-server/400/225",
+        category: "Frontend",
+        changeRate: 18.4,
       },
       {
         rank: 2,
@@ -20,6 +23,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "toss_tech",
         tags: ["TypeScript"],
         viewCount: 982,
+        thumbnailUrl: null,
+        category: "Frontend",
+        changeRate: 7.2,
       },
       {
         rank: 3,
@@ -28,6 +34,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "naver_d2",
         tags: ["AWS", "Serverless"],
         viewCount: 834,
+        thumbnailUrl: "https://picsum.photos/seed/aws-lambda/400/225",
+        category: "DevOps",
+        changeRate: -3.1,
       },
       {
         rank: 4,
@@ -36,6 +45,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "velog",
         tags: ["Tailwind", "CSS"],
         viewCount: 721,
+        thumbnailUrl: null,
+        category: "Frontend",
+        changeRate: 24.6,
       },
       {
         rank: 5,
@@ -44,6 +56,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "kakao_tech",
         tags: ["PostgreSQL", "DB"],
         viewCount: 658,
+        thumbnailUrl: "https://picsum.photos/seed/postgresql/400/225",
+        category: "Backend",
+        changeRate: 0,
       },
     ],
     topPostsSummary:
@@ -73,6 +88,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "naver_d2",
         tags: ["Frontend", "React"],
         viewCount: 8412,
+        thumbnailUrl: "https://picsum.photos/seed/frontend-ecosystem/400/225",
+        category: "Frontend",
+        changeRate: 32.1,
       },
       {
         rank: 2,
@@ -81,6 +99,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "우아한형제들",
         tags: ["Spring", "Kotlin"],
         viewCount: 6238,
+        thumbnailUrl: null,
+        category: "Backend",
+        changeRate: 14.7,
       },
       {
         rank: 3,
@@ -89,6 +110,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "kakao_tech",
         tags: ["Kubernetes", "Docker"],
         viewCount: 5847,
+        thumbnailUrl: "https://picsum.photos/seed/kubernetes-local/400/225",
+        category: "DevOps",
+        changeRate: -5.3,
       },
       {
         rank: 4,
@@ -97,6 +121,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "toss_tech",
         tags: ["AI", "Python", "LLM"],
         viewCount: 4921,
+        thumbnailUrl: "https://picsum.photos/seed/rag-langchain/400/225",
+        category: "AI",
+        changeRate: 61.8,
       },
       {
         rank: 5,
@@ -105,6 +132,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "oliveyoung_tech",
         tags: ["DevOps", "Monorepo"],
         viewCount: 4103,
+        thumbnailUrl: null,
+        category: "DevOps",
+        changeRate: 9.2,
       },
     ],
     topPostsSummary:
@@ -140,6 +170,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "naver_d2",
         tags: ["AI", "DevOps"],
         viewCount: 52341,
+        thumbnailUrl: "https://picsum.photos/seed/ai-coding-assistant/400/225",
+        category: "AI",
+        changeRate: 89.3,
       },
       {
         rank: 2,
@@ -148,6 +181,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "kakao_tech",
         tags: ["Next.js", "React"],
         viewCount: 41827,
+        thumbnailUrl: null,
+        category: "Frontend",
+        changeRate: 27.4,
       },
       {
         rank: 3,
@@ -156,6 +192,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "우아한형제들",
         tags: ["MSA", "Backend"],
         viewCount: 38452,
+        thumbnailUrl: "https://picsum.photos/seed/msa-migration/400/225",
+        category: "Backend",
+        changeRate: -8.6,
       },
       {
         rank: 4,
@@ -164,6 +203,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "velog",
         tags: ["Python", "Async"],
         viewCount: 29873,
+        thumbnailUrl: null,
+        category: "Backend",
+        changeRate: 11.2,
       },
       {
         rank: 5,
@@ -172,6 +214,9 @@ const MOCK_HOME_TREND: Record<TrendRange, HomeTrendData> = {
         sourceName: "toss_tech",
         tags: ["AWS", "Cloud"],
         viewCount: 24561,
+        thumbnailUrl: "https://picsum.photos/seed/cloud-cost-aws/400/225",
+        category: "DevOps",
+        changeRate: 43.7,
       },
     ],
     topPostsSummary:
