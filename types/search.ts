@@ -24,6 +24,17 @@ export interface TrendKeywordItem {
   isMyInterest?: boolean;
 }
 
+export interface SearchResultItem {
+  id: string;
+  title: string;
+  sourceName: string;
+  publishedAt: string;
+  thumbnailUrl: string | null;
+  summary: string;
+  tags: string[];
+  url: string;
+}
+
 export interface HomeTrendData {
   dateLabel: string;
   topPosts: TrendTopPost[];

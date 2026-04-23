@@ -5,12 +5,14 @@ import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchHomeTrend, type TrendRange } from "@/lib/mock/home-search-trend";
+import { searchMockResults } from "@/lib/mock/home-search-results";
 import { useAuthStore } from "@/store/auth.store";
 import { HomeRangeTabs } from "./HomeRangeTabs";
 import { HomeTopPostsSection } from "./HomeTopPostsSection";
 import { HomeTopPostsSummarySection } from "./HomeTopPostsSummarySection";
 import { HomeCollectionSummarySection } from "./HomeCollectionSummarySection";
 import { HomeTrendingKeywordsSection } from "./HomeTrendingKeywordsSection";
+import { HomeSearchResultsSection } from "./HomeSearchResultsSection";
 
 const normalizeTag = (value: string) =>
   value.toLowerCase().replace(/\s+/g, "").replace(/[.#]/g, "");
@@ -23,6 +25,8 @@ interface HomeSearchOverlayProps {
 export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
   const [range, setRange] = useState<TrendRange>("week");
   const [inputValue, setInputValue] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -37,6 +41,8 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
       clearTimeout(t);
       document.body.style.overflow = "";
       setInputValue("");
+      setDebouncedQuery("");
+      setActiveItemId(null);
     };
   }, [isOpen]);
 
@@ -63,7 +69,30 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
 
   const handleKeywordClick = useCallback((keyword: string) => {
     setInputValue(keyword);
+    setActiveItemId(null);
     inputRef.current?.focus();
+  }, []);
+
+  // debounce: 2글자 미만이면 즉시 초기화, 이상이면 300ms 후 반영
+  // setActiveItemId(null)도 함께 실행해 검색어 변경 시 열린 아코디언 초기화
+  useEffect(() => {
+    const delay = inputValue.length >= 2 ? 300 : 0;
+    const timer = setTimeout(() => {
+      setDebouncedQuery(inputValue.length >= 2 ? inputValue : "");
+      setActiveItemId(null);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
+  const searchResults = useMemo(
+    () => (debouncedQuery ? searchMockResults(debouncedQuery) : []),
+    [debouncedQuery],
+  );
+
+  const isSearching = debouncedQuery.length > 0;
+
+  const handleToggleItem = useCallback((id: string) => {
+    setActiveItemId((prev) => (prev === id ? null : id));
   }, []);
 
   const keywordsWithInterest = useMemo(() => {
@@ -118,6 +147,18 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
               placeholder="관심 주제나 기술을 검색해 보세요..."
               className="flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground md:text-lg"
             />
+            {inputValue && (
+              <button
+                onClick={() => {
+                  setInputValue("");
+                  inputRef.current?.focus();
+                }}
+                className="shrink-0 cursor-pointer text-muted-foreground hover:text-foreground"
+                aria-label="검색어 지우기"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -133,34 +174,44 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
       {/* 스크롤 영역 — 전체 너비로 확장해 여백 포함 스크롤 가능 */}
       <div className="flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="mx-auto max-w-5xl px-6 py-2 md:px-8 md:py-6">
-          <div className="flex flex-col gap-10">
-            <HomeTopPostsSection
-              posts={data?.topPosts ?? []}
-              isLoading={isLoading}
-              rangeLabel={rangeLabel}
+          {isSearching ? (
+            <HomeSearchResultsSection
+              results={searchResults}
+              activeItemId={activeItemId}
+              onToggle={handleToggleItem}
+              isLoading={false}
+              isError={false}
             />
-
-            <HomeTopPostsSummarySection
-              summary={data?.topPostsSummary ?? ""}
-              isLoading={isLoading}
-              rangeLabel={rangeLabel}
-            />
-
-            {showCollectionSummary && (
-              <HomeCollectionSummarySection
-                summary={data?.collectionSummary ?? ""}
+          ) : (
+            <div className="flex flex-col gap-10">
+              <HomeTopPostsSection
+                posts={data?.topPosts ?? []}
                 isLoading={isLoading}
                 rangeLabel={rangeLabel}
               />
-            )}
 
-            <HomeTrendingKeywordsSection
-              keywords={keywordsWithInterest}
-              isLoading={isLoading}
-              rangeLabel={rangeLabel}
-              onKeywordClick={handleKeywordClick}
-            />
-          </div>
+              <HomeTopPostsSummarySection
+                summary={data?.topPostsSummary ?? ""}
+                isLoading={isLoading}
+                rangeLabel={rangeLabel}
+              />
+
+              {showCollectionSummary && (
+                <HomeCollectionSummarySection
+                  summary={data?.collectionSummary ?? ""}
+                  isLoading={isLoading}
+                  rangeLabel={rangeLabel}
+                />
+              )}
+
+              <HomeTrendingKeywordsSection
+                keywords={keywordsWithInterest}
+                isLoading={isLoading}
+                rangeLabel={rangeLabel}
+                onKeywordClick={handleKeywordClick}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>,
