@@ -13,8 +13,12 @@ type LogoConfig = {
 
 const SOURCE_LOGO: Record<string, LogoConfig> = {
   velog: { src: "/icons/sources/velog.svg" },
-  naver_d2: { src: "/icons/sources/naver.svg", bg: "#03C75A", innerPadding: 2 },
-  kakao_tech: { src: "/icons/sources/kakao.svg", bg: "#FEE500", innerPadding: 2 },
+  naver_d2: { src: "/icons/sources/naver.svg", bg: "#03C75A", innerPadding: 5 },
+  kakao_tech: {
+    src: "/icons/sources/kakao.svg",
+    bg: "#FEE500",
+    innerPadding: 2,
+  },
   toss_tech: { src: "/icons/sources/toss.png" },
   oliveyoung_tech: { src: "/icons/sources/oliveyoung.svg" },
 };
@@ -61,7 +65,11 @@ export function SourceLogo({ sourceName, size = 17 }: SourceLogoProps) {
   return (
     <span
       className="flex shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-bold text-muted-foreground"
-      style={{ width: size, height: size, minWidth: size }}
+      style={{
+        width: size,
+        height: size,
+        minWidth: size,
+      }}
     >
       {sourceName.charAt(0).toUpperCase()}
     </span>
