@@ -272,51 +272,51 @@ const SOURCES = [
   {
     name: "Stack Overflow",
     sub: "",
-    bg: "bg-[#F48024]",
-    textColor: "text-white",
-    initial: "SO",
+    containerBg: "bg-white",
+    logo: "/icons/sources/stackoverflow.svg",
+    logoPadding: "p-2",
   },
   {
     name: "Velog",
     sub: "",
-    bg: "bg-[#20C997]",
-    textColor: "text-white",
-    initial: "V",
+    containerBg: "bg-white",
+    logo: "/icons/sources/velog.svg",
+    logoPadding: "",
   },
   {
     name: "NAVER D2",
     sub: "기술 블로그",
-    bg: "bg-[#03C75A]",
-    textColor: "text-white",
-    initial: "N",
+    containerBg: "bg-[#03C75A]",
+    logo: "/icons/sources/naver.svg",
+    logoPadding: "p-3.5",
   },
   {
     name: "Kakao Tech",
     sub: "",
-    bg: "bg-[#FEE500]",
-    textColor: "text-neutral-900",
-    initial: "K",
+    containerBg: "bg-[#FEE500]",
+    logo: "/icons/sources/kakao.svg",
+    logoPadding: "p-2",
   },
   {
     name: "Toss Tech",
     sub: "",
-    bg: "bg-[#0064FF]",
-    textColor: "text-white",
-    initial: "T",
+    containerBg: "bg-white",
+    logo: "/icons/sources/toss.png",
+    logoPadding: "p-0.5",
   },
   {
     name: "OliveYoung Tech",
     sub: "",
-    bg: "bg-[#3A7D44]",
-    textColor: "text-white",
-    initial: "O",
+    containerBg: "bg-white",
+    logo: "/icons/sources/oliveyoung.svg",
+    logoPadding: "p-1.5",
   },
   {
     name: "Medium",
     sub: "당근 · 무신사 · 마이리얼트립 · 넷플릭스",
-    bg: "bg-black",
-    textColor: "text-white",
-    initial: "M",
+    containerBg: "bg-white",
+    logo: "/icons/sources/medium.svg",
+    logoPadding: "",
   },
 ];
 
@@ -409,11 +409,14 @@ function FeaturesSection() {
                 className="flex flex-col items-center gap-1.5"
               >
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-lg shadow-sm ${source.bg}`}
+                  className={`flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg shadow-sm ${source.containerBg} ${source.logoPadding}`}
                 >
-                  <span className={`text-sm font-bold ${source.textColor}`}>
-                    {source.initial}
-                  </span>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={source.logo}
+                    alt={source.name}
+                    className="h-full w-full object-contain"
+                  />
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-semibold text-foreground">
