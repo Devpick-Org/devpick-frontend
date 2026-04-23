@@ -1,15 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchHomeTrend, type TrendRange } from "@/lib/mock/home-search-trend";
+import { useAuthStore } from "@/store/auth.store";
 import { HomeRangeTabs } from "./HomeRangeTabs";
 import { HomeTopPostsSection } from "./HomeTopPostsSection";
 import { HomeTopPostsSummarySection } from "./HomeTopPostsSummarySection";
 import { HomeCollectionSummarySection } from "./HomeCollectionSummarySection";
 import { HomeTrendingKeywordsSection } from "./HomeTrendingKeywordsSection";
+
+const normalizeTag = (value: string) =>
+  value.toLowerCase().replace(/\s+/g, "").replace(/[.#]/g, "");
 
 interface HomeSearchOverlayProps {
   isOpen: boolean;
@@ -18,7 +22,10 @@ interface HomeSearchOverlayProps {
 
 export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
   const [range, setRange] = useState<TrendRange>("week");
+  const [inputValue, setInputValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // 배경 스크롤 잠금 + 검색 input 포커스
   // range 초기화는 별도 effect 불필요 — isOpen=false 시 컴포넌트가 언마운트되어 useState 초기값("week")으로 자동 리셋
@@ -29,6 +36,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
     return () => {
       clearTimeout(t);
       document.body.style.overflow = "";
+      setInputValue("");
     };
   }, [isOpen]);
 
@@ -52,6 +60,22 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
   const handleRangeChange = useCallback((next: TrendRange) => {
     setRange(next);
   }, []);
+
+  const handleKeywordClick = useCallback((keyword: string) => {
+    setInputValue(keyword);
+    inputRef.current?.focus();
+  }, []);
+
+  const keywordsWithInterest = useMemo(() => {
+    const keywords = data?.trendingKeywords ?? [];
+    const userTags = user?.tags;
+    if (!isAuthenticated || !userTags?.length) return keywords;
+    const userTagsNormalized = new Set(userTags.map(normalizeTag));
+    return keywords.map((item) => ({
+      ...item,
+      isMyInterest: userTagsNormalized.has(normalizeTag(item.keyword)),
+    }));
+  }, [data?.trendingKeywords, isAuthenticated, user]);
 
   const RANGE_LABEL: Record<TrendRange, string> = {
     day: "일간",
@@ -91,9 +115,10 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
               <input
                 ref={inputRef}
                 type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
                 placeholder="관심 주제나 기술을 검색해 보세요..."
-                className="flex-1 bg-transparent text-base text-muted-foreground outline-none placeholder:text-muted-foreground md:text-lg"
-                // 검색 결과 연동은 추후 별도 티켓에서 구현
+                className="flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground md:text-lg"
               />
             </div>
           </div>
@@ -131,9 +156,10 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
             )}
 
             <HomeTrendingKeywordsSection
-              keywords={data?.trendingKeywords ?? []}
+              keywords={keywordsWithInterest}
               isLoading={isLoading}
               rangeLabel={rangeLabel}
+              onKeywordClick={handleKeywordClick}
             />
           </div>
         </div>
