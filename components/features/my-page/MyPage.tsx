@@ -1,37 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ScrappedPostsSection } from "./scraps/ScrappedPostsSection";
 import { WrongQuizSection } from "./quizzes/WrongQuizSection";
-
-function SectionHeader({ title, href }: { title: string; href?: string }) {
-  return (
-    <div className="mb-4 flex items-center justify-between">
-      <h2 className="text-base font-semibold text-foreground">{title}</h2>
-      {href && (
-        <Link
-          href={href}
-          className="flex items-center gap-0.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          전체 보기
-          <ChevronRight className="h-4 w-4" />
-        </Link>
-      )}
-    </div>
-  );
-}
-
-function SkeletonCards({ count = 4 }: { count?: number }) {
-  return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-      {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className="h-28 rounded-xl" />
-      ))}
-    </div>
-  );
-}
+import { RecommendedSection } from "./recommend/RecommendedSection";
 
 export default function MyPage() {
   return (
@@ -52,24 +23,7 @@ export default function MyPage() {
       <WrongQuizSection />
 
       {/* 3. 추천 */}
-      <section className="space-y-8">
-        <SectionHeader title="추천" />
-
-        <div>
-          <SectionHeader title="홈 글" />
-          <SkeletonCards />
-        </div>
-
-        <div>
-          <SectionHeader title="유튜브" />
-          <SkeletonCards />
-        </div>
-
-        <div>
-          <SectionHeader title="서적" />
-          <SkeletonCards />
-        </div>
-      </section>
+      <RecommendedSection />
     </div>
   );
 }

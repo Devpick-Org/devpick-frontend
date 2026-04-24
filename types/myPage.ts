@@ -22,3 +22,33 @@ export interface MyPageScrap {
   createdAt: string;
   summary?: string;
 }
+
+export interface MyPageRecommendHomePost {
+  contentId: string;
+  title: string;
+  sourceName: string;
+  thumbnail: string | null;
+  summary?: string;
+  date: string;
+}
+
+export interface MyPageRecommendVideo {
+  videoId: string;
+  title: string;
+  channelName: string;
+  thumbnail: string | null;
+  url: string;
+  duration: string;
+  views: number;
+  uploadedAt: string;
+}
+
+export interface MyPageRecommendBook {
+  bookId: string;
+  title: string;
+  authors: string[];
+  cover: string | null;
+  url: string;
+  publisher: string;
+  publishedAt: string;
+}

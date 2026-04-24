@@ -1,11 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { WrongQuizList } from "@/components/features/my-page/quizzes/WrongQuizList";
-import { fetchMyWrongQuizzes } from "@/lib/mock/my-page-wrong-quizzes";
+import { WrongQuizListWrapper } from "@/components/features/my-page/quizzes/WrongQuizListWrapper";
 
-export default async function WrongQuizzesPage() {
-  const quizzes = await fetchMyWrongQuizzes();
-
+export default function WrongQuizzesPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 lg:px-8">
       <Link
@@ -20,7 +17,7 @@ export default async function WrongQuizzesPage() {
         틀린 퀴즈들
       </h1>
 
-      <WrongQuizList quizzes={quizzes} />
+      <WrongQuizListWrapper />
     </div>
   );
 }
