@@ -26,7 +26,7 @@ function ChangeRate({ rate }: { rate: number }) {
 
 function TopPostCard({ post }: { post: TrendTopPost }) {
   return (
-    <div className="w-44 shrink-0 overflow-hidden rounded-xl border border-border bg-card">
+    <div className="w-44 shrink-0 overflow-hidden rounded-md border border-border bg-card">
       {/* 썸네일 영역 */}
       <div className="relative aspect-video w-full overflow-hidden">
         {post.thumbnailUrl ? (
@@ -66,7 +66,7 @@ function TopPostCard({ post }: { post: TrendTopPost }) {
 
 function TopPostCardSkeleton() {
   return (
-    <div className="w-44 shrink-0 overflow-hidden rounded-xl border border-border bg-card">
+    <div className="w-44 shrink-0 overflow-hidden rounded-md border border-border bg-card">
       <Skeleton className="aspect-video w-full" />
       <div className="flex flex-col gap-2 p-3">
         <Skeleton className="h-3 w-14 rounded" />
