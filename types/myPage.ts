@@ -47,8 +47,10 @@ export interface MyPageRecommendBook {
   bookId: string;
   title: string;
   authors: string[];
+  description?: string;
   cover: string | null;
   url: string;
+  price?: number;
   publisher: string;
   publishedAt: string;
 }
