@@ -19,7 +19,7 @@ export function WrongQuizListItem({ quiz }: { quiz: MyPageQuizHistory }) {
   return (
     <Link
       href={`/home/${contentId}/quiz/result`}
-      className="-mx-2 flex gap-4 rounded-lg px-2 py-3 transition-colors"
+      className="-mx-2 flex gap-4 px-2 py-3 transition-colors"
     >
       <div className="relative aspect-[3/2] w-36 shrink-0 overflow-hidden rounded-sm bg-muted">
         {thumbnail ? (

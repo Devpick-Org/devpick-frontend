@@ -4,7 +4,7 @@ import type { MyPageRecommendBook } from "@/types/myPage";
 
 export function RecommendedBookCard({ book }: { book: MyPageRecommendBook }) {
   const { title, authors, cover, url, publisher, publishedAt } = book;
-  const year = publishedAt.slice(0, 4);
+  const year = publishedAt ? publishedAt.slice(0, 4) : "";
 
   return (
     <a href={url} target="_blank" rel="noopener noreferrer">

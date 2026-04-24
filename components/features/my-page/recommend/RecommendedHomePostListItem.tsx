@@ -1,14 +1,16 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { Bookmark } from "lucide-react";
+import { FileText } from "lucide-react";
 import { SourceLogo } from "@/components/features/home/SourceLogo";
 import { formatDate } from "@/lib/utils";
-import type { MyPageScrap } from "@/types/myPage";
+import type { MyPageRecommendHomePost } from "@/types/myPage";
 
-export function ScrappedPostListItem({ scrap }: { scrap: MyPageScrap }) {
-  const { contentId, title, sourceName, thumbnail, createdAt, summary } = scrap;
+export function RecommendedHomePostListItem({
+  post,
+}: {
+  post: MyPageRecommendHomePost;
+}) {
+  const { contentId, title, sourceName, thumbnail, summary, date } = post;
 
   return (
     <Link
@@ -20,7 +22,7 @@ export function ScrappedPostListItem({ scrap }: { scrap: MyPageScrap }) {
           <Image fill src={thumbnail} alt={title} className="object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <Bookmark className="h-5 w-5 text-muted-foreground/30" />
+            <FileText className="h-5 w-5 text-muted-foreground/30" />
           </div>
         )}
       </div>
@@ -28,7 +30,7 @@ export function ScrappedPostListItem({ scrap }: { scrap: MyPageScrap }) {
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex items-center gap-1.5">
           <SourceLogo sourceName={sourceName} size={13} />
-          <span className="text-xs text-muted-foreground font-medium">
+          <span className="text-xs font-medium text-muted-foreground">
             {sourceName}
           </span>
         </div>
@@ -36,12 +38,10 @@ export function ScrappedPostListItem({ scrap }: { scrap: MyPageScrap }) {
           {title}
         </p>
         {summary && (
-          <p className="line-clamp-1 text-xs text-muted-foreground">
-            {summary}
-          </p>
+          <p className="line-clamp-1 text-xs text-muted-foreground">{summary}</p>
         )}
         <span className="mt-auto pt-1 text-xs text-muted-foreground">
-          {formatDate(createdAt)}
+          {formatDate(date)}
         </span>
       </div>
     </Link>
