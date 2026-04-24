@@ -74,6 +74,41 @@ export const MOCK_SCRAPS: MyPageScrap[] = [
     summary:
       "Zustand v4에서 v5로 업그레이드할 때 꼭 확인해야 할 변경사항들을 정리했습니다.",
   },
+  {
+    id: "9",
+    contentId: "content-109",
+    title: "Tailwind CSS v4 마이그레이션 — @theme 토큰과 CSS 변수 전환",
+    sourceName: "kakao_tech",
+    thumbnail: "https://picsum.photos/seed/scrap9/400/240",
+    createdAt: "2026-03-30T10:00:00Z",
+    summary: "v3에서 v4로 넘어갈 때 바뀐 설정 방식과 토큰 시스템을 정리합니다.",
+  },
+  {
+    id: "10",
+    contentId: "content-110",
+    title: "Kubernetes 입문 — Pod, Service, Deployment 핵심 개념 정리",
+    sourceName: "naver_d2",
+    thumbnail: null,
+    createdAt: "2026-03-27T14:00:00Z",
+    summary: "컨테이너 오케스트레이션의 핵심 리소스를 예제와 함께 설명합니다.",
+  },
+  {
+    id: "11",
+    contentId: "content-111",
+    title: "웹 성능 최적화 — Core Web Vitals 개선 실전 사례",
+    sourceName: "toss_tech",
+    thumbnail: "https://picsum.photos/seed/scrap11/400/240",
+    createdAt: "2026-03-24T09:00:00Z",
+    summary: "LCP, CLS, INP 지표를 실제 서비스에서 개선한 경험을 공유합니다.",
+  },
+  {
+    id: "12",
+    contentId: "content-112",
+    title: "Git 브랜치 전략 — Trunk Based Development vs Git Flow 비교",
+    sourceName: "medium",
+    thumbnail: "https://picsum.photos/seed/scrap12/400/240",
+    createdAt: "2026-03-20T11:30:00Z",
+  },
 ];
 
 export async function fetchMyScraps(): Promise<MyPageScrap[]> {

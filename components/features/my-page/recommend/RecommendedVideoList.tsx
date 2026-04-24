@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecommendedVideoListItem } from "./RecommendedVideoListItem";
+import { MyPagePagination } from "../MyPagePagination";
 import { fetchRecommendVideos } from "@/lib/mock/my-page-recommend-video";
 import type { MyPageRecommendVideo } from "@/types/myPage";
+
+const PAGE_SIZE = 10;
 
 function ListItemSkeleton() {
   return (
@@ -23,6 +26,7 @@ export function RecommendedVideoList() {
   const [videos, setVideos] = useState<MyPageRecommendVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchRecommendVideos()
@@ -30,6 +34,12 @@ export function RecommendedVideoList() {
       .catch(() => setIsError(true))
       .finally(() => setIsLoading(false));
   }, []);
+
+  const totalPages = Math.ceil(videos.length / PAGE_SIZE);
+  const pagedItems = useMemo(
+    () => videos.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [videos, currentPage],
+  );
 
   if (isError) {
     return (
@@ -58,10 +68,18 @@ export function RecommendedVideoList() {
   }
 
   return (
-    <div className="divide-y divide-border">
-      {videos.map((video) => (
-        <RecommendedVideoListItem key={video.videoId} video={video} />
-      ))}
-    </div>
+    <>
+      <div className="divide-y divide-border">
+        {pagedItems.map((video) => (
+          <RecommendedVideoListItem key={video.videoId} video={video} />
+        ))}
+      </div>
+      <MyPagePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        className="mt-8 mb-12"
+      />
+    </>
   );
 }
