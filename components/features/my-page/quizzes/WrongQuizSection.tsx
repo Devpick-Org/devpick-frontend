@@ -11,12 +11,19 @@ import type { MyPageQuizHistory } from "@/types/myPage";
 export function WrongQuizSection() {
   const [quizzes, setQuizzes] = useState<MyPageQuizHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    fetchMyWrongQuizzesPreview(4).then((data) => {
-      setQuizzes(data);
-      setIsLoading(false);
-    });
+    fetchMyWrongQuizzesPreview(4)
+      .then((data) => {
+        setQuizzes(data);
+      })
+      .catch(() => {
+        setIsError(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   return (
@@ -32,7 +39,11 @@ export function WrongQuizSection() {
         </Link>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <p className="text-sm text-muted-foreground">
+          불러오는 중 오류가 발생했습니다.
+        </p>
+      ) : isLoading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
