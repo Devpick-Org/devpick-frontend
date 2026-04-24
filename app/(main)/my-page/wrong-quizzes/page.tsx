@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { ScrappedPostsList } from "@/components/features/my-page/scraps/ScrappedPostsList";
+import { WrongQuizList } from "@/components/features/my-page/quizzes/WrongQuizList";
+import { fetchMyWrongQuizzes } from "@/lib/mock/my-page-wrong-quizzes";
 
-export default function ScrapsPage() {
+export default async function WrongQuizzesPage() {
+  const quizzes = await fetchMyWrongQuizzes();
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-8 lg:px-8">
       <Link
@@ -14,10 +17,10 @@ export default function ScrapsPage() {
       </Link>
 
       <h1 className="text-xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
-        스크랩한 글들
+        틀린 퀴즈들
       </h1>
 
-      <ScrappedPostsList />
+      <WrongQuizList quizzes={quizzes} />
     </div>
   );
 }

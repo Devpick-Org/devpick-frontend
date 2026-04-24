@@ -1,0 +1,122 @@
+import type { MyPageQuizHistory } from "@/types/myPage";
+
+export const MOCK_QUIZ_HISTORIES: MyPageQuizHistory[] = [
+  {
+    attemptId: "a1",
+    contentId: "content-201",
+    contentTitle: "React 19의 새로운 기능들: useActionState, useFormStatus 완벽 정리",
+    thumbnail: "https://picsum.photos/seed/quiz1/400/240",
+    preview: "React 19에서 useActionState 훅의 주요 역할은 무엇인가요?",
+    level: "MIDDLE",
+    score: 2,
+    totalQuestions: 5,
+    passed: false,
+    attemptedAt: "2026-04-20T10:30:00Z",
+  },
+  {
+    attemptId: "a2",
+    contentId: "content-202",
+    contentTitle: "TypeScript 5.5 주요 변경사항 — infer 키워드 개선과 strictness 강화",
+    thumbnail: "https://picsum.photos/seed/quiz2/400/240",
+    preview: "TypeScript 5.5에서 infer 키워드가 개선된 주된 이유는 무엇인가요?",
+    level: "JUNIOR",
+    score: 3,
+    totalQuestions: 5,
+    passed: false,
+    attemptedAt: "2026-04-18T14:00:00Z",
+  },
+  {
+    attemptId: "a3",
+    contentId: "content-203",
+    contentTitle: "PostgreSQL EXPLAIN ANALYZE 읽는 법 — 쿼리 최적화 실전 가이드",
+    thumbnail: null,
+    level: "SENIOR",
+    score: 1,
+    totalQuestions: 5,
+    passed: false,
+    attemptedAt: "2026-04-15T09:00:00Z",
+  },
+  {
+    attemptId: "a4",
+    contentId: "content-204",
+    contentTitle: "Docker Compose로 로컬 개발 환경 구성하기 — 실전 템플릿 공개",
+    thumbnail: "https://picsum.photos/seed/quiz4/400/240",
+    level: "BEGINNER",
+    score: 5,
+    totalQuestions: 5,
+    passed: true,
+    attemptedAt: "2026-04-13T11:20:00Z",
+  },
+  {
+    attemptId: "a5",
+    contentId: "content-205",
+    contentTitle: "Next.js App Router에서 Server Component와 Client Component 경계 설계하기",
+    thumbnail: "https://picsum.photos/seed/quiz5/400/240",
+    preview: "Next.js App Router에서 Server Component가 Client Component를 import할 수 없는 이유는?",
+    level: "MIDDLE",
+    score: 2,
+    totalQuestions: 5,
+    passed: false,
+    attemptedAt: "2026-04-10T16:45:00Z",
+  },
+  {
+    attemptId: "a6",
+    contentId: "content-206",
+    contentTitle: "Redis 캐싱 전략 비교 — Cache-Aside, Write-Through, Write-Behind",
+    thumbnail: null,
+    level: "JUNIOR",
+    score: 5,
+    totalQuestions: 5,
+    passed: true,
+    attemptedAt: "2026-04-08T13:00:00Z",
+  },
+  {
+    attemptId: "a7",
+    contentId: "content-207",
+    contentTitle: "REST API 설계 원칙 — 버저닝 전략과 에러 응답 포맷 표준화",
+    thumbnail: "https://picsum.photos/seed/quiz7/400/240",
+    preview: "REST API에서 버저닝 전략 중 URL 버저닝의 단점은 무엇인가요?",
+    level: "JUNIOR",
+    score: 3,
+    totalQuestions: 5,
+    passed: false,
+    attemptedAt: "2026-04-05T10:10:00Z",
+  },
+  {
+    attemptId: "a8",
+    contentId: "content-208",
+    contentTitle: "Zustand v5 마이그레이션 가이드 — 스토어 구조와 미들웨어 변경점",
+    thumbnail: null,
+    level: "MIDDLE",
+    score: 5,
+    totalQuestions: 5,
+    passed: true,
+    attemptedAt: "2026-04-03T09:30:00Z",
+  },
+  {
+    attemptId: "a9",
+    contentId: "content-209",
+    contentTitle: "CSS Container Queries 실전 활용 — 반응형 컴포넌트 설계",
+    thumbnail: null,
+    level: "BEGINNER",
+    score: 4,
+    totalQuestions: 5,
+    passed: false,
+    attemptedAt: "2026-04-01T15:00:00Z",
+  },
+];
+
+export async function fetchMyWrongQuizzes(): Promise<MyPageQuizHistory[]> {
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  return MOCK_QUIZ_HISTORIES.filter((q) => q.score < q.totalQuestions);
+}
+
+export async function fetchMyWrongQuizzesPreview(
+  count = 4,
+): Promise<MyPageQuizHistory[]> {
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  const wrongQuizzes = MOCK_QUIZ_HISTORIES.filter(
+    (q) => q.score < q.totalQuestions,
+  );
+  return wrongQuizzes.slice(0, count);
+}
