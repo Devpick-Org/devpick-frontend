@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ScrappedPostsSection } from "./ScrappedPostsSection";
 
 function SectionHeader({ title, href }: { title: string; href?: string }) {
   return (
@@ -43,25 +44,16 @@ export default function MyPage() {
         </p>
       </div>
 
-      {/* 1. 로드맵 */}
-      <section>
-        <SectionHeader title="로드맵" />
-        <Skeleton className="h-44 rounded-xl" />
-      </section>
+      {/* 1. 스크랩한 글들 */}
+      <ScrappedPostsSection />
 
-      {/* 2. 스크랩한 글들 */}
-      <section>
-        <SectionHeader title="스크랩한 글들" />
-        <SkeletonCards />
-      </section>
-
-      {/* 3. 틀린 퀴즈들 */}
+      {/* 2. 틀린 퀴즈들 */}
       <section>
         <SectionHeader title="틀린 퀴즈들" />
         <SkeletonCards />
       </section>
 
-      {/* 4. 추천 */}
+      {/* 3. 추천 */}
       <section className="space-y-8">
         <SectionHeader title="추천" />
 
