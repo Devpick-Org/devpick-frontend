@@ -11,8 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrappedPostListItem } from "./ScrappedPostListItem";
+import { MyPagePagination } from "../MyPagePagination";
 import { fetchMyScraps } from "@/lib/mock/my-page-scraps";
 import type { MyPageScrap } from "@/types/myPage";
+
+const PAGE_SIZE = 10;
 
 type SortOrder = "newest" | "oldest";
 
@@ -36,6 +39,7 @@ export function ScrappedPostsList() {
   const [isError, setIsError] = useState(false);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortOrder>("newest");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchMyScraps()
@@ -61,6 +65,12 @@ export function ScrappedPostsList() {
       return sort === "newest" ? -diff : diff;
     });
   }, [scraps, query, sort]);
+
+  const totalPages = Math.ceil(processed.length / PAGE_SIZE);
+  const pagedItems = processed.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   if (isLoading) {
     return (
@@ -93,7 +103,7 @@ export function ScrappedPostsList() {
               type="text"
               placeholder="검색"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => { setQuery(e.target.value); setCurrentPage(1); }}
               className="h-8 w-40 rounded-md border border-border bg-background pl-7 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none"
             />
           </div>
@@ -105,7 +115,7 @@ export function ScrappedPostsList() {
             <DropdownMenuContent align="end" className="min-w-[6rem] p-1">
               <DropdownMenuRadioGroup
                 value={sort}
-                onValueChange={(v) => setSort(v as SortOrder)}
+                onValueChange={(v) => { setSort(v as SortOrder); setCurrentPage(1); }}
               >
                 <DropdownMenuRadioItem className="cursor-pointer" value="newest">
                   최신순
@@ -124,11 +134,19 @@ export function ScrappedPostsList() {
           {query ? "검색 결과가 없습니다." : "스크랩한 글이 없습니다."}
         </p>
       ) : (
-        <div className="divide-y divide-border">
-          {processed.map((scrap) => (
-            <ScrappedPostListItem key={scrap.id} scrap={scrap} />
-          ))}
-        </div>
+        <>
+          <div className="divide-y divide-border">
+            {pagedItems.map((scrap) => (
+              <ScrappedPostListItem key={scrap.id} scrap={scrap} />
+            ))}
+          </div>
+          <MyPagePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            className="mt-8 mb-12"
+          />
+        </>
       )}
     </div>
   );

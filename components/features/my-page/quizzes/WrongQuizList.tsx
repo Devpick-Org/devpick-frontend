@@ -10,12 +10,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { WrongQuizListItem } from "./WrongQuizListItem";
+import { MyPagePagination } from "../MyPagePagination";
 import type { MyPageQuizHistory } from "@/types/myPage";
+
+const PAGE_SIZE = 10;
 
 type SortOrder = "newest" | "oldest";
 
 export function WrongQuizList({ quizzes }: { quizzes: MyPageQuizHistory[] }) {
   const [sort, setSort] = useState<SortOrder>("newest");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const sorted = useMemo(() => {
     return [...quizzes].sort((a, b) => {
@@ -24,6 +28,12 @@ export function WrongQuizList({ quizzes }: { quizzes: MyPageQuizHistory[] }) {
       return sort === "newest" ? -diff : diff;
     });
   }, [quizzes, sort]);
+
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+  const pagedItems = sorted.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   return (
     <div>
@@ -37,7 +47,7 @@ export function WrongQuizList({ quizzes }: { quizzes: MyPageQuizHistory[] }) {
           <DropdownMenuContent align="end" className="min-w-[6rem] p-1">
             <DropdownMenuRadioGroup
               value={sort}
-              onValueChange={(v) => setSort(v as SortOrder)}
+              onValueChange={(v) => { setSort(v as SortOrder); setCurrentPage(1); }}
             >
               <DropdownMenuRadioItem className="cursor-pointer" value="newest">
                 최신순
@@ -55,11 +65,19 @@ export function WrongQuizList({ quizzes }: { quizzes: MyPageQuizHistory[] }) {
           틀린 퀴즈가 없습니다.
         </p>
       ) : (
-        <div className="divide-y divide-border">
-          {sorted.map((quiz) => (
-            <WrongQuizListItem key={quiz.attemptId} quiz={quiz} />
-          ))}
-        </div>
+        <>
+          <div className="divide-y divide-border">
+            {pagedItems.map((quiz) => (
+              <WrongQuizListItem key={quiz.attemptId} quiz={quiz} />
+            ))}
+          </div>
+          <MyPagePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            className="mt-8 mb-12"
+          />
+        </>
       )}
     </div>
   );

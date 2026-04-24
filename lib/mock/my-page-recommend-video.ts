@@ -41,11 +41,93 @@ export const MOCK_RECOMMEND_VIDEOS: MyPageRecommendVideo[] = [
     views: 34800,
     uploadedAt: "2026-04-07T00:00:00Z",
   },
+  {
+    videoId: "vid-005",
+    title: "TypeScript 제네릭 완전 정복 — 실전 패턴 7가지",
+    channelName: "코딩애플",
+    thumbnail: "https://picsum.photos/seed/vid5/400/240",
+    url: "https://www.youtube.com/watch?v=example5",
+    duration: "22:15",
+    views: 78400,
+    uploadedAt: "2026-04-04T00:00:00Z",
+  },
+  {
+    videoId: "vid-006",
+    title: "Redis 기초부터 실전까지 — 캐싱 전략과 세션 관리",
+    channelName: "드림코딩",
+    thumbnail: null,
+    url: "https://www.youtube.com/watch?v=example6",
+    duration: "35:40",
+    views: 52100,
+    uploadedAt: "2026-04-01T00:00:00Z",
+  },
+  {
+    videoId: "vid-007",
+    title: "CI/CD 파이프라인 구축 — GitHub Actions 실전편",
+    channelName: "Fireship",
+    thumbnail: "https://picsum.photos/seed/vid7/400/240",
+    url: "https://www.youtube.com/watch?v=example7",
+    duration: "14:32",
+    views: 120500,
+    uploadedAt: "2026-03-28T00:00:00Z",
+  },
+  {
+    videoId: "vid-008",
+    title: "Spring Boot REST API 설계 — 실무 패턴과 예외 처리",
+    channelName: "우아한테크",
+    thumbnail: "https://picsum.photos/seed/vid8/400/240",
+    url: "https://www.youtube.com/watch?v=example8",
+    duration: "51:08",
+    views: 43700,
+    uploadedAt: "2026-03-25T00:00:00Z",
+  },
+  {
+    videoId: "vid-009",
+    title: "SQL 쿼리 최적화 — 인덱스 설계와 실행 계획 분석",
+    channelName: "데이터리안",
+    thumbnail: null,
+    url: "https://www.youtube.com/watch?v=example9",
+    duration: "38:20",
+    views: 29300,
+    uploadedAt: "2026-03-22T00:00:00Z",
+  },
+  {
+    videoId: "vid-010",
+    title: "Tailwind CSS v4 신기능 총정리 — 10분 핵심 정리",
+    channelName: "Traversy Media",
+    thumbnail: "https://picsum.photos/seed/vid10/400/240",
+    url: "https://www.youtube.com/watch?v=example10",
+    duration: "09:55",
+    views: 67800,
+    uploadedAt: "2026-03-18T00:00:00Z",
+  },
+  {
+    videoId: "vid-011",
+    title: "Zustand로 전역 상태 관리하기 — Redux 없이 깔끔하게",
+    channelName: "코딩애플",
+    thumbnail: "https://picsum.photos/seed/vid11/400/240",
+    url: "https://www.youtube.com/watch?v=example11",
+    duration: "16:47",
+    views: 91200,
+    uploadedAt: "2026-03-14T00:00:00Z",
+  },
+  {
+    videoId: "vid-012",
+    title: "웹 접근성 A11y 기초 — 스크린 리더 대응과 ARIA 사용법",
+    channelName: "드림코딩",
+    thumbnail: null,
+    url: "https://www.youtube.com/watch?v=example12",
+    duration: "24:11",
+    views: 18600,
+    uploadedAt: "2026-03-10T00:00:00Z",
+  },
 ];
 
 export async function fetchRecommendVideos(
-  count = 4,
+  count?: number,
 ): Promise<MyPageRecommendVideo[]> {
   await new Promise((resolve) => setTimeout(resolve, 400));
-  return MOCK_RECOMMEND_VIDEOS.slice(0, count);
+  return count !== undefined
+    ? MOCK_RECOMMEND_VIDEOS.slice(0, count)
+    : MOCK_RECOMMEND_VIDEOS;
 }

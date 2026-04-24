@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecommendedBookListItem } from "./RecommendedBookListItem";
+import { MyPagePagination } from "../MyPagePagination";
 import { fetchRecommendBooks } from "@/lib/mock/my-page-recommend-book";
 import type { MyPageRecommendBook } from "@/types/myPage";
+
+const PAGE_SIZE = 10;
 
 function ListItemSkeleton() {
   return (
@@ -40,6 +43,7 @@ export function RecommendedBookList() {
   const [books, setBooks] = useState<MyPageRecommendBook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchRecommendBooks()
@@ -47,6 +51,12 @@ export function RecommendedBookList() {
       .catch(() => setIsError(true))
       .finally(() => setIsLoading(false));
   }, []);
+
+  const totalPages = Math.ceil(books.length / PAGE_SIZE);
+  const pagedItems = useMemo(
+    () => books.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [books, currentPage],
+  );
 
   if (isError) {
     return (
@@ -75,10 +85,18 @@ export function RecommendedBookList() {
   }
 
   return (
-    <div className="divide-y divide-border">
-      {books.map((book) => (
-        <RecommendedBookListItem key={book.bookId} book={book} />
-      ))}
-    </div>
+    <>
+      <div className="divide-y divide-border">
+        {pagedItems.map((book) => (
+          <RecommendedBookListItem key={book.bookId} book={book} />
+        ))}
+      </div>
+      <MyPagePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        className="mt-8 mb-12"
+      />
+    </>
   );
 }
