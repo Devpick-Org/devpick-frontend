@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { mapJobDetail } from "@/lib/jobs/mapJobApi";
 import { JobDetailHeader } from "./JobDetailHeader";
+import { JobDetailBulletList } from "./JobDetailBulletList";
 import { JobDetailSection } from "./JobDetailSection";
 import { JobMatchSection } from "./JobMatchSection";
 import { JobQASection } from "./JobQASection";
@@ -194,45 +195,15 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
           </div>
 
           <JobDetailSection title="주요 업무">
-            <ul className="space-y-2.5">
-              {job.responsibilities.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-2.5 text-sm font-medium text-foreground"
-                >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <JobDetailBulletList items={job.responsibilities} />
           </JobDetailSection>
 
           <JobDetailSection title="자격 요건">
-            <ul className="space-y-2.5">
-              {job.requirements.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-2.5 text-sm font-medium text-foreground"
-                >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <JobDetailBulletList items={job.requirements} />
           </JobDetailSection>
 
           <JobDetailSection title="우대 사항">
-            <ul className="space-y-2.5">
-              {job.preferredQualifications.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-2.5 text-sm font-medium text-foreground"
-                >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <JobDetailBulletList items={job.preferredQualifications} />
           </JobDetailSection>
 
           <JobDetailSection title="복지 혜택">

@@ -10,6 +10,7 @@ import type {
   MatchSubSection,
 } from "@/types/jobs";
 import type { JobDetailApi, JobListItemApi } from "@/lib/api/endpoints/jobs";
+import { sanitizeJobDetailLine, sanitizeJobDetailLines } from "@/lib/jobs/sanitizeJobListLines";
 
 const EMPLOYMENT: EmploymentType[] = [
   "FULL_TIME",
@@ -49,7 +50,7 @@ function asMatchStatus(s: string): MatchItemStatus {
 }
 
 function mapMatchItem(i: { label: string; status: string }): MatchItem {
-  return { label: i.label, status: asMatchStatus(i.status) };
+  return { label: sanitizeJobDetailLine(i.label), status: asMatchStatus(i.status) };
 }
 
 function mapSubSection(s: {
@@ -100,11 +101,11 @@ export function mapJobDetail(row: JobDetailApi): JobDetail {
     ...base,
     salary: row.salary ?? "",
     applyUrl: row.applyUrl ?? "#",
-    responsibilities: row.responsibilities ?? [],
-    requirements: row.requirements ?? [],
-    preferredQualifications: row.preferredQualifications ?? [],
-    benefits: row.benefits ?? [],
-    hiringProcess: row.hiringProcess ?? [],
+    responsibilities: sanitizeJobDetailLines(row.responsibilities),
+    requirements: sanitizeJobDetailLines(row.requirements),
+    preferredQualifications: sanitizeJobDetailLines(row.preferredQualifications),
+    benefits: sanitizeJobDetailLines(row.benefits),
+    hiringProcess: sanitizeJobDetailLines(row.hiringProcess),
     matchBreakdown: mapBreakdown(row.matchBreakdown),
   };
 }

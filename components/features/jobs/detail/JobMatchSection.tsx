@@ -26,9 +26,11 @@ const STATUS_CLASS: Record<MatchItemStatus, string> = {
 function MatchStatusRow({ item }: { item: MatchItem }) {
   const Icon = STATUS_ICON[item.status];
   return (
-    <div className="flex items-center gap-2.5">
-      <Icon className={cn("h-4 w-4 shrink-0", STATUS_CLASS[item.status])} />
-      <span className="text-sm text-foreground">{item.label}</span>
+    <div className="flex items-start gap-2.5">
+      <Icon
+        className={cn("mt-0.5 h-4 w-4 shrink-0", STATUS_CLASS[item.status])}
+      />
+      <span className="text-sm leading-relaxed text-foreground">{item.label}</span>
     </div>
   );
 }
@@ -66,7 +68,7 @@ function MatchSubSection({
       <p className="mb-3 text-[11px] font-medium text-muted-foreground">
         {summary}
       </p>
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {items.map((item, i) => (
           <MatchStatusRow key={i} item={item} />
         ))}
