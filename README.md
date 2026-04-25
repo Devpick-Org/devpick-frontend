@@ -12,10 +12,8 @@ Trace 캡스톤 프론트엔드 저장소입니다.
 2. `CONTRIBUTING.md` 확인
 3. 본인 작업 브랜치 생성 후 개발 시작
 
-## 로컬에서 백엔드와 붙여 테스트
+## 프론트 로컬 실행
 
-- 프론트는 `NEXT_PUBLIC_API_BASE_URL` 이 없으면 **EC2 백엔드(https://3-39-96-126.sslip.io/v1)** 를 쓰도록 되어 있음 (`lib/api/client.ts`).
-- **로컬 Spring(보통 `http://localhost:8080/v1`)** 으로 로그인·API까지 끝까지 보려면 아래 중 하나만 쓰면 됨.
-  1. **`env.local.sample`** 을 참고해 `.env.local` 에 `NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/v1` 한 줄 추가 (기존 env 내용은 유지).
-  2. 또는 **`npm run dev:local`** — 같은 효과이며 `.env` 파일을 건드리지 않음.
-- 백엔드는 `devpick-backend` 의 `.env.example` 기준으로 `FRONTEND_URL=http://localhost:3000` , GitHub/Google OAuth 앱에 `http://localhost:3000/auth/.../callback` 등록이 필요함. 상세는 백엔드 `AGENTS.md` §9.
+- `next dev` 는 `.env.development` 를 통해 기본적으로 **운영 API(`https://3-39-96-126.sslip.io/v1`)** 를 사용함.
+- 개인/임시 API로 바꾸려면 **`env.local.sample`** 을 참고해 `.env.local` 에 `NEXT_PUBLIC_API_BASE_URL=...` 를 추가하면 됨.
+- 백엔드·AI는 운영 서버를 사용하고, 프론트만 `http://localhost:3000` 에서 실행함.

@@ -8,12 +8,15 @@ interface ResumeUploadSectionProps {
   isParsing: boolean;
   onFileSelect: (file: File) => void;
   errorMessage?: string | null;
+  /** MVP: 파일 파싱 없이 직접 작성 */
+  onStartManual?: () => void;
 }
 
 export function ResumeUploadSection({
   isParsing,
   onFileSelect,
   errorMessage,
+  onStartManual,
 }: ResumeUploadSectionProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -75,6 +78,23 @@ export function ResumeUploadSection({
         <p className="text-xs text-muted-foreground font-medium">
           PDF, HWP, HWPX, DOC, DOCX 파일 지원 · 최대 10MB
         </p>
+
+        {onStartManual && (
+          <div className="flex flex-col items-center gap-2 border-t border-border pt-6">
+            <p className="text-xs font-medium text-muted-foreground">
+              또는 직접 입력으로 마스터 이력서를 작성할 수 있어요.
+            </p>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="font-semibold"
+              onClick={onStartManual}
+            >
+              직접 작성하기
+            </Button>
+          </div>
+        )}
 
         <input
           ref={inputRef}

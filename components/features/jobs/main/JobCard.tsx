@@ -3,22 +3,39 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Bookmark, MapPin, Clock } from "lucide-react";
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn, formatDate } from "@/lib/utils";
+import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import { extractApiError } from "@/lib/api/extractApiError";
 import type { Job } from "@/types/jobs";
 import { EXPERIENCE_LEVEL_LABEL, JOB_CATEGORY_LABEL } from "./jobs.constants";
+import { toast } from "sonner";
 
 interface JobCardProps {
   job: Job;
 }
 
 export function JobCard({ job }: JobCardProps) {
-  const [scrapped, setScrapped] = useState(false);
+  const qc = useQueryClient();
+  const bookmarked = job.bookmarked ?? false;
+
+  const toggleBookmark = useMutation({
+    mutationFn: () =>
+      bookmarked ? jobsEndpoints.unbookmark(job.id) : jobsEndpoints.bookmark(job.id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["jobs"] });
+      void qc.invalidateQueries({ queryKey: ["job-detail", job.id] });
+    },
+    onError: (e) => {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "북마크 처리에 실패했습니다.");
+    },
+  });
 
   const handleScrap = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setScrapped((prev) => !prev);
+    toggleBookmark.mutate();
   };
 
   const scoreColor =
@@ -64,17 +81,18 @@ export function JobCard({ job }: JobCardProps) {
           <button
             type="button"
             onClick={handleScrap}
-            aria-label={scrapped ? "스크랩 해제" : "스크랩"}
+            disabled={toggleBookmark.isPending}
+            aria-label={bookmarked ? "스크랩 해제" : "스크랩"}
             className={cn(
               "shrink-0 rounded-lg p-1.5 transition-colors cursor-pointer",
-              scrapped
+              bookmarked
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
             <Bookmark
               className="h-4 w-4"
-              fill={scrapped ? "currentColor" : "none"}
+              fill={bookmarked ? "currentColor" : "none"}
             />
           </button>
         </div>
@@ -91,7 +109,11 @@ export function JobCard({ job }: JobCardProps) {
               매칭 점수
             </span>
             <span className={cn("text-xs font-bold", scoreColor)}>
-              {job.matchScore}%
+              {job.postingStatus === "EXPIRED"
+                ? "만료"
+                : job.matchScore > 0
+                  ? `${job.matchScore}%`
+                  : "이력서 필요"}
             </span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -100,7 +122,12 @@ export function JobCard({ job }: JobCardProps) {
                 "h-full rounded-full transition-all",
                 scoreBarColor,
               )}
-              style={{ width: `${job.matchScore}%` }}
+              style={{
+                width:
+                  job.postingStatus === "EXPIRED" || job.matchScore <= 0
+                    ? "0%"
+                    : `${job.matchScore}%`,
+              }}
             />
           </div>
         </div>

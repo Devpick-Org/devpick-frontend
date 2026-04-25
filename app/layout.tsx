@@ -28,7 +28,11 @@ export default function RootLayout({
   return (
     // suppressHydrationWarning: 다크모드 적용 시 서버/클라이언트 테마 차이로 인한 경고 방지
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${jetbrainsMono.variable} font-sans antialiased`}>
+      {/* body: 브라우저 확장(예: Video Speed Controller)이 class를 주입해 hydration 불일치가 날 수 있음 */}
+      <body
+        className={`${jetbrainsMono.variable} font-sans antialiased`}
+        suppressHydrationWarning
+      >
         {/* 모든 능력(데이터+테마)이 담긴 Providers로 감싸기 */}
         <Providers>{children}</Providers>
       </body>

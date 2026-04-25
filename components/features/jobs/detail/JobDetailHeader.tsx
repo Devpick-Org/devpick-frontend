@@ -3,8 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Bookmark, ExternalLink } from "lucide-react";
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { cn, formatDate } from "@/lib/utils";
+import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import { extractApiError } from "@/lib/api/extractApiError";
 import type { JobDetail } from "@/types/jobs";
 import {
   JOB_CATEGORY_LABEL,
@@ -16,7 +19,22 @@ interface JobDetailHeaderProps {
 }
 
 export function JobDetailHeader({ job }: JobDetailHeaderProps) {
-  const [scrapped, setScrapped] = useState(false);
+  const qc = useQueryClient();
+  const bookmarked = job.bookmarked ?? false;
+  const expired = job.postingStatus === "EXPIRED";
+
+  const toggleBookmark = useMutation({
+    mutationFn: () =>
+      bookmarked ? jobsEndpoints.unbookmark(job.id) : jobsEndpoints.bookmark(job.id),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["job-detail", job.id] });
+      void qc.invalidateQueries({ queryKey: ["jobs"] });
+    },
+    onError: (e) => {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "북마크 처리에 실패했습니다.");
+    },
+  });
 
   const deadlineLabel =
     job.deadline === "채용 시 마감"
@@ -58,23 +76,29 @@ export function JobDetailHeader({ job }: JobDetailHeaderProps) {
             <p className="text-sm font-bold text-foreground">
               {job.companyName}
             </p>
+            {expired && (
+              <span className="mt-1 inline-block rounded-md bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                마감됨
+              </span>
+            )}
           </div>
         </div>
 
         <button
           type="button"
-          onClick={() => setScrapped((prev) => !prev)}
-          aria-label={scrapped ? "스크랩 해제" : "스크랩"}
+          onClick={() => toggleBookmark.mutate()}
+          disabled={toggleBookmark.isPending}
+          aria-label={bookmarked ? "스크랩 해제" : "스크랩"}
           className={cn(
             "shrink-0 cursor-pointer rounded-lg p-1.5 transition-colors",
-            scrapped
+            bookmarked
               ? "text-primary"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
           <Bookmark
             className="h-5 w-5"
-            fill={scrapped ? "currentColor" : "none"}
+            fill={bookmarked ? "currentColor" : "none"}
           />
         </button>
       </div>
@@ -99,12 +123,12 @@ export function JobDetailHeader({ job }: JobDetailHeaderProps) {
       {/* 지원하러 가기 */}
       <div className="flex justify-end -mt-16">
         <a
-          href={job.applyUrl}
+          href={job.applyUrl || "#"}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         >
-          지원하러 가기
+          원문 보기
           <ExternalLink className="h-4 w-4" />
         </a>
       </div>

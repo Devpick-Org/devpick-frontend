@@ -3,65 +3,101 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Bookmark,
-  BookmarkCheck,
-  Download,
-  Loader2,
-  RefreshCw,
-} from "lucide-react";
+import { Download, Loader2, RefreshCw } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { toast } from "sonner";
-import { MOCK_JOB_QA_SETS } from "@/lib/mock/jobs";
 import { exportQAAsPdf } from "@/lib/jobs/exportQAPdf";
+import { parseInterviewQaPayload } from "@/lib/jobs/parseInterviewQaPayload";
 import type { QACategory } from "@/types/jobs";
-import { saveQA, isQASaved } from "@/lib/mock/resume-qa";
+import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import { resumeEndpoints } from "@/lib/api/endpoints/resume";
+import { extractApiError } from "@/lib/api/extractApiError";
 import { JobDetailSection } from "./JobDetailSection";
 import { JobQACategory } from "./JobQACategory";
-
-// mock: 이력서 등록 여부
-const HAS_RESUME = true;
 
 interface JobQASectionProps {
   jobId: string;
   companyName?: string;
   jobTitle?: string;
+  /** 표시용 (향후 확장) */
   matchScore?: number;
 }
 
 export function JobQASection({
   jobId,
-  companyName = "",
-  jobTitle = "",
-  matchScore = 0,
+  companyName: _companyName = "",
+  jobTitle: _jobTitle = "",
+  matchScore: _matchScore = 0,
 }: JobQASectionProps) {
-  const router = useRouter();
-  const [isSaved, setIsSaved] = useState(() => isQASaved(jobId));
-  const [isGenerated, setIsGenerated] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [currentQA, setCurrentQA] = useState<QACategory[]>(MOCK_JOB_QA_SETS[0]);
-  const [currentSetIdx, setCurrentSetIdx] = useState(0);
+  void _companyName;
+  void _jobTitle;
+  void _matchScore;
 
-  const generate = async () => {
-    setIsLoading(true);
-    setIsGenerated(false);
-    setIsSaved(false);
-    setIsError(false);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      const nextIdx = (currentSetIdx + 1) % MOCK_JOB_QA_SETS.length;
-      setCurrentSetIdx(nextIdx);
-      setCurrentQA(MOCK_JOB_QA_SETS[nextIdx]);
-      setIsGenerated(true);
-    } catch {
-      setIsError(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const router = useRouter();
+  const qc = useQueryClient();
+  const [isExporting, setIsExporting] = useState(false);
+
+  const { data: hasResume } = useQuery({
+    queryKey: ["master-resume"],
+    queryFn: resumeEndpoints.getMasterOrNull,
+    select: (d) => d != null,
+    staleTime: 60_000,
+  });
+
+  const {
+    data: savedCategories,
+    isLoading: isLoadingSaved,
+    isError: isLoadError,
+    refetch,
+  } = useQuery({
+    queryKey: ["job-interview-qa", jobId],
+    queryFn: async (): Promise<QACategory[] | null> => {
+      try {
+        const r = await jobsEndpoints.getInterviewQa(jobId);
+        const parsed = parseInterviewQaPayload(r.payloadJson);
+        return parsed.length ? parsed : null;
+      } catch (e) {
+        if (isAxiosError(e) && e.response?.status === 404) return null;
+        throw e;
+      }
+    },
+  });
+
+  const generate = useMutation({
+    mutationFn: () => jobsEndpoints.generateInterviewQa(jobId),
+    onSuccess: (res) => {
+      const cats = parseInterviewQaPayload(res.payloadJson);
+      void qc.setQueryData(["job-interview-qa", jobId], cats.length ? cats : null);
+      void qc.invalidateQueries({ queryKey: ["interview-qa-list"] });
+      toast.success("면접 Q&A가 저장되었습니다.", {
+        action: {
+          label: "Q&A 보기",
+          onClick: () => router.push("/my-resume?tab=qa"),
+        },
+        actionButtonStyle: {
+          backgroundColor: "#16a34a",
+          color: "white",
+        },
+      });
+    },
+    onError: (e) => {
+      const { code, message } = extractApiError(e);
+      if (code === "RESUME_001") {
+        toast.error("먼저 마스터 이력서를 작성해 주세요.");
+        return;
+      }
+      toast.error(message ?? "면접 Q&A 생성에 실패했습니다.");
+    },
+  });
+
+  const currentQA: QACategory[] | null = savedCategories ?? null;
+  const isGenerated = (currentQA?.length ?? 0) > 0;
+  const isLoading = isLoadingSaved || generate.isPending;
+  const isError = isLoadError;
 
   const handleDownloadPdf = async () => {
+    if (!currentQA?.length) return;
     try {
       setIsExporting(true);
       await exportQAAsPdf(currentQA, jobId);
@@ -70,34 +106,12 @@ export function JobQASection({
     }
   };
 
-  const handleSave = () => {
-    if (isSaved) return;
-    saveQA({
-      jobId,
-      companyName,
-      jobTitle,
-      matchScore,
-      qaCategories: currentQA,
-    });
-    setIsSaved(true);
-    toast.success("면접 Q&A가 저장되었습니다.", {
-      action: {
-        label: "Q&A 보기",
-        onClick: () => router.push("/my-resume?tab=qa"),
-      },
-      actionButtonStyle: {
-        backgroundColor: "#16a34a", // green-600
-        color: "white",
-      },
-    });
-  };
-
   const sectionAction = isGenerated ? (
     <div className="flex items-center gap-3">
       <button
         type="button"
-        onClick={generate}
-        disabled={isLoading || isExporting}
+        onClick={() => generate.mutate()}
+        disabled={isLoading || isExporting || !hasResume}
         className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
       >
         <RefreshCw className="h-3.5 w-3.5" />
@@ -118,21 +132,9 @@ export function JobQASection({
         PDF 다운로드
       </button>
 
-      {isSaved ? (
-        <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-          <BookmarkCheck className="h-3.5 w-3.5" />
-          저장됨
-        </span>
-      ) : (
-        <button
-          type="button"
-          onClick={handleSave}
-          className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <Bookmark className="h-3.5 w-3.5" />
-          저장하기
-        </button>
-      )}
+      <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        서버에 저장됨
+      </span>
     </div>
   ) : undefined;
 
@@ -142,29 +144,29 @@ export function JobQASection({
       titleClassName="text-lg"
       action={sectionAction}
     >
-      {!HAS_RESUME && (
+      {!hasResume && (
         <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="text-sm font-medium text-muted-foreground">
-            이력서를 등록하면 이 공고에 맞춤화된 면접 예상 질문과 모범 답변을
-            생성할 수 있어요.
+            마스터 이력서를 작성하면 이 공고에 맞춤화된 면접 예상 질문과 모범 답변을 생성할 수
+            있어요.
           </p>
           <Link
             href="/my-resume"
             className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            이력서 등록하기
+            이력서 작성하기
           </Link>
         </div>
       )}
 
-      {HAS_RESUME && !isGenerated && !isLoading && !isError && (
+      {hasResume && !isGenerated && !isLoading && !isError && (
         <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="text-sm font-medium text-muted-foreground">
             이 공고를 기반으로 면접 예상 질문과 모범 답변을 생성할 수 있어요.
           </p>
           <button
             type="button"
-            onClick={generate}
+            onClick={() => generate.mutate()}
             className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             면접 질문 생성하기
@@ -172,21 +174,21 @@ export function JobQASection({
         </div>
       )}
 
-      {isLoading && (
+      {isLoading && !isGenerated && (
         <div className="flex items-center gap-2.5 rounded-lg bg-muted/50 px-4 py-3.5 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          면접 질문을 생성하고 있어요...
+          {generate.isPending ? "면접 질문을 생성하고 있어요..." : "불러오는 중..."}
         </div>
       )}
 
-      {isError && (
+      {generate.isError && !isGenerated && (
         <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="text-sm font-medium text-muted-foreground">
             면접 질문 생성에 실패했습니다. 다시 시도해 주세요.
           </p>
           <button
             type="button"
-            onClick={generate}
+            onClick={() => generate.mutate()}
             className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             다시 시도
@@ -194,7 +196,22 @@ export function JobQASection({
         </div>
       )}
 
-      {isGenerated && (
+      {isError && !isGenerated && !generate.isError && (
+        <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <p className="text-sm font-medium text-muted-foreground">
+            면접 Q&A를 불러오지 못했습니다. 다시 시도해 주세요.
+          </p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
+      {isGenerated && currentQA && (
         <div className="divide-y divide-border">
           {currentQA.map((category, i) => (
             <JobQACategory key={i} category={category} />

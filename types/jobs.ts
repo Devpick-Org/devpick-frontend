@@ -2,6 +2,8 @@ export type EmploymentType = "FULL_TIME" | "PART_TIME" | "CONTRACT" | "INTERNSHI
 export type JobCategory = "FRONTEND" | "BACKEND" | "FULLSTACK" | "DEVOPS" | "AI_ML" | "MOBILE" | "DATA";
 export type ExperienceLevel = "NEW" | "JUNIOR" | "MIDDLE" | "SENIOR" | "ANY";
 
+export type JobPostingStatus = "ACTIVE" | "EXPIRED";
+
 export interface Job {
   id: string;
   companyName: string;
@@ -16,6 +18,10 @@ export interface Job {
   matchScore: number;
   matchedTags: string[];
   missingTags: string[];
+  /** 서버 북마크 여부 (실 API 연동 시 필수) */
+  bookmarked?: boolean;
+  /** 공고 상태 */
+  postingStatus?: JobPostingStatus;
 }
 
 export type MatchItemStatus = "MET" | "UNMET" | "PARTIAL";

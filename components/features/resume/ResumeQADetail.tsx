@@ -42,9 +42,13 @@ export function ResumeQADetail({ qa, onDelete }: ResumeQADetailProps) {
           <h3 className="mt-0.5 text-base font-bold text-foreground">
             {qa.jobTitle}
           </h3>
-          <p className="mt-1 text-xs font-semibold text-primary">
-            매칭 {qa.matchScore}%
-          </p>
+          {qa.matchScore > 0 ? (
+            <p className="mt-1 text-xs font-semibold text-primary">
+              매칭 {qa.matchScore}%
+            </p>
+          ) : (
+            <p className="mt-1 text-xs font-medium text-muted-foreground">매칭 —</p>
+          )}
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <button

@@ -3,8 +3,11 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
-import { fetchJobsPaginated, type JobSortBy } from "@/lib/mock/jobs";
-import { MOCK_RESUME } from "@/lib/mock/resume";
+import type { JobSortBy } from "@/lib/mock/jobs";
+import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import { resumeEndpoints } from "@/lib/api/endpoints/resume";
+import { mapJobListItem } from "@/lib/jobs/mapJobApi";
+import { masterJsonToResumeData } from "@/lib/resume/masterResumeJson";
 import { Skeleton } from "@/components/ui/skeleton";
 import { type JobFilters } from "./JobFilterBar";
 import { JobSearchPanel } from "./JobSearchPanel";
@@ -13,8 +16,6 @@ import { JobList } from "./JobList";
 import { JobPagination } from "./JobPagination";
 import { ResumeSummaryBanner } from "./ResumeSummaryBanner";
 import type { Job } from "@/types/jobs";
-
-const HAS_RESUME = true;
 
 const PAGE_SIZE = 9;
 
@@ -97,19 +98,38 @@ export function JobPage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  const { data: resumeJson } = useQuery({
+    queryKey: ["master-resume"],
+    queryFn: resumeEndpoints.getMasterOrNull,
+    staleTime: 60_000,
+  });
+  const hasResume = resumeJson != null;
+  const resumeForBanner = resumeJson ? masterJsonToResumeData(resumeJson) : undefined;
+
+  const techStackParam =
+    filters.techStack.length > 0 ? filters.techStack.join(",") : undefined;
+  const locationParam = filters.location === "ALL" ? undefined : filters.location;
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["jobs", currentPage, debouncedQuery, filters, sortBy],
     queryFn: () =>
-      fetchJobsPaginated({
-        page: currentPage - 1,
-        size: PAGE_SIZE,
-        searchQuery: debouncedQuery,
-        category: filters.category,
-        experienceLevel: filters.experienceLevel,
-        location: filters.location,
-        techStack: filters.techStack,
-        sortBy,
-      }),
+      jobsEndpoints
+        .list({
+          page: currentPage - 1,
+          size: PAGE_SIZE,
+          query: debouncedQuery.trim() || undefined,
+          category: filters.category === "ALL" ? undefined : filters.category,
+          experienceLevel:
+            filters.experienceLevel === "ALL" ? undefined : filters.experienceLevel,
+          location: locationParam,
+          techStack: techStackParam,
+          sortBy,
+        })
+        .then((page) => ({
+          jobs: page.jobs.map(mapJobListItem),
+          totalCount: page.totalCount,
+          totalPages: page.totalPages,
+        })),
   });
 
   const filteredJobs = data?.jobs ?? [];
@@ -143,8 +163,8 @@ export function JobPage() {
   return (
     <div className="flex flex-col gap-5">
       <ResumeSummaryBanner
-        hasResume={HAS_RESUME}
-        resume={HAS_RESUME ? MOCK_RESUME : undefined}
+        hasResume={hasResume}
+        resume={hasResume ? resumeForBanner : undefined}
       />
       <JobSearchPanel
         searchQuery={searchQuery}

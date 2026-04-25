@@ -3,11 +3,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchJobDetailById } from "@/lib/mock/jobs";
+import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import { mapJobDetail } from "@/lib/jobs/mapJobApi";
 import { JobDetailHeader } from "./JobDetailHeader";
 import { JobDetailSection } from "./JobDetailSection";
 import { JobMatchSection } from "./JobMatchSection";
 import { JobQASection } from "./JobQASection";
+import { JobSkillGapSection } from "./JobSkillGapSection";
 
 interface JobDetailPageProps {
   id: string;
@@ -156,7 +158,7 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
     isError,
   } = useQuery({
     queryKey: ["job-detail", id],
-    queryFn: () => fetchJobDetailById(id),
+    queryFn: () => jobsEndpoints.getDetail(id).then(mapJobDetail),
   });
 
   if (isLoading) return <JobDetailSkeleton />;
@@ -273,6 +275,10 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
               jobTitle={job.title}
               matchScore={job.matchScore}
             />
+          </div>
+
+          <div className="mt-8 border-t pt-8">
+            <JobSkillGapSection jobId={id} />
           </div>
         </main>
 

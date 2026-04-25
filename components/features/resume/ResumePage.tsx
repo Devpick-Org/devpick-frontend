@@ -1,15 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { MOCK_RESUME } from "@/lib/mock/resume";
 import type { ResumeData, ResumeBasicInfo } from "@/types/resume";
+import { resumeEndpoints } from "@/lib/api/endpoints/resume";
+import { extractApiError } from "@/lib/api/extractApiError";
+import {
+  emptyResumeData,
+  masterJsonToResumeData,
+  resumeDataToMasterJson,
+} from "@/lib/resume/masterResumeJson";
 import { ResumeUploadSection } from "./ResumeUploadSection";
 import { ResumeSummarySection } from "./ResumeSummarySection";
 import { ResumeQATab } from "./ResumeQATab";
-
-const MOCK_PARSE_FAIL = false;
 
 const TRIGGER_CLASS =
   "rounded-none border-b-2 border-transparent px-4 pb-3 pt-1 text-sm font-semibold " +
@@ -20,34 +26,65 @@ const TRIGGER_CLASS =
 
 export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const router = useRouter();
-  // TODO: API 연동 시 useQuery로 기존 이력서 조회 후 hasResume/resume 초기값 설정 필요
-  const [hasResume, setHasResume] = useState(false);
+  const qc = useQueryClient();
   const [isParsing, setIsParsing] = useState(false);
-  const [resume, setResume] = useState<ResumeData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<ResumeBasicInfo | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const {
+    data: masterJson,
+    isLoading: isResumeLoading,
+    isError: isResumeError,
+    refetch: refetchResume,
+  } = useQuery({
+    queryKey: ["master-resume"],
+    queryFn: resumeEndpoints.getMasterOrNull,
+  });
+
+  const resume: ResumeData | null = useMemo(
+    () => (masterJson ? masterJsonToResumeData(masterJson) : null),
+    [masterJson],
+  );
+
+  const hasResume = resume != null;
+
+  const saveMutation = useMutation({
+    mutationFn: (data: ResumeData) =>
+      resumeEndpoints.putMaster(resumeDataToMasterJson(data)),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["master-resume"] });
+      toast.success("이력서가 저장되었습니다.");
+    },
+    onError: (e) => {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "저장에 실패했습니다.");
+    },
+  });
 
   const handleFileSelect = async (file: File) => {
     void file;
     setErrorMessage(null);
     setIsParsing(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    if (MOCK_PARSE_FAIL) {
-      setIsParsing(false);
-      setErrorMessage(
-        "이력서를 분석하지 못했습니다. 파일 형식을 확인하고 다시 시도해 주세요.",
-      );
-      return;
-    }
-    setResume(MOCK_RESUME);
-    setHasResume(true);
+    await new Promise((r) => setTimeout(r, 400));
     setIsParsing(false);
+    setErrorMessage(
+      "현재 버전에서는 파일 자동 파싱을 지원하지 않습니다. 아래 「직접 작성하기」로 정보를 입력해 주세요.",
+    );
   };
 
+  const startManual = useCallback(() => {
+    const initial = emptyResumeData();
+    saveMutation.mutate(initial, {
+      onSuccess: () => {
+        setIsEditing(true);
+        setDraft({ ...initial.basicInfo });
+      },
+    });
+  }, [saveMutation]);
+
   const handleReupload = () => {
-    setHasResume(false);
-    setResume(null);
+    toast.message("이력서를 삭제하려면 내용을 비운 뒤 저장하거나 관리자에게 문의하세요.");
   };
 
   const handleStartEdit = () => {
@@ -63,9 +100,13 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
 
   const handleSave = () => {
     if (!resume || !draft) return;
-    setResume({ ...resume, basicInfo: draft });
-    setIsEditing(false);
-    setDraft(null);
+    const next: ResumeData = { ...resume, basicInfo: draft };
+    saveMutation.mutate(next, {
+      onSuccess: () => {
+        setIsEditing(false);
+        setDraft(null);
+      },
+    });
   };
 
   const handleDraftChange = (
@@ -74,6 +115,29 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   ) => {
     setDraft((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
+
+  if (isResumeLoading) {
+    return (
+      <div className="rounded-2xl border border-border bg-muted/20 py-20 text-center text-sm text-muted-foreground">
+        불러오는 중…
+      </div>
+    );
+  }
+
+  if (isResumeError) {
+    return (
+      <div className="rounded-2xl border border-destructive/30 bg-destructive/5 py-12 text-center">
+        <p className="text-sm font-medium text-destructive">이력서를 불러오지 못했습니다.</p>
+        <button
+          type="button"
+          onClick={() => void refetchResume()}
+          className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+        >
+          다시 시도
+        </button>
+      </div>
+    );
+  }
 
   return (
     <Tabs
@@ -98,6 +162,7 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
             isParsing={isParsing}
             onFileSelect={handleFileSelect}
             errorMessage={errorMessage}
+            onStartManual={startManual}
           />
         ) : (
           resume && (
@@ -110,6 +175,7 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
               onCancelEdit={handleCancelEdit}
               onSave={handleSave}
               onDraftChange={handleDraftChange}
+              isSaving={saveMutation.isPending}
             />
           )
         )}

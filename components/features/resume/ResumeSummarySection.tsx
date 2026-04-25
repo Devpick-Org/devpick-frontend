@@ -14,6 +14,7 @@ interface ResumeSummarySectionProps {
   onCancelEdit: () => void;
   onSave: () => void;
   onDraftChange: (field: keyof ResumeBasicInfo, value: string | number) => void;
+  isSaving?: boolean;
 }
 
 function SectionTitle({ children }: { children: ReactNode }) {
@@ -29,6 +30,7 @@ export function ResumeSummarySection({
   onCancelEdit,
   onSave,
   onDraftChange,
+  isSaving = false,
 }: ResumeSummarySectionProps) {
   const { fileName, uploadedAt, basicInfo, techStack, careers, projects } =
     resume;
@@ -43,10 +45,10 @@ export function ResumeSummarySection({
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-foreground">
-              {fileName}
+              {fileName?.trim() ? fileName : "마스터 이력서 (직접 작성)"}
             </p>
             <p className="mt-0.5 text-xs text-muted-foreground font-medium">
-              {formatDate(uploadedAt)} 업로드
+              {formatDate(uploadedAt)} 저장
             </p>
           </div>
         </div>
@@ -65,9 +67,9 @@ export function ResumeSummarySection({
       <div className="flex flex-col gap-7">
         <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
           <div>
-            <h2 className="text-base font-bold text-foreground">추출된 정보</h2>
+            <h2 className="text-base font-bold text-foreground">기본 정보</h2>
             <p className="mt-0.5 text-xs text-muted-foreground font-medium">
-              이력서에서 자동으로 분석된 내용입니다.
+              채용 매칭·면접 Q&A에 사용되는 마스터 이력서입니다.
             </p>
           </div>
           {!isEditing && (
@@ -142,7 +144,12 @@ export function ResumeSummarySection({
                 >
                   취소
                 </Button>
-                <Button size="sm" className="gap-1.5" onClick={onSave}>
+                <Button
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={onSave}
+                  disabled={isSaving}
+                >
                   저장
                 </Button>
               </div>

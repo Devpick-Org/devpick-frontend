@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { getSavedQAs, removeQA } from "@/lib/mock/resume-qa";
+import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import { parseInterviewQaPayload } from "@/lib/jobs/parseInterviewQaPayload";
+import { extractApiError } from "@/lib/api/extractApiError";
 import type { SavedQA } from "@/lib/mock/resume-qa";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResumeQAJobList } from "./ResumeQAJobList";
 import { ResumeQADetail } from "./ResumeQADetail";
-
-const MOCK_QA_LOADING = false;
-const MOCK_QA_ERROR = false;
 
 function ResumeQATabSkeleton() {
   return (
@@ -55,59 +55,79 @@ function ResumeQATabError({ onRetry }: { onRetry: () => void }) {
   );
 }
 
+function toSavedQA(row: {
+  jobId: string;
+  companyName: string;
+  jobTitle: string;
+  matchScore: number;
+  payloadJson: string;
+  updatedAt: string;
+}): SavedQA {
+  return {
+    jobId: row.jobId,
+    companyName: row.companyName,
+    jobTitle: row.jobTitle,
+    matchScore: row.matchScore,
+    qaCategories: parseInterviewQaPayload(row.payloadJson),
+    savedAt: row.updatedAt,
+  };
+}
+
 export function ResumeQATab() {
-  // TODO: API 연동 시 useQuery로 교체 — isLoading/isError를 useQuery 값으로 교체하면 됨
-  const [isLoading, setIsLoading] = useState(MOCK_QA_LOADING);
-  const [isError, setIsError] = useState(MOCK_QA_ERROR);
-  const [savedQAs, setSavedQAs] = useState<SavedQA[]>(() =>
-    !MOCK_QA_LOADING && !MOCK_QA_ERROR ? getSavedQAs() : []
-  );
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(() => {
-    if (MOCK_QA_LOADING || MOCK_QA_ERROR) return null;
-    return getSavedQAs()[0]?.jobId ?? null;
+  const qc = useQueryClient();
+  const {
+    data: rows,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ["interview-qa-list"],
+    queryFn: jobsEndpoints.listInterviewQa,
   });
 
-  useEffect(() => {
-    if (!MOCK_QA_LOADING) return;
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      const data = getSavedQAs();
-      setSavedQAs(data);
-      setSelectedJobId(data[0]?.jobId ?? null);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
+  const savedQAs: SavedQA[] = useMemo(
+    () => (rows ?? []).map(toSavedQA).filter((q) => q.qaCategories.length > 0),
+    [rows],
+  );
 
-  const load = () => {
-    setIsError(false);
-    const data = getSavedQAs();
-    setSavedQAs(data);
-    setSelectedJobId(data[0]?.jobId ?? null);
-  };
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
-  const handleDelete = (jobId: string) => {
-    removeQA(jobId);
-    const updated = getSavedQAs();
-    setSavedQAs(updated);
-    if (selectedJobId === jobId) {
-      setSelectedJobId(updated[0]?.jobId ?? null);
-    }
-    toast.success("면접 Q&A가 삭제되었습니다.");
-  };
+  const selectedEffective =
+    selectedJobId && savedQAs.some((q) => q.jobId === selectedJobId)
+      ? selectedJobId
+      : savedQAs[0]?.jobId ?? null;
+
+  const deleteMutation = useMutation({
+    mutationFn: (jobId: string) => jobsEndpoints.deleteInterviewQa(jobId),
+    onSuccess: (_, jobId) => {
+      void qc.invalidateQueries({ queryKey: ["interview-qa-list"] });
+      void qc.invalidateQueries({ queryKey: ["job-interview-qa", jobId] });
+      toast.success("면접 Q&A가 삭제되었습니다.");
+      setSelectedJobId(null);
+    },
+    onError: (e) => {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "삭제에 실패했습니다.");
+    },
+  });
 
   if (isLoading) return <ResumeQATabSkeleton />;
-  if (isError) return <ResumeQATabError onRetry={load} />;
+  if (isError) return <ResumeQATabError onRetry={() => void refetch()} />;
 
-  const selectedQA = savedQAs.find((qa) => qa.jobId === selectedJobId) ?? null;
+  const selectedQA =
+    savedQAs.find((qa) => qa.jobId === selectedEffective) ?? null;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <ResumeQAJobList
         items={savedQAs}
-        selectedJobId={selectedJobId}
+        selectedJobId={selectedEffective}
         onSelect={setSelectedJobId}
       />
-      <ResumeQADetail qa={selectedQA} onDelete={handleDelete} />
+      <ResumeQADetail
+        qa={selectedQA}
+        onDelete={(jobId) => deleteMutation.mutate(jobId)}
+      />
     </div>
   );
 }
