@@ -1199,6 +1199,6 @@ export async function fetchJobDetailById(id: string): Promise<JobDetail | null> 
     ...base,
     ...extra,
     jdImageUrls: extra.jdImageUrls ?? [],
-    parseStatus: extra.parseStatus ?? "OK",
+    parseStatus: extra.parseStatus ?? "PENDING",
   };
 }

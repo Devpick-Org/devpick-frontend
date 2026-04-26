@@ -6,15 +6,27 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { mapJobDetail } from "@/lib/jobs/mapJobApi";
 import { JobDetailHeader } from "./JobDetailHeader";
-import { JobDetailStructuredList } from "./JobDetailStructuredList";
-import { JobDetailSection } from "./JobDetailSection";
 import { JobDetailJdImages } from "./JobDetailJdImages";
+import { JobDetailSection } from "./JobDetailSection";
+import { JobDetailStructuredList } from "./JobDetailStructuredList";
 import { JobMatchSection } from "./JobMatchSection";
 import { JobQASection } from "./JobQASection";
 import { JobSkillGapSection } from "./JobSkillGapSection";
 
 interface JobDetailPageProps {
   id: string;
+}
+
+/** 스킬 태그만 자격에 복제된 경우(랠릿·이미지 JD) 텍스트 JD가 있는 것처럼 보이지 않게 구분 */
+function sameStringSet(a: string[], b: string[]): boolean {
+  const norm = (s: string) => s.trim();
+  const sa = new Set(a.map(norm).filter((x) => x.length > 0));
+  const sb = new Set(b.map(norm).filter((x) => x.length > 0));
+  if (sa.size !== sb.size) return false;
+  for (const x of sa) {
+    if (!sb.has(x)) return false;
+  }
+  return true;
 }
 
 function JobDetailSkeleton() {
@@ -177,13 +189,20 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
     );
   }
 
-  /** 원문이 인포그래픽 위주면 텍스트 JD 섹션은 비어 있고, 스킬·이미지·채용 절차만 노출한다. */
-  const infographicLayout =
-    job.parseStatus === "SKIPPED_IMAGE" &&
-    job.jdImageUrls.length > 0 &&
+  /**
+   * 인포그래픽 JD: 본문 문단이 비었고 이미지 URL이 있을 때.
+   * parseStatus 가 아직 OK/PENDING 이어도, 자격이 기술스택과 동일하면 텍스트 JD로 보지 않는다.
+   */
+  const noStructuredProse =
     job.responsibilities.length === 0 &&
     job.preferredQualifications.length === 0 &&
     job.benefits.length === 0;
+  const requirementsLookLikeTechOnly =
+    job.requirements.length === 0 || sameStringSet(job.requirements, job.techStack);
+  const infographicLayout =
+    job.jdImageUrls.length > 0 &&
+    noStructuredProse &&
+    requirementsLookLikeTechOnly;
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8 lg:px-8">
