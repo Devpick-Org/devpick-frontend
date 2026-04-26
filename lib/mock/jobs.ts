@@ -259,7 +259,8 @@ export async function fetchJobsPaginated(params: {
 // 상세 mock 데이터 (req 45점 + preferred 35점 + experience 20점 = 100점)
 // ─────────────────────────────────────────────────────────────────────────────
 
-type JobDetailExtra = Omit<JobDetail, keyof Job>;
+type JobDetailExtra = Omit<JobDetail, keyof Job | "jdImageUrls" | "parseStatus"> &
+  Partial<Pick<JobDetail, "jdImageUrls" | "parseStatus">>;
 
 const MOCK_JOB_DETAILS: Record<string, JobDetailExtra> = {
   "1": {
@@ -1194,5 +1195,10 @@ export async function fetchJobDetailById(id: string): Promise<JobDetail | null> 
   if (!base) return null;
   const extra = MOCK_JOB_DETAILS[id];
   if (!extra) return null;
-  return { ...base, ...extra };
+  return {
+    ...base,
+    ...extra,
+    jdImageUrls: extra.jdImageUrls ?? [],
+    parseStatus: extra.parseStatus ?? "OK",
+  };
 }

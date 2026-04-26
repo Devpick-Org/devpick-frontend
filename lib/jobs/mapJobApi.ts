@@ -106,6 +106,8 @@ export function mapJobDetail(row: JobDetailApi): JobDetail {
     preferredQualifications: sanitizeJobDetailLines(row.preferredQualifications),
     benefits: sanitizeJobDetailLines(row.benefits),
     hiringProcess: sanitizeJobDetailLines(row.hiringProcess),
+    jdImageUrls: row.jdImageUrls?.filter((u) => typeof u === "string" && u.trim()) ?? [],
+    parseStatus: row.parseStatus ?? "PENDING",
     matchBreakdown: mapBreakdown(row.matchBreakdown),
   };
 }

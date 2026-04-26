@@ -55,6 +55,9 @@ export interface QACategory {
   items: QAItem[];
 }
 
+/** 백엔드 JobParseStatus (확장 대비 string 허용) */
+export type JobParseStatus = "PENDING" | "OK" | "UNPARSABLE" | "SKIPPED_IMAGE" | string;
+
 export interface JobDetail extends Job {
   salary: string;
   applyUrl: string;
@@ -63,5 +66,8 @@ export interface JobDetail extends Job {
   preferredQualifications: string[];
   benefits: string[];
   hiringProcess: string[];
+  /** 인포그래픽 등 원문 이미지 URL (텍스트 JD가 비어 있을 때 표시) */
+  jdImageUrls: string[];
+  parseStatus: JobParseStatus;
   matchBreakdown: MatchBreakdown;
 }

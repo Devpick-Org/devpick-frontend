@@ -33,6 +33,7 @@ const POPULAR_TECHS = [
   "TypeScript",
   "Python",
   "Java",
+  "C#",
   "Node.js",
   "Spring Boot",
 ];
@@ -254,9 +255,28 @@ export function JobSearchPanel({
               />
             </div>
             {techSearch.trim() && filteredTechOptions.length === 0 && (
-              <p className="mt-4 w-64 text-center text-xs text-muted-foreground font-medium">
-                태그 검색 결과가 없습니다.
-              </p>
+              <div className="mt-3 w-64 space-y-2">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  프리셋에 없는 이름이에요. 아래를 누르면 그대로 필터에 넣을 수 있어요. (DB
+                  태그와 철자가 같을 때만 걸립니다.)
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const t = techSearch.trim();
+                    const exists = filters.techStack.some(
+                      (x) => x.toLowerCase() === t.toLowerCase(),
+                    );
+                    if (!exists) {
+                      onChange({ ...filters, techStack: [...filters.techStack, t] });
+                    }
+                    setTechSearch("");
+                  }}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-left text-xs font-semibold text-foreground transition-colors hover:bg-muted/60 cursor-pointer"
+                >
+                  「{techSearch.trim()}」 필터에 추가
+                </button>
+              </div>
             )}
           </div>
           {POPULAR_TECHS.map((tech) => {

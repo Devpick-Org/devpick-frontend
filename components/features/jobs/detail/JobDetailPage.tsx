@@ -8,6 +8,7 @@ import { mapJobDetail } from "@/lib/jobs/mapJobApi";
 import { JobDetailHeader } from "./JobDetailHeader";
 import { JobDetailStructuredList } from "./JobDetailStructuredList";
 import { JobDetailSection } from "./JobDetailSection";
+import { JobDetailJdImages } from "./JobDetailJdImages";
 import { JobMatchSection } from "./JobMatchSection";
 import { JobQASection } from "./JobQASection";
 import { JobSkillGapSection } from "./JobSkillGapSection";
@@ -196,6 +197,15 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
               </div>
             </JobDetailSection>
           </div>
+
+          {job.jdImageUrls.length > 0 && (
+            <div className="-mt-2">
+              <JobDetailJdImages
+                urls={job.jdImageUrls}
+                parseStatus={job.parseStatus}
+              />
+            </div>
+          )}
 
           <JobDetailSection title="주요 업무">
             <JobDetailStructuredList items={job.responsibilities} />
