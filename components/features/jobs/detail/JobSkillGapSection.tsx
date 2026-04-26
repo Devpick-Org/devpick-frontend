@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ExternalLink, Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { extractApiError } from "@/lib/api/extractApiError";
@@ -17,14 +17,11 @@ export function JobSkillGapSection({ jobId }: JobSkillGapSectionProps) {
   const [contents, setContents] = useState<
     { id: string; title: string; preview: string; canonicalUrl: string; tags: string[] }[]
   >([]);
-  const [youtube, setYoutube] = useState<{ title: string; url: string }[]>([]);
-
   const mutation = useMutation({
     mutationFn: () => jobsEndpoints.skillGap(jobId),
     onSuccess: (data) => {
       setRoadmap(data.roadmap ?? []);
       setContents(data.contents ?? []);
-      setYoutube(data.youtube ?? []);
     },
     onError: (e) => {
       const { message } = extractApiError(e);
@@ -33,9 +30,7 @@ export function JobSkillGapSection({ jobId }: JobSkillGapSectionProps) {
   });
 
   const hasResult =
-    (roadmap && roadmap.length > 0) ||
-    contents.length > 0 ||
-    youtube.length > 0;
+    (roadmap && roadmap.length > 0) || contents.length > 0;
 
   return (
     <JobDetailSection
@@ -59,8 +54,7 @@ export function JobSkillGapSection({ jobId }: JobSkillGapSectionProps) {
     >
       {!hasResult && !mutation.isPending && (
         <p className="text-sm font-medium text-muted-foreground">
-          필수 기술 대비 부족한 부분을 기준으로 학습 로드맵과 콘텐츠·영상 힌트를 받을 수
-          있어요.
+          필수 기술 대비 부족한 부분을 기준으로 학습 로드맵과 추천 콘텐츠를 받을 수 있어요.
         </p>
       )}
 
@@ -101,27 +95,6 @@ export function JobSkillGapSection({ jobId }: JobSkillGapSectionProps) {
                     {c.preview ? (
                       <p className="mt-0.5 text-xs text-muted-foreground">{c.preview}</p>
                     ) : null}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {youtube.length > 0 && (
-            <div>
-              <h4 className="mb-2 text-sm font-bold text-foreground">영상 힌트</h4>
-              <ul className="space-y-1.5">
-                {youtube.map((y, i) => (
-                  <li key={i}>
-                    <a
-                      href={y.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm font-medium text-primary"
-                    >
-                      {y.title}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
                   </li>
                 ))}
               </ul>

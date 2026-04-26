@@ -68,7 +68,6 @@ export interface ContentPickApi {
 export interface SkillGapApi {
   roadmap: string[];
   contents: ContentPickApi[];
-  youtube: { title: string; url: string }[];
 }
 
 export interface InterviewQaListItemApi {
