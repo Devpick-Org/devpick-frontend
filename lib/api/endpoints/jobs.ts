@@ -54,6 +54,8 @@ export interface JobDetailApi extends JobListItemApi {
   preferredQualifications: string[];
   benefits: string[];
   hiringProcess: string[];
+  jdImageUrls?: string[];
+  parseStatus?: string;
   matchBreakdown: MatchBreakdownApi;
 }
 
