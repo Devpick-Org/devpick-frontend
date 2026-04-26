@@ -177,6 +177,14 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
     );
   }
 
+  /** 원문이 인포그래픽 위주면 텍스트 JD 섹션은 비어 있고, 스킬·이미지·채용 절차만 노출한다. */
+  const infographicLayout =
+    job.parseStatus === "SKIPPED_IMAGE" &&
+    job.jdImageUrls.length > 0 &&
+    job.responsibilities.length === 0 &&
+    job.preferredQualifications.length === 0 &&
+    job.benefits.length === 0;
+
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8 lg:px-8">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
@@ -203,25 +211,30 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
               <JobDetailJdImages
                 urls={job.jdImageUrls}
                 parseStatus={job.parseStatus}
+                compact={infographicLayout}
               />
             </div>
           )}
 
-          <JobDetailSection title="주요 업무">
-            <JobDetailStructuredList items={job.responsibilities} />
-          </JobDetailSection>
+          {!infographicLayout && (
+            <>
+              <JobDetailSection title="주요 업무">
+                <JobDetailStructuredList items={job.responsibilities} />
+              </JobDetailSection>
 
-          <JobDetailSection title="자격 요건">
-            <JobDetailStructuredList items={job.requirements} />
-          </JobDetailSection>
+              <JobDetailSection title="자격 요건">
+                <JobDetailStructuredList items={job.requirements} />
+              </JobDetailSection>
 
-          <JobDetailSection title="우대 사항">
-            <JobDetailStructuredList items={job.preferredQualifications} />
-          </JobDetailSection>
+              <JobDetailSection title="우대 사항">
+                <JobDetailStructuredList items={job.preferredQualifications} />
+              </JobDetailSection>
 
-          <JobDetailSection title="복지 혜택">
-            <JobDetailStructuredList items={job.benefits} />
-          </JobDetailSection>
+              <JobDetailSection title="복지 혜택">
+                <JobDetailStructuredList items={job.benefits} />
+              </JobDetailSection>
+            </>
+          )}
 
           <JobDetailSection title="채용 절차">
             <div className="flex flex-wrap items-center gap-2">
