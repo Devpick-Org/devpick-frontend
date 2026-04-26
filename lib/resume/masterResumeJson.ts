@@ -11,6 +11,7 @@ export function emptyResumeData(): ResumeData {
       careerYears: 0,
       location: "",
     },
+    summary: "",
     techStack: [],
     careers: [],
     projects: [],
@@ -32,6 +33,7 @@ export function masterJsonToResumeData(json: MasterResumeJson): ResumeData {
         typeof bi?.careerYears === "number" ? bi.careerYears : Number(bi?.careerYears) || 0,
       location: typeof bi?.location === "string" ? bi.location : "",
     },
+    summary: typeof json.summary === "string" ? json.summary : "",
     techStack: Array.isArray(json.techStack)
       ? json.techStack.map((t) => String(t))
       : [],
@@ -53,8 +55,10 @@ export function masterJsonToResumeData(json: MasterResumeJson): ResumeData {
           return {
             name: String(o.name ?? ""),
             period: String(o.period ?? ""),
+            role: typeof o.role === "string" ? o.role : "",
             techStack: Array.isArray(ts) ? ts.map((x) => String(x)) : [],
             description: String(o.description ?? ""),
+            achievements: typeof o.achievements === "string" ? o.achievements : "",
           };
         })
       : [],

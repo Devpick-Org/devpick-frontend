@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import { FileText, RefreshCw, Pencil, UserRound } from "lucide-react";
+import { Check, Circle, FileText, RefreshCw, Pencil, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/utils";
+import { getResumeCompleteness } from "@/lib/resume/resumeCompleteness";
 import type { ResumeData, ResumeBasicInfo } from "@/types/resume";
 import { ResumeDetailEditSection } from "./ResumeDetailEditSection";
 
@@ -25,6 +26,8 @@ interface ResumeSummarySectionProps {
   onCancelDetailEdit: () => void;
   onSaveDetail: () => void;
   onDetailDraftChange: (next: ResumeData) => void;
+  /** 프로필 태그 + 직무 기반 기술 추천 풀 */
+  suggestedTechPool?: string[];
 }
 
 function SectionTitle({ children }: { children: ReactNode }) {
@@ -48,9 +51,11 @@ export function ResumeSummarySection({
   onCancelDetailEdit,
   onSaveDetail,
   onDetailDraftChange,
+  suggestedTechPool = [],
 }: ResumeSummarySectionProps) {
-  const { fileName, uploadedAt, basicInfo, techStack, careers, projects } =
+  const { fileName, uploadedAt, basicInfo, summary, techStack, careers, projects } =
     resume;
+  const completeness = getResumeCompleteness(resume);
 
   return (
     <div className="flex flex-col gap-8">
@@ -80,13 +85,45 @@ export function ResumeSummarySection({
         </Button>
       </div>
 
+      {/* 완성도 */}
+      <div className="rounded-xl border border-border bg-card px-4 py-3.5">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-sm font-bold text-foreground">이력서 완성도</span>
+          <span className="text-xs font-semibold text-primary">
+            {completeness.doneCount}/{completeness.total} · {completeness.percent}%
+          </span>
+        </div>
+        <p className="mb-3 text-xs text-muted-foreground">
+          프로필 정보로 기본값을 채우고, 프로젝트·성과는 직접 보완하면 매칭과 면접
+          Q&A가 정확해져요.
+        </p>
+        <ul className="flex flex-col gap-1.5">
+          {completeness.items.map((item) => (
+            <li
+              key={item.id}
+              className="flex items-start gap-2 text-xs font-medium text-foreground"
+            >
+              {item.done ? (
+                <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+              ) : (
+                <Circle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+              )}
+              <span className={item.done ? "text-foreground" : "text-muted-foreground"}>
+                {item.label}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       {/* 추출된 정보 */}
       <div className="flex flex-col gap-7">
         <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
           <div>
             <h2 className="text-base font-bold text-foreground">기본 정보</h2>
             <p className="mt-0.5 text-xs text-muted-foreground font-medium">
-              채용 매칭·면접 Q&A에 사용되는 마스터 이력서입니다.
+              공고 매칭, 면접 Q&A, 부족 역량 추천에 사용됩니다. 프로필 반영은
+              비어 있는 항목 위주로 채웁니다.
             </p>
           </div>
           {!isEditing && !detailDraft && (
@@ -204,6 +241,22 @@ export function ResumeSummarySection({
           )}
         </section>
 
+        {/* 자기소개 요약 (읽기 전용 — 상세 편집에서 수정) */}
+        {!detailDraft ? (
+          <section className="flex flex-col gap-2">
+            <SectionTitle>자기소개·요약</SectionTitle>
+            {summary.trim() ? (
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
+                {summary}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                아직 요약이 없습니다. 「상세 편집」에서 3~5문장으로 적어 주세요.
+              </p>
+            )}
+          </section>
+        ) : null}
+
         {/* 기술·경력·프로젝트 */}
         <section className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -228,6 +281,7 @@ export function ResumeSummarySection({
               onSave={onSaveDetail}
               onCancel={onCancelDetailEdit}
               isSaving={isSaving}
+              suggestedTechPool={suggestedTechPool}
             />
           ) : (
             <>
@@ -311,6 +365,11 @@ export function ResumeSummarySection({
                             {project.period}
                           </span>
                         </div>
+                        {project.role.trim() ? (
+                          <p className="text-xs font-medium text-muted-foreground">
+                            역할: {project.role}
+                          </p>
+                        ) : null}
                         <div className="flex flex-wrap gap-1.5">
                           {project.techStack.map((tag) => (
                             <span
@@ -324,6 +383,14 @@ export function ResumeSummarySection({
                         <p className="text-sm text-foreground/80">
                           {project.description}
                         </p>
+                        {project.achievements.trim() ? (
+                          <p className="text-sm text-foreground/80">
+                            <span className="font-semibold text-foreground">
+                              성과:{" "}
+                            </span>
+                            {project.achievements}
+                          </p>
+                        ) : null}
                       </li>
                     ))}
                   </ul>

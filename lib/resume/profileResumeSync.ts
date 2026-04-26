@@ -36,10 +36,11 @@ function jobCodeToTitle(job?: string | null): string {
 
 /**
  * 계정 프로필(닉네임·직무·레벨·관심 태그)을 마스터 이력서에 반영합니다.
- * - 이름: 프로필 닉네임으로 덮어씀
- * - 직무: 프로필 직무가 있으면 한글 직무명으로 덮어씀
- * - 경력(년): 현재 0이고 프로필 레벨이 있으면 참고 연차 적용
- * - 기술 스택: 프로필 태그를 기존 목록과 합쳐 중복 제거
+ * 사용자가 이미 입력한 값은 덮어쓰지 않습니다.
+ * - 이름: 비어 있을 때만 프로필 닉네임
+ * - 직무: 비어 있을 때만 프로필 직무 한글명
+ * - 경력(년): 0이고 프로필 레벨이 있으면 참고 연차
+ * - 기술 스택: 프로필 태그를 기존 목록에 병합(중복 제거)
  */
 export function mergeProfileIntoResume(
   resume: ResumeData,
@@ -59,12 +60,15 @@ export function mergeProfileIntoResume(
   ]);
 
   const keepJobTitle = resume.basicInfo.jobTitle.trim().length > 0;
+  const keepName = resume.basicInfo.name.trim().length > 0;
 
   return {
     ...resume,
     basicInfo: {
       ...resume.basicInfo,
-      name: user.nickname?.trim() || resume.basicInfo.name,
+      name: keepName
+        ? resume.basicInfo.name
+        : user.nickname?.trim() || resume.basicInfo.name,
       jobTitle: keepJobTitle ? resume.basicInfo.jobTitle : profileJobTitle || resume.basicInfo.jobTitle,
       careerYears:
         resume.basicInfo.careerYears > 0

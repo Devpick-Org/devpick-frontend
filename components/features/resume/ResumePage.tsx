@@ -15,6 +15,7 @@ import {
   resumeDataToMasterJson,
 } from "@/lib/resume/masterResumeJson";
 import { mergeProfileIntoResume } from "@/lib/resume/profileResumeSync";
+import { dedupeCi, suggestedTechFromJobTitle } from "@/lib/resume/skillSuggestions";
 import { useAuthStore } from "@/store/auth.store";
 import { ResumeUploadSection } from "./ResumeUploadSection";
 import { ResumeSummarySection } from "./ResumeSummarySection";
@@ -51,6 +52,18 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
     () => (masterJson ? masterJsonToResumeData(masterJson) : null),
     [masterJson],
   );
+
+  const suggestedTechPool = useMemo(() => {
+    const jobTitle =
+      detailDraft?.basicInfo.jobTitle ?? resume?.basicInfo.jobTitle ?? "";
+    const fromProfile = user?.tags ?? [];
+    const fromJob = suggestedTechFromJobTitle(jobTitle);
+    return dedupeCi([...fromProfile, ...fromJob]);
+  }, [
+    detailDraft?.basicInfo.jobTitle,
+    resume?.basicInfo.jobTitle,
+    user?.tags,
+  ]);
 
   const hasResume = resume != null;
 
@@ -215,6 +228,7 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
               onCancelDetailEdit={handleCancelDetailEdit}
               onSaveDetail={handleSaveDetail}
               onDetailDraftChange={setDetailDraft}
+              suggestedTechPool={suggestedTechPool}
             />
           )
         )}

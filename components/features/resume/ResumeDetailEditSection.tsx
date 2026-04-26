@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { filterNewSuggestions } from "@/lib/resume/skillSuggestions";
 import type { ResumeCareer, ResumeData, ResumeProject } from "@/types/resume";
 
 function emptyCareer(): ResumeCareer {
@@ -11,7 +12,14 @@ function emptyCareer(): ResumeCareer {
 }
 
 function emptyProject(): ResumeProject {
-  return { name: "", period: "", techStack: [], description: "" };
+  return {
+    name: "",
+    period: "",
+    role: "",
+    techStack: [],
+    description: "",
+    achievements: "",
+  };
 }
 
 interface ResumeDetailEditSectionProps {
@@ -20,6 +28,8 @@ interface ResumeDetailEditSectionProps {
   onSave: () => void;
   onCancel: () => void;
   isSaving?: boolean;
+  /** 프로필 태그 + 직무 기반 추천 (이미 보유 스택 제외) */
+  suggestedTechPool?: string[];
 }
 
 export function ResumeDetailEditSection({
@@ -28,6 +38,7 @@ export function ResumeDetailEditSection({
   onSave,
   onCancel,
   isSaving = false,
+  suggestedTechPool = [],
 }: ResumeDetailEditSectionProps) {
   const [techInput, setTechInput] = useState("");
   const [projTechInputs, setProjTechInputs] = useState<Record<number, string>>(
@@ -57,6 +68,18 @@ export function ResumeDetailEditSection({
   const setProjects = (projects: ResumeProject[]) =>
     onChange({ ...draft, projects });
 
+  const suggestedToShow = filterNewSuggestions(
+    suggestedTechPool,
+    draft.techStack,
+  ).slice(0, 16);
+
+  const addSuggested = (tag: string) => {
+    const t = tag.trim();
+    if (!t || draft.techStack.some((x) => x.toLowerCase() === t.toLowerCase()))
+      return;
+    onChange({ ...draft, techStack: [...draft.techStack, t] });
+  };
+
   return (
     <div className="flex flex-col gap-8 rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
       <div className="flex flex-col gap-2 border-b border-border pb-3">
@@ -64,9 +87,28 @@ export function ResumeDetailEditSection({
           기술·경력·프로젝트 편집
         </h3>
         <p className="text-xs font-medium text-muted-foreground">
-          채용 매칭·면접 Q&A에 반영됩니다. 저장 시 서버에 바로 반영돼요.
+          이력서가 자세할수록 공고 매칭, 면접 질문, 부족 역량 추천이 정확해집니다.
+          자동 반영된 값은 언제든 수정할 수 있어요.
         </p>
       </div>
+
+      {/* 자기소개 */}
+      <section className="flex flex-col gap-2">
+        <span className="text-sm font-semibold text-foreground">
+          자기소개·요약
+        </span>
+        <p className="text-xs text-muted-foreground">
+          3~5문장 정도로 강점·관심 분야를 적어 주세요. 면접 Q&A의 자기소개
+          질문에 활용됩니다.
+        </p>
+        <textarea
+          value={draft.summary}
+          onChange={(e) => onChange({ ...draft, summary: e.target.value })}
+          rows={5}
+          placeholder="예: OO 기술 스택으로 서비스를 만들며, 사용자 경험과 운영 안정성을 모두 고려하는 백엔드 개발자입니다."
+          className="min-h-[100px] w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+      </section>
 
       {/* 기술 스택 */}
       <section className="flex flex-col gap-3">
@@ -113,6 +155,25 @@ export function ResumeDetailEditSection({
             추가
           </Button>
         </div>
+        {suggestedToShow.length > 0 ? (
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">
+              추천 (프로필·직무 기반) — 클릭 시 추가
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {suggestedToShow.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => addSuggested(tag)}
+                  className="rounded-full border border-dashed border-primary/40 bg-background px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+                >
+                  + {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </section>
 
       {/* 경력 */}
@@ -282,6 +343,21 @@ export function ResumeDetailEditSection({
                   />
                 </div>
                 <div className="flex flex-col gap-1 sm:col-span-2">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    본인 역할
+                  </label>
+                  <Input
+                    value={p.role}
+                    onChange={(e) => {
+                      const next = [...draft.projects];
+                      next[i] = { ...p, role: e.target.value };
+                      setProjects(next);
+                    }}
+                    placeholder="예: 백엔드 담당, 인프라 설계"
+                    className="h-8 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-1 sm:col-span-2">
                   <span className="text-xs font-medium text-muted-foreground">
                     사용 기술
                   </span>
@@ -348,8 +424,12 @@ export function ResumeDetailEditSection({
                 </div>
                 <div className="flex flex-col gap-1 sm:col-span-2">
                   <label className="text-xs font-medium text-muted-foreground">
-                    설명
+                    간단 설명
                   </label>
+                  <p className="text-[11px] text-muted-foreground">
+                    무엇을 만들었는지, 어떤 기술로 풀었는지 적어 주세요. 면접
+                    질문 품질에 큰 영향을 줍니다.
+                  </p>
                   <textarea
                     value={p.description}
                     onChange={(e) => {
@@ -359,6 +439,22 @@ export function ResumeDetailEditSection({
                     }}
                     rows={3}
                     className="min-h-[72px] w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  />
+                </div>
+                <div className="flex flex-col gap-1 sm:col-span-2">
+                  <label className="text-xs font-medium text-muted-foreground">
+                    성과·문제 해결
+                  </label>
+                  <textarea
+                    value={p.achievements}
+                    onChange={(e) => {
+                      const next = [...draft.projects];
+                      next[i] = { ...p, achievements: e.target.value };
+                      setProjects(next);
+                    }}
+                    rows={2}
+                    placeholder="예: 응답 시간 40% 개선, 장애 0건 유지"
+                    className="min-h-[56px] w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                 </div>
               </div>

@@ -9,6 +9,8 @@ export const MOCK_RESUME: ResumeData = {
     careerYears: 2,
     location: "서울특별시 강남구",
   },
+  summary:
+    "사용자 경험과 성능을 중시하는 프론트엔드 개발자입니다. 디자인 시스템과 상태 관리에 관심이 많습니다.",
   techStack: [
     "TypeScript",
     "React",
@@ -38,23 +40,29 @@ export const MOCK_RESUME: ResumeData = {
     {
       name: "Trace — 개발자 성장형 통합 플랫폼",
       period: "2026.01 – 현재",
+      role: "프론트엔드",
       techStack: ["Next.js", "TypeScript", "Tailwind CSS", "TanStack Query"],
       description:
         "개발 콘텐츠 탐색, AI 요약, 커뮤니티 소통, 성장 기록을 하나의 흐름으로 연결하는 플랫폼 프론트엔드 개발.",
+      achievements: "피드·상세·퀴즈 플로우 설계, API 연동 및 로딩/에러 UX 정리.",
     },
     {
       name: "사내 디자인 시스템 구축",
       period: "2024.06 – 2024.09",
+      role: "프론트 리드",
       techStack: ["React", "TypeScript", "Storybook", "CSS Modules"],
       description:
         "재사용 가능한 UI 컴포넌트 라이브러리 설계 및 Storybook 문서화. 팀 내 개발 속도 30% 향상.",
+      achievements: "컴포넌트 40+ 개 표준화, 릴리스 주기 단축.",
     },
     {
       name: "실시간 협업 메모 앱",
       period: "2023.09 – 2023.12",
+      role: "풀스택(프론트 비중)",
       techStack: ["React", "Firebase", "Zustand"],
       description:
         "WebSocket 기반 실시간 공동 편집 기능 구현. Firebase를 활용한 인증 및 데이터 동기화.",
+      achievements: "동시 편집 충돌 최소화를 위한 낙관적 UI 적용.",
     },
   ],
 };
