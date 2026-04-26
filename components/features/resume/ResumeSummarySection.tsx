@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import { FileText, RefreshCw, Pencil } from "lucide-react";
+import { FileText, RefreshCw, Pencil, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate } from "@/lib/utils";
 import type { ResumeData, ResumeBasicInfo } from "@/types/resume";
+import { ResumeDetailEditSection } from "./ResumeDetailEditSection";
 
 interface ResumeSummarySectionProps {
   resume: ResumeData;
@@ -15,6 +16,15 @@ interface ResumeSummarySectionProps {
   onSave: () => void;
   onDraftChange: (field: keyof ResumeBasicInfo, value: string | number) => void;
   isSaving?: boolean;
+  /** 프로필(닉네임·직무·레벨·관심 태그) → 이력서 반영 */
+  onApplyProfile?: () => void;
+  showApplyProfile?: boolean;
+  /** 기술·경력·프로젝트 상세 편집 */
+  detailDraft: ResumeData | null;
+  onStartDetailEdit: () => void;
+  onCancelDetailEdit: () => void;
+  onSaveDetail: () => void;
+  onDetailDraftChange: (next: ResumeData) => void;
 }
 
 function SectionTitle({ children }: { children: ReactNode }) {
@@ -31,6 +41,13 @@ export function ResumeSummarySection({
   onSave,
   onDraftChange,
   isSaving = false,
+  onApplyProfile,
+  showApplyProfile = false,
+  detailDraft,
+  onStartDetailEdit,
+  onCancelDetailEdit,
+  onSaveDetail,
+  onDetailDraftChange,
 }: ResumeSummarySectionProps) {
   const { fileName, uploadedAt, basicInfo, techStack, careers, projects } =
     resume;
@@ -72,21 +89,33 @@ export function ResumeSummarySection({
               채용 매칭·면접 Q&A에 사용되는 마스터 이력서입니다.
             </p>
           </div>
-          {!isEditing && (
-            <button
-              type="button"
-              onClick={onStartEdit}
-              className="flex cursor-pointer items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              기본 정보 수정
-            </button>
+          {!isEditing && !detailDraft && (
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {showApplyProfile && onApplyProfile ? (
+                <button
+                  type="button"
+                  onClick={onApplyProfile}
+                  disabled={isSaving}
+                  className="flex cursor-pointer items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-primary disabled:opacity-50"
+                >
+                  <UserRound className="h-3.5 w-3.5" />
+                  프로필 반영
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={onStartEdit}
+                className="flex cursor-pointer items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                기본 정보 수정
+              </button>
+            </div>
           )}
         </div>
 
-        {/* 기본 정보 */}
+        {/* 기본 정보 필드 */}
         <section className="flex flex-col gap-3">
-          <SectionTitle>기본 정보</SectionTitle>
           {isEditing && draft ? (
             <>
               <div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-4">
@@ -175,82 +204,133 @@ export function ResumeSummarySection({
           )}
         </section>
 
-        {/* 기술 스택 */}
+        {/* 기술·경력·프로젝트 */}
         <section className="flex flex-col gap-3">
-          <SectionTitle>기술 스택</SectionTitle>
-          <div className="flex flex-wrap gap-2">
-            {techStack.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <SectionTitle>기술 스택 · 경력 · 프로젝트</SectionTitle>
+            {!detailDraft && !isEditing ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="shrink-0"
+                onClick={onStartDetailEdit}
               >
-                {tag}
-              </span>
-            ))}
+                상세 편집
+              </Button>
+            ) : null}
           </div>
-        </section>
 
-        {/* 경력 */}
-        <section className="flex flex-col gap-3">
-          <SectionTitle>경력</SectionTitle>
-          <ul className="flex flex-col gap-4">
-            {careers.map((career, i) => (
-              <li
-                key={i}
-                className="flex flex-col gap-1 border-l-2 border-primary/30 pl-4"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-bold text-foreground">
-                    {career.company}
-                  </span>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {career.role}
-                  </span>
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  {career.period}
-                </span>
-                <p className="mt-1 text-sm text-foreground/80">
-                  {career.description}
+          {detailDraft ? (
+            <ResumeDetailEditSection
+              draft={detailDraft}
+              onChange={onDetailDraftChange}
+              onSave={onSaveDetail}
+              onCancel={onCancelDetailEdit}
+              isSaving={isSaving}
+            />
+          ) : (
+            <>
+              <div>
+                <p className="mb-2 text-xs font-medium text-muted-foreground">
+                  기술 스택
                 </p>
-              </li>
-            ))}
-          </ul>
-        </section>
+                {techStack.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    등록된 기술이 없습니다. 「상세 편집」에서 추가해 주세요.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {techStack.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-        {/* 프로젝트 */}
-        <section className="flex flex-col gap-3">
-          <SectionTitle>프로젝트</SectionTitle>
-          <ul className="flex flex-col gap-4">
-            {projects.map((project, i) => (
-              <li
-                key={i}
-                className="flex flex-col gap-2 border-l-2 border-border pl-4"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-bold text-foreground">
-                    {project.name}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {project.period}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {project.techStack.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-sm text-foreground/80">
-                  {project.description}
+              <div>
+                <p className="mb-2 text-xs font-medium text-muted-foreground">
+                  경력
                 </p>
-              </li>
-            ))}
-          </ul>
+                {careers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    등록된 경력이 없습니다. 「상세 편집」에서 추가해 주세요.
+                  </p>
+                ) : (
+                  <ul className="flex flex-col gap-4">
+                    {careers.map((career, i) => (
+                      <li
+                        key={i}
+                        className="flex flex-col gap-1 border-l-2 border-primary/30 pl-4"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-bold text-foreground">
+                            {career.company}
+                          </span>
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {career.role}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {career.period}
+                        </span>
+                        <p className="mt-1 text-sm text-foreground/80">
+                          {career.description}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div>
+                <p className="mb-2 text-xs font-medium text-muted-foreground">
+                  프로젝트
+                </p>
+                {projects.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    등록된 프로젝트가 없습니다. 「상세 편집」에서 추가해 주세요.
+                  </p>
+                ) : (
+                  <ul className="flex flex-col gap-4">
+                    {projects.map((project, i) => (
+                      <li
+                        key={i}
+                        className="flex flex-col gap-2 border-l-2 border-border pl-4"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-bold text-foreground">
+                            {project.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {project.period}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {project.techStack.map((tag) => (
+                            <span
+                              key={tag}
+                              className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-foreground"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="text-sm text-foreground/80">
+                          {project.description}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </>
+          )}
         </section>
       </div>
     </div>

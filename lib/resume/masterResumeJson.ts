@@ -64,3 +64,8 @@ export function masterJsonToResumeData(json: MasterResumeJson): ResumeData {
 export function resumeDataToMasterJson(data: ResumeData): MasterResumeJson {
   return { ...data } as unknown as MasterResumeJson;
 }
+
+/** 편집용 깊은 복사 */
+export function cloneResumeData(r: ResumeData): ResumeData {
+  return JSON.parse(JSON.stringify(r)) as ResumeData;
+}

@@ -9,10 +9,13 @@ import type { ResumeData, ResumeBasicInfo } from "@/types/resume";
 import { resumeEndpoints } from "@/lib/api/endpoints/resume";
 import { extractApiError } from "@/lib/api/extractApiError";
 import {
+  cloneResumeData,
   emptyResumeData,
   masterJsonToResumeData,
   resumeDataToMasterJson,
 } from "@/lib/resume/masterResumeJson";
+import { mergeProfileIntoResume } from "@/lib/resume/profileResumeSync";
+import { useAuthStore } from "@/store/auth.store";
 import { ResumeUploadSection } from "./ResumeUploadSection";
 import { ResumeSummarySection } from "./ResumeSummarySection";
 import { ResumeQATab } from "./ResumeQATab";
@@ -27,9 +30,11 @@ const TRIGGER_CLASS =
 export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const router = useRouter();
   const qc = useQueryClient();
+  const user = useAuthStore((s) => s.user);
   const [isParsing, setIsParsing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<ResumeBasicInfo | null>(null);
+  const [detailDraft, setDetailDraft] = useState<ResumeData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
@@ -74,14 +79,14 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   };
 
   const startManual = useCallback(() => {
-    const initial = emptyResumeData();
+    const initial = mergeProfileIntoResume(emptyResumeData(), user);
     saveMutation.mutate(initial, {
       onSuccess: () => {
         setIsEditing(true);
         setDraft({ ...initial.basicInfo });
       },
     });
-  }, [saveMutation]);
+  }, [saveMutation, user]);
 
   const handleReupload = () => {
     toast.message("이력서를 삭제하려면 내용을 비운 뒤 저장하거나 관리자에게 문의하세요.");
@@ -89,6 +94,7 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
 
   const handleStartEdit = () => {
     if (!resume) return;
+    setDetailDraft(null);
     setDraft({ ...resume.basicInfo });
     setIsEditing(true);
   };
@@ -96,6 +102,32 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const handleCancelEdit = () => {
     setDraft(null);
     setIsEditing(false);
+  };
+
+  const handleStartDetailEdit = () => {
+    if (!resume) return;
+    setIsEditing(false);
+    setDraft(null);
+    setDetailDraft(cloneResumeData(resume));
+  };
+
+  const handleCancelDetailEdit = () => {
+    setDetailDraft(null);
+  };
+
+  const handleSaveDetail = () => {
+    if (!detailDraft) return;
+    saveMutation.mutate(detailDraft, {
+      onSuccess: () => {
+        setDetailDraft(null);
+      },
+    });
+  };
+
+  const handleApplyProfile = () => {
+    if (!resume) return;
+    const next = mergeProfileIntoResume(resume, user);
+    saveMutation.mutate(next);
   };
 
   const handleSave = () => {
@@ -176,6 +208,13 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
               onSave={handleSave}
               onDraftChange={handleDraftChange}
               isSaving={saveMutation.isPending}
+              onApplyProfile={handleApplyProfile}
+              showApplyProfile={Boolean(user)}
+              detailDraft={detailDraft}
+              onStartDetailEdit={handleStartDetailEdit}
+              onCancelDetailEdit={handleCancelDetailEdit}
+              onSaveDetail={handleSaveDetail}
+              onDetailDraftChange={setDetailDraft}
             />
           )
         )}
