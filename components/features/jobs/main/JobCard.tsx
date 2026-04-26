@@ -160,7 +160,11 @@ export function JobCard({ job }: JobCardProps) {
           </span>
           <span className="flex items-center gap-1">
             <Clock className="h-3.5 w-3.5 shrink-0" />
-            {job.deadline === "채용 시 마감" ? "채용 시 마감" : `${formatDate(job.deadline)}까지`}
+            {!job.deadline?.trim()
+              ? "마감일 미정"
+              : job.deadline === "채용 시 마감"
+                ? "채용 시 마감"
+                : `${formatDate(job.deadline)}까지`}
           </span>
         </div>
       </article>

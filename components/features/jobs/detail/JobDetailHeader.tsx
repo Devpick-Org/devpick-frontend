@@ -36,8 +36,9 @@ export function JobDetailHeader({ job }: JobDetailHeaderProps) {
     },
   });
 
-  const deadlineLabel =
-    job.deadline === "채용 시 마감"
+  const deadlineLabel = !job.deadline?.trim()
+    ? "마감일 미정"
+    : job.deadline === "채용 시 마감"
       ? "채용 시 마감"
       : `${formatDate(job.deadline)}까지`;
 
