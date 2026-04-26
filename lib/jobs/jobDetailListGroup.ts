@@ -23,7 +23,7 @@ const EXACT_HEADINGS = new Set(
 /** JD 본문 줄이 요구사항·경력 등 ‘내용’에 가깝는지 (소제목 후보에서 제외) */
 export function looksLikeContentItem(s: string): boolean {
   if (s.length > 42) return true;
-  return /\d+\s*년|\d+\s*개월|경력|경험|이상|필요|우선|합니다|습니다|다\.$|SQL|MySQL|AWS|GCP|Docker|Git|REST|API|Kubernetes|Terraform|프레임워크|Node\.js|Python|Java|Kotlin|Spring|React|Vue|Angular|TypeScript|Linux|서버|백엔드|프론트|DB|데이터베이스|데이터|처리|구조화|가공|통합|연계|저장|마이그레이션|운영|설계|구축|테스트|배포|인프라|LLM|AI|MongoDB|PostgreSQL|Redis|Kafka|환경|병원|의무기록/i.test(
+  return /\d+\s*년|\d+\s*개월|경력|경험|이상|필요|우선|합니다|습니다|다\.$|SQL|MySQL|AWS|GCP|Docker|Git|REST|API|Kubernetes|Terraform|프레임워크|Node\.js|Python|Java|Kotlin|Spring|React|Vue|Angular|TypeScript|Linux|서버|백엔드|프론트|DB|데이터베이스|데이터|처리|구조화|가공|통합|연계|저장|마이그레이션|운영|설계|구축|테스트|배포|인프라|LLM|AI|MongoDB|PostgreSQL|Redis|Kafka|환경|병원|의무기록|지원|검진|휴가|경조|학자금|양육|식대|도서|스낵|리조트|심리|급여|수당|보험|이주|무제한|근무제|재택|원격|스톡|옵션|멤버십|자기계발|생일|반차|연차|맥북|노트북|모니터/i.test(
     s,
   );
 }

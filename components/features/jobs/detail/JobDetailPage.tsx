@@ -78,9 +78,12 @@ function JobDetailSkeleton() {
           {/* 복지 혜택 */}
           <div className="flex flex-col gap-3">
             <Skeleton className="h-5 w-20 rounded" />
-            <div className="flex flex-wrap gap-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-20 rounded-lg" />
+            <div className="space-y-2.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-2.5">
+                  <Skeleton className="h-1.5 w-1.5 rounded-full" />
+                  <Skeleton className="h-4 w-full rounded" />
+                </div>
               ))}
             </div>
           </div>
@@ -207,16 +210,7 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
           </JobDetailSection>
 
           <JobDetailSection title="복지 혜택">
-            <div className="flex flex-wrap gap-2">
-              {job.benefits.map((item) => (
-                <span
-                  key={item}
-                  className="rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-foreground"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
+            <JobDetailStructuredList items={job.benefits} />
           </JobDetailSection>
 
           <JobDetailSection title="채용 절차">
