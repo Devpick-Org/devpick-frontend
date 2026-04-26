@@ -17,6 +17,7 @@ export function sanitizeJobDetailLine(raw: string): string {
       .replace(/^[\s]*[-–—]\s+/, "")
       .trim();
   }
+  s = s.replace(/\*\*/g, "").trim();
   return s;
 }
 

@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { mapJobDetail } from "@/lib/jobs/mapJobApi";
 import { JobDetailHeader } from "./JobDetailHeader";
-import { JobDetailBulletList } from "./JobDetailBulletList";
+import { JobDetailStructuredList } from "./JobDetailStructuredList";
 import { JobDetailSection } from "./JobDetailSection";
 import { JobMatchSection } from "./JobMatchSection";
 import { JobQASection } from "./JobQASection";
@@ -195,15 +195,15 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
           </div>
 
           <JobDetailSection title="주요 업무">
-            <JobDetailBulletList items={job.responsibilities} />
+            <JobDetailStructuredList items={job.responsibilities} />
           </JobDetailSection>
 
           <JobDetailSection title="자격 요건">
-            <JobDetailBulletList items={job.requirements} />
+            <JobDetailStructuredList items={job.requirements} />
           </JobDetailSection>
 
           <JobDetailSection title="우대 사항">
-            <JobDetailBulletList items={job.preferredQualifications} />
+            <JobDetailStructuredList items={job.preferredQualifications} />
           </JobDetailSection>
 
           <JobDetailSection title="복지 혜택">
