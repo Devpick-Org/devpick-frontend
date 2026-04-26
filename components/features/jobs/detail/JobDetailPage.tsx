@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { mapJobDetail } from "@/lib/jobs/mapJobApi";
 import { JobDetailHeader } from "./JobDetailHeader";
+import { JobDetailJdImages } from "./JobDetailJdImages";
 import { JobDetailSection } from "./JobDetailSection";
 import { JobMatchSection } from "./JobMatchSection";
 import { JobQASection } from "./JobQASection";
@@ -172,6 +173,14 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
     );
   }
 
+  /** 원문이 인포그래픽 위주면 텍스트 JD 섹션은 비어 있고, 스킬·이미지·채용 절차만 노출한다. */
+  const infographicLayout =
+    job.parseStatus === "SKIPPED_IMAGE" &&
+    job.jdImageUrls.length > 0 &&
+    job.responsibilities.length === 0 &&
+    job.preferredQualifications.length === 0 &&
+    job.benefits.length === 0;
+
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 md:py-8 lg:px-8">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
@@ -193,60 +202,74 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
             </JobDetailSection>
           </div>
 
-          <JobDetailSection title="주요 업무">
-            <ul className="space-y-2.5">
-              {job.responsibilities.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-2.5 text-sm font-medium text-foreground"
-                >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </JobDetailSection>
-
-          <JobDetailSection title="자격 요건">
-            <ul className="space-y-2.5">
-              {job.requirements.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-2.5 text-sm font-medium text-foreground"
-                >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </JobDetailSection>
-
-          <JobDetailSection title="우대 사항">
-            <ul className="space-y-2.5">
-              {job.preferredQualifications.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex items-center gap-2.5 text-sm font-medium text-foreground"
-                >
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </JobDetailSection>
-
-          <JobDetailSection title="복지 혜택">
-            <div className="flex flex-wrap gap-2">
-              {job.benefits.map((item) => (
-                <span
-                  key={item}
-                  className="rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-foreground"
-                >
-                  {item}
-                </span>
-              ))}
+          {job.jdImageUrls.length > 0 && (
+            <div className="-mt-2">
+              <JobDetailJdImages
+                urls={job.jdImageUrls}
+                parseStatus={job.parseStatus}
+                compact={infographicLayout}
+              />
             </div>
-          </JobDetailSection>
+          )}
+
+          {!infographicLayout && (
+            <>
+              <JobDetailSection title="주요 업무">
+                <ul className="space-y-2.5">
+                  {job.responsibilities.map((item, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center gap-2.5 text-sm font-medium text-foreground"
+                    >
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </JobDetailSection>
+
+              <JobDetailSection title="자격 요건">
+                <ul className="space-y-2.5">
+                  {job.requirements.map((item, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center gap-2.5 text-sm font-medium text-foreground"
+                    >
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </JobDetailSection>
+
+              <JobDetailSection title="우대 사항">
+                <ul className="space-y-2.5">
+                  {job.preferredQualifications.map((item, i) => (
+                    <li
+                      key={i}
+                      className="flex items-center gap-2.5 text-sm font-medium text-foreground"
+                    >
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </JobDetailSection>
+
+              <JobDetailSection title="복지 혜택">
+                <div className="flex flex-wrap gap-2">
+                  {job.benefits.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-foreground"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </JobDetailSection>
+            </>
+          )}
 
           <JobDetailSection title="채용 절차">
             <div className="flex flex-wrap items-center gap-2">
