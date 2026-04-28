@@ -13,12 +13,12 @@ const LEVEL_LABEL: Record<QuizLevel, string> = {
 };
 
 export function WrongQuizListItem({ quiz }: { quiz: MyPageQuizHistory }) {
-  const { contentId, contentTitle, thumbnail, preview, level, score, totalQuestions, attemptedAt } =
+  const { attemptId, contentId, contentTitle, thumbnail, preview, level, score, totalQuestions, attemptedAt } =
     quiz;
 
   return (
     <Link
-      href={`/home/${contentId}/quiz/result`}
+      href={`/home/${contentId}/quiz/result?attemptId=${attemptId}`}
       className="-mx-2 flex gap-4 px-2 py-3 transition-colors"
     >
       <div className="relative aspect-[3/2] w-36 shrink-0 overflow-hidden rounded-sm bg-muted">

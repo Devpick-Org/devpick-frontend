@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
@@ -13,32 +12,31 @@ import { WrongQuizListItem } from "./WrongQuizListItem";
 import { MyPagePagination } from "../MyPagePagination";
 import type { MyPageQuizHistory } from "@/types/myPage";
 
-const PAGE_SIZE = 10;
-
 type SortOrder = "newest" | "oldest";
 
-export function WrongQuizList({ quizzes }: { quizzes: MyPageQuizHistory[] }) {
-  const [sort, setSort] = useState<SortOrder>("newest");
-  const [currentPage, setCurrentPage] = useState(1);
+interface WrongQuizListProps {
+  quizzes: MyPageQuizHistory[];
+  totalElements: number;
+  totalPages: number;
+  sort: SortOrder;
+  page: number;
+  onSortChange: (value: SortOrder) => void;
+  onPageChange: (page: number) => void;
+}
 
-  const sorted = useMemo(() => {
-    return [...quizzes].sort((a, b) => {
-      const diff =
-        new Date(a.attemptedAt).getTime() - new Date(b.attemptedAt).getTime();
-      return sort === "newest" ? -diff : diff;
-    });
-  }, [quizzes, sort]);
-
-  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
-  const pagedItems = sorted.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
-
+export function WrongQuizList({
+  quizzes,
+  totalElements,
+  totalPages,
+  sort,
+  page,
+  onSortChange,
+  onPageChange,
+}: WrongQuizListProps) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">{sorted.length}개</span>
+        <span className="text-sm text-muted-foreground">{totalElements}개</span>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger className="flex h-8 w-24 cursor-pointer items-center justify-between rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none">
             {sort === "newest" ? "최신순" : "오래된순"}
@@ -47,7 +45,7 @@ export function WrongQuizList({ quizzes }: { quizzes: MyPageQuizHistory[] }) {
           <DropdownMenuContent align="end" className="min-w-[6rem] p-1">
             <DropdownMenuRadioGroup
               value={sort}
-              onValueChange={(v) => { setSort(v as SortOrder); setCurrentPage(1); }}
+              onValueChange={(v) => onSortChange(v as SortOrder)}
             >
               <DropdownMenuRadioItem className="cursor-pointer" value="newest">
                 최신순
@@ -60,23 +58,25 @@ export function WrongQuizList({ quizzes }: { quizzes: MyPageQuizHistory[] }) {
         </DropdownMenu>
       </div>
 
-      {sorted.length === 0 ? (
+      {quizzes.length === 0 ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
-          틀린 퀴즈가 없습니다.
+          퀴즈 기록이 없습니다.
         </p>
       ) : (
         <>
           <div className="divide-y divide-border">
-            {pagedItems.map((quiz) => (
+            {quizzes.map((quiz) => (
               <WrongQuizListItem key={quiz.attemptId} quiz={quiz} />
             ))}
           </div>
-          <MyPagePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            className="mt-8 mb-12"
-          />
+          {totalPages > 1 && (
+            <MyPagePagination
+              currentPage={page + 1}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+              className="mt-8 mb-12"
+            />
+          )}
         </>
       )}
     </div>

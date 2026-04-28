@@ -13,7 +13,10 @@ import {
 } from "lucide-react";
 import { quizzesEndpoints } from "@/lib/api/endpoints/quizzes";
 import { extractApiError } from "@/lib/api/extractApiError";
-import { calculateQuizResult } from "@/lib/quiz/quizResult";
+import {
+  calculateQuizResult,
+  isQuestionCorrect,
+} from "@/lib/quiz/quizResult";
 import { useAuthStore } from "@/store/auth.store";
 import type {
   QuizStage,
@@ -145,12 +148,36 @@ export function ContentQuizPage({ contentId }: ContentQuizPageProps) {
       quiz.passingCount,
     );
 
+    const submittedAnswers = quiz.questions.map((q) => {
+      const answer = answers[q.id];
+      const correct = isQuestionCorrect(q, answer);
+      if (q.type === "multiple_choice") {
+        return {
+          questionId: q.id,
+          selectedOptionId:
+            answer?.type === "multiple_choice"
+              ? answer.selectedOptionId
+              : null,
+          answerText: null,
+          isCorrect: correct,
+        };
+      }
+      return {
+        questionId: q.id,
+        selectedOptionId: null,
+        answerText:
+          answer?.type === "short_answer" ? answer.answerText || null : null,
+        isCorrect: correct,
+      };
+    });
+
     try {
       const res = await quizzesEndpoints.submitQuiz(contentId, {
         level: quiz.level,
         score: correctCount,
         totalQuestions: quiz.questions.length,
         passed,
+        answers: submittedAnswers,
       });
       setSubmitResult(res.data);
       // 인트로로 돌아올 때 hasAttempted 반영되도록 캐시 무효화
