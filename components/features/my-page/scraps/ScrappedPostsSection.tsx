@@ -13,8 +13,8 @@ export function ScrappedPostsSection() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchMyScrapsPreview(4).then((data) => {
-      setScraps(data);
+    fetchMyScrapsPreview(4).then((res) => {
+      setScraps(res.content);
       setIsLoading(false);
     });
   }, []);
@@ -56,7 +56,7 @@ export function ScrappedPostsSection() {
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {scraps.map((scrap) => (
-            <ScrappedPostCard key={scrap.id} scrap={scrap} />
+            <ScrappedPostCard key={scrap.contentId} scrap={scrap} />
           ))}
         </div>
       )}

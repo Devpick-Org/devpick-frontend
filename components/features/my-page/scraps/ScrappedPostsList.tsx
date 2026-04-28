@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -13,11 +13,31 @@ import {
 import { ScrappedPostListItem } from "./ScrappedPostListItem";
 import { MyPagePagination } from "../MyPagePagination";
 import { fetchMyScraps } from "@/lib/mock/my-page-scraps";
-import type { MyPageScrap } from "@/types/myPage";
-
-const PAGE_SIZE = 10;
+import type { MyPageScrapResponse } from "@/types/myPage";
 
 type SortOrder = "newest" | "oldest";
+
+type FetchState = {
+  data: MyPageScrapResponse | null;
+  isLoading: boolean;
+  isError: boolean;
+};
+
+type FetchAction =
+  | { type: "start" }
+  | { type: "success"; payload: MyPageScrapResponse }
+  | { type: "error" };
+
+function fetchReducer(state: FetchState, action: FetchAction): FetchState {
+  switch (action.type) {
+    case "start":
+      return { ...state, isLoading: true, isError: false };
+    case "success":
+      return { data: action.payload, isLoading: false, isError: false };
+    case "error":
+      return { ...state, isLoading: false, isError: true };
+  }
+}
 
 function ListItemSkeleton() {
   return (
@@ -34,43 +54,32 @@ function ListItemSkeleton() {
 }
 
 export function ScrappedPostsList() {
-  const [scraps, setScraps] = useState<MyPageScrap[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [{ data, isLoading, isError }, dispatch] = useReducer(fetchReducer, {
+    data: null,
+    isLoading: true,
+    isError: false,
+  });
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortOrder>("newest");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
-    fetchMyScraps()
-      .then((data) => setScraps(data))
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-  }, []);
+    let cancelled = false;
 
-  const processed = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const filtered = q
-      ? scraps.filter(
-          (s) =>
-            s.title.toLowerCase().includes(q) ||
-            s.sourceName.toLowerCase().includes(q) ||
-            (s.summary?.toLowerCase().includes(q) ?? false),
-        )
-      : scraps;
+    dispatch({ type: "start" });
 
-    return [...filtered].sort((a, b) => {
-      const diff =
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      return sort === "newest" ? -diff : diff;
-    });
-  }, [scraps, query, sort]);
+    fetchMyScraps({ q: query || undefined, sort, page, size: 10 })
+      .then((res) => {
+        if (!cancelled) dispatch({ type: "success", payload: res });
+      })
+      .catch(() => {
+        if (!cancelled) dispatch({ type: "error" });
+      });
 
-  const totalPages = Math.ceil(processed.length / PAGE_SIZE);
-  const pagedItems = processed.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE,
-  );
+    return () => {
+      cancelled = true;
+    };
+  }, [query, sort, page]);
 
   if (isLoading) {
     return (
@@ -94,7 +103,7 @@ export function ScrappedPostsList() {
     <div>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-sm text-muted-foreground">
-          {processed.length}개
+          {data?.totalElements ?? 0}개
         </span>
         <div className="flex items-center gap-2 sm:justify-end">
           <div className="relative">
@@ -103,7 +112,10 @@ export function ScrappedPostsList() {
               type="text"
               placeholder="검색"
               value={query}
-              onChange={(e) => { setQuery(e.target.value); setCurrentPage(1); }}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(0);
+              }}
               className="h-8 w-40 rounded-md border border-border bg-background pl-7 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none"
             />
           </div>
@@ -115,12 +127,18 @@ export function ScrappedPostsList() {
             <DropdownMenuContent align="end" className="min-w-[6rem] p-1">
               <DropdownMenuRadioGroup
                 value={sort}
-                onValueChange={(v) => { setSort(v as SortOrder); setCurrentPage(1); }}
+                onValueChange={(v) => {
+                  setSort(v as SortOrder);
+                  setPage(0);
+                }}
               >
                 <DropdownMenuRadioItem className="cursor-pointer" value="newest">
                   최신순
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem className="cursor-pointer" value="oldest">
+                <DropdownMenuRadioItem
+                  className="cursor-pointer"
+                  value="oldest"
+                >
                   오래된순
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
@@ -129,23 +147,25 @@ export function ScrappedPostsList() {
         </div>
       </div>
 
-      {processed.length === 0 ? (
+      {data?.totalElements === 0 ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
           {query ? "검색 결과가 없습니다." : "스크랩한 글이 없습니다."}
         </p>
       ) : (
         <>
           <div className="divide-y divide-border">
-            {pagedItems.map((scrap) => (
-              <ScrappedPostListItem key={scrap.id} scrap={scrap} />
+            {data?.content.map((scrap) => (
+              <ScrappedPostListItem key={scrap.contentId} scrap={scrap} />
             ))}
           </div>
-          <MyPagePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            className="mt-8 mb-12"
-          />
+          {data && data.totalPages > 1 && (
+            <MyPagePagination
+              currentPage={page + 1}
+              totalPages={data.totalPages}
+              onPageChange={(nextPage) => setPage(nextPage - 1)}
+              className="mt-8 mb-12"
+            />
+          )}
         </>
       )}
     </div>

@@ -14,13 +14,20 @@ export interface MyPageQuizHistory {
 }
 
 export interface MyPageScrap {
-  id: string;
   contentId: string;
   title: string;
   sourceName: string;
   thumbnail: string | null;
+  summary: string | null;
   createdAt: string;
-  summary?: string;
+}
+
+export interface MyPageScrapResponse {
+  content: MyPageScrap[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 export interface MyPageRecommendHomePost {
