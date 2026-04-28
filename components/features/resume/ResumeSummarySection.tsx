@@ -94,10 +94,11 @@ export function ResumeSummarySection({
           </span>
         </div>
         <p className="mb-3 text-xs text-muted-foreground">
-          프로필 정보로 기본값을 채우고, 프로젝트·성과는 직접 보완하면 매칭과 면접
-          Q&A가 정확해져요.
+          프로필 정보로 기본값을 채우고, 아래 체크리스트를 채우면 공고 매칭·면접 Q&A
+          품질이 올라갑니다. 「상세 편집」에서 추천 초안을 켜고 수정해 적용할 수
+          있어요.
         </p>
-        <ul className="flex flex-col gap-1.5">
+        <ul className="mb-3 flex flex-col gap-1.5 border-b border-border pb-3">
           {completeness.items.map((item) => (
             <li
               key={item.id}
@@ -114,6 +115,43 @@ export function ResumeSummarySection({
             </li>
           ))}
         </ul>
+        {completeness.items.some((i) => !i.done) ? (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-foreground">먼저 보완하면 좋은 항목</p>
+            <div className="flex flex-col gap-2">
+              {completeness.items
+                .filter((item) => !item.done)
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded-lg border border-amber-500/35 bg-amber-500/5 px-3 py-2.5 dark:bg-amber-500/10"
+                  >
+                    <p className="text-xs font-semibold text-foreground">{item.label}</p>
+                    <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                      {item.description}
+                    </p>
+                    {!detailDraft && !isEditing ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="mt-2 h-8 text-xs"
+                        onClick={
+                          item.fixAction === "basic"
+                            ? onStartEdit
+                            : onStartDetailEdit
+                        }
+                      >
+                        {item.actionLabel}
+                      </Button>
+                    ) : null}
+                  </div>
+                ))}
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs font-medium text-primary">모든 항목을 충족했습니다.</p>
+        )}
       </div>
 
       {/* 추출된 정보 */}
@@ -241,30 +279,45 @@ export function ResumeSummarySection({
           )}
         </section>
 
-        {/* 자기소개 요약 (읽기 전용 — 상세 편집에서 수정) */}
+        {/* 강점 요약 (읽기 전용 — 상세 편집에서 수정) */}
         {!detailDraft ? (
           <section className="flex flex-col gap-2">
-            <SectionTitle>자기소개·요약</SectionTitle>
+            <SectionTitle>강점 요약</SectionTitle>
+            <p className="text-xs text-muted-foreground">
+              자기소개·한 줄 소개에 가깝게, 면접 첫 질문에 바로 쓸 수 있게
+              적어 두면 좋아요. (완성도: 40자 이상)
+            </p>
             {summary.trim() ? (
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
                 {summary}
               </p>
             ) : (
               <p className="text-sm text-muted-foreground">
-                아직 요약이 없습니다. 「상세 편집」에서 3~5문장으로 적어 주세요.
+                아직 요약이 없습니다. 「상세 편집」에서 작성하거나 추천 초안을
+                적용해 보세요.
               </p>
             )}
           </section>
         ) : null}
 
-        {/* 기술·경력·프로젝트 */}
-        <section className="flex flex-col gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <SectionTitle>기술 스택 · 경력 · 프로젝트</SectionTitle>
+        {/* 기술 · 경력 · 프로젝트 */}
+        <section className="flex flex-col gap-5">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-3">
+            <div className="min-w-0 flex-1">
+              <SectionTitle>기술 · 경력 · 프로젝트</SectionTitle>
+              <p className="mt-1 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground/80">기술</span>은
+                공고 스킬 매칭에,{" "}
+                <span className="font-medium text-foreground/80">
+                  경력·프로젝트
+                </span>
+                는 면접 질문·경험 추출에 쓰입니다.
+              </p>
+            </div>
             {!detailDraft && !isEditing ? (
               <Button
                 type="button"
-                variant="outline"
+                variant="default"
                 size="sm"
                 className="shrink-0"
                 onClick={onStartDetailEdit}
@@ -286,15 +339,13 @@ export function ResumeSummarySection({
           ) : (
             <>
               <div>
-                <p className="mb-2 text-xs font-medium text-muted-foreground">
-                  기술 스택
-                </p>
+                <SectionTitle>기술</SectionTitle>
                 {techStack.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     등록된 기술이 없습니다. 「상세 편집」에서 추가해 주세요.
                   </p>
                 ) : (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     {techStack.map((tag) => (
                       <span
                         key={tag}
@@ -308,7 +359,12 @@ export function ResumeSummarySection({
               </div>
 
               <div>
-                <p className="mb-2 text-xs font-medium text-muted-foreground">
+                <SectionTitle>경력·프로젝트</SectionTitle>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  경력과 프로젝트 중 한쪽이라도 구체적으로 채우면 완성도의
+                  「경험」 항목에 도움이 됩니다.
+                </p>
+                <p className="mb-2 mt-3 text-xs font-medium text-muted-foreground">
                   경력
                 </p>
                 {careers.length === 0 ? (
@@ -340,15 +396,14 @@ export function ResumeSummarySection({
                     ))}
                   </ul>
                 )}
-              </div>
 
-              <div>
-                <p className="mb-2 text-xs font-medium text-muted-foreground">
+                <p className="mb-2 mt-5 text-xs font-medium text-muted-foreground">
                   프로젝트
                 </p>
                 {projects.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
-                    등록된 프로젝트가 없습니다. 「상세 편집」에서 추가해 주세요.
+                    등록된 프로젝트가 없습니다. 「상세 편집」에서 추가하거나
+                    예시 프로젝트를 넣을 수 있어요.
                   </p>
                 ) : (
                   <ul className="flex flex-col gap-4">

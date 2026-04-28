@@ -1,11 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { filterNewSuggestions } from "@/lib/resume/skillSuggestions";
+import {
+  suggestExampleProject,
+  suggestProjectDescription,
+  suggestProjectRoleAchievements,
+  suggestResumeSummary,
+} from "@/lib/resume/resumeDraftSuggestions";
 import type { ResumeCareer, ResumeData, ResumeProject } from "@/types/resume";
+
+type SuggestionPreview =
+  | { kind: "summary"; text: string }
+  | { kind: "projectDesc"; index: number; text: string }
+  | {
+      kind: "projectRole";
+      index: number;
+      role: string;
+      achievements: string;
+    };
 
 function emptyCareer(): ResumeCareer {
   return { company: "", role: "", period: "", description: "" };
@@ -44,6 +60,22 @@ export function ResumeDetailEditSection({
   const [projTechInputs, setProjTechInputs] = useState<Record<number, string>>(
     {},
   );
+  const [suggestionPreview, setSuggestionPreview] =
+    useState<SuggestionPreview | null>(null);
+
+  const clearPreviewIfStale = (next: ResumeData) => {
+    setSuggestionPreview((prev) => {
+      if (!prev) return null;
+      if (prev.kind === "summary") return prev;
+      if (prev.index >= next.projects.length) return null;
+      return prev;
+    });
+  };
+
+  const applyDraftChange = (next: ResumeData) => {
+    clearPreviewIfStale(next);
+    onChange(next);
+  };
 
   const addTech = () => {
     const t = techInput.trim();
@@ -51,22 +83,22 @@ export function ResumeDetailEditSection({
       setTechInput("");
       return;
     }
-    onChange({ ...draft, techStack: [...draft.techStack, t] });
+    applyDraftChange({ ...draft, techStack: [...draft.techStack, t] });
     setTechInput("");
   };
 
   const removeTech = (tag: string) => {
-    onChange({
+    applyDraftChange({
       ...draft,
       techStack: draft.techStack.filter((x) => x !== tag),
     });
   };
 
   const setCareers = (careers: ResumeCareer[]) =>
-    onChange({ ...draft, careers });
+    applyDraftChange({ ...draft, careers });
 
   const setProjects = (projects: ResumeProject[]) =>
-    onChange({ ...draft, projects });
+    applyDraftChange({ ...draft, projects });
 
   const suggestedToShow = filterNewSuggestions(
     suggestedTechPool,
@@ -77,7 +109,7 @@ export function ResumeDetailEditSection({
     const t = tag.trim();
     if (!t || draft.techStack.some((x) => x.toLowerCase() === t.toLowerCase()))
       return;
-    onChange({ ...draft, techStack: [...draft.techStack, t] });
+    applyDraftChange({ ...draft, techStack: [...draft.techStack, t] });
   };
 
   return (
@@ -99,15 +131,78 @@ export function ResumeDetailEditSection({
         </span>
         <p className="text-xs text-muted-foreground">
           3~5문장 정도로 강점·관심 분야를 적어 주세요. 면접 Q&A의 자기소개
-          질문에 활용됩니다.
+          질문에 활용됩니다. 완성도는 40자 이상일 때 충족됩니다.
         </p>
+        {draft.summary.trim().length < 40 ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-8 gap-1 text-xs"
+              onClick={() =>
+                setSuggestionPreview({
+                  kind: "summary",
+                  text: suggestResumeSummary(draft),
+                })
+              }
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              추천 요약 만들기
+            </Button>
+            <span className="text-[11px] text-muted-foreground">
+              직무·기술·이름 기반 로컬 초안입니다. 적용 전에 꼭 수정하세요.
+            </span>
+          </div>
+        ) : null}
+        {suggestionPreview?.kind === "summary" ? (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+            <p className="text-xs font-semibold text-foreground">미리보기</p>
+            <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-foreground/90">
+              {suggestionPreview.text}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                type="button"
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => {
+                  applyDraftChange({
+                    ...draft,
+                    summary: suggestionPreview.text,
+                  });
+                  setSuggestionPreview(null);
+                }}
+              >
+                적용
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs"
+                onClick={() => setSuggestionPreview(null)}
+              >
+                취소
+              </Button>
+            </div>
+          </div>
+        ) : null}
         <textarea
           value={draft.summary}
-          onChange={(e) => onChange({ ...draft, summary: e.target.value })}
+          onChange={(e) => {
+            setSuggestionPreview((p) =>
+              p?.kind === "summary" ? null : p,
+            );
+            onChange({ ...draft, summary: e.target.value });
+          }}
           rows={5}
           placeholder="예: OO 기술 스택으로 서비스를 만들며, 사용자 경험과 운영 안정성을 모두 고려하는 백엔드 개발자입니다."
           className="min-h-[100px] w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
+        <p className="text-[11px] text-muted-foreground">
+          {draft.summary.trim().length}자 · 완성도 기준 40자 이상
+        </p>
       </section>
 
       {/* 기술 스택 */}
@@ -293,9 +388,24 @@ export function ResumeDetailEditSection({
         </div>
         <div className="flex flex-col gap-4">
           {draft.projects.length === 0 ? (
-            <p className="text-xs text-muted-foreground">
-              프로젝트가 없습니다. 「행 추가」로 입력해 주세요.
-            </p>
+            <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border bg-muted/30 p-3">
+              <p className="text-xs text-muted-foreground">
+                프로젝트가 없습니다. 「행 추가」로 직접 입력하거나, 아래에서 예시
+                한 건을 넣을 수 있어요.
+              </p>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="h-8 w-fit gap-1 text-xs"
+                onClick={() =>
+                  setProjects([...draft.projects, suggestExampleProject(draft)])
+                }
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                프로젝트 예시 추가
+              </Button>
+            </div>
           ) : null}
           {draft.projects.map((p, i) => (
             <div
@@ -346,9 +456,34 @@ export function ResumeDetailEditSection({
                   <label className="text-xs font-medium text-muted-foreground">
                     본인 역할
                   </label>
+                  {(!p.role.trim() || !p.achievements.trim()) && (
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        className="h-7 gap-1 text-[11px]"
+                        onClick={() =>
+                          setSuggestionPreview({
+                            kind: "projectRole",
+                            index: i,
+                            ...suggestProjectRoleAchievements(draft, i),
+                          })
+                        }
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        역할·성과 문장 추천
+                      </Button>
+                    </div>
+                  )}
                   <Input
                     value={p.role}
                     onChange={(e) => {
+                      setSuggestionPreview((prev) =>
+                        prev?.kind === "projectRole" && prev.index === i
+                          ? null
+                          : prev,
+                      );
                       const next = [...draft.projects];
                       next[i] = { ...p, role: e.target.value };
                       setProjects(next);
@@ -428,11 +563,73 @@ export function ResumeDetailEditSection({
                   </label>
                   <p className="text-[11px] text-muted-foreground">
                     무엇을 만들었는지, 어떤 기술로 풀었는지 적어 주세요. 면접
-                    질문 품질에 큰 영향을 줍니다.
+                    질문 품질에 큰 영향을 줍니다. 완성도는 100자 이상 한 항목이
+                    있으면 충족됩니다.
                   </p>
+                  {p.description.trim().length < 100 ? (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      className="mb-1 h-7 w-fit gap-1 text-[11px]"
+                      onClick={() =>
+                        setSuggestionPreview({
+                          kind: "projectDesc",
+                          index: i,
+                          text: suggestProjectDescription(draft, i),
+                        })
+                      }
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      설명 초안 추천
+                    </Button>
+                  ) : null}
+                  {suggestionPreview?.kind === "projectDesc" &&
+                  suggestionPreview.index === i ? (
+                    <div className="mb-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                      <p className="text-xs font-semibold text-foreground">
+                        설명 미리보기
+                      </p>
+                      <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-foreground/90">
+                        {suggestionPreview.text}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => {
+                            const next = [...draft.projects];
+                            next[i] = {
+                              ...p,
+                              description: suggestionPreview.text,
+                            };
+                            setProjects(next);
+                            setSuggestionPreview(null);
+                          }}
+                        >
+                          적용
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => setSuggestionPreview(null)}
+                        >
+                          취소
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
                   <textarea
                     value={p.description}
                     onChange={(e) => {
+                      setSuggestionPreview((prev) =>
+                        prev?.kind === "projectDesc" && prev.index === i
+                          ? null
+                          : prev,
+                      );
                       const next = [...draft.projects];
                       next[i] = { ...p, description: e.target.value };
                       setProjects(next);
@@ -440,14 +637,70 @@ export function ResumeDetailEditSection({
                     rows={3}
                     className="min-h-[72px] w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
+                  <p className="text-[11px] text-muted-foreground">
+                    {p.description.trim().length}자 · 완성도 기준 100자 이상
+                  </p>
                 </div>
                 <div className="flex flex-col gap-1 sm:col-span-2">
                   <label className="text-xs font-medium text-muted-foreground">
                     성과·문제 해결
                   </label>
+                  {suggestionPreview?.kind === "projectRole" &&
+                  suggestionPreview.index === i ? (
+                    <div className="mb-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
+                      <p className="text-xs font-semibold text-foreground">
+                        역할·성과 미리보기
+                      </p>
+                      <p className="mt-1 text-xs font-medium text-foreground/90">
+                        역할
+                      </p>
+                      <p className="text-xs leading-relaxed text-foreground/90">
+                        {suggestionPreview.role}
+                      </p>
+                      <p className="mt-2 text-xs font-medium text-foreground/90">
+                        성과
+                      </p>
+                      <p className="text-xs leading-relaxed text-foreground/90">
+                        {suggestionPreview.achievements}
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => {
+                            const next = [...draft.projects];
+                            next[i] = {
+                              ...p,
+                              role: suggestionPreview.role,
+                              achievements: suggestionPreview.achievements,
+                            };
+                            setProjects(next);
+                            setSuggestionPreview(null);
+                          }}
+                        >
+                          적용
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs"
+                          onClick={() => setSuggestionPreview(null)}
+                        >
+                          취소
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
                   <textarea
                     value={p.achievements}
                     onChange={(e) => {
+                      setSuggestionPreview((prev) =>
+                        prev?.kind === "projectRole" && prev.index === i
+                          ? null
+                          : prev,
+                      );
                       const next = [...draft.projects];
                       next[i] = { ...p, achievements: e.target.value };
                       setProjects(next);
