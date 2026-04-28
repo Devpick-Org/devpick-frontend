@@ -6,6 +6,7 @@ interface HomeSearchResultsSectionProps {
   results: SearchResultItem[];
   activeItemId: string | null;
   onToggle: (id: string) => void;
+  onClose: () => void;
   isLoading?: boolean;
   isError?: boolean;
 }
@@ -27,6 +28,7 @@ export function HomeSearchResultsSection({
   results,
   activeItemId,
   onToggle,
+  onClose,
   isLoading = false,
   isError = false,
 }: HomeSearchResultsSectionProps) {
@@ -69,6 +71,7 @@ export function HomeSearchResultsSection({
               item={item}
               isOpen={activeItemId === item.id}
               onToggle={() => onToggle(item.id)}
+              onClose={onClose}
             />
           ))}
         </div>
