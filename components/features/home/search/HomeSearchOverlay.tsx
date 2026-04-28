@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchHomeTrend, type TrendRange } from "@/lib/mock/home-search-trend";
+import { fetchHomeTrend } from "@/lib/mock/home-search-trend";
+import type { TrendRange } from "@/types/search";
 import { searchMockResults } from "@/lib/mock/home-search-results";
 import { useAuthStore } from "@/store/auth.store";
 import { HomeRangeTabs } from "./HomeRangeTabs";
@@ -22,7 +23,7 @@ interface HomeSearchOverlayProps {
 }
 
 export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
-  const [range, setRange] = useState<TrendRange>("week");
+  const [unit, setUnit] = useState<TrendRange>("weekly");
   const [inputValue, setInputValue] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
@@ -31,7 +32,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // 배경 스크롤 잠금 + 검색 input 포커스
-  // range 초기화는 별도 effect 불필요 — isOpen=false 시 컴포넌트가 언마운트되어 useState 초기값("week")으로 자동 리셋
+  // unit 초기화는 별도 effect 불필요 — isOpen=false 시 컴포넌트가 언마운트되어 useState 초기값("weekly")으로 자동 리셋
   useEffect(() => {
     if (!isOpen) return;
     document.body.style.overflow = "hidden";
@@ -56,14 +57,14 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
   }, [isOpen, onClose]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["homeSearchTrend", { range }],
-    queryFn: () => fetchHomeTrend(range),
+    queryKey: ["trends", "analysis", unit],
+    queryFn: () => fetchHomeTrend(unit),
     staleTime: 5 * 60 * 1000,
     enabled: isOpen,
   });
 
-  const handleRangeChange = useCallback((next: TrendRange) => {
-    setRange(next);
+  const handleUnitChange = useCallback((next: TrendRange) => {
+    setUnit(next);
   }, []);
 
   const handleKeywordClick = useCallback((keyword: string) => {
@@ -95,7 +96,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
   }, []);
 
   const keywordsWithInterest = useMemo(() => {
-    const keywords = data?.trendingKeywords ?? [];
+    const keywords = data?.trendingTags ?? [];
     const userTags = user?.tags;
     if (!isAuthenticated || !userTags?.length) return keywords;
     const userTagsNormalized = new Set(userTags.map(normalizeTag));
@@ -103,21 +104,35 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
       ...item,
       isMyInterest: userTagsNormalized.has(normalizeTag(item.keyword)),
     }));
-  }, [data?.trendingKeywords, isAuthenticated, user]);
+  }, [data?.trendingTags, isAuthenticated, user?.tags]);
+
+  const topPostsWithInterest = useMemo(() => {
+    const posts = data?.topPosts ?? [];
+    const userTags = user?.tags;
+    if (!isAuthenticated || !userTags?.length) return posts;
+    const userTagsNormalized = new Set(userTags.map(normalizeTag));
+    return posts.map((post) => ({
+      ...post,
+      isMyInterest: post.tags.some((t) =>
+        userTagsNormalized.has(normalizeTag(t)),
+      ),
+    }));
+  }, [data?.topPosts, isAuthenticated, user?.tags]);
 
   const RANGE_LABEL: Record<TrendRange, string> = {
-    day: "일간",
-    week: "주간",
-    month: "월간",
+    daily: "일간",
+    weekly: "주간",
+    monthly: "월간",
   };
-  const rangeLabel = RANGE_LABEL[range];
+  const rangeLabel = RANGE_LABEL[unit];
 
   // isOpen이 false면 렌더하지 않음
   // createPortal은 user interaction 이후에만 호출되므로 document.body 접근 안전
   if (!isOpen) return null;
 
-  /** 수집 동향만 day 탭에서 비노출 — Top 5 동향은 항상 노출 */
-  const showCollectionSummary = range !== "day";
+  /** collectionSummary는 daily에서 항상 null, LLM 실패 시도 null — 둘 다 숨김 */
+  const showCollectionSummary =
+    unit !== "daily" && data?.collectionSummary != null;
 
   return createPortal(
     <div
@@ -165,8 +180,8 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
       {/* 기간 탭 — 검색 중에는 숨김 */}
       {!isSearching && (
         <HomeRangeTabs
-          range={range}
-          onChange={handleRangeChange}
+          unit={unit}
+          onChange={handleUnitChange}
           dateLabel={data?.dateLabel ?? ""}
           className="mx-auto w-full max-w-5xl px-6 md:px-8"
         />
@@ -174,27 +189,29 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
 
       {/* 스크롤 영역 — 전체 너비로 확장해 여백 포함 스크롤 가능 */}
       <div className="flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="mx-auto max-w-5xl px-6 py-2 md:px-8 md:py-6">
+        <div className="mx-auto max-w-5xl px-6 pb-6 pt-0 md:px-8 md:pb-8 md:pt-2">
           {isSearching ? (
             <HomeSearchResultsSection
               results={searchResults}
               activeItemId={activeItemId}
               onToggle={handleToggleItem}
+              onClose={onClose}
               isLoading={false}
               isError={false}
             />
           ) : (
             <div className="flex flex-col gap-10">
               <HomeTopPostsSection
-                posts={data?.topPosts ?? []}
+                posts={topPostsWithInterest}
                 isLoading={isLoading}
                 rangeLabel={rangeLabel}
                 summary={data?.topPostsSummary}
+                onClose={onClose}
               />
 
               {showCollectionSummary && (
                 <HomeCollectionSummarySection
-                  summary={data?.collectionSummary ?? ""}
+                  summary={data.collectionSummary!}
                   isLoading={isLoading}
                   rangeLabel={rangeLabel}
                 />
