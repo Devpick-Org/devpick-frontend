@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -17,28 +17,6 @@ import type { MyPageScrapResponse } from "@/types/myPage";
 
 type SortOrder = "newest" | "oldest";
 
-type FetchState = {
-  data: MyPageScrapResponse | null;
-  isLoading: boolean;
-  isError: boolean;
-};
-
-type FetchAction =
-  | { type: "start" }
-  | { type: "success"; payload: MyPageScrapResponse }
-  | { type: "error" };
-
-function fetchReducer(state: FetchState, action: FetchAction): FetchState {
-  switch (action.type) {
-    case "start":
-      return { ...state, isLoading: true, isError: false };
-    case "success":
-      return { data: action.payload, isLoading: false, isError: false };
-    case "error":
-      return { ...state, isLoading: false, isError: true };
-  }
-}
-
 function ListItemSkeleton() {
   return (
     <div className="-mx-2 flex gap-4 px-2 py-3">
@@ -54,11 +32,9 @@ function ListItemSkeleton() {
 }
 
 export function ScrappedPostsList() {
-  const [{ data, isLoading, isError }, dispatch] = useReducer(fetchReducer, {
-    data: null,
-    isLoading: true,
-    isError: false,
-  });
+  const [data, setData] = useState<MyPageScrapResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortOrder>("newest");
   const [page, setPage] = useState(0);
@@ -66,20 +42,41 @@ export function ScrappedPostsList() {
   useEffect(() => {
     let cancelled = false;
 
-    dispatch({ type: "start" });
-
     fetchMyScraps({ q: query || undefined, sort, page, size: 10 })
       .then((res) => {
-        if (!cancelled) dispatch({ type: "success", payload: res });
+        if (!cancelled) setData(res);
       })
       .catch(() => {
-        if (!cancelled) dispatch({ type: "error" });
+        if (!cancelled) setIsError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
       });
 
     return () => {
       cancelled = true;
     };
   }, [query, sort, page]);
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setPage(0);
+    setIsLoading(true);
+    setIsError(false);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSort(value as SortOrder);
+    setPage(0);
+    setIsLoading(true);
+    setIsError(false);
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    setPage(nextPage - 1);
+    setIsLoading(true);
+    setIsError(false);
+  };
 
   if (isLoading) {
     return (
@@ -112,10 +109,7 @@ export function ScrappedPostsList() {
               type="text"
               placeholder="검색"
               value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setPage(0);
-              }}
+              onChange={(e) => handleQueryChange(e.target.value)}
               className="h-8 w-40 rounded-md border border-border bg-background pl-7 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none"
             />
           </div>
@@ -127,10 +121,7 @@ export function ScrappedPostsList() {
             <DropdownMenuContent align="end" className="min-w-[6rem] p-1">
               <DropdownMenuRadioGroup
                 value={sort}
-                onValueChange={(v) => {
-                  setSort(v as SortOrder);
-                  setPage(0);
-                }}
+                onValueChange={handleSortChange}
               >
                 <DropdownMenuRadioItem className="cursor-pointer" value="newest">
                   최신순
@@ -162,7 +153,7 @@ export function ScrappedPostsList() {
             <MyPagePagination
               currentPage={page + 1}
               totalPages={data.totalPages}
-              onPageChange={(nextPage) => setPage(nextPage - 1)}
+              onPageChange={handlePageChange}
               className="mt-8 mb-12"
             />
           )}

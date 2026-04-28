@@ -30,6 +30,43 @@ export interface MyPageScrapResponse {
   totalPages: number;
 }
 
+export interface MyPageQuizHistoryResponse {
+  content: MyPageQuizHistory[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface QuizHistoryDetailQuestion {
+  id: string;
+  type: "multiple_choice" | "short_answer";
+  question: string;
+  options: { id: string; text: string }[];
+  correctOptionId: string;
+  explanation: string;
+  correctAnswer: string;
+}
+
+export interface QuizHistoryMyAnswer {
+  questionId: string;
+  selectedOptionId: string | null;
+  answerText: string | null;
+  isCorrect: boolean;
+}
+
+export interface QuizHistoryDetail {
+  attemptId: string;
+  contentId: string;
+  score: number;
+  totalQuestions: number;
+  passed: boolean;
+  pointsEarned: number;
+  questions: QuizHistoryDetailQuestion[] | null;
+  passingCount: number;
+  myAnswers: QuizHistoryMyAnswer[];
+}
+
 export interface MyPageRecommendHomePost {
   contentId: string;
   title: string;

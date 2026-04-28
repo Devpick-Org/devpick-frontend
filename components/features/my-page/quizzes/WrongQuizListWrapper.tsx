@@ -3,26 +3,49 @@
 import { useEffect, useState } from "react";
 import { WrongQuizList } from "./WrongQuizList";
 import { WrongQuizListItemSkeleton } from "./WrongQuizListItemSkeleton";
-import { fetchMyWrongQuizzes } from "@/lib/mock/my-page-wrong-quizzes";
-import type { MyPageQuizHistory } from "@/types/myPage";
+import { fetchMyQuizHistory } from "@/lib/mock/my-page-wrong-quizzes";
+import type { MyPageQuizHistoryResponse } from "@/types/myPage";
+
+type SortOrder = "newest" | "oldest";
 
 export function WrongQuizListWrapper() {
-  const [quizzes, setQuizzes] = useState<MyPageQuizHistory[]>([]);
+  const [data, setData] = useState<MyPageQuizHistoryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [sort, setSort] = useState<SortOrder>("newest");
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
-    fetchMyWrongQuizzes()
-      .then((data) => {
-        setQuizzes(data);
+    let cancelled = false;
+
+    fetchMyQuizHistory({ sort, page, size: 10, wrongOnly: true })
+      .then((res) => {
+        if (!cancelled) setData(res);
       })
       .catch(() => {
-        setIsError(true);
+        if (!cancelled) setIsError(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       });
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sort, page]);
+
+  const handleSortChange = (value: SortOrder) => {
+    setSort(value);
+    setPage(0);
+    setIsLoading(true);
+    setIsError(false);
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    setPage(nextPage - 1);
+    setIsLoading(true);
+    setIsError(false);
+  };
 
   if (isError) {
     return (
@@ -42,5 +65,15 @@ export function WrongQuizListWrapper() {
     );
   }
 
-  return <WrongQuizList quizzes={quizzes} />;
+  return (
+    <WrongQuizList
+      quizzes={data?.content ?? []}
+      totalElements={data?.totalElements ?? 0}
+      totalPages={data?.totalPages ?? 0}
+      sort={sort}
+      page={page}
+      onSortChange={handleSortChange}
+      onPageChange={handlePageChange}
+    />
+  );
 }

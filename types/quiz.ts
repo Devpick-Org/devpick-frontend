@@ -47,11 +47,19 @@ export type ContentQuizResponse = ApiResponse<ContentQuiz>;
 
 // ─── Submit ───────────────────────────────────────────────────────────────────
 
+export interface QuizSubmitAnswer {
+  questionId: string;
+  selectedOptionId: string | null;
+  answerText: string | null;
+  isCorrect: boolean;
+}
+
 export interface QuizSubmitRequest {
   level: QuizLevel;
   score: number;
   totalQuestions: number;
   passed: boolean;
+  answers: QuizSubmitAnswer[];
 }
 
 export interface QuizSubmitResult {
