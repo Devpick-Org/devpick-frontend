@@ -133,6 +133,9 @@ export interface AiAnswer {
   id: string;
   postId: string;
   content: string;
+  keyPoints: string[] | null;
+  suggestedTags: string[] | null;
+  confidence: number | null; // 0.0 ~ 1.0
   isAdopted: boolean;
   createdAt: string;
 }
