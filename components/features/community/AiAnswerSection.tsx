@@ -1,6 +1,7 @@
-import { RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 import { ContentRenderer } from "./ContentRenderer";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type AiAnswerStatus = "loading" | "success" | "error" | "empty";
@@ -8,6 +9,9 @@ type AiAnswerStatus = "loading" | "success" | "error" | "empty";
 interface AiAnswerSectionProps {
   status: AiAnswerStatus;
   content?: string;
+  keyPoints?: string[] | null;
+  suggestedTags?: string[] | null;
+  confidence?: number | null;
   onRetry?: () => void;
   isRetrying?: boolean;
 }
@@ -15,6 +19,9 @@ interface AiAnswerSectionProps {
 export function AiAnswerSection({
   status,
   content,
+  keyPoints,
+  suggestedTags,
+  confidence,
   onRetry,
   isRetrying = false,
 }: AiAnswerSectionProps) {
@@ -26,10 +33,37 @@ export function AiAnswerSection({
       <div className="rounded-xl border border-border bg-card p-5">
         {status === "loading" && <AiAnswerLoading />}
         {status === "success" && content && (
-          <ContentRenderer
-            content={content}
-            className="space-y-3 text-[15px] leading-7 text-foreground/85 font-medium"
-          />
+          <div className="space-y-4">
+            {confidence !== null && confidence !== undefined && confidence < 0.5 && (
+              <div className="flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                AI 답변이 불확실할 수 있습니다
+              </div>
+            )}
+            {keyPoints && keyPoints.length > 0 && (
+              <ul className="space-y-1.5 rounded-lg bg-muted/50 px-4 py-3">
+                {keyPoints.map((point, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <ContentRenderer
+              content={content}
+              className="space-y-3 text-[15px] leading-7 text-foreground/85 font-medium"
+            />
+            {suggestedTags && suggestedTags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 border-t border-border pt-3">
+                {suggestedTags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
         )}
         {status === "error" && (
           <AiAnswerError onRetry={onRetry} isRetrying={isRetrying} />
@@ -83,7 +117,7 @@ function AiAnswerError({
 
 function AiAnswerEmpty() {
   return (
-    <div className="flex min-h-[72px] items-center">
+    <div className="flex min-h-[72px] items-center justify-center">
       <p className="text-sm text-muted-foreground font-medium">
         아직 생성된 AI 답변이 없습니다.
       </p>

@@ -86,6 +86,9 @@ export function CommunityDetailPage({ postId }: Props) {
         ? "success"
         : "empty";
   const aiContent = aiAnswerRes?.data?.content;
+  const aiKeyPoints = aiAnswerRes?.data?.keyPoints;
+  const aiSuggestedTags = aiAnswerRes?.data?.suggestedTags;
+  const aiConfidence = aiAnswerRes?.data?.confidence;
   // isLoading은 캐시가 없는 최초 fetch, isFetching은 refetch 포함 모든 fetch
   const isAiRetrying = isAiError && isAiFetching;
 
@@ -127,6 +130,9 @@ export function CommunityDetailPage({ postId }: Props) {
           <AiAnswerSection
             status={aiStatus}
             content={aiContent}
+            keyPoints={aiKeyPoints}
+            suggestedTags={aiSuggestedTags}
+            confidence={aiConfidence}
             onRetry={() => refetchAiAnswer()}
             isRetrying={isAiRetrying}
           />
