@@ -1,13 +1,10 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecommendedHomePostListItem } from "./RecommendedHomePostListItem";
-import { MyPagePagination } from "../MyPagePagination";
 import { fetchRecommendHomePosts } from "@/lib/mock/my-page-recommend-home";
-import type { MyPageRecommendHomePost } from "@/types/myPage";
-
-const PAGE_SIZE = 10;
+import type { MyPageRecommendContentsResponse } from "@/types/myPage";
 
 function ListItemSkeleton() {
   return (
@@ -24,23 +21,17 @@ function ListItemSkeleton() {
 }
 
 export function RecommendedHomePostList() {
-  const [posts, setPosts] = useState<MyPageRecommendHomePost[]>([]);
+  const [postsData, setPostsData] =
+    useState<MyPageRecommendContentsResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchRecommendHomePosts()
-      .then((data) => setPosts(data))
+      .then((data) => setPostsData(data))
       .catch(() => setIsError(true))
       .finally(() => setIsLoading(false));
   }, []);
-
-  const totalPages = Math.ceil(posts.length / PAGE_SIZE);
-  const pagedItems = useMemo(
-    () => posts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-    [posts, currentPage],
-  );
 
   if (isError) {
     return (
@@ -60,6 +51,16 @@ export function RecommendedHomePostList() {
     );
   }
 
+  if (!postsData?.isPersonalized) {
+    return (
+      <p className="py-10 text-center text-sm text-muted-foreground">
+        {postsData?.message ?? "아직 추천할 글이 부족해요. 더 많은 글을 읽어보세요!"}
+      </p>
+    );
+  }
+
+  const posts = postsData.contents;
+
   if (posts.length === 0) {
     return (
       <p className="py-10 text-center text-sm text-muted-foreground">
@@ -69,18 +70,10 @@ export function RecommendedHomePostList() {
   }
 
   return (
-    <>
-      <div className="divide-y divide-border">
-        {pagedItems.map((post) => (
-          <RecommendedHomePostListItem key={post.contentId} post={post} />
-        ))}
-      </div>
-      <MyPagePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        className="mt-8 mb-12"
-      />
-    </>
+    <div className="divide-y divide-border">
+      {posts.map((post) => (
+        <RecommendedHomePostListItem key={post.id} post={post} />
+      ))}
+    </div>
   );
 }

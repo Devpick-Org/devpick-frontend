@@ -11,7 +11,7 @@ import { fetchRecommendHomePosts } from "@/lib/mock/my-page-recommend-home";
 import { fetchRecommendVideos } from "@/lib/mock/my-page-recommend-video";
 import { fetchRecommendBooks } from "@/lib/mock/my-page-recommend-book";
 import type {
-  MyPageRecommendHomePost,
+  MyPageRecommendContentsResponse,
   MyPageRecommendVideo,
   MyPageRecommendBook,
 } from "@/types/myPage";
@@ -58,7 +58,8 @@ function BookCardSkeleton() {
 }
 
 export function RecommendedSection() {
-  const [homePosts, setHomePosts] = useState<MyPageRecommendHomePost[]>([]);
+  const [homePostsData, setHomePostsData] =
+    useState<MyPageRecommendContentsResponse | null>(null);
   const [videos, setVideos] = useState<MyPageRecommendVideo[]>([]);
   const [books, setBooks] = useState<MyPageRecommendBook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,14 +71,16 @@ export function RecommendedSection() {
       fetchRecommendVideos(4),
       fetchRecommendBooks(4),
     ])
-      .then(([posts, vids, bks]) => {
-        setHomePosts(posts);
+      .then(([postsData, vids, bks]) => {
+        setHomePostsData(postsData);
         setVideos(vids);
         setBooks(bks);
       })
       .catch(() => setIsError(true))
       .finally(() => setIsLoading(false));
   }, []);
+
+  const homePosts = homePostsData?.contents ?? [];
 
   if (isError) {
     return (
@@ -107,12 +110,17 @@ export function RecommendedSection() {
                 <CardSkeleton key={i} />
               ))}
             </div>
+          ) : !homePostsData?.isPersonalized ? (
+            <p className="text-sm text-muted-foreground">
+              {homePostsData?.message ??
+                "아직 추천할 글이 부족해요. 더 많은 글을 읽어보세요!"}
+            </p>
           ) : homePosts.length === 0 ? (
             <p className="text-sm text-muted-foreground">추천 글이 없습니다.</p>
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {homePosts.map((post) => (
-                <RecommendedHomePostCard key={post.contentId} post={post} />
+                <RecommendedHomePostCard key={post.id} post={post} />
               ))}
             </div>
           )}

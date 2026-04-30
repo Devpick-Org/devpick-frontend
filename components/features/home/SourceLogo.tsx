@@ -3,6 +3,7 @@ import { isStackOverflowSource } from "@/lib/content/sourceGuards";
 interface SourceLogoProps {
   sourceName: string;
   size?: number;
+  paddingOverride?: number;
 }
 
 type LogoConfig = {
@@ -68,7 +69,7 @@ const SOURCE_LOGO: Record<string, LogoConfig> = {
   nextjs_blog: { src: "/icons/sources/nextjs_blog.svg", bg: "#FFFFFF" },
 };
 
-export function SourceLogo({ sourceName, size = 17 }: SourceLogoProps) {
+export function SourceLogo({ sourceName, size = 17, paddingOverride }: SourceLogoProps) {
   const key = sourceName.trim().toLowerCase();
 
   let config: LogoConfig | undefined;
@@ -82,7 +83,7 @@ export function SourceLogo({ sourceName, size = 17 }: SourceLogoProps) {
   }
 
   if (config) {
-    const pad = config.innerPadding ?? 0;
+    const pad = paddingOverride !== undefined ? paddingOverride : (config.innerPadding ?? 0);
     const innerSize = size - pad * 2;
     return (
       <span
