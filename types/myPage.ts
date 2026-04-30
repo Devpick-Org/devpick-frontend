@@ -95,14 +95,23 @@ export interface MyPageRecommendContentsResponse {
 }
 
 export interface MyPageRecommendVideo {
-  videoId: string;
+  contentId: string;
   title: string;
-  channelName: string;
-  thumbnail: string | null;
-  url: string;
-  duration: string;
-  views: number;
-  uploadedAt: string;
+  translatedTitle: string | null;
+  videoId: string;
+  channelName: string | null;
+  duration: string | null;
+  thumbnailUrl: string | null;
+  tags: string[];
+  publishedAt: string;
+  isScrapped: boolean;
+  isLiked: boolean;
+}
+
+export interface MyPageRecommendYoutubeResponse {
+  videos: MyPageRecommendVideo[];
+  isPersonalized: boolean;
+  message?: string | null;
 }
 
 export interface MyPageRecommendBook {

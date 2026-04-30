@@ -12,7 +12,7 @@ import { fetchRecommendVideos } from "@/lib/mock/my-page-recommend-video";
 import { fetchRecommendBooks } from "@/lib/mock/my-page-recommend-book";
 import type {
   MyPageRecommendContentsResponse,
-  MyPageRecommendVideo,
+  MyPageRecommendYoutubeResponse,
   MyPageRecommendBook,
 } from "@/types/myPage";
 
@@ -60,7 +60,8 @@ function BookCardSkeleton() {
 export function RecommendedSection() {
   const [homePostsData, setHomePostsData] =
     useState<MyPageRecommendContentsResponse | null>(null);
-  const [videos, setVideos] = useState<MyPageRecommendVideo[]>([]);
+  const [videosData, setVideosData] =
+    useState<MyPageRecommendYoutubeResponse | null>(null);
   const [books, setBooks] = useState<MyPageRecommendBook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -71,9 +72,9 @@ export function RecommendedSection() {
       fetchRecommendVideos(4),
       fetchRecommendBooks(4),
     ])
-      .then(([postsData, vids, bks]) => {
+      .then(([postsData, vidsData, bks]) => {
         setHomePostsData(postsData);
-        setVideos(vids);
+        setVideosData(vidsData);
         setBooks(bks);
       })
       .catch(() => setIsError(true))
@@ -81,6 +82,7 @@ export function RecommendedSection() {
   }, []);
 
   const homePosts = homePostsData?.contents ?? [];
+  const videos = videosData?.videos ?? [];
 
   if (isError) {
     return (
@@ -137,6 +139,10 @@ export function RecommendedSection() {
                 <CardSkeleton key={i} />
               ))}
             </div>
+          ) : !videosData?.isPersonalized ? (
+            <p className="text-sm text-muted-foreground">
+              {videosData?.message ?? "아직 추천할 영상이 부족해요. 더 많은 글을 읽어보세요!"}
+            </p>
           ) : videos.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               추천 영상이 없습니다.
@@ -144,7 +150,7 @@ export function RecommendedSection() {
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {videos.map((video) => (
-                <RecommendedVideoCard key={video.videoId} video={video} />
+                <RecommendedVideoCard key={video.contentId} video={video} />
               ))}
             </div>
           )}
