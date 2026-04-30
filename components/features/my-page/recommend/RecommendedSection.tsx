@@ -13,7 +13,7 @@ import { fetchRecommendBooks } from "@/lib/mock/my-page-recommend-book";
 import type {
   MyPageRecommendContentsResponse,
   MyPageRecommendYoutubeResponse,
-  MyPageRecommendBook,
+  MyPageRecommendBooksResponse,
 } from "@/types/myPage";
 
 function SubSectionHeader({ title, href }: { title: string; href: string }) {
@@ -62,7 +62,8 @@ export function RecommendedSection() {
     useState<MyPageRecommendContentsResponse | null>(null);
   const [videosData, setVideosData] =
     useState<MyPageRecommendYoutubeResponse | null>(null);
-  const [books, setBooks] = useState<MyPageRecommendBook[]>([]);
+  const [booksData, setBooksData] =
+    useState<MyPageRecommendBooksResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
@@ -75,7 +76,7 @@ export function RecommendedSection() {
       .then(([postsData, vidsData, bks]) => {
         setHomePostsData(postsData);
         setVideosData(vidsData);
-        setBooks(bks);
+        setBooksData(bks);
       })
       .catch(() => setIsError(true))
       .finally(() => setIsLoading(false));
@@ -83,6 +84,7 @@ export function RecommendedSection() {
 
   const homePosts = homePostsData?.contents ?? [];
   const videos = videosData?.videos ?? [];
+  const books = booksData?.books ?? [];
 
   if (isError) {
     return (
@@ -164,6 +166,10 @@ export function RecommendedSection() {
                 <BookCardSkeleton key={i} />
               ))}
             </div>
+          ) : !booksData?.isPersonalized ? (
+            <p className="text-sm text-muted-foreground">
+              {booksData?.message ?? "아직 추천할 도서가 부족해요. 더 많은 글을 읽어보세요!"}
+            </p>
           ) : books.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               추천 서적이 없습니다.
@@ -171,7 +177,7 @@ export function RecommendedSection() {
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {books.map((book) => (
-                <RecommendedBookCard key={book.bookId} book={book} />
+                <RecommendedBookCard key={book.url} book={book} />
               ))}
             </div>
           )}

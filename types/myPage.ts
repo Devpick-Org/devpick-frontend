@@ -115,13 +115,18 @@ export interface MyPageRecommendYoutubeResponse {
 }
 
 export interface MyPageRecommendBook {
-  bookId: string;
   title: string;
   authors: string[];
-  description?: string;
-  cover: string | null;
-  url: string;
-  price?: number;
   publisher: string;
-  publishedAt: string;
+  thumbnail: string | null;
+  url: string;
+  contents: string | null;
+  price: number;
+  salePrice: number;
+}
+
+export interface MyPageRecommendBooksResponse {
+  books: MyPageRecommendBook[];
+  isPersonalized: boolean;
+  message?: string;
 }

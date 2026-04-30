@@ -3,17 +3,18 @@ import { BookOpen } from "lucide-react";
 import type { MyPageRecommendBook } from "@/types/myPage";
 
 export function RecommendedBookCard({ book }: { book: MyPageRecommendBook }) {
-  const { title, authors, cover, url, publisher, publishedAt } = book;
-  const year = publishedAt ? publishedAt.slice(0, 4) : "";
+  const { title, authors, thumbnail, url, publisher, price, salePrice } = book;
+  const hasDiscount = salePrice !== -1;
+  const hasThumbnail = thumbnail && thumbnail.trim() !== "";
 
   return (
     <a href={url} target="_blank" rel="noopener noreferrer">
       <div className="group flex h-full flex-col overflow-hidden rounded-md border border-border bg-card">
         <div className="relative aspect-[3/4] w-full overflow-hidden bg-muted">
-          {cover ? (
+          {hasThumbnail ? (
             <Image
               fill
-              src={cover}
+              src={thumbnail!}
               alt={title}
               className="object-cover transition-transform duration-200"
             />
@@ -31,11 +32,21 @@ export function RecommendedBookCard({ book }: { book: MyPageRecommendBook }) {
           <span className="text-xs text-muted-foreground">
             {authors.join(", ")}
           </span>
-          <span className="text-xs text-muted-foreground">
-            {publisher}
-            <span className="mx-1">·</span>
-            {year}
-          </span>
+          <span className="text-xs text-muted-foreground">{publisher}</span>
+          {hasDiscount ? (
+            <div className="flex flex-col">
+              <span className="text-[11px] text-muted-foreground line-through">
+                {price.toLocaleString()}원
+              </span>
+              <span className="text-sm font-semibold text-foreground">
+                {salePrice.toLocaleString()}원
+              </span>
+            </div>
+          ) : (
+            <span className="text-sm font-semibold text-foreground">
+              {price.toLocaleString()}원
+            </span>
+          )}
         </div>
       </div>
     </a>
