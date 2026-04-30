@@ -1,59 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { WrongQuizList } from "./WrongQuizList";
 import { WrongQuizListItemSkeleton } from "./WrongQuizListItemSkeleton";
-import { fetchMyQuizHistory } from "@/lib/mock/my-page-wrong-quizzes";
-import type { MyPageQuizHistoryResponse } from "@/types/myPage";
+import { getMyQuizHistory } from "@/lib/api/endpoints/users";
 
 type SortOrder = "newest" | "oldest";
 
 export function WrongQuizListWrapper() {
-  const [data, setData] = useState<MyPageQuizHistoryResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
   const [sort, setSort] = useState<SortOrder>("newest");
   const [page, setPage] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchMyQuizHistory({ sort, page, size: 10, wrongOnly: true })
-      .then((res) => {
-        if (!cancelled) setData(res);
-      })
-      .catch(() => {
-        if (!cancelled) setIsError(true);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [sort, page]);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["myQuizHistory", sort, page],
+    queryFn: () =>
+      getMyQuizHistory({
+        passed: false,
+        sort,
+        page,
+        size: 10,
+      }),
+  });
 
   const handleSortChange = (value: SortOrder) => {
     setSort(value);
     setPage(0);
-    setIsLoading(true);
-    setIsError(false);
   };
 
   const handlePageChange = (nextPage: number) => {
     setPage(nextPage - 1);
-    setIsLoading(true);
-    setIsError(false);
   };
-
-  if (isError) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        불러오는 중 오류가 발생했습니다.
-      </p>
-    );
-  }
 
   if (isLoading) {
     return (
@@ -62,6 +39,14 @@ export function WrongQuizListWrapper() {
           <WrongQuizListItemSkeleton key={i} />
         ))}
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <p className="py-10 text-center text-sm text-muted-foreground">
+        불러오는 중 오류가 발생했습니다.
+      </p>
     );
   }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -10,10 +10,10 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useQuery } from "@tanstack/react-query";
 import { ScrappedPostListItem } from "./ScrappedPostListItem";
 import { MyPagePagination } from "../MyPagePagination";
-import { fetchMyScraps } from "@/lib/mock/my-page-scraps";
-import type { MyPageScrapResponse } from "@/types/myPage";
+import { getMyScraps } from "@/lib/api/endpoints/users";
 
 type SortOrder = "newest" | "oldest";
 
@@ -32,50 +32,33 @@ function ListItemSkeleton() {
 }
 
 export function ScrappedPostsList() {
-  const [data, setData] = useState<MyPageScrapResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortOrder>("newest");
   const [page, setPage] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchMyScraps({ q: query || undefined, sort, page, size: 10 })
-      .then((res) => {
-        if (!cancelled) setData(res);
-      })
-      .catch(() => {
-        if (!cancelled) setIsError(true);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [query, sort, page]);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["myScraps", query.trim(), sort, page],
+    queryFn: () =>
+      getMyScraps({
+        q: query.trim() || undefined,
+        sort,
+        page,
+        size: 10,
+      }),
+  });
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
     setPage(0);
-    setIsLoading(true);
-    setIsError(false);
   };
 
   const handleSortChange = (value: string) => {
     setSort(value as SortOrder);
     setPage(0);
-    setIsLoading(true);
-    setIsError(false);
   };
 
   const handlePageChange = (nextPage: number) => {
     setPage(nextPage - 1);
-    setIsLoading(true);
-    setIsError(false);
   };
 
   if (isLoading) {

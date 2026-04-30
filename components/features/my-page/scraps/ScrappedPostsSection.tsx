@@ -1,23 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
 import { ScrappedPostCard } from "./ScrappedPostCard";
-import { fetchMyScrapsPreview } from "@/lib/mock/my-page-scraps";
-import type { MyPageScrap } from "@/types/myPage";
+import { getMyScraps } from "@/lib/api/endpoints/users";
 
 export function ScrappedPostsSection() {
-  const [scraps, setScraps] = useState<MyPageScrap[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["myScrapsPreview"],
+    queryFn: () =>
+      getMyScraps({
+        page: 0,
+        size: 4,
+        sort: "newest",
+      }),
+  });
 
-  useEffect(() => {
-    fetchMyScrapsPreview(4).then((res) => {
-      setScraps(res.content);
-      setIsLoading(false);
-    });
-  }, []);
+  const scraps = data?.content ?? [];
 
   return (
     <section>
@@ -51,6 +52,8 @@ export function ScrappedPostsSection() {
             </div>
           ))}
         </div>
+      ) : isError ? (
+        <p className="text-sm text-muted-foreground">불러오는 중 오류가 발생했습니다.</p>
       ) : scraps.length === 0 ? (
         <p className="text-sm text-muted-foreground">스크랩한 글이 없습니다.</p>
       ) : (

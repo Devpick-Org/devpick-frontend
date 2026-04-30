@@ -7,6 +7,7 @@ import type {
   QuizSubmitResponse,
   QuizLevel,
 } from "@/types/quiz";
+import type { QuizHistoryDetail } from "@/types/myPage";
 
 export const quizzesEndpoints = {
   /**
@@ -49,3 +50,10 @@ export const quizzesEndpoints = {
       .then((r) => r.data);
   },
 };
+
+export async function getQuizHistoryDetail(
+  attemptId: string,
+): Promise<QuizHistoryDetail> {
+  const res = await apiClient.get(`/quiz-history/${attemptId}`);
+  return res.data.data;
+}
