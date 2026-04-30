@@ -1,12 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { QuizResult } from "@/components/features/home/quiz/QuizResult";
-import { fetchMyQuizHistoryDetail } from "@/lib/mock/my-page-wrong-quizzes";
-import type { QuizHistoryDetail } from "@/types/myPage";
+import { getQuizHistoryDetail } from "@/lib/api/endpoints/quizzes";
 
 function QuizResultContent() {
   const params = useParams<{ id: string }>();
@@ -16,17 +16,11 @@ function QuizResultContent() {
   const contentId = params.id;
   const attemptId = searchParams.get("attemptId");
 
-  const [detail, setDetail] = useState<QuizHistoryDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(!!attemptId);
-  const [isError, setIsError] = useState(!attemptId);
-
-  useEffect(() => {
-    if (!attemptId) return;
-    fetchMyQuizHistoryDetail(attemptId)
-      .then(setDetail)
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-  }, [attemptId]);
+  const { data: detail, isLoading, isError } = useQuery({
+    queryKey: ["quizHistoryDetail", attemptId],
+    queryFn: () => getQuizHistoryDetail(attemptId!),
+    enabled: !!attemptId,
+  });
 
   if (isLoading) {
     return (
