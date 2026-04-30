@@ -36,7 +36,7 @@ export default function HistoryTimelineItem({ item, isLast }: Props) {
   const meta = ACTION_META[item.actionType];
   const Icon = meta.icon;
   const href = getHref(item);
-  const title = item.content?.title ?? item.post?.title ?? null;
+  const title = item.content?.translatedTitle ?? item.content?.title ?? item.post?.title ?? null;
   const preview = item.content?.preview ?? null;
 
   const card = (

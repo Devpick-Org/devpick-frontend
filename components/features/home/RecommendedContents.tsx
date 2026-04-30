@@ -25,7 +25,7 @@ export function RecommendedContents({ items }: RecommendedContentsProps) {
                   {item.thumbnailUrl ? (
                     <Image
                       src={item.thumbnailUrl}
-                      alt={item.title}
+                      alt={item.translatedTitle ?? item.title}
                       fill
                       className="object-cover"
                       sizes="288px"
@@ -40,7 +40,7 @@ export function RecommendedContents({ items }: RecommendedContentsProps) {
                 {/* 텍스트 */}
                 <div className="p-3">
                   <p className="mb-1.5 line-clamp-2 text-sm font-semibold leading-snug text-foreground">
-                    {item.title}
+                    {item.translatedTitle ?? item.title}
                   </p>
                   <span className="text-xs text-muted-foreground font-medium">
                     {item.sourceName}

@@ -312,8 +312,123 @@ const SOURCES = [
     logoPadding: "p-1.5",
   },
   {
+    name: "우아한형제들",
+    sub: "기술 블로그",
+    containerBg: "bg-white",
+    logo: "/icons/sources/woowahan_tech.png",
+    logoPadding: "",
+  },
+  {
+    name: "SOCAR Tech",
+    sub: "",
+    containerBg: "bg-white",
+    logo: "/icons/sources/socar_tech.png",
+    logoPadding: "p-1.5",
+  },
+  {
+    name: "SK Planet",
+    sub: "기술 블로그",
+    containerBg: "bg-white",
+    logo: "/icons/sources/skplanet_tech.svg",
+    logoPadding: "p-1",
+  },
+  {
+    name: "농심 클라우드",
+    sub: "기술 블로그",
+    containerBg: "bg-white",
+    logo: "/icons/sources/nongshim_cloud_tech.png",
+    logoPadding: "p-1.5",
+  },
+  {
+    name: "KakaoPay Tech",
+    sub: "",
+    containerBg: "bg-[#FEE500]",
+    logo: "/icons/sources/kakaopay_tech.png",
+    logoPadding: "",
+  },
+  {
+    name: "Meta Engineering",
+    sub: "",
+    containerBg: "bg-white",
+    logo: "/icons/sources/meta_engineering.svg",
+    logoPadding: "p-1.5",
+    iconColor: "#0668E1",
+  },
+  {
+    name: "Cloudflare",
+    sub: "Blog",
+    containerBg: "bg-white",
+    logo: "/icons/sources/cloudflare_blog.svg",
+    logoPadding: "p-1",
+  },
+  {
+    name: "GitHub Blog",
+    sub: "",
+    containerBg: "bg-white",
+    logo: "/icons/sources/github_blog.svg",
+    logoPadding: "p-1.5",
+  },
+  {
+    name: "AWS Korea",
+    sub: "Tech",
+    containerBg: "bg-white",
+    logo: "/icons/sources/aws_korea_tech.svg",
+    logoPadding: "p-1.5",
+  },
+  {
+    name: "Microsoft",
+    sub: "DevBlogs",
+    containerBg: "bg-white",
+    logo: "/icons/sources/ms_devblogs.svg",
+    logoPadding: "p-2",
+  },
+  {
+    name: "NVIDIA",
+    sub: "Developer",
+    containerBg: "bg-white",
+    logo: "/icons/sources/nvidia_developer.svg",
+    logoPadding: "p-1.5",
+    iconColor: "#77B900",
+  },
+  {
+    name: "Grab",
+    sub: "Engineering",
+    containerBg: "bg-white",
+    logo: "/icons/sources/grab_engineering.svg",
+    logoPadding: "p-1.5",
+    iconColor: "#00983A",
+  },
+  {
+    name: "Google Developers",
+    sub: "",
+    containerBg: "bg-white",
+    logo: "/icons/sources/google_developers.svg",
+    logoPadding: "p-2",
+  },
+  {
+    name: "Spring Blog",
+    sub: "",
+    containerBg: "bg-white",
+    logo: "/icons/sources/spring_blog.svg",
+    logoPadding: "p-2",
+  },
+  {
+    name: "Flex",
+    sub: "기술 블로그",
+    containerBg: "bg-white",
+    logo: "/icons/sources/flex_tech.jpg",
+    logoPadding: "",
+  },
+  {
+    name: "Next.js Blog",
+    sub: "",
+    containerBg: "bg-white",
+    logo: "/icons/sources/nextjs_blog.svg",
+    logoPadding: "p-2",
+  },
+  {
     name: "Medium",
-    sub: "당근 · 무신사 · 마이리얼트립 · 넷플릭스",
+    sub: "당근 · 무신사 · 마이리얼트립 · 넷플릭스 · 에어비앤비 · 핀터레스트 · 여기어때 · Flutter",
     containerBg: "bg-white",
     logo: "/icons/sources/medium.svg",
     logoPadding: "",
@@ -411,12 +526,29 @@ function FeaturesSection() {
                 <div
                   className={`flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg shadow-sm ${source.containerBg} ${source.logoPadding}`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={source.logo}
-                    alt={source.name}
-                    className="h-full w-full object-contain"
-                  />
+                  {"iconColor" in source && source.iconColor ? (
+                    <span
+                      className="block h-full w-full"
+                      style={{
+                        backgroundColor: source.iconColor,
+                        WebkitMaskImage: `url(${source.logo})`,
+                        maskImage: `url(${source.logo})`,
+                        WebkitMaskSize: "contain",
+                        maskSize: "contain",
+                        WebkitMaskRepeat: "no-repeat",
+                        maskRepeat: "no-repeat",
+                        WebkitMaskPosition: "center",
+                        maskPosition: "center",
+                      }}
+                    />
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={source.logo}
+                      alt={source.name}
+                      className="h-full w-full object-contain"
+                    />
+                  )}
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-semibold text-foreground">
