@@ -10,17 +10,19 @@ export function RecommendedHomePostCard({
 }: {
   post: MyPageRecommendHomePost;
 }) {
-  const { contentId, title, sourceName, thumbnail, date } = post;
+  const { id, title, translatedTitle, sourceName, thumbnailUrl, publishedAt } =
+    post;
+  const displayTitle = translatedTitle ?? title;
 
   return (
-    <Link href={`/home/${contentId}`}>
+    <Link href={`/home/${id}`}>
       <div className="group flex h-full flex-col overflow-hidden rounded-md border border-border bg-card">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
-          {thumbnail ? (
+          {thumbnailUrl ? (
             <Image
               fill
-              src={thumbnail}
-              alt={title}
+              src={thumbnailUrl}
+              alt={displayTitle}
               className="object-cover transition-transform duration-200"
             />
           ) : (
@@ -32,14 +34,18 @@ export function RecommendedHomePostCard({
 
         <div className="flex flex-1 flex-col gap-1.5 p-3">
           <div className="flex items-center gap-1.5">
-            <SourceLogo sourceName={sourceName} size={13} />
+            <SourceLogo
+              sourceName={sourceName}
+              size={13}
+              {...(sourceName === "naver_d2" && { paddingOverride: 4 })}
+            />
             <span className="text-xs text-muted-foreground">{sourceName}</span>
           </div>
           <p className="line-clamp-2 flex-1 text-sm font-medium leading-snug tracking-[-0.01em] text-foreground">
-            {title}
+            {displayTitle}
           </p>
           <span className="text-xs text-muted-foreground">
-            {formatDate(date)}
+            {formatDate(publishedAt)}
           </span>
         </div>
       </div>
