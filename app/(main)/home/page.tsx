@@ -10,6 +10,7 @@ import {
 import { FeedSearch } from "@/components/features/home/FeedSearch";
 import { HomeSearchOverlay } from "@/components/features/home/search/HomeSearchOverlay";
 import { useAuthStore } from "@/store/auth.store";
+import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 
 const PAGE_SIZE = 6;
 
@@ -35,7 +36,14 @@ export default function HomePage() {
   const nickname = user?.nickname ?? "김데브";
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const handleOpenSearch = useCallback(() => setIsSearchOpen(true), []);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const handleOpenSearch = useCallback(() => {
+    if (!isAuthenticated) {
+      setLoginDialogOpen(true);
+      return;
+    }
+    setIsSearchOpen(true);
+  }, [isAuthenticated]);
   const handleCloseSearch = useCallback(() => setIsSearchOpen(false), []);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -173,6 +181,11 @@ export default function HomePage() {
       </div>
 
       <HomeSearchOverlay isOpen={isSearchOpen} onClose={handleCloseSearch} />
+      <LoginPromptDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
+        message="검색 기능을 사용하려면"
+      />
     </div>
   );
 }
