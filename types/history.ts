@@ -26,6 +26,7 @@ export type ActivityFilterValue = ActivityActionType | "answer";
 export interface HistoryContentRef {
   id: string;
   title: string;
+  translatedTitle: string | null;
   preview?: string;
 }
 
