@@ -4,10 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchHomeTrend } from "@/lib/mock/home-search-trend";
+import { isAxiosError } from "axios";
 import type { TrendRange } from "@/types/search";
-import { searchMockResults } from "@/lib/mock/home-search-results";
+import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import { useAuthStore } from "@/store/auth.store";
+import { SEARCH_QUERY_KEYS, searchEndpoints } from "@/lib/api/endpoints/search";
 import { HomeRangeTabs } from "./HomeRangeTabs";
 import { HomeTopPostsSection } from "./HomeTopPostsSection";
 import { HomeCollectionSummarySection } from "./HomeCollectionSummarySection";
@@ -16,6 +17,18 @@ import { HomeSearchResultsSection } from "./HomeSearchResultsSection";
 
 const normalizeTag = (value: string) =>
   value.toLowerCase().replace(/\s+/g, "").replace(/[.#]/g, "");
+
+/** ApiErrorResponse 구조(data.error.code)와 대안 경로(data.code) 둘 다 안전하게 추출 */
+function getApiErrorCode(data: unknown): string | undefined {
+  if (typeof data !== "object" || data === null) return undefined;
+  const d = data as Record<string, unknown>;
+  if (typeof d.error === "object" && d.error !== null) {
+    const e = d.error as Record<string, unknown>;
+    if (typeof e.code === "string") return e.code;
+  }
+  if (typeof d.code === "string") return d.code;
+  return undefined;
+}
 
 interface HomeSearchOverlayProps {
   isOpen: boolean;
@@ -56,11 +69,32 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["trends", "analysis", unit],
-    queryFn: () => fetchHomeTrend(unit),
+  const {
+    data,
+    isLoading,
+    isError: isTrendError,
+    error: trendError,
+  } = useQuery({
+    queryKey: SEARCH_QUERY_KEYS.trendAnalysis(unit),
+    queryFn: () => searchEndpoints.getTrendAnalysis(unit),
     staleTime: 5 * 60 * 1000,
     enabled: isOpen,
+  });
+
+  const {
+    data: searchData,
+    isLoading: isSearchLoading,
+    isError: isSearchError,
+  } = useQuery({
+    queryKey: ["contents", "search", debouncedQuery],
+    queryFn: () =>
+      contentsEndpoints.searchContents({
+        query: debouncedQuery,
+        page: 0,
+        size: 10,
+      }),
+    staleTime: 30 * 1000,
+    enabled: isOpen && debouncedQuery.length > 0,
   });
 
   const handleUnitChange = useCallback((next: TrendRange) => {
@@ -84,10 +118,19 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
     return () => clearTimeout(timer);
   }, [inputValue]);
 
-  const searchResults = useMemo(
-    () => (debouncedQuery ? searchMockResults(debouncedQuery) : []),
-    [debouncedQuery],
-  );
+  const searchResults = useMemo(() => {
+    const contents = searchData?.data?.contents ?? [];
+    return contents.map((c) => ({
+      id: c.id,
+      title: c.title,
+      sourceName: c.sourceName,
+      publishedAt: c.publishedAt,
+      thumbnailUrl: c.thumbnailUrl,
+      summary: c.preview,
+      tags: c.tags,
+      url: `/home/${c.id}`,
+    }));
+  }, [searchData]);
 
   const isSearching = debouncedQuery.length > 0;
 
@@ -125,6 +168,11 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
     monthly: "월간",
   };
   const rangeLabel = RANGE_LABEL[unit];
+
+  const isTrendEmpty =
+    isAxiosError(trendError) &&
+    trendError.response?.status === 404 &&
+    getApiErrorCode(trendError.response?.data) === "TREND_001";
 
   // isOpen이 false면 렌더하지 않음
   // createPortal은 user interaction 이후에만 호출되므로 document.body 접근 안전
@@ -189,16 +237,22 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
 
       {/* 스크롤 영역 — 전체 너비로 확장해 여백 포함 스크롤 가능 */}
       <div className="flex-1 overflow-x-hidden overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="mx-auto max-w-5xl px-6 pb-6 pt-0 md:px-8 md:pb-8 md:pt-2">
+        <div className="mx-auto max-w-5xl px-6 pb-16 pt-0 md:px-8 md:pb-12 md:pt-2">
           {isSearching ? (
             <HomeSearchResultsSection
               results={searchResults}
               activeItemId={activeItemId}
               onToggle={handleToggleItem}
               onClose={onClose}
-              isLoading={false}
-              isError={false}
+              isLoading={isSearchLoading}
+              isError={isSearchError}
             />
+          ) : isTrendError ? (
+            <p className="py-10 text-center text-sm font-medium text-muted-foreground">
+              {isTrendEmpty
+                ? "집계된 트렌드가 없습니다"
+                : "데이터를 불러오지 못했습니다"}
+            </p>
           ) : (
             <div className="flex flex-col gap-10">
               <HomeTopPostsSection
