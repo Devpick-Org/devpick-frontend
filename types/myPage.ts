@@ -5,7 +5,7 @@ export interface MyPageQuizHistory {
   contentId: string;
   contentTitle: string;
   thumbnail?: string | null;
-  preview?: string;
+  preview?: string | null;
   level: QuizLevel;
   score: number;
   totalQuestions: number;
