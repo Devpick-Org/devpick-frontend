@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecommendedHomePostListItem } from "./RecommendedHomePostListItem";
-import { fetchRecommendHomePosts } from "@/lib/mock/my-page-recommend-home";
-import type { MyPageRecommendContentsResponse } from "@/types/myPage";
+import { getRecommendContents, MY_PAGE_QUERY_KEYS } from "@/lib/api/endpoints/myPage";
 
 function ListItemSkeleton() {
   return (
@@ -21,17 +20,10 @@ function ListItemSkeleton() {
 }
 
 export function RecommendedHomePostList() {
-  const [postsData, setPostsData] =
-    useState<MyPageRecommendContentsResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    fetchRecommendHomePosts()
-      .then((data) => setPostsData(data))
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { data: postsData, isLoading, isError } = useQuery({
+    queryKey: MY_PAGE_QUERY_KEYS.recommendContents,
+    queryFn: getRecommendContents,
+  });
 
   if (isError) {
     return (
