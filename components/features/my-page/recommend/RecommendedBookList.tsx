@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecommendedBookListItem } from "./RecommendedBookListItem";
-import { fetchRecommendBooks } from "@/lib/mock/my-page-recommend-book";
-import type { MyPageRecommendBooksResponse } from "@/types/myPage";
+import { getRecommendBooks, MY_PAGE_QUERY_KEYS } from "@/lib/api/endpoints/myPage";
 
 function ListItemSkeleton() {
   return (
@@ -25,17 +24,10 @@ function ListItemSkeleton() {
 }
 
 export function RecommendedBookList() {
-  const [booksData, setBooksData] =
-    useState<MyPageRecommendBooksResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-
-  useEffect(() => {
-    fetchRecommendBooks()
-      .then((data) => setBooksData(data))
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-  }, []);
+  const { data: booksData, isLoading, isError } = useQuery({
+    queryKey: MY_PAGE_QUERY_KEYS.recommendBooks,
+    queryFn: getRecommendBooks,
+  });
 
   if (isError) {
     return (

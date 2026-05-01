@@ -1,20 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecommendedHomePostCard } from "./RecommendedHomePostCard";
 import { RecommendedVideoCard } from "./RecommendedVideoCard";
 import { RecommendedBookCard } from "./RecommendedBookCard";
-import { fetchRecommendHomePosts } from "@/lib/mock/my-page-recommend-home";
-import { fetchRecommendVideos } from "@/lib/mock/my-page-recommend-video";
-import { fetchRecommendBooks } from "@/lib/mock/my-page-recommend-book";
-import type {
-  MyPageRecommendContentsResponse,
-  MyPageRecommendYoutubeResponse,
-  MyPageRecommendBooksResponse,
-} from "@/types/myPage";
+import {
+  getRecommendContents,
+  getRecommendYoutube,
+  getRecommendBooks,
+  MY_PAGE_QUERY_KEYS,
+} from "@/lib/api/endpoints/myPage";
 
 function SubSectionHeader({ title, href }: { title: string; href: string }) {
   return (
@@ -58,46 +56,36 @@ function BookCardSkeleton() {
 }
 
 export function RecommendedSection() {
-  const [homePostsData, setHomePostsData] =
-    useState<MyPageRecommendContentsResponse | null>(null);
-  const [videosData, setVideosData] =
-    useState<MyPageRecommendYoutubeResponse | null>(null);
-  const [booksData, setBooksData] =
-    useState<MyPageRecommendBooksResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const {
+    data: homePostsData,
+    isLoading: homeLoading,
+    isError: homeError,
+  } = useQuery({
+    queryKey: MY_PAGE_QUERY_KEYS.recommendContents,
+    queryFn: getRecommendContents,
+  });
 
-  useEffect(() => {
-    Promise.all([
-      fetchRecommendHomePosts(4),
-      fetchRecommendVideos(4),
-      fetchRecommendBooks(4),
-    ])
-      .then(([postsData, vidsData, bks]) => {
-        setHomePostsData(postsData);
-        setVideosData(vidsData);
-        setBooksData(bks);
-      })
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-  }, []);
+  const {
+    data: videosData,
+    isLoading: videosLoading,
+    isError: videosError,
+  } = useQuery({
+    queryKey: MY_PAGE_QUERY_KEYS.recommendYoutube,
+    queryFn: getRecommendYoutube,
+  });
+
+  const {
+    data: booksData,
+    isLoading: booksLoading,
+    isError: booksError,
+  } = useQuery({
+    queryKey: MY_PAGE_QUERY_KEYS.recommendBooks,
+    queryFn: getRecommendBooks,
+  });
 
   const homePosts = homePostsData?.contents ?? [];
   const videos = videosData?.videos ?? [];
   const books = booksData?.books ?? [];
-
-  if (isError) {
-    return (
-      <section>
-        <h2 className="mb-3 text-base font-semibold text-foreground">
-          사용자 맞춤 추천
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          불러오는 중 오류가 발생했습니다.
-        </p>
-      </section>
-    );
-  }
 
   return (
     <section>
@@ -108,12 +96,16 @@ export function RecommendedSection() {
       <div className="space-y-8">
         <div>
           <SubSectionHeader title="홈 추천 글" href="/my-page/recommend/home" />
-          {isLoading ? (
+          {homeLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <CardSkeleton key={i} />
               ))}
             </div>
+          ) : homeError ? (
+            <p className="text-sm text-muted-foreground">
+              불러오는 중 오류가 발생했습니다.
+            </p>
           ) : !homePostsData?.isPersonalized ? (
             <p className="text-sm text-muted-foreground">
               {homePostsData?.message ??
@@ -135,12 +127,16 @@ export function RecommendedSection() {
             title="추천 유튜브"
             href="/my-page/recommend/video"
           />
-          {isLoading ? (
+          {videosLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <CardSkeleton key={i} />
               ))}
             </div>
+          ) : videosError ? (
+            <p className="text-sm text-muted-foreground">
+              불러오는 중 오류가 발생했습니다.
+            </p>
           ) : !videosData?.isPersonalized ? (
             <p className="text-sm text-muted-foreground">
               {videosData?.message ?? "아직 추천할 영상이 부족해요. 더 많은 글을 읽어보세요!"}
@@ -160,12 +156,16 @@ export function RecommendedSection() {
 
         <div>
           <SubSectionHeader title="추천 서적" href="/my-page/recommend/book" />
-          {isLoading ? (
+          {booksLoading ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <BookCardSkeleton key={i} />
               ))}
             </div>
+          ) : booksError ? (
+            <p className="text-sm text-muted-foreground">
+              불러오는 중 오류가 발생했습니다.
+            </p>
           ) : !booksData?.isPersonalized ? (
             <p className="text-sm text-muted-foreground">
               {booksData?.message ?? "아직 추천할 도서가 부족해요. 더 많은 글을 읽어보세요!"}
