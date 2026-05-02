@@ -1,0 +1,22 @@
+# Vercel 프로젝트가 Git 연동으로 main 푸시마다 자동 배포면 이 파일은 선택 사항입니다.
+# Git 연동이 없거나 재배포만 강제하려면: Vercel → Settings → Git → Deploy Hooks 에서 Hook URL 생성 후,
+# 레포 Secrets 에 VERCEL_DEPLOY_HOOK 로 저장하고 아래 워크플로를 실행합니다.
+
+name: Trigger Vercel deploy (Deploy Hook)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  hook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST Deploy Hook
+        env:
+          HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "${HOOK_URL:-}" ]; then
+            echo "Secret VERCEL_DEPLOY_HOOK is not set. Add it in Repo Settings → Secrets and variables → Actions." >&2
+            exit 1
+          fi
+          curl -fsS -X POST "$HOOK_URL"
