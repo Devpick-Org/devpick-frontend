@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/auth.store";
 import {
   ArrowRight,
-  BarChart2,
   BookOpen,
+  Briefcase,
   ChevronRight,
   History,
   MessageSquare,
   Search,
+  TrendingUp,
+  User,
   Users,
   Zap,
 } from "lucide-react";
@@ -204,7 +206,7 @@ function HeroSection() {
       />
 
       <div className="relative mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="grid items-start gap-10 md:grid-cols-2 md:gap-6 lg:gap-16">
+        <div className="grid items-center gap-10 md:grid-cols-2 md:gap-6 lg:gap-16">
           {/* ── 좌측: 텍스트 ── */}
           <div className="text-center md:text-left">
             {/* Badge */}
@@ -224,7 +226,7 @@ function HeroSection() {
 
             <FadeUp delay={0.2}>
               <p className="mx-auto mb-8 max-w-lg text-lg font-medium leading-relaxed text-muted-foreground md:mx-0">
-                기술 블로그, AI 요약, 커뮤니티, 리포트까지.
+                기술 피드, AI 요약, 커뮤니티, 채용, 트렌드까지.
                 <br />
                 흩어진 학습을 하나의 흐름으로 연결하세요.
               </p>
@@ -440,32 +442,32 @@ const FEATURES = [
   {
     icon: BookOpen,
     title: "맞춤형 기술 피드",
-    desc: "Velog, Medium, Stack Overflow 등 여러 기술 블로그를 한데 모아 직무와 기술 스택에 맞게 보여드립니다.",
-  },
-  {
-    icon: Zap,
-    title: "AI 요약 & 퀴즈",
-    desc: "긴 글을 4가지 레벨에 맞게 요약하고, AI 퀴즈로 이해도를 바로 점검하세요.",
+    desc: "Velog, Medium, Stack Overflow 등 여러 기술 블로그를 직무·스택에 맞게 모아보고, AI 요약과 퀴즈로 빠르게 이해하세요.",
   },
   {
     icon: Users,
     title: "개발자 커뮤니티",
-    desc: "궁금한 것을 질문하고 사용자들의 답변을 받아보세요. AI가 생성한 1차 답변도 함께 제공됩니다.",
+    desc: "궁금한 것을 질문하고 답변을 받아보세요. AI가 질문을 다듬어 더 좋은 답변을 이끌어냅니다.",
   },
   {
-    icon: MessageSquare,
-    title: "AI 질문 개선",
-    desc: "AI가 질문을 다듬어 더 좋은 답변을 받을 수 있도록 도와드립니다.",
+    icon: Briefcase,
+    title: "채용 정보",
+    desc: "개발자 채용 공고를 한곳에서 확인하세요. 이력서와 쌓인 학습 데이터를 바탕으로 매칭 점수를 확인하고, 공고별 예상 면접 Q&A도 받아보세요.",
+  },
+  {
+    icon: TrendingUp,
+    title: "트렌드 동향",
+    desc: "일·주·월별 기술 키워드 트렌드를 한눈에 파악하세요. 지금 개발 씬에서 무엇이 주목받는지 확인할 수 있습니다.",
   },
   {
     icon: History,
-    title: "히스토리 & 배지",
-    desc: "읽은 글, 퀴즈 결과, 활동 내역 등을 타임라인으로 기록하고 배지를 획득하세요.",
+    title: "히스토리 & 리포트",
+    desc: "읽은 글, 퀴즈 결과, 활동 내역을 타임라인으로 기록하고, 주간 학습 패턴을 차트로 분석해 성장을 추적하세요.",
   },
   {
-    icon: BarChart2,
-    title: "주간 학습 리포트",
-    desc: "한 주간의 학습 패턴을 차트로 분석하고, 리포트를 공유하세요.",
+    icon: User,
+    title: "마이페이지",
+    desc: "스크랩한 콘텐츠와 퀴즈 기록을 모아보고, 나의 관심사 기반으로 추천된 도서와 영상을 확인하세요.",
   },
 ];
 
@@ -575,6 +577,7 @@ const FLOW_STEPS = [
   { icon: Zap, label: "학습", desc: "AI 요약 & 퀴즈로 빠른 이해" },
   { icon: MessageSquare, label: "질문", desc: "커뮤니티에서 심화 토론" },
   { icon: History, label: "기록", desc: "히스토리 & 리포트로 성장 추적" },
+  { icon: Briefcase, label: "채용", desc: "축적된 성장 데이터로 취업 준비" },
 ];
 
 function FlowSection() {
@@ -688,10 +691,10 @@ function LandingFooter() {
               커뮤니티
             </Link>
             <Link
-              href="/trends"
+              href="/jobs"
               className="transition-colors hover:text-foreground"
             >
-              트렌드
+              채용
             </Link>
             <Link
               href="/auth"
