@@ -8,12 +8,14 @@ interface HomeSearchResultAccordionItemProps {
   item: SearchResultItem;
   isOpen: boolean;
   onToggle: () => void;
+  onClose: () => void;
 }
 
 export function HomeSearchResultAccordionItem({
   item,
   isOpen,
   onToggle,
+  onClose,
 }: HomeSearchResultAccordionItemProps) {
   return (
     <div className="border-b border-border">
@@ -64,7 +66,8 @@ export function HomeSearchResultAccordionItem({
               ))}
             </div>
             <Link
-              href={item.url}
+              href={`/home/${item.id}`}
+              onClick={onClose}
               className="mt-1 w-fit text-xs font-medium text-primary hover:underline"
             >
               전체 글 보기 →

@@ -47,3 +47,4 @@ export const usersEndpoints = {
       .then((r) => r.data);
   },
 };
+

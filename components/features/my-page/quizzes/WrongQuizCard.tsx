@@ -19,11 +19,11 @@ export function LevelBadge({ level }: { level: QuizLevel }) {
 }
 
 export function WrongQuizCard({ quiz }: { quiz: MyPageQuizHistory }) {
-  const { contentId, contentTitle, level, score, totalQuestions, attemptedAt } =
+  const { attemptId, contentId, contentTitle, level, score, totalQuestions, attemptedAt } =
     quiz;
 
   return (
-    <Link href={`/home/${contentId}/quiz/result`}>
+    <Link href={`/home/${contentId}/quiz/result?attemptId=${attemptId}`}>
       <div className="group flex h-full flex-col rounded-xl border border-border bg-card p-3">
         <p className="line-clamp-2 flex-1 text-sm font-semibold leading-snug tracking-[-0.01em] text-foreground">
           {contentTitle}

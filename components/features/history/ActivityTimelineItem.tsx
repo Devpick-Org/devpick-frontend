@@ -33,6 +33,7 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
   const Icon = meta.icon;
   const href = getHref(item);
   const title =
+    item.content?.translatedTitle ??
     item.content?.title ??
     item.post?.title ??
     (item.actionType === "daily_login" ? "출석을 완료했어요" : null);

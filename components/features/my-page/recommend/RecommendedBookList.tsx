@@ -1,37 +1,21 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecommendedBookListItem } from "./RecommendedBookListItem";
-import { MyPagePagination } from "../MyPagePagination";
-import { fetchRecommendBooks } from "@/lib/mock/my-page-recommend-book";
-import type { MyPageRecommendBook } from "@/types/myPage";
-
-const PAGE_SIZE = 10;
+import { getRecommendBooks, MY_PAGE_QUERY_KEYS } from "@/lib/api/endpoints/myPage";
 
 function ListItemSkeleton() {
   return (
     <div className="-mx-2 flex gap-4 px-2 py-3">
-      {/* 썸네일 */}
       <Skeleton className="aspect-[2/3] w-24 shrink-0 rounded-sm" />
-
       <div className="flex flex-1 flex-col gap-2 py-0.5">
-        {/* title */}
         <Skeleton className="h-4 w-4/5 rounded" />
-
-        {/* description */}
         <Skeleton className="h-3 w-full rounded" />
         <Skeleton className="h-3 w-3/4 rounded" />
-
-        {/* authors */}
         <Skeleton className="h-3 w-2/5 rounded" />
-
-        {/* bottom 영역 */}
         <div className="mt-auto flex flex-col gap-1">
-          {/* publisher · year */}
           <Skeleton className="h-3 w-24 rounded" />
-
-          {/* price */}
           <Skeleton className="h-4 w-20 rounded" />
         </div>
       </div>
@@ -40,23 +24,10 @@ function ListItemSkeleton() {
 }
 
 export function RecommendedBookList() {
-  const [books, setBooks] = useState<MyPageRecommendBook[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    fetchRecommendBooks()
-      .then((data) => setBooks(data))
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  const totalPages = Math.ceil(books.length / PAGE_SIZE);
-  const pagedItems = useMemo(
-    () => books.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-    [books, currentPage],
-  );
+  const { data: booksData, isLoading, isError } = useQuery({
+    queryKey: MY_PAGE_QUERY_KEYS.recommendBooks,
+    queryFn: getRecommendBooks,
+  });
 
   if (isError) {
     return (
@@ -76,6 +47,16 @@ export function RecommendedBookList() {
     );
   }
 
+  if (!booksData?.isPersonalized) {
+    return (
+      <p className="py-10 text-center text-sm text-muted-foreground">
+        {booksData?.message ?? "아직 추천할 도서가 부족해요. 더 많은 글을 읽어보세요!"}
+      </p>
+    );
+  }
+
+  const books = booksData.books;
+
   if (books.length === 0) {
     return (
       <p className="py-10 text-center text-sm text-muted-foreground">
@@ -85,18 +66,10 @@ export function RecommendedBookList() {
   }
 
   return (
-    <>
-      <div className="divide-y divide-border">
-        {pagedItems.map((book) => (
-          <RecommendedBookListItem key={book.bookId} book={book} />
-        ))}
-      </div>
-      <MyPagePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        className="mt-8 mb-12"
-      />
-    </>
+    <div className="divide-y divide-border">
+      {books.map((book) => (
+        <RecommendedBookListItem key={book.url} book={book} />
+      ))}
+    </div>
   );
 }

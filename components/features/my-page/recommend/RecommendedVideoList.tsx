@@ -1,13 +1,9 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RecommendedVideoListItem } from "./RecommendedVideoListItem";
-import { MyPagePagination } from "../MyPagePagination";
-import { fetchRecommendVideos } from "@/lib/mock/my-page-recommend-video";
-import type { MyPageRecommendVideo } from "@/types/myPage";
-
-const PAGE_SIZE = 10;
+import { getRecommendYoutube, MY_PAGE_QUERY_KEYS } from "@/lib/api/endpoints/myPage";
 
 function ListItemSkeleton() {
   return (
@@ -23,23 +19,10 @@ function ListItemSkeleton() {
 }
 
 export function RecommendedVideoList() {
-  const [videos, setVideos] = useState<MyPageRecommendVideo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    fetchRecommendVideos()
-      .then((data) => setVideos(data))
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  const totalPages = Math.ceil(videos.length / PAGE_SIZE);
-  const pagedItems = useMemo(
-    () => videos.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-    [videos, currentPage],
-  );
+  const { data: videosData, isLoading, isError } = useQuery({
+    queryKey: MY_PAGE_QUERY_KEYS.recommendYoutube,
+    queryFn: getRecommendYoutube,
+  });
 
   if (isError) {
     return (
@@ -59,6 +42,16 @@ export function RecommendedVideoList() {
     );
   }
 
+  if (!videosData?.isPersonalized) {
+    return (
+      <p className="py-10 text-center text-sm text-muted-foreground">
+        {videosData?.message ?? "아직 추천할 영상이 부족해요. 더 많은 글을 읽어보세요!"}
+      </p>
+    );
+  }
+
+  const videos = videosData.videos;
+
   if (videos.length === 0) {
     return (
       <p className="py-10 text-center text-sm text-muted-foreground">
@@ -68,18 +61,10 @@ export function RecommendedVideoList() {
   }
 
   return (
-    <>
-      <div className="divide-y divide-border">
-        {pagedItems.map((video) => (
-          <RecommendedVideoListItem key={video.videoId} video={video} />
-        ))}
-      </div>
-      <MyPagePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        className="mt-8 mb-12"
-      />
-    </>
+    <div className="divide-y divide-border">
+      {videos.map((video) => (
+        <RecommendedVideoListItem key={video.contentId} video={video} />
+      ))}
+    </div>
   );
 }

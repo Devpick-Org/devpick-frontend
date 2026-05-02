@@ -1,6 +1,7 @@
+import Link from "next/link";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { TrendTopPost } from "@/lib/mock/home-search-trend";
+import type { TrendTopPost } from "@/types/search";
 
 function ThumbnailPlaceholder({ sourceName }: { sourceName: string }) {
   return (
@@ -24,9 +25,19 @@ function ChangeRate({ rate }: { rate: number }) {
   );
 }
 
-function TopPostCard({ post }: { post: TrendTopPost }) {
+function TopPostCard({
+  post,
+  onClose,
+}: {
+  post: TrendTopPost;
+  onClose: () => void;
+}) {
   return (
-    <div className="w-44 shrink-0 overflow-hidden rounded-md border border-border bg-card">
+    <Link
+      href={`/home/${post.id}`}
+      onClick={onClose}
+      className="w-44 shrink-0 overflow-hidden rounded-md border border-border bg-card block"
+    >
       {/* 썸네일 영역 */}
       <div className="relative aspect-video w-full overflow-hidden">
         {post.thumbnailUrl ? (
@@ -51,7 +62,7 @@ function TopPostCard({ post }: { post: TrendTopPost }) {
           {post.category}
         </span>
         <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground">
-          {post.title}
+          {post.translatedTitle || post.title}
         </p>
         <div className="flex items-center justify-between">
           <span className="text-[11px] text-muted-foreground">
@@ -60,7 +71,7 @@ function TopPostCard({ post }: { post: TrendTopPost }) {
           <ChangeRate rate={post.changeRate} />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -82,7 +93,8 @@ interface HomeTopPostsSectionProps {
   posts: TrendTopPost[];
   isLoading: boolean;
   rangeLabel: string;
-  summary?: string;
+  summary?: string | null;
+  onClose: () => void;
 }
 
 export function HomeTopPostsSection({
@@ -90,6 +102,7 @@ export function HomeTopPostsSection({
   isLoading,
   rangeLabel,
   summary,
+  onClose,
 }: HomeTopPostsSectionProps) {
   return (
     <section>
@@ -119,7 +132,7 @@ export function HomeTopPostsSection({
             ? Array.from({ length: 5 }).map((_, i) => (
                 <TopPostCardSkeleton key={i} />
               ))
-            : posts.map((post) => <TopPostCard key={post.id} post={post} />)}
+            : posts.map((post) => <TopPostCard key={post.id} post={post} onClose={onClose} />)}
         </div>
       </div>
     </section>

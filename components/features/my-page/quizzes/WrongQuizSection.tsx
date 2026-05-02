@@ -1,30 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
 import { WrongQuizCard } from "./WrongQuizCard";
-import { fetchMyWrongQuizzesPreview } from "@/lib/mock/my-page-wrong-quizzes";
-import type { MyPageQuizHistory } from "@/types/myPage";
+import { getMyQuizHistory } from "@/lib/api/endpoints/myPage";
 
 export function WrongQuizSection() {
-  const [quizzes, setQuizzes] = useState<MyPageQuizHistory[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["myQuizHistoryPreview"],
+    queryFn: () =>
+      getMyQuizHistory({
+        passed: false,
+        page: 0,
+        size: 4,
+        sort: "newest",
+      }),
+  });
 
-  useEffect(() => {
-    fetchMyWrongQuizzesPreview(4)
-      .then((data) => {
-        setQuizzes(data);
-      })
-      .catch(() => {
-        setIsError(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+  const quizzes = data?.content ?? [];
 
   return (
     <section>
@@ -39,11 +34,7 @@ export function WrongQuizSection() {
         </Link>
       </div>
 
-      {isError ? (
-        <p className="text-sm text-muted-foreground">
-          불러오는 중 오류가 발생했습니다.
-        </p>
-      ) : isLoading ? (
+      {isLoading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
@@ -59,6 +50,10 @@ export function WrongQuizSection() {
             </div>
           ))}
         </div>
+      ) : isError ? (
+        <p className="text-sm text-muted-foreground">
+          불러오는 중 오류가 발생했습니다.
+        </p>
       ) : quizzes.length === 0 ? (
         <p className="text-sm text-muted-foreground">틀린 퀴즈가 없습니다.</p>
       ) : (

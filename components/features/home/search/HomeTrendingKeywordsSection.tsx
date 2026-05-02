@@ -1,7 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import type { TrendKeywordItem, TrendKeywordDeltaType } from "@/types/search";
+import type { TrendKeywordItem, TrendKeywordState } from "@/types/search";
 
 interface HomeTrendingKeywordsSectionProps {
   keywords: TrendKeywordItem[];
@@ -11,34 +11,34 @@ interface HomeTrendingKeywordsSectionProps {
 }
 
 function DeltaBadge({
-  deltaType,
-  deltaValue,
+  state,
+  rankChange,
 }: {
-  deltaType: TrendKeywordDeltaType;
-  deltaValue?: number;
+  state: TrendKeywordState;
+  rankChange: number;
 }) {
-  if (deltaType === "new") {
+  if (state === "new") {
     return (
       <span className="text-[10px] font-bold leading-none text-red-500">
         NEW
       </span>
     );
   }
-  if (deltaType === "up" && deltaValue) {
+  if (state === "up" && rankChange) {
     return (
       <span className="text-[10px] font-bold leading-none text-red-500">
-        ▲{deltaValue}
+        ▲{rankChange}
       </span>
     );
   }
-  if (deltaType === "down" && deltaValue) {
+  if (state === "down" && rankChange) {
     return (
       <span className="text-[10px] font-bold leading-none text-green-500">
-        ▼{deltaValue}
+        ▼{rankChange}
       </span>
     );
   }
-  if (deltaType === "same") {
+  if (state === "same") {
     return (
       <span className="text-[10px] font-bold leading-none text-muted-foreground">
         -
@@ -72,6 +72,10 @@ export function HomeTrendingKeywordsSection({
             </div>
           ))}
         </div>
+      ) : keywords.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          집계된 트렌딩 키워드가 없습니다.
+        </p>
       ) : (
         <div className="columns-1 gap-x-10 sm:columns-2 md:columns-3">
           {keywords.map((item) => (
@@ -95,12 +99,10 @@ export function HomeTrendingKeywordsSection({
                     ({item.count})
                   </span>
                 )}
-                {item.deltaType && (
-                  <DeltaBadge
-                    deltaType={item.deltaType}
-                    deltaValue={item.deltaValue}
-                  />
-                )}
+                <DeltaBadge
+                  state={item.state}
+                  rankChange={item.rankChange}
+                />
               </div>
             </button>
           ))}
