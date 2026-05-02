@@ -1,7 +1,6 @@
 import { apiClient } from "../client";
 import type { ApiResponse } from "@/types/api";
 import type { UserProfileResponse } from "@/types/userProfile";
-import type { MyPageScrapResponse, MyPageQuizHistoryResponse } from "@/types/myPage";
 
 export interface UpdateMeRequest {
   nickname?: string;
@@ -49,22 +48,3 @@ export const usersEndpoints = {
   },
 };
 
-export async function getMyQuizHistory(params?: {
-  sort?: "newest" | "oldest";
-  page?: number;
-  size?: number;
-  passed?: boolean;
-}): Promise<MyPageQuizHistoryResponse> {
-  const res = await apiClient.get("/users/me/quiz-history", { params });
-  return res.data.data;
-}
-
-export async function getMyScraps(params?: {
-  q?: string;
-  sort?: "newest" | "oldest";
-  page?: number;
-  size?: number;
-}): Promise<MyPageScrapResponse> {
-  const res = await apiClient.get("/users/me/scraps", { params });
-  return res.data.data;
-}

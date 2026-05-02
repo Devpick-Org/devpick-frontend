@@ -13,7 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { ScrappedPostListItem } from "./ScrappedPostListItem";
 import { MyPagePagination } from "../MyPagePagination";
-import { getMyScraps } from "@/lib/api/endpoints/users";
+import { getMyScraps } from "@/lib/api/endpoints/myPage";
 
 type SortOrder = "newest" | "oldest";
 
