@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { WrongQuizCard } from "./WrongQuizCard";
-import { getMyQuizHistory } from "@/lib/api/endpoints/users";
+import { getMyQuizHistory } from "@/lib/api/endpoints/myPage";
 
 export function WrongQuizSection() {
   const { data, isLoading, isError } = useQuery({

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { WrongQuizList } from "./WrongQuizList";
 import { WrongQuizListItemSkeleton } from "./WrongQuizListItemSkeleton";
-import { getMyQuizHistory } from "@/lib/api/endpoints/users";
+import { getMyQuizHistory } from "@/lib/api/endpoints/myPage";
 
 type SortOrder = "newest" | "oldest";
 

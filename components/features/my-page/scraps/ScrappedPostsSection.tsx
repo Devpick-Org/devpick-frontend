@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { ScrappedPostCard } from "./ScrappedPostCard";
-import { getMyScraps } from "@/lib/api/endpoints/users";
+import { getMyScraps } from "@/lib/api/endpoints/myPage";
 
 export function ScrappedPostsSection() {
   const { data, isLoading, isError } = useQuery({
