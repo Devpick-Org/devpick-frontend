@@ -78,6 +78,12 @@ export interface JobTechTagFacetApi {
   source: string;
 }
 
+export interface JobCompanyFacetApi {
+  name: string;
+  count: number;
+  logoUrl?: string | null;
+}
+
 export interface InterviewQaListItemApi {
   jobId: string;
   companyName: string;
@@ -96,6 +102,7 @@ export const jobsEndpoints = {
     experienceLevel?: string;
     location?: string;
     techStack?: string;
+    companies?: string;
     sortBy?: string;
   }): Promise<JobListPageApi> =>
     apiClient
@@ -105,6 +112,13 @@ export const jobsEndpoints = {
   listTechTags: (limit = 80): Promise<JobTechTagFacetApi[]> =>
     apiClient
       .get<ApiResponse<JobTechTagFacetApi[]>>("/jobs/tech-tags", {
+        params: { limit },
+      })
+      .then((r) => r.data.data),
+
+  listCompanies: (limit = 120): Promise<JobCompanyFacetApi[]> =>
+    apiClient
+      .get<ApiResponse<JobCompanyFacetApi[]>>("/jobs/companies", {
         params: { limit },
       })
       .then((r) => r.data.data),

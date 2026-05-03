@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Bookmark, MapPin, Clock } from "lucide-react";
@@ -18,6 +19,9 @@ interface JobCardProps {
 export function JobCard({ job }: JobCardProps) {
   const qc = useQueryClient();
   const bookmarked = job.bookmarked ?? false;
+  const [logoFailed, setLogoFailed] = useState(false);
+  const companyInitial = (job.companyName?.trim()?.[0] ?? "회").toUpperCase();
+  const hasLogo = Boolean(job.companyLogo?.trim()) && !logoFailed;
 
   const toggleBookmark = useMutation({
     mutationFn: () =>
@@ -58,14 +62,19 @@ export function JobCard({ job }: JobCardProps) {
         {/* Header: 로고 + 회사명 + 고용형태 + 스크랩 */}
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
-              <Image
-                src={job.companyLogo}
-                alt={job.companyName}
-                fill
-                className="object-cover"
-                unoptimized
-              />
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted text-xs font-bold text-muted-foreground">
+              {hasLogo ? (
+                <Image
+                  src={job.companyLogo}
+                  alt={job.companyName}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                  onError={() => setLogoFailed(true)}
+                />
+              ) : (
+                <span aria-hidden>{companyInitial}</span>
+              )}
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">

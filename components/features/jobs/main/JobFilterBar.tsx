@@ -24,6 +24,7 @@ export interface JobFilters {
   category: JobCategory | "ALL";
   experienceLevel: ExperienceLevel | "ALL";
   techStack: string[];
+  companyNames: string[];
   location: string | "ALL";
 }
 

@@ -248,11 +248,17 @@ export function JobSearchPanel({
                 )}
               >
                 {filters.techStack.length
-                  ? `${filters.techStack.length}개 선택됨 — 탭해서 변경`
-                  : "기술 스택 검색… (수집 콘텐츠 태그 기준)"}
+                  ? `기술 ${filters.techStack.length}개${
+                      filters.companyNames.length
+                        ? ` · 회사 ${filters.companyNames.length}개`
+                        : ""
+                    } 선택됨`
+                  : filters.companyNames.length
+                    ? `회사 ${filters.companyNames.length}개 선택됨`
+                    : "기술 스택·회사 검색..."}
               </span>
             </button>
-            {filters.techStack.length > 0 ? (
+            {filters.techStack.length > 0 || filters.companyNames.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
                 {filters.techStack.map((tech) => (
                   <button
@@ -267,6 +273,23 @@ export function JobSearchPanel({
                     className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/15"
                   >
                     {tech} ×
+                  </button>
+                ))}
+                {filters.companyNames.map((company) => (
+                  <button
+                    key={company}
+                    type="button"
+                    onClick={() =>
+                      onChange({
+                        ...filters,
+                        companyNames: filters.companyNames.filter(
+                          (name) => name !== company,
+                        ),
+                      })
+                    }
+                    className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-semibold text-foreground transition-colors hover:bg-secondary/80"
+                  >
+                    {company} ×
                   </button>
                 ))}
               </div>
@@ -286,7 +309,14 @@ export function JobSearchPanel({
           open={techModalOpen}
           onOpenChange={setTechModalOpen}
           value={filters.techStack}
-          onApply={(next) => onChange({ ...filters, techStack: next })}
+          companyNames={filters.companyNames}
+          onApply={(next) =>
+            onChange({
+              ...filters,
+              techStack: next.techStack,
+              companyNames: next.companyNames,
+            })
+          }
         />
       </div>
     </div>

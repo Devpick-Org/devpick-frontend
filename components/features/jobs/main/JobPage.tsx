@@ -23,6 +23,7 @@ const DEFAULT_FILTERS: JobFilters = {
   category: "ALL",
   experienceLevel: "ALL",
   techStack: [],
+  companyNames: [],
   location: "ALL",
 };
 
@@ -108,6 +109,8 @@ export function JobPage() {
 
   const techStackParam =
     filters.techStack.length > 0 ? filters.techStack.join(",") : undefined;
+  const companiesParam =
+    filters.companyNames.length > 0 ? filters.companyNames.join(",") : undefined;
   const locationParam = filters.location === "ALL" ? undefined : filters.location;
 
   const { data, isLoading, isError } = useQuery({
@@ -123,6 +126,7 @@ export function JobPage() {
             filters.experienceLevel === "ALL" ? undefined : filters.experienceLevel,
           location: locationParam,
           techStack: techStackParam,
+          companies: companiesParam,
           sortBy,
         })
         .then((page) => ({
@@ -138,6 +142,7 @@ export function JobPage() {
     filters.category !== "ALL" ||
     filters.experienceLevel !== "ALL" ||
     filters.techStack.length > 0 ||
+    filters.companyNames.length > 0 ||
     filters.location !== "ALL";
 
   const handleFiltersChange = (next: JobFilters) => {
