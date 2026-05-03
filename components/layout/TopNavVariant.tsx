@@ -29,25 +29,9 @@ import {
 import { useAuthStore } from "@/store/auth.store";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { cn } from "@/lib/utils";
+import { TraceMark } from "@/components/brand/TraceMark";
 
-// 로고 컴포넌트
-function TraceLogo({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="16 18 22 12 16 6" />
-      <polyline points="8 6 2 12 8 18" />
-    </svg>
-  );
-}
-
+// 로고 마크 — `components/brand/TraceMark` (public/trace-mark.png)
 // 사이드바에 있던 메뉴들을 이쪽으로 가져옵니다.
 const TRENDS_ENABLED = process.env.NEXT_PUBLIC_FEATURE_TRENDS === "true";
 
@@ -95,9 +79,7 @@ export function TopNavVariant() {
           {/* [왼쪽 영역] Logo */}
           <div className="flex items-center">
             <Link href="/home" className="flex items-center gap-2.5 shrink-0">
-              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/15">
-                <TraceLogo className="h-5 w-5 text-primary" />
-              </div>
+              <TraceMark variant="nav" />
               <span className="text-xl font-bold tracking-tight text-foreground">
                 Trace
               </span>

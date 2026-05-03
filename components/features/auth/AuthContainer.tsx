@@ -6,23 +6,13 @@ import { LoginForm } from "./LoginForm";
 import { SignupForm } from "./SignupForm";
 import { SocialAuthButtons } from "./SocialAuthButtons";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
+import { TraceMark } from "@/components/brand/TraceMark";
 
-function TraceLogo() {
+function AuthHero() {
   return (
     <div className="mb-8 text-center">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
-        <svg
-          className="h-7 w-7 text-primary"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="16 18 22 12 16 6" />
-          <polyline points="8 6 2 12 8 18" />
-        </svg>
+      <div className="mx-auto mb-4 flex justify-center">
+        <TraceMark variant="auth" />
       </div>
       <h1 className="text-2xl font-bold tracking-tight text-foreground">
         Trace
@@ -64,7 +54,7 @@ export function AuthContainer({ oauthError }: AuthContainerProps) {
 
   return (
     <div className="mx-auto w-full max-w-[464px]">
-      <TraceLogo />
+      <AuthHero />
 
       {(oauthError || socialError) && (
         <p className="mb-4 text-sm text-center text-red-500">

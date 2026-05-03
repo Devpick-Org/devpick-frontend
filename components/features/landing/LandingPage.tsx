@@ -20,6 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
+import { TraceMark } from "@/components/brand/TraceMark";
 
 // ─── Motion Helpers ───────────────────────────────────────────────────────────
 
@@ -105,33 +106,13 @@ function StaggerItem({
   );
 }
 
-// ─── 공통 로고 SVG ────────────────────────────────────────────────────────────
-function TraceLogo({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="16 18 22 12 16 6" />
-      <polyline points="8 6 2 12 8 18" />
-    </svg>
-  );
-}
-
 // ─── Landing Navigation ───────────────────────────────────────────────────────
 function LandingNav() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-white shadow-md shadow-black/1">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 ring-1 ring-primary/15">
-            <TraceLogo className="h-5 w-5 text-primary" />
-          </div>
+          <TraceMark variant="nav" />
           <span className="text-xl font-bold tracking-tight text-foreground">
             Trace
           </span>
