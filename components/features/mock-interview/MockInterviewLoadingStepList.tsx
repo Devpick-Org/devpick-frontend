@@ -59,7 +59,7 @@ export function MockInterviewLoadingStepList({
 
     const maxIdx = Math.max(0, steps.length - 1);
 
-    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let intervalId: number | undefined;
     const outer = window.setTimeout(() => {
       setActiveIndex(0);
       intervalId = window.setInterval(() => {
