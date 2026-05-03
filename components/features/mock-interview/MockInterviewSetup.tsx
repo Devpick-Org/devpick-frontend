@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Search } from "lucide-react";
+import { Building2, Loader2, Search } from "lucide-react";
 import {
   mockInterviewsEndpoints,
   type MockInterviewMode,
@@ -149,55 +149,118 @@ export function MockInterviewSetup({
                   className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-3 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-primary/40"
                 />
               </label>
+              <p className="text-[11px] text-muted-foreground">
+                카드를 좌우로 스크롤해 선택해 주세요.
+              </p>
               {isLoadingJobs ? (
-                <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
                   <Loader2 className="size-4 animate-spin" aria-hidden /> 공고를 불러오는 중…
                 </div>
+              ) : !jobSearchPage?.jobs?.length ? (
+                <div className="rounded-2xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
+                  검색 결과가 없어요.
+                </div>
               ) : (
-                <ul
-                  className={cn(
-                    "max-h-56 space-y-1 overflow-y-auto rounded-xl border border-border bg-muted/15 p-1.5",
-                    !jobSearchPage?.jobs?.length && "py-6 text-center text-sm text-muted-foreground",
-                  )}
+                <div
+                  className="-mx-1 flex gap-3 overflow-x-auto overflow-y-hidden pb-3 pt-1 [scrollbar-width:thin] snap-x snap-mandatory px-1"
                   role="listbox"
                   aria-label="채용 공고 검색 결과"
                 >
-                  {jobSearchPage?.jobs?.length ? (
-                    jobSearchPage.jobs.map((job) => {
-                      const active = selectedJob?.id === job.id;
-                      return (
-                        <li key={job.id}>
-                          <button
-                            type="button"
-                            role="option"
-                            aria-selected={active}
-                            onClick={() => {
-                              setSelectedJob(job);
-                              setCompanyName(job.companyName);
-                              setJobTitle(job.title);
-                              setJobCategory(
-                                job.jobCategory?.trim() ? job.jobCategory : "FRONTEND",
-                              );
-                            }}
-                            className={cn(
-                              "flex w-full flex-col gap-0.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
-                              active ? "bg-primary/12 ring-1 ring-primary/35" : "hover:bg-muted/60",
-                            )}
-                          >
-                            <span className="font-semibold text-foreground">{job.companyName}</span>
-                            <span className="line-clamp-2 text-xs text-muted-foreground">{job.title}</span>
-                            <span className="text-[11px] text-muted-foreground/90">
-                              {job.location ? `${job.location} · ` : ""}
-                              {job.jobCategory}
+                  {jobSearchPage.jobs.map((job) => {
+                    const active = selectedJob?.id === job.id;
+                    const techPreview = (job.techStack ?? []).slice(0, 4);
+                    const techExtra = Math.max(
+                      0,
+                      (job.techStack?.length ?? 0) - techPreview.length,
+                    );
+                    const metaParts = [
+                      [job.employmentType, job.experienceLevel].filter(Boolean).join(" · "),
+                      [job.location, job.jobCategory].filter(Boolean).join(" · "),
+                    ].filter((s) => s.length > 0);
+                    return (
+                      <button
+                        key={job.id}
+                        type="button"
+                        role="option"
+                        aria-selected={active}
+                        onClick={() => {
+                          setSelectedJob(job);
+                          setCompanyName(job.companyName);
+                          setJobTitle(job.title);
+                          setJobCategory(
+                            job.jobCategory?.trim() ? job.jobCategory : "FRONTEND",
+                          );
+                        }}
+                        className={cn(
+                          "flex min-h-[260px] w-[260px] shrink-0 snap-start flex-col overflow-hidden rounded-2xl border bg-card text-left shadow-sm outline-none ring-offset-background transition-[box-shadow,border-color,transform] hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary/50 active:scale-[0.99] sm:w-[272px]",
+                          active
+                            ? "border-primary ring-2 ring-primary/35 shadow-md"
+                            : "border-border hover:border-primary/25",
+                        )}
+                      >
+                        <div className="relative flex h-[88px] w-full shrink-0 items-center justify-center bg-muted/60">
+                          {job.companyLogo ? (
+                            // 외부 로고 URL — next/image 원격 패턴 목록 의존 없이 카드 헤더에 표시
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={job.companyLogo}
+                              alt=""
+                              className="mx-auto max-h-[72px] max-w-[90%] object-contain"
+                            />
+                          ) : (
+                            <div className="flex size-full items-center justify-center bg-gradient-to-br from-primary/[0.12] via-muted/40 to-primary/[0.08]">
+                              <span className="flex size-14 items-center justify-center rounded-2xl bg-background/85 text-xl font-bold text-primary shadow-inner">
+                                {job.companyName?.trim()?.charAt(0) ? (
+                                  job.companyName.trim().charAt(0)
+                                ) : (
+                                  <Building2
+                                    className="size-7 text-muted-foreground"
+                                    aria-hidden
+                                  />
+                                )}
+                              </span>
+                            </div>
+                          )}
+                          {active ? (
+                            <span className="absolute right-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground shadow-sm">
+                              선택됨
                             </span>
-                          </button>
-                        </li>
-                      );
-                    })
-                  ) : (
-                    <li className="px-3">검색 결과가 없어요.</li>
-                  )}
-                </ul>
+                          ) : null}
+                        </div>
+                        <div className="flex min-h-0 flex-1 flex-col gap-2 p-3.5 pt-3">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary/90">
+                            {job.companyName}
+                          </p>
+                          <p className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug text-foreground">
+                            {job.title}
+                          </p>
+                          {metaParts.length > 0 ? (
+                            <p className="line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
+                              {metaParts.join(" | ")}
+                            </p>
+                          ) : null}
+                          {techPreview.length > 0 ? (
+                            <div className="mt-auto flex flex-wrap gap-1.5 pt-1">
+                              {techPreview.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="rounded-md bg-muted/80 px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                              {techExtra > 0 ? (
+                                <span className="rounded-md border border-border/80 px-2 py-0.5 text-[10px] text-muted-foreground">
+                                  +{techExtra}
+                                </span>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               )}
               {selectedJob ? (
                 <p className="rounded-lg bg-primary/8 px-3 py-2 text-xs text-muted-foreground">
