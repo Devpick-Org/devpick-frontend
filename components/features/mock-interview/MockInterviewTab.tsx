@@ -4,15 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  AlertCircle,
-  Info,
-  ListChecks,
-  MessageSquare,
-  Plus,
-  RefreshCw,
-  Trash2,
-} from "lucide-react";
+import { AlertCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { extractApiError } from "@/lib/api/extractApiError";
@@ -358,17 +350,18 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
             </section>
 
             <section className="space-y-2">
-              <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-foreground">
-                <ListChecks className="size-3.5 text-primary" aria-hidden />
-                제공 기능
-              </h3>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground">제공 기능</h3>
               <ul className="grid gap-2 sm:grid-cols-1">
                 {MOCK_FEATURE_ROWS.map((row) => (
                   <li
                     key={row.text}
-                    className="relative rounded-xl border border-border/60 bg-background/70 px-3 py-2.5 pl-[1.125rem] text-sm leading-snug text-muted-foreground backdrop-blur-sm before:absolute before:left-3 before:top-[0.9em] before:size-1 before:rounded-full before:bg-primary/70 before:content-[''] sm:pl-4 sm:before:left-3.5"
+                    className="flex gap-3 rounded-xl border border-border/60 bg-background/70 px-3 py-2.5 text-sm leading-snug text-muted-foreground backdrop-blur-sm"
                   >
-                    {row.text}
+                    <span
+                      className="mt-[0.42em] size-1.5 shrink-0 rounded-full bg-primary/70"
+                      aria-hidden
+                    />
+                    <span className="min-w-0">{row.text}</span>
                   </li>
                 ))}
               </ul>
@@ -377,27 +370,11 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
 
           <aside className="flex min-h-[11rem] flex-col justify-between gap-4 rounded-2xl border border-border/70 bg-muted/25 p-4 shadow-inner backdrop-blur-md sm:p-5 dark:bg-muted/15">
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                  <MessageSquare className="size-4" aria-hidden />
-                </span>
-                지금 바로 시작
-              </div>
+              <p className="text-sm font-semibold text-foreground">지금 바로 시작</p>
               <p className="text-pretty text-xs leading-relaxed text-muted-foreground">
-                채용 공고를 붙여 넣거나 기본 JD로 시작할 수 있어요. 결과는 요약과 피드백으로 확인합니다.
+                수집된 채용 공고를 고르거나 JD를 직접 입력해 시작할 수 있어요. 결과는 요약과 피드백으로
+                확인합니다.
               </p>
-              <div className="flex flex-wrap gap-1 pt-1">
-                {MOCK_PHASE_CHIPS.map((row, i) => (
-                  <span
-                    key={row.short}
-                    className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/70 px-2 py-0.5 font-mono text-[10px] font-medium tabular-nums text-muted-foreground"
-                    title={`${row.short} ${row.detail}`}
-                  >
-                    <span className="font-semibold text-primary/90">{i + 1}</span>
-                    <span>{row.detail.replace("문항", "")}</span>
-                  </span>
-                ))}
-              </div>
             </div>
             <button
               type="button"
@@ -470,10 +447,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-transparent"
         />
-        <div className="relative flex gap-3.5 px-4 py-4 sm:px-5">
-          <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
-            <Info className="size-[18px]" aria-hidden />
-          </span>
+        <div className="relative px-4 py-4 sm:px-5">
           <p className="text-pretty text-xs leading-relaxed text-muted-foreground">
             저장 한도 <span className="font-semibold text-foreground">{max}개</span>를 넘으면 가장 오래된 기록부터 자동 삭제돼요. PDF는 저장하지 않으며,
             AI 호출은 본인 Claude 구독 한도에서 차감돼요(면접 1회 약 20~35회 호출).

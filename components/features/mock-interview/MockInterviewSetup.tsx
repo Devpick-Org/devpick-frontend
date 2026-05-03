@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Building2, Loader2, Search } from "lucide-react";
 import {
@@ -66,6 +66,7 @@ export function MockInterviewSetup({
   const [debouncedJobSearch, setDebouncedJobSearch] = useState("");
   const [selectedJob, setSelectedJob] = useState<JobListItemApi | null>(null);
   const [manualJd, setManualJd] = useState(false);
+  const jobCardsScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const t = window.setTimeout(() => setDebouncedJobSearch(jobSearchInput), 350);
@@ -83,6 +84,36 @@ export function MockInterviewSetup({
       }),
     staleTime: 20_000,
   });
+
+  useEffect(() => {
+    if (manualJd) return;
+    const el = jobCardsScrollRef.current;
+    if (!el || !jobSearchPage?.jobs?.length) return;
+
+    const epsilon = 2;
+    const onWheel = (e: WheelEvent) => {
+      if (el.scrollWidth <= el.clientWidth + epsilon) return;
+      const useX = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      const delta = useX ? e.deltaX : e.deltaY;
+      if (delta === 0) return;
+
+      const { scrollLeft } = el;
+      const maxLeft = el.scrollWidth - el.clientWidth;
+      const goingRight = delta > 0;
+      const goingLeft = delta < 0;
+      const atEnd = scrollLeft >= maxLeft - epsilon;
+      const atStart = scrollLeft <= epsilon;
+
+      if ((goingRight && atEnd) || (goingLeft && atStart)) {
+        return;
+      }
+      e.preventDefault();
+      el.scrollLeft += delta;
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [manualJd, jobSearchPage?.jobs?.length]);
 
   useEffect(() => {
     if (!modelsData) return;
@@ -150,7 +181,8 @@ export function MockInterviewSetup({
                 />
               </label>
               <p className="text-[11px] text-muted-foreground">
-                카드를 좌우로 스크롤해 선택해 주세요.
+                휠을 아래로 내리면 카드 줄이 오른쪽으로 넘어가요. 끝·시작에서는 페이지 스크롤이 이어져요 (가로
+                스크롤·드래그도 가능해요).
               </p>
               {isLoadingJobs ? (
                 <div className="flex items-center gap-2 py-8 text-sm text-muted-foreground">
@@ -162,6 +194,7 @@ export function MockInterviewSetup({
                 </div>
               ) : (
                 <div
+                  ref={jobCardsScrollRef}
                   className="-mx-1 flex gap-3 overflow-x-auto overflow-y-hidden pb-3 pt-1 [scrollbar-width:thin] snap-x snap-mandatory px-1"
                   role="listbox"
                   aria-label="채용 공고 검색 결과"
