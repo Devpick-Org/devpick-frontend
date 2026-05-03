@@ -4,15 +4,50 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import type { JobCategory } from "@/types/jobs";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { extractApiError } from "@/lib/api/extractApiError";
+import { JOB_CATEGORY_LABEL } from "../main/jobs.constants";
+import {
+  JobAiProgressSteps,
+  useProgressStepTicker,
+} from "./JobAiProgressSteps";
 import { JobDetailSection } from "./JobDetailSection";
 
 interface JobSkillGapSectionProps {
   jobId: string;
+  companyName?: string;
+  jobTitle?: string;
+  jobCategory?: JobCategory;
 }
 
-export function JobSkillGapSection({ jobId }: JobSkillGapSectionProps) {
+function ellipsize(s: string, maxLen: number): string {
+  const t = s.trim();
+  if (t.length <= maxLen) return t;
+  return `${t.slice(0, Math.max(0, maxLen - 1))}…`;
+}
+
+function buildSkillGapSteps(
+  companyName: string,
+  jobTitle: string,
+  categoryLabel: string,
+): readonly string[] {
+  const co = companyName.trim() || "해당 회사";
+  const title = ellipsize(jobTitle.trim() || "이 포지션", 36);
+  const cat = categoryLabel || "직무";
+  return [
+    `${co} 「${title}」 필수 역량 요건을 분석하고 있어요`,
+    `마스터 이력서 스킬과 공고 ${cat} 역량 요건을 비교하고 있어요`,
+    `학습 로드맵과 추천 콘텐츠를 골라 정리하고 있어요`,
+  ];
+}
+
+export function JobSkillGapSection({
+  jobId,
+  companyName = "",
+  jobTitle = "",
+  jobCategory,
+}: JobSkillGapSectionProps) {
   const [roadmap, setRoadmap] = useState<string[] | null>(null);
   const [contents, setContents] = useState<
     { id: string; title: string; preview: string; canonicalUrl: string; tags: string[] }[]
@@ -28,6 +63,18 @@ export function JobSkillGapSection({ jobId }: JobSkillGapSectionProps) {
       toast.error(message ?? "부족 역량 추천을 불러오지 못했습니다.");
     },
   });
+
+  const skillGapSteps = buildSkillGapSteps(
+    companyName,
+    jobTitle,
+    jobCategory != null ? JOB_CATEGORY_LABEL[jobCategory] : "개발",
+  );
+  const skillGapActiveStep = useProgressStepTicker(
+    mutation.isPending,
+    skillGapSteps.length,
+    1100,
+    jobId,
+  );
 
   const hasResult =
     (roadmap && roadmap.length > 0) || contents.length > 0;
@@ -59,9 +106,8 @@ export function JobSkillGapSection({ jobId }: JobSkillGapSectionProps) {
       )}
 
       {mutation.isPending && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          추천을 생성하고 있어요…
+        <div className="rounded-lg bg-muted/50 px-4 py-3.5">
+          <JobAiProgressSteps labels={skillGapSteps} activeStepIndex={skillGapActiveStep} />
         </div>
       )}
 

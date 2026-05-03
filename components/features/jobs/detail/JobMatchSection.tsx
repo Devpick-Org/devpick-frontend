@@ -50,19 +50,29 @@ function MatchSubSection({
   summary,
   items,
 }: SubSectionProps) {
-  const pct = Math.round((score / maxScore) * 100);
+  const hasScoreGauge = maxScore > 0;
+  const pct = hasScoreGauge ? Math.round((score / maxScore) * 100) : 0;
+
+  const scoreRightLabel =
+    !hasScoreGauge && score === 0 ? "항목 없음" : `${score} / ${maxScore}점`;
+
   return (
     <div className="rounded-lg">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-xs font-bold text-foreground">{title}</span>
         <span className="text-xs font-semibold text-muted-foreground">
-          {score} / {maxScore}점
+          {scoreRightLabel}
         </span>
       </div>
       <div className="mb-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div
-          className="h-full rounded-full bg-primary transition-all"
-          style={{ width: `${pct}%` }}
+          className={cn(
+            "h-full rounded-full transition-all",
+            hasScoreGauge ? "bg-primary" : "w-0",
+          )}
+          style={{
+            width: hasScoreGauge ? `${pct}%` : undefined,
+          }}
         />
       </div>
       <p className="mb-3 text-[11px] font-medium text-muted-foreground">

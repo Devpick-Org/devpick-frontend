@@ -9,10 +9,12 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { exportQAAsPdf } from "@/lib/jobs/exportQAPdf";
 import { parseInterviewQaPayload } from "@/lib/jobs/parseInterviewQaPayload";
-import type { QACategory } from "@/types/jobs";
-import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
-import { resumeEndpoints } from "@/lib/api/endpoints/resume";
-import { extractApiError } from "@/lib/api/extractApiError";
+import type { JobCategory, QACategory } from "@/types/jobs";
+import { JOB_CATEGORY_LABEL } from "../main/jobs.constants";
+import {
+  JobAiProgressSteps,
+  useProgressStepTicker,
+} from "./JobAiProgressSteps";
 import { JobDetailSection } from "./JobDetailSection";
 import { JobQACategory } from "./JobQACategory";
 
@@ -20,18 +22,40 @@ interface JobQASectionProps {
   jobId: string;
   companyName?: string;
   jobTitle?: string;
+  jobCategory?: JobCategory;
   /** 표시용 (향후 확장) */
   matchScore?: number;
 }
 
+function ellipsize(s: string, maxLen: number): string {
+  const t = s.trim();
+  if (t.length <= maxLen) return t;
+  return `${t.slice(0, Math.max(0, maxLen - 1))}…`;
+}
+
+function buildInterviewQaSteps(
+  companyName: string,
+  jobTitle: string,
+  categoryLabel: string,
+): readonly string[] {
+  const co = companyName.trim() || "해당 회사";
+  const title = ellipsize(jobTitle.trim() || "이 공고", 36);
+  const cat = categoryLabel || "직무";
+  return [
+    `${co} 「${title}」 공고를 읽고 있어요`,
+    `비슷한 ${cat} 직무 공고를 찾고 있어요`,
+    `예상 면접 질문과 모범 답변을 작성하고 있어요`,
+    `결과를 정리해 저장하고 있어요`,
+  ];
+}
+
 export function JobQASection({
   jobId,
-  companyName: _companyName = "",
-  jobTitle: _jobTitle = "",
+  companyName = "",
+  jobTitle = "",
+  jobCategory,
   matchScore: _matchScore = 0,
 }: JobQASectionProps) {
-  void _companyName;
-  void _jobTitle;
   void _matchScore;
 
   const router = useRouter();
@@ -95,6 +119,18 @@ export function JobQASection({
   const isGenerated = (currentQA?.length ?? 0) > 0;
   const isLoading = isLoadingSaved || generate.isPending;
   const isError = isLoadError;
+
+  const qaStepLabels = buildInterviewQaSteps(
+    companyName,
+    jobTitle,
+    jobCategory != null ? JOB_CATEGORY_LABEL[jobCategory] : "개발",
+  );
+  const qaActiveStep = useProgressStepTicker(
+    generate.isPending,
+    qaStepLabels.length,
+    1200,
+    jobId,
+  );
 
   const handleDownloadPdf = async () => {
     if (!currentQA?.length) return;
@@ -175,9 +211,15 @@ export function JobQASection({
       )}
 
       {isLoading && !isGenerated && (
-        <div className="flex items-center gap-2.5 rounded-lg bg-muted/50 px-4 py-3.5 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          {generate.isPending ? "면접 질문을 생성하고 있어요..." : "불러오는 중..."}
+        <div className="rounded-lg bg-muted/50 px-4 py-3.5">
+          {generate.isPending ? (
+            <JobAiProgressSteps labels={qaStepLabels} activeStepIndex={qaActiveStep} />
+          ) : (
+            <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+              불러오는 중...
+            </div>
+          )}
         </div>
       )}
 
@@ -212,10 +254,17 @@ export function JobQASection({
       )}
 
       {isGenerated && currentQA && (
-        <div className="divide-y divide-border">
-          {currentQA.map((category, i) => (
-            <JobQACategory key={i} category={category} />
-          ))}
+        <div>
+          {generate.isPending && (
+            <div className="mb-4 rounded-lg bg-muted/50 px-4 py-3.5">
+              <JobAiProgressSteps labels={qaStepLabels} activeStepIndex={qaActiveStep} />
+            </div>
+          )}
+          <div className="divide-y divide-border">
+            {currentQA.map((category, i) => (
+              <JobQACategory key={i} category={category} />
+            ))}
+          </div>
         </div>
       )}
     </JobDetailSection>

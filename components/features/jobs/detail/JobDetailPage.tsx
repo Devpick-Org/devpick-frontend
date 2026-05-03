@@ -280,12 +280,18 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
               jobId={id}
               companyName={job.companyName}
               jobTitle={job.title}
+              jobCategory={job.jobCategory}
               matchScore={job.matchScore}
             />
           </div>
 
           <div className="mt-8 border-t pt-8">
-            <JobSkillGapSection jobId={id} />
+            <JobSkillGapSection
+              jobId={id}
+              companyName={job.companyName}
+              jobTitle={job.title}
+              jobCategory={job.jobCategory}
+            />
           </div>
         </main>
 
