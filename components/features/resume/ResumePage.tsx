@@ -56,9 +56,8 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [draft, setDraft] = useState<ResumeBasicInfo | null>(null);
-  const [detailDraft, setDetailDraft] = useState<ResumeData | null>(null);
+  const [activeTab, setActiveTab] = useState(defaultTab === "qa" ? "qa" : "resume");
+  const [editDraft, setEditDraft] = useState<ResumeData | null>(null);
 
   const {
     data: masterJson,
@@ -77,12 +76,12 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
 
   const suggestedTechPool = useMemo(() => {
     const jobTitle =
-      detailDraft?.basicInfo.jobTitle ?? resume?.basicInfo.jobTitle ?? "";
+      editDraft?.basicInfo.jobTitle ?? resume?.basicInfo.jobTitle ?? "";
     const fromProfile = user?.tags ?? [];
     const fromJob = suggestedTechFromJobTitle(jobTitle);
     return dedupeCi([...fromProfile, ...fromJob]);
   }, [
-    detailDraft?.basicInfo.jobTitle,
+    editDraft?.basicInfo.jobTitle,
     resume?.basicInfo.jobTitle,
     user?.tags,
   ]);
@@ -159,8 +158,7 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
     const initial = mergeProfileIntoResume(emptyResumeData(), user);
     saveMutation.mutate(initial, {
       onSuccess: () => {
-        setIsEditing(true);
-        setDraft({ ...initial.basicInfo });
+        setEditDraft(cloneResumeData(initial));
       },
     });
   }, [saveMutation, user]);
@@ -185,67 +183,22 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
     importMutation.mutate(file);
   };
 
-  const handleReupload = () => {
-    toast.message(
-      "새 파일로 덮어쓰려면 아래에서 다시 업로드하거나, 상세 편집에서 내용을 정리할 수 있어요.",
-    );
-    setErrorMessage(null);
-  };
-
   const handleStartEdit = () => {
     if (!resume) return;
-    setDetailDraft(null);
-    setDraft({ ...resume.basicInfo });
-    setIsEditing(true);
+    setEditDraft(cloneResumeData(resume));
   };
 
   const handleCancelEdit = () => {
-    setDraft(null);
-    setIsEditing(false);
+    setEditDraft(null);
   };
 
-  const handleStartDetailEdit = () => {
-    if (!resume) return;
-    setIsEditing(false);
-    setDraft(null);
-    setDetailDraft(cloneResumeData(resume));
-  };
-
-  const handleCancelDetailEdit = () => {
-    setDetailDraft(null);
-  };
-
-  const handleSaveDetail = () => {
-    if (!detailDraft) return;
-    saveMutation.mutate(detailDraft, {
+  const handleSaveEdit = () => {
+    if (!editDraft) return;
+    saveMutation.mutate(editDraft, {
       onSuccess: () => {
-        setDetailDraft(null);
+        setEditDraft(null);
       },
     });
-  };
-
-  const handleApplyProfile = () => {
-    if (!resume) return;
-    const next = mergeProfileIntoResume(resume, user);
-    saveMutation.mutate(next);
-  };
-
-  const handleSave = () => {
-    if (!resume || !draft) return;
-    const next: ResumeData = { ...resume, basicInfo: draft };
-    saveMutation.mutate(next, {
-      onSuccess: () => {
-        setIsEditing(false);
-        setDraft(null);
-      },
-    });
-  };
-
-  const handleDraftChange = (
-    field: keyof ResumeBasicInfo,
-    value: string | number,
-  ) => {
-    setDraft((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
   if (isResumeLoading) {
@@ -273,8 +226,9 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
 
   return (
     <Tabs
-      defaultValue={defaultTab}
+      value={activeTab}
       onValueChange={(value) => {
+        setActiveTab(value);
         const url = value === "qa" ? "/my-resume?tab=qa" : "/my-resume";
         router.replace(url, { scroll: false });
       }}
@@ -300,21 +254,13 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
           resume && (
             <ResumeSummarySection
               resume={resume}
-              onReupload={handleReupload}
-              isEditing={isEditing}
-              draft={draft}
+              onReuploadFile={handleFileSelect}
+              editDraft={editDraft}
               onStartEdit={handleStartEdit}
               onCancelEdit={handleCancelEdit}
-              onSave={handleSave}
-              onDraftChange={handleDraftChange}
+              onSaveEdit={handleSaveEdit}
+              onEditDraftChange={setEditDraft}
               isSaving={saveMutation.isPending}
-              onApplyProfile={handleApplyProfile}
-              showApplyProfile={Boolean(user)}
-              detailDraft={detailDraft}
-              onStartDetailEdit={handleStartDetailEdit}
-              onCancelDetailEdit={handleCancelDetailEdit}
-              onSaveDetail={handleSaveDetail}
-              onDetailDraftChange={setDetailDraft}
               suggestedTechPool={suggestedTechPool}
             />
           )

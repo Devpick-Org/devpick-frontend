@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Search,
   ChevronDown,
@@ -12,6 +13,7 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -28,7 +30,7 @@ import {
 } from "./jobs.constants";
 import type { JobFilters } from "./JobFilterBar";
 
-const POPULAR_TECHS = [
+const FALLBACK_POPULAR_TECHS = [
   "React",
   "TypeScript",
   "Python",
@@ -119,11 +121,43 @@ export function JobSearchPanel({
   const locationLabel = filters.location === "ALL" ? "전체" : filters.location;
 
   const [techSearch, setTechSearch] = useState("");
+  const { data: techTagFacets = [] } = useQuery({
+    queryKey: ["job-tech-tags", 80],
+    queryFn: () => jobsEndpoints.listTechTags(80),
+    staleTime: 1000 * 60 * 10,
+    retry: 1,
+  });
+  const dynamicTechOptions = React.useMemo(() => {
+    const seen = new Set<string>();
+    const fromJobs = techTagFacets
+      .map((facet) => facet.name.trim())
+      .filter((name) => {
+        const key = name.toLowerCase();
+        if (!name || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    return fromJobs.length > 0 ? fromJobs : TECH_STACK_OPTIONS;
+  }, [techTagFacets]);
+  const popularTechs = React.useMemo(
+    () =>
+      dynamicTechOptions.length > 0
+        ? dynamicTechOptions.slice(0, 10)
+        : FALLBACK_POPULAR_TECHS,
+    [dynamicTechOptions],
+  );
+  const techCountByName = React.useMemo(() => {
+    const map = new Map<string, number>();
+    for (const facet of techTagFacets) {
+      map.set(facet.name.toLowerCase(), facet.count);
+    }
+    return map;
+  }, [techTagFacets]);
   const filteredTechOptions = techSearch.trim()
-    ? TECH_STACK_OPTIONS.filter((t) =>
+    ? dynamicTechOptions.filter((t) =>
         t.toLowerCase().includes(techSearch.toLowerCase()),
       )
-    : TECH_STACK_OPTIONS;
+    : dynamicTechOptions;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card">
@@ -257,8 +291,8 @@ export function JobSearchPanel({
             {techSearch.trim() && filteredTechOptions.length === 0 && (
               <div className="mt-3 w-64 space-y-2">
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  프리셋에 없는 이름이에요. 아래를 누르면 그대로 필터에 넣을 수 있어요. (DB
-                  태그와 철자가 같을 때만 걸립니다.)
+                  공고 태그 목록에 없는 이름이에요. 아래를 누르면 그대로 필터에 넣을 수
+                  있어요.
                 </p>
                 <button
                   type="button"
@@ -279,8 +313,9 @@ export function JobSearchPanel({
               </div>
             )}
           </div>
-          {POPULAR_TECHS.map((tech) => {
+          {popularTechs.map((tech) => {
             const selected = filters.techStack.includes(tech);
+            const count = techCountByName.get(tech.toLowerCase());
             return (
               <button
                 key={tech}
@@ -292,13 +327,18 @@ export function JobSearchPanel({
                   onChange({ ...filters, techStack: next });
                 }}
                 className={cn(
-                  "h-7 rounded-full px-3 text-xs font-medium transition-colors cursor-pointer",
+                  "inline-flex h-7 items-center rounded-full px-3 text-xs font-medium transition-colors cursor-pointer",
                   selected
                     ? "bg-primary/10 text-primary"
                     : "bg-muted text-muted-foreground hover:text-foreground",
                 )}
               >
                 {tech}
+                {count ? (
+                  <span className="ml-1 rounded-full bg-background/70 px-1.5 text-[10px] font-bold tabular-nums">
+                    {count}
+                  </span>
+                ) : null}
               </button>
             );
           })}
@@ -316,6 +356,7 @@ export function JobSearchPanel({
           <div className="mt-2 flex flex-wrap gap-1.5">
             {filteredTechOptions.map((tech) => {
               const selected = filters.techStack.includes(tech);
+              const count = techCountByName.get(tech.toLowerCase());
               return (
                 <button
                   key={tech}
@@ -327,13 +368,18 @@ export function JobSearchPanel({
                     onChange({ ...filters, techStack: next });
                   }}
                   className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer",
+                    "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer",
                     selected
                       ? "bg-primary/10 text-primary"
                       : "border border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground",
                   )}
                 >
-                  {tech}
+                  <span>{tech}</span>
+                  {count ? (
+                    <span className="ml-1 rounded-full bg-muted px-1.5 text-[10px] font-bold tabular-nums text-muted-foreground">
+                      {count}
+                    </span>
+                  ) : null}
                 </button>
               );
             })}

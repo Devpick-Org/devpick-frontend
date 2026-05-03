@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useId, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn, dedupeTags } from "@/lib/utils";
+import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { TAG_GROUPS } from "./constants";
 
 interface TechTagPickerModalProps {
@@ -45,6 +47,12 @@ function TechTagPickerBody({
   const [q, setQ] = useState("");
   const [draft, setDraft] = useState<string[]>(() => dedupeTags([...value]));
   const [manual, setManual] = useState("");
+  const { data: jobTagFacets = [], isError } = useQuery({
+    queryKey: ["job-tech-tags", 80],
+    queryFn: () => jobsEndpoints.listTechTags(80),
+    staleTime: 1000 * 60 * 10,
+    retry: 1,
+  });
 
   useEffect(() => {
     const esc = (e: KeyboardEvent) => {
@@ -55,15 +63,27 @@ function TechTagPickerBody({
   }, [onOpenChange]);
 
   const query = q.trim().toLowerCase();
+  const facetCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const facet of jobTagFacets) {
+      map.set(facet.name.toLowerCase(), facet.count);
+    }
+    return map;
+  }, [jobTagFacets]);
 
   const filteredGroups = useMemo(() => {
-    return TAG_GROUPS.map((g) => ({
+    const jobTags = dedupeTags(jobTagFacets.map((facet) => facet.name)).slice(0, 48);
+    const groups = jobTags.length > 0
+      ? [{ label: "공고 인기 기술", tags: jobTags }, ...TAG_GROUPS]
+      : TAG_GROUPS;
+
+    return groups.map((g) => ({
       ...g,
       tags: query
         ? g.tags.filter((t) => t.toLowerCase().includes(query))
         : g.tags,
     })).filter((g) => g.tags.length > 0);
-  }, [query]);
+  }, [jobTagFacets, query]);
 
   const toggle = (tag: string) => {
     const t = tag.trim();
@@ -110,8 +130,8 @@ function TechTagPickerBody({
             {title}
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            검색 후 태그를 눌러 선택·해제하세요. 목록에 없으면 아래 입력으로 추가할 수
-            있습니다.
+            공고에서 자주 등장하는 기술을 먼저 보여드려요. 목록에 없으면 아래 입력으로
+            추가할 수 있습니다.
           </p>
           <div className="relative mt-3">
             <SearchGlyph className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -131,6 +151,11 @@ function TechTagPickerBody({
             <span className="text-primary tabular-nums">{draft.length}</span>개
           </p>
           <div className="space-y-5">
+            {isError ? (
+              <p className="rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+                공고 태그를 불러오지 못해 기본 기술 목록을 보여드리고 있어요.
+              </p>
+            ) : null}
             {filteredGroups.map((group) => (
               <section key={group.label} className="space-y-2">
                 <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
@@ -147,13 +172,21 @@ function TechTagPickerBody({
                         type="button"
                         onClick={() => toggle(tag)}
                         className={cn(
-                          "rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors",
+                          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors",
                           on
                             ? "border-primary bg-primary/10 text-primary"
                             : "border-border bg-secondary text-foreground hover:border-primary/40",
                         )}
                       >
-                        {tag}
+                        <span>{tag}</span>
+                        {facetCounts.has(tag.toLowerCase()) ? (
+                          <span className={cn(
+                            "rounded-full px-1.5 text-[10px] font-bold tabular-nums",
+                            on ? "bg-primary/15 text-primary" : "bg-background text-muted-foreground",
+                          )}>
+                            {facetCounts.get(tag.toLowerCase())}
+                          </span>
+                        ) : null}
                       </button>
                     );
                   })}

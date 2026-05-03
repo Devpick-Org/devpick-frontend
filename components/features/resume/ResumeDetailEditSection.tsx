@@ -103,6 +103,15 @@ export function ResumeDetailEditSection({
   const setProjects = (projects: ResumeProject[]) =>
     applyDraftChange({ ...draft, projects });
 
+  const setBasicInfo = (
+    field: keyof ResumeData["basicInfo"],
+    value: string | number,
+  ) =>
+    applyDraftChange({
+      ...draft,
+      basicInfo: { ...draft.basicInfo, [field]: value },
+    });
+
   const suggestedToShow = filterNewSuggestions(
     suggestedTechPool,
     draft.techStack,
@@ -116,19 +125,64 @@ export function ResumeDetailEditSection({
   };
 
   return (
-    <div className="flex flex-col gap-8 rounded-xl border border-border bg-muted/20 p-4 sm:p-5">
-      <div className="flex flex-col gap-2 border-b border-border pb-3">
-        <h3 className="text-sm font-bold text-foreground">
-          기술·경력·프로젝트 편집
+    <div className="flex flex-col gap-5 rounded-3xl border border-border bg-card p-4 shadow-sm sm:p-6">
+      <div className="flex flex-col gap-2 rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-background to-background p-4">
+        <h3 className="text-lg font-bold tracking-[-0.01em] text-foreground">
+          이력서 정보 편집
         </h3>
         <p className="text-xs font-medium text-muted-foreground">
-          이력서가 자세할수록 공고 매칭, 면접 질문, 부족 역량 추천이 정확해집니다.
-          자동 반영된 값은 언제든 수정할 수 있어요.
+          기본 정보부터 기술·경력·프로젝트까지 한 번에 수정합니다. 저장하면
+          프로필 정보도 이력서 기준으로 자동 최신화됩니다.
         </p>
       </div>
 
+      <section className="rounded-2xl border border-border bg-background p-4">
+        <span className="text-sm font-semibold text-foreground">기본 정보</span>
+        <p className="mt-1 text-xs text-muted-foreground">
+          공고 매칭과 면접 Q&A의 기준이 되는 정보입니다.
+        </p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground">이름</label>
+            <Input
+              value={draft.basicInfo.name}
+              onChange={(e) => setBasicInfo("name", e.target.value)}
+              className="h-9 text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground">직무</label>
+            <Input
+              value={draft.basicInfo.jobTitle}
+              onChange={(e) => setBasicInfo("jobTitle", e.target.value)}
+              className="h-9 text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground">
+              경력 (년)
+            </label>
+            <Input
+              type="number"
+              min={0}
+              value={draft.basicInfo.careerYears}
+              onChange={(e) => setBasicInfo("careerYears", Number(e.target.value))}
+              className="h-9 text-sm"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-muted-foreground">위치</label>
+            <Input
+              value={draft.basicInfo.location}
+              onChange={(e) => setBasicInfo("location", e.target.value)}
+              className="h-9 text-sm"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* 자기소개 */}
-      <section className="flex flex-col gap-2">
+      <section className="flex flex-col gap-2 rounded-2xl border border-border bg-background p-4">
         <span className="text-sm font-semibold text-foreground">
           자기소개·요약
         </span>
@@ -209,7 +263,7 @@ export function ResumeDetailEditSection({
       </section>
 
       {/* 기술 스택 */}
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-background p-4">
         <span className="text-sm font-semibold text-foreground">기술 스택</span>
         <div className="flex flex-wrap gap-2">
           {draft.techStack.map((tag) => (
@@ -301,7 +355,7 @@ export function ResumeDetailEditSection({
       </section>
 
       {/* 경력 */}
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-background p-4">
         <div className="flex items-center justify-between gap-2">
           <span className="text-sm font-semibold text-foreground">경력</span>
           <Button
@@ -323,7 +377,7 @@ export function ResumeDetailEditSection({
           {draft.careers.map((c, i) => (
             <div
               key={i}
-              className="flex flex-col gap-2 rounded-lg border border-border bg-background p-3"
+              className="flex flex-col gap-2 rounded-xl border border-border bg-muted/20 p-3"
             >
               <div className="flex justify-end">
                 <button
@@ -402,7 +456,7 @@ export function ResumeDetailEditSection({
       </section>
 
       {/* 프로젝트 */}
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-background p-4">
         <div className="flex items-center justify-between gap-2">
           <span className="text-sm font-semibold text-foreground">프로젝트</span>
           <Button
@@ -439,7 +493,7 @@ export function ResumeDetailEditSection({
           {draft.projects.map((p, i) => (
             <div
               key={i}
-              className="flex flex-col gap-2 rounded-lg border border-border bg-background p-3"
+              className="flex flex-col gap-2 rounded-xl border border-border bg-muted/20 p-3"
             >
               <div className="flex justify-end">
                 <button
@@ -745,7 +799,7 @@ export function ResumeDetailEditSection({
         </div>
       </section>
 
-      <div className="flex justify-end gap-2 border-t border-border pt-4">
+      <div className="sticky bottom-4 flex justify-end gap-2 rounded-2xl border border-border bg-background/95 p-3 shadow-lg backdrop-blur">
         <Button
           type="button"
           variant="outline"
@@ -756,7 +810,7 @@ export function ResumeDetailEditSection({
           취소
         </Button>
         <Button type="button" size="sm" onClick={onSave} disabled={isSaving}>
-          상세 저장
+          저장하기
         </Button>
       </div>
     </div>

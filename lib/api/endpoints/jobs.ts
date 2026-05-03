@@ -72,6 +72,12 @@ export interface SkillGapApi {
   contents: ContentPickApi[];
 }
 
+export interface JobTechTagFacetApi {
+  name: string;
+  count: number;
+  source: string;
+}
+
 export interface InterviewQaListItemApi {
   jobId: string;
   companyName: string;
@@ -94,6 +100,13 @@ export const jobsEndpoints = {
   }): Promise<JobListPageApi> =>
     apiClient
       .get<ApiResponse<JobListPageApi>>("/jobs", { params })
+      .then((r) => r.data.data),
+
+  listTechTags: (limit = 80): Promise<JobTechTagFacetApi[]> =>
+    apiClient
+      .get<ApiResponse<JobTechTagFacetApi[]>>("/jobs/tech-tags", {
+        params: { limit },
+      })
       .then((r) => r.data.data),
 
   getDetail: (jobId: string): Promise<JobDetailApi> =>
