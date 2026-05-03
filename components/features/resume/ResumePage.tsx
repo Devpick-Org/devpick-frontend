@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { ResumeUploadSection } from "./ResumeUploadSection";
 import { ResumeSummarySection } from "./ResumeSummarySection";
 import { ResumeQATab } from "./ResumeQATab";
+import { MockInterviewTab } from "../mock-interview/MockInterviewTab";
 
 const TRIGGER_CLASS =
   "rounded-none border-b-2 border-transparent px-4 pb-3 pt-1 text-sm font-semibold " +
@@ -56,7 +57,13 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState(defaultTab === "qa" ? "qa" : "resume");
+  const [activeTab, setActiveTab] = useState(
+    defaultTab === "qa"
+      ? "qa"
+      : defaultTab === "mock"
+        ? "mock"
+        : "resume",
+  );
   const [editDraft, setEditDraft] = useState<ResumeData | null>(null);
 
   const {
@@ -229,7 +236,12 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
       value={activeTab}
       onValueChange={(value) => {
         setActiveTab(value);
-        const url = value === "qa" ? "/my-resume?tab=qa" : "/my-resume";
+        const url =
+          value === "qa"
+            ? "/my-resume?tab=qa"
+            : value === "mock"
+              ? "/my-resume?tab=mock"
+              : "/my-resume";
         router.replace(url, { scroll: false });
       }}
     >
@@ -239,6 +251,9 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
         </TabsTrigger>
         <TabsTrigger value="qa" className={TRIGGER_CLASS}>
           면접 Q&A
+        </TabsTrigger>
+        <TabsTrigger value="mock" className={TRIGGER_CLASS}>
+          모의면접
         </TabsTrigger>
       </TabsList>
 
@@ -269,6 +284,18 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
 
       <TabsContent value="qa">
         <ResumeQATab />
+      </TabsContent>
+
+      <TabsContent value="mock">
+        <Suspense
+          fallback={
+            <div className="rounded-2xl border border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+              모의면접 정보를 불러오는 중…
+            </div>
+          }
+        >
+          <MockInterviewTab hasResume={hasResume} />
+        </Suspense>
       </TabsContent>
     </Tabs>
   );

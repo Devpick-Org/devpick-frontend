@@ -6,7 +6,8 @@ export default async function Page({
   searchParams: Promise<{ tab?: string }>;
 }) {
   const { tab } = await searchParams;
-  const defaultTab = tab === "qa" ? "qa" : "resume";
+  const defaultTab =
+    tab === "qa" ? "qa" : tab === "mock" ? "mock" : "resume";
 
   return (
     <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">

@@ -10,6 +10,7 @@ import { JobDetailJdImages } from "./JobDetailJdImages";
 import { JobDetailSection } from "./JobDetailSection";
 import { JobDetailStructuredList } from "./JobDetailStructuredList";
 import { JobMatchSection } from "./JobMatchSection";
+import { JobMockInterviewCta } from "./JobMockInterviewCta";
 import { JobQASection } from "./JobQASection";
 import { JobSkillGapSection } from "./JobSkillGapSection";
 
@@ -283,6 +284,10 @@ export function JobDetailPage({ id }: JobDetailPageProps) {
               jobCategory={job.jobCategory}
               matchScore={job.matchScore}
             />
+          </div>
+
+          <div className="mt-8 border-t pt-8">
+            <JobMockInterviewCta jobId={id} />
           </div>
 
           <div className="mt-8 border-t pt-8">
