@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowRight,
+  Check,
+  ChevronRight,
   CornerDownLeft,
   Flag,
   Loader2,
@@ -20,6 +21,7 @@ import {
 } from "@/lib/api/endpoints/mock-interviews";
 import { cn } from "@/lib/utils";
 import { MockInterviewConversationLog } from "./MockInterviewConversationLog";
+import { MOCK_INTERVIEW_PHASE_STEPS, phaseTitleKo } from "./phaseLabels";
 
 interface MockInterviewRoomProps {
   session: MockInterviewSessionDetailApi;
@@ -27,22 +29,6 @@ interface MockInterviewRoomProps {
   onCompleted: (session: MockInterviewSessionDetailApi) => void;
   onSavedExit: () => void;
 }
-
-const PHASE_LABEL: Record<string, string> = {
-  WARM_UP: "WARM-UP",
-  PROJECT: "PROJECT",
-  DOMAIN: "DOMAIN",
-  CS_INFRA: "CS & INFRA",
-  BEHAVIORAL: "BEHAVIORAL",
-};
-
-const PHASE_RANGE: { phase: string; from: number; to: number }[] = [
-  { phase: "WARM_UP", from: 1, to: 2 },
-  { phase: "PROJECT", from: 3, to: 6 },
-  { phase: "DOMAIN", from: 7, to: 10 },
-  { phase: "CS_INFRA", from: 11, to: 14 },
-  { phase: "BEHAVIORAL", from: 15, to: 15 },
-];
 
 export function MockInterviewRoom({
   session,
@@ -143,14 +129,27 @@ export function MockInterviewRoom({
 
   if (!currentQuestion) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
+      <div className="rounded-3xl border border-border/80 bg-card p-8 text-center text-sm text-muted-foreground shadow-inner">
         질문 데이터를 불러오지 못했습니다.
       </div>
     );
   }
 
-  const phaseLabel = PHASE_LABEL[currentQuestion.phase] ?? currentQuestion.phase;
-  const isBusy = answerMutation.isPending || passMutation.isPending;
+  const phaseKo = phaseTitleKo(currentQuestion.phase);
+
+  const overlayVariant =
+    answerMutation.isPending
+      ? "answer"
+      : passMutation.isPending
+        ? "pass"
+        : saveExitMutation.isPending
+          ? "save"
+          : finishEarlyMutation.isPending
+            ? "finish"
+            : null;
+
+  const blockingAnswerOrPass =
+    answerMutation.isPending || passMutation.isPending;
 
   const handleSubmit = () => {
     const content = draft.trim();
@@ -162,87 +161,99 @@ export function MockInterviewRoom({
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-      <div className="flex flex-col gap-4">
+    <div className="relative grid gap-7 lg:grid-cols-[1.35fr_minmax(0,1fr)]">
+      {overlayVariant ? <BusyOverlay variant={overlayVariant} /> : null}
+
+      <div className="flex min-w-0 flex-col gap-5">
         <PhaseBar currentNo={currentQuestion.questionNo} />
 
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            <span>Q{currentQuestion.questionNo} / {session.totalQuestions}</span>
-            <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-foreground">
-              {phaseLabel}
+        <article className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/95 px-6 py-6 shadow-lg ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(600px_120px_at_50%_-20%,var(--color-primary)_0%,transparent_70%)] opacity-[0.09]"
+          />
+          <div className="relative mb-4 flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-primary/15 px-2.5 py-1 text-xs font-bold tabular-nums tracking-tight text-primary">
+              Q{currentQuestion.questionNo} / {session.totalQuestions}
             </span>
-            <span>{currentQuestion.topic}</span>
-            {currentQuestion.jdOnlyKeyword && (
+            <span className="rounded-full bg-muted/90 px-2.5 py-1 text-xs font-semibold text-foreground ring-1 ring-border/60">
+              {phaseKo}
+            </span>
+            <span className="text-xs font-medium text-muted-foreground">
+              · {currentQuestion.topic}
+            </span>
+            {currentQuestion.jdOnlyKeyword ? (
               <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
-                JD 갭 키워드
+                JD 키워드
               </span>
-            )}
+            ) : null}
           </div>
-          <p className="whitespace-pre-wrap text-base font-medium leading-relaxed text-foreground">
+          <p className="relative whitespace-pre-wrap text-base font-medium leading-relaxed tracking-tight text-foreground">
             {lastPrompt?.content ?? currentQuestion.prompt}
           </p>
-          {lastEvaluation?.rating && lastPrompt?.type !== "QUESTION" && (
-            <p className="mt-3 rounded-lg bg-muted/50 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
-              직전 답변 평가: <strong>{ratingText(lastEvaluation.rating)}</strong>
-              {lastEvaluation.metadata && typeof lastEvaluation.metadata.evaluatorComment === "string" && (
+          {lastEvaluation?.rating && lastPrompt?.type !== "QUESTION" ? (
+            <div className="relative mt-4 rounded-2xl border border-border/60 bg-muted/35 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+              직전 답변 평가:{" "}
+              <strong className="text-foreground">{ratingText(lastEvaluation.rating)}</strong>
+              {lastEvaluation.metadata &&
+              typeof lastEvaluation.metadata.evaluatorComment === "string" ? (
                 <>
-                  {" — "}
+                  {" · "}
                   {String(lastEvaluation.metadata.evaluatorComment)}
                 </>
-              )}
-            </p>
-          )}
-        </div>
+              ) : null}
+            </div>
+          ) : null}
+        </article>
 
-        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="rounded-3xl border border-border/70 bg-card/90 p-5 shadow-md ring-1 ring-black/[0.03] dark:bg-card dark:ring-white/[0.05]">
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                if (!isBusy) handleSubmit();
+                if (!blockingAnswerOrPass) handleSubmit();
               }
             }}
-            placeholder="답변을 입력하세요. Enter로 전송, Shift+Enter로 줄바꿈."
+            placeholder="답변을 입력하세요. Enter로 전송 · Shift+Enter로 줄바꿈."
             rows={6}
-            disabled={isBusy}
-            className="w-full resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm leading-relaxed disabled:opacity-60"
+            disabled={blockingAnswerOrPass}
+            className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-sm leading-relaxed outline-none transition-shadow placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-[3px] focus-visible:ring-primary/25 disabled:opacity-65"
           />
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => passMutation.mutate()}
-                disabled={isBusy}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 font-medium hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={blockingAnswerOrPass}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-border/90 bg-background/80 px-3.5 py-2 text-xs font-semibold hover:bg-muted/50 disabled:pointer-events-none disabled:opacity-50"
               >
-                <SkipForward className="h-3.5 w-3.5" /> 질문 패스
+                <SkipForward className="h-3.5 w-3.5" aria-hidden /> 질문 패스
               </button>
               <button
                 type="button"
                 onClick={() => saveExitMutation.mutate()}
-                disabled={saveExitMutation.isPending}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 font-medium hover:bg-muted/40 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={blockingAnswerOrPass || saveExitMutation.isPending}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-border/90 bg-background/80 px-3.5 py-2 text-xs font-semibold hover:bg-muted/50 disabled:pointer-events-none disabled:opacity-50"
               >
                 {saveExitMutation.isPending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" aria-hidden />
                 ) : (
-                  <RefreshCcw className="h-3.5 w-3.5" />
+                  <RefreshCcw className="h-3.5 w-3.5" aria-hidden />
                 )}
                 저장 후 나가기
               </button>
               <button
                 type="button"
                 onClick={() => finishEarlyMutation.mutate()}
-                disabled={finishEarlyMutation.isPending}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/40 px-3 py-1.5 font-medium text-rose-600 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={blockingAnswerOrPass || finishEarlyMutation.isPending}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/45 bg-rose-500/[0.04] px-3.5 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-500/10 dark:text-rose-300 disabled:pointer-events-none disabled:opacity-50"
               >
                 {finishEarlyMutation.isPending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
                 ) : (
-                  <Flag className="h-3.5 w-3.5" />
+                  <Flag className="h-3.5 w-3.5" aria-hidden />
                 )}
                 여기서 마치기
               </button>
@@ -250,73 +261,158 @@ export function MockInterviewRoom({
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={isBusy || !draft.trim()}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={blockingAnswerOrPass || !draft.trim()}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold tracking-tight text-primary-foreground shadow-md shadow-primary/25 transition-[transform,box-shadow] hover:bg-primary/90 hover:shadow-lg active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55"
             >
-              {isBusy ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+              {answerMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
               ) : (
-                <CornerDownLeft className="h-4 w-4" />
+                <CornerDownLeft className="h-4 w-4" aria-hidden />
               )}
               답변 보내기
             </button>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card/60 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-          <p className="mb-1 font-semibold text-foreground">실전 팁</p>
-          <ul className="grid gap-1 sm:grid-cols-2">
-            <li>결론 → 기술 스택 → 디테일 순서로 답변하면 꼬리질문이 더 생산적이에요.</li>
-            <li>모르는 질문은 과감히 패스하고, 아는 질문에 집중하세요.</li>
-            <li>JD 본문을 입력하면 회사 맞춤형 질문이 나와요.</li>
-            <li>이전 면접 결과와 비교해 점수 변화를 확인할 수 있어요.</li>
+        <aside className="rounded-3xl border border-border/55 bg-muted/25 px-5 py-4 text-xs leading-relaxed text-muted-foreground ring-1 ring-black/[0.02] backdrop-blur-sm dark:bg-muted/15 dark:ring-white/[0.04]">
+          <p className="mb-3 text-sm font-bold text-foreground">실전 팁</p>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            <li className="rounded-xl bg-background/50 px-3 py-2 ring-1 ring-border/50">
+              결론 → 스택 → 디테일 순으로 말하면 꼬리질문이 더 생산적이에요.
+            </li>
+            <li className="rounded-xl bg-background/50 px-3 py-2 ring-1 ring-border/50">
+              모르는 질문은 패스 후, 시간을 아는 문항에 쓰는 편이 유리해요.
+            </li>
+            <li className="rounded-xl bg-background/50 px-3 py-2 ring-1 ring-border/50">
+              공고 JD를 채워 두면 맞춤 질문 품질이 올라가요.
+            </li>
+            <li className="rounded-xl bg-background/50 px-3 py-2 ring-1 ring-border/50">
+              완료 후 이전 결과와 점수·피드를 비교해 볼 수 있어요.
+            </li>
           </ul>
-        </div>
+        </aside>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between rounded-2xl border border-border bg-card px-4 py-3 text-sm">
-          <p className="font-semibold text-foreground">대화 로그</p>
-          <span className="text-xs text-muted-foreground">
+      <aside className="flex min-h-0 min-w-0 flex-col gap-4">
+        <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-gradient-to-r from-muted/35 to-muted/15 px-4 py-3.5 shadow-sm ring-1 ring-black/[0.03] backdrop-blur-sm dark:from-muted/20 dark:to-muted/10">
+          <p className="font-bold text-foreground">대화 로그</p>
+          <span className="tabular-nums text-[11px] font-semibold text-muted-foreground">
             진행 {session.answeredCount}/{session.totalQuestions}
           </span>
         </div>
         <MockInterviewConversationLog session={session} />
-        <p className="text-xs text-muted-foreground">
-          대화 로그는 실시간으로 저장돼요. 새로고침해도 이어서 진행할 수 있어요.
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          로그는 실시간 저장돼요. 새로고침 후에도 이어서 진행할 수 있습니다.
         </p>
-      </div>
+      </aside>
     </div>
   );
 }
 
 function PhaseBar({ currentNo }: { currentNo: number }) {
   return (
-    <div className="flex items-center gap-2 overflow-x-auto rounded-2xl border border-border bg-card px-3 py-2 text-xs">
-      {PHASE_RANGE.map((p, i) => {
-        const active = currentNo >= p.from && currentNo <= p.to;
-        const done = currentNo > p.to;
+    <nav
+      className="-mx-1 flex items-stretch gap-1.5 overflow-x-auto pb-2 pt-0.5 [scrollbar-width:thin] snap-x snap-mandatory px-1"
+      aria-label="모의면접 단계"
+    >
+      {MOCK_INTERVIEW_PHASE_STEPS.map((step, i) => {
+        const active = currentNo >= step.from && currentNo <= step.to;
+        const done = currentNo > step.to;
         return (
-          <div key={p.phase} className="flex items-center gap-2 whitespace-nowrap">
-            <span
+          <Fragment key={step.phase}>
+            <div
               className={cn(
-                "rounded-full px-2.5 py-1 font-semibold",
-                active
-                  ? "bg-primary text-primary-foreground"
-                  : done
-                    ? "bg-muted text-foreground"
-                    : "bg-card text-muted-foreground",
+                "flex min-w-[108px] max-w-[128px] shrink-0 snap-start flex-col rounded-2xl border px-3 py-2.5 text-left transition-[border-color,box-shadow,background-color]",
+                active &&
+                  "border-primary/55 bg-gradient-to-br from-primary/[0.14] via-primary/[0.05] to-transparent shadow-md shadow-primary/10 ring-[1.5px] ring-primary/35",
+                done &&
+                  !active &&
+                  "border-emerald-500/35 bg-emerald-500/[0.07] shadow-sm",
+                !active && !done && "border-border/70 bg-muted/25 opacity-95",
               )}
             >
-              {PHASE_LABEL[p.phase]} · Q{p.from}
-              {p.from !== p.to ? `-${p.to}` : ""}
-            </span>
-            {i < PHASE_RANGE.length - 1 && (
-              <ArrowRight className="h-3 w-3 text-muted-foreground/40" />
-            )}
-          </div>
+              <div className="flex items-start justify-between gap-1">
+                <span
+                  className={cn(
+                    "text-[13px] font-bold leading-tight",
+                    active || done ? "text-foreground" : "text-muted-foreground",
+                  )}
+                >
+                  {step.title}
+                </span>
+                {done ? (
+                  <Check
+                    className="mt-0.5 size-3.5 shrink-0 stroke-[2.5] text-emerald-600 dark:text-emerald-400"
+                    aria-hidden
+                  />
+                ) : null}
+              </div>
+              <span className="mt-1 text-[11px] font-semibold tabular-nums tracking-tight text-muted-foreground">
+                문항 {step.questionRangeLabel}
+              </span>
+            </div>
+            {i < MOCK_INTERVIEW_PHASE_STEPS.length - 1 ? (
+              <ChevronRight
+                className="hidden shrink-0 self-center text-muted-foreground/25 sm:block"
+                aria-hidden
+                strokeWidth={1.75}
+              />
+            ) : null}
+          </Fragment>
         );
       })}
+    </nav>
+  );
+}
+
+function BusyOverlay({
+  variant,
+}: {
+  variant: "answer" | "pass" | "save" | "finish";
+}) {
+  const copyMap = {
+    answer: {
+      title: "답변 분석 중",
+      body:
+        "AI가 평가·피드백과 다음 단계를 준비하고 있어요. 보통 몇 초~수십 초 걸려요.",
+    },
+    pass: {
+      title: "다음 문항으로 이동 중",
+      body: "패스를 반영하고 이어서 질문을 준비하고 있어요.",
+    },
+    save: {
+      title: "저장 중",
+      body: "진행 상태를 서버에 기록하고 있어요. 잠시만 기다려 주세요.",
+    },
+    finish: {
+      title: "결과 정리 중",
+      body: "지금까지 답변을 요약하고 최종 평가를 만드는 중이에요.",
+    },
+  } as const;
+
+  const { title, body } = copyMap[variant];
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-busy="true"
+      aria-live="polite"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 p-4 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
+    >
+      <div className="relative w-full max-w-md rounded-3xl border border-border/80 bg-card p-8 shadow-2xl ring-1 ring-black/[0.05] dark:ring-white/[0.08]">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-primary/45 to-transparent"
+        />
+        <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" aria-hidden />
+        <p className="mt-6 text-center text-lg font-bold tracking-tight text-foreground">
+          {title}
+        </p>
+        <p className="mt-3 text-center text-pretty text-sm leading-relaxed text-muted-foreground">
+          {body}
+        </p>
+      </div>
     </div>
   );
 }

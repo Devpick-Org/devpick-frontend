@@ -132,8 +132,30 @@ export function MockInterviewSetup({
       (manualJd && jobTitle.trim().length > 0));
 
   return (
-    <form
-      className="flex flex-col gap-5"
+    <>
+      {submitting ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-busy="true"
+          aria-live="polite"
+          className="fixed inset-0 z-[99] flex items-center justify-center bg-background/80 p-6 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
+        >
+          <div className="w-full max-w-md rounded-3xl border border-border/80 bg-card p-8 text-center shadow-2xl ring-1 ring-black/[0.05] dark:ring-white/[0.08]">
+            <Loader2
+              className="mx-auto size-12 animate-spin text-primary"
+              aria-hidden
+            />
+            <p className="mt-6 text-lg font-bold text-foreground">모의면접을 시작하는 중</p>
+            <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
+              질문 플랜을 만들고 AI 세션을 여는 동안이라 잠시만 기다려 주세요. 통상 몇 초~1분 안에
+              첫 화면으로 들어가요.
+            </p>
+          </div>
+        </div>
+      ) : null}
+      <form
+        className={cn("relative flex flex-col gap-5", submitting && "pointer-events-none")}
       onSubmit={(e) => {
         e.preventDefault();
         if (!canSubmit) return;
@@ -429,5 +451,6 @@ export function MockInterviewSetup({
         모의면접 시작하기
       </button>
     </form>
+    </>
   );
 }

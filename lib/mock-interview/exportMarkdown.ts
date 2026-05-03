@@ -2,15 +2,8 @@ import type {
   MockInterviewSessionDetailApi,
   MockInterviewTurnApi,
 } from "@/lib/api/endpoints/mock-interviews";
+import { phaseTitleKo } from "@/components/features/mock-interview/phaseLabels";
 import type { MockInterviewResult } from "./buildPlaceholderResult";
-
-const PHASE_LABEL: Record<string, string> = {
-  WARM_UP: "WARM-UP",
-  PROJECT: "PROJECT",
-  DOMAIN: "DOMAIN",
-  CS_INFRA: "CS & INFRA",
-  BEHAVIORAL: "BEHAVIORAL",
-};
 
 export function buildMockInterviewMarkdown(
   session: MockInterviewSessionDetailApi,
@@ -71,7 +64,7 @@ export function buildMockInterviewMarkdown(
 
   lines.push("## 전체 대화와 모범 답안");
   for (const q of session.plan.questions) {
-    const phase = PHASE_LABEL[q.phase] ?? q.phase;
+    const phase = phaseTitleKo(q.phase);
     lines.push("");
     lines.push(`### Q${q.questionNo}. [${phase}] ${q.topic}`);
     lines.push(q.prompt);

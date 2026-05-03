@@ -6,20 +6,13 @@ import type {
   MockInterviewTurnApi,
 } from "@/lib/api/endpoints/mock-interviews";
 import { cn } from "@/lib/utils";
+import { phaseTitleKo } from "./phaseLabels";
 
 interface MockInterviewConversationLogProps {
   session: MockInterviewSessionDetailApi;
   className?: string;
   scrollOnUpdate?: boolean;
 }
-
-const PHASE_LABEL: Record<string, string> = {
-  WARM_UP: "WARM-UP",
-  PROJECT: "PROJECT",
-  DOMAIN: "DOMAIN",
-  CS_INFRA: "CS & INFRA",
-  BEHAVIORAL: "BEHAVIORAL",
-};
 
 export function MockInterviewConversationLog({
   session,
@@ -39,7 +32,7 @@ export function MockInterviewConversationLog({
     <div
       ref={scrollRef}
       className={cn(
-        "flex max-h-[60vh] flex-col gap-3 overflow-y-auto rounded-2xl border border-border bg-card/60 p-4 text-sm",
+        "flex max-h-[60vh] flex-col gap-3 overflow-y-auto rounded-2xl border border-border/70 bg-card/70 p-4 shadow-inner ring-1 ring-black/[0.02] dark:ring-white/[0.04]",
         className,
       )}
     >
@@ -58,11 +51,11 @@ export function MockInterviewConversationLog({
 
 function ConversationLogTurn({ turn }: { turn: MockInterviewTurnApi }) {
   const { tone, badge } = turnStyle(turn);
-  const phase = PHASE_LABEL[turn.phase] ?? turn.phase;
+  const phase = phaseTitleKo(turn.phase);
   return (
     <div className={cn("rounded-xl border px-3 py-2.5", tone)}>
-      <div className="mb-1 flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-        <span>
+      <div className="mb-1 flex items-center justify-between gap-2 text-[11px] font-semibold text-muted-foreground">
+        <span className="tabular-nums">
           Q{turn.questionNo} · {phase}
         </span>
         <span>{badge}</span>

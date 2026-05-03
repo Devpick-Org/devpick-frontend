@@ -13,6 +13,7 @@ import {
   type MockInterviewSessionListItemApi,
 } from "@/lib/api/endpoints/mock-interviews";
 import { cn } from "@/lib/utils";
+import { MOCK_INTERVIEW_HERO_CHIPS, phaseTitleKo } from "./phaseLabels";
 import { MockInterviewSetup } from "./MockInterviewSetup";
 import { MockInterviewRoom } from "./MockInterviewRoom";
 import { MockInterviewResult } from "./MockInterviewResult";
@@ -26,27 +27,13 @@ type View =
   | { kind: "setup" }
   | { kind: "session"; sessionId: string };
 
-const PHASE_LABEL: Record<string, string> = {
-  WARM_UP: "WARM-UP",
-  PROJECT: "PROJECT",
-  DOMAIN: "DOMAIN",
-  CS_INFRA: "CS & INFRA",
-  BEHAVIORAL: "BEHAVIORAL",
-};
-
 const STATUS_TONE: Record<string, string> = {
   IN_PROGRESS: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
   COMPLETED: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
   EARLY_FINISHED: "bg-rose-500/15 text-rose-700 dark:text-rose-300",
 };
 
-const MOCK_PHASE_CHIPS = [
-  { short: "WARM-UP", detail: "2문항", span: "Q1–2" },
-  { short: "PROJECT", detail: "4문항", span: "Q3–6" },
-  { short: "직무", detail: "4문항", span: "Q7–10" },
-  { short: "CS · INFRA", detail: "4문항", span: "Q11–14" },
-  { short: "BEHAVIORAL", detail: "1문항", span: "Q15" },
-] as const;
+const MOCK_PHASE_CHIPS = MOCK_INTERVIEW_HERO_CHIPS;
 
 const MOCK_FEATURE_ROWS = [
   { text: "질문 패스 — 모르는 문항은 건너뛰고, 결과에서 모범 답안을 볼 수 있어요." },
@@ -487,7 +474,7 @@ function SessionCard({
         </p>
         <p className="text-xs text-muted-foreground">
           진행 {item.answeredCount}/{item.totalQuestions} ·{" "}
-          {PHASE_LABEL[item.phase] ?? item.phase} · 모델 {item.modelKey}
+          {phaseTitleKo(item.phase)} · 모델 {item.modelKey}
           {item.overallScore != null && ` · 종합 ${item.overallScore}`}
         </p>
         {item.status === "IN_PROGRESS" && (
