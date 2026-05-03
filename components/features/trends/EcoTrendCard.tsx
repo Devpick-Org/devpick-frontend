@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Share2 } from "lucide-react";
 import { useState } from "react";
+import { bootcampProxiedThumbnailUrl } from "@/lib/trends/bootcampThumbnail";
 import { cn } from "@/lib/utils";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
@@ -28,13 +29,18 @@ function categoryBadge(category: EcosystemTrendItemDto["category"]): string {
 export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
   const [thumbFailed, setThumbFailed] = useState(false);
   const initial = (item.title?.trim() ? item.title.trim() : "?").slice(0, 1);
-  const hasThumb = Boolean(item.thumbnailUrl?.trim());
+  /** 부트캠퍼 썸네일은 API 프록시(Referer 차단 회피) */
+  const displayThumbnail =
+    item.category === "bootcamp"
+      ? bootcampProxiedThumbnailUrl(item.thumbnailUrl) ?? item.thumbnailUrl?.trim()
+      : item.thumbnailUrl?.trim();
+  const hasThumb = Boolean(displayThumbnail?.trim());
   const showImage = hasThumb && !thumbFailed;
   /** 동아리는 썸네일이 없거나 로드 실패 시 이미지 칸 없이 텍스트만 */
   const hideHero = item.category === "club" && (!hasThumb || thumbFailed);
-  /** 부트캠퍼 _next/image 일부 CDN/WAF 설정에서 Referer 없음(no-referrer) 요청을 거절함 */
-  const bootcamperNextThumbnail =
-    !!item.thumbnailUrl?.trim() && item.thumbnailUrl.includes("bootcamper.co.kr/_next/image");
+  /** 프록시·동일 도메인 썸네일은 브라우저 기본 Referer 로 충분 */
+  const imgNoReferrer =
+    !(displayThumbnail && displayThumbnail.includes("/trends/ecosystem/bootcamp-thumbnail"));
 
   const share = async () => {
     try {
@@ -63,18 +69,16 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
           rel="noopener noreferrer"
           className="relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-muted"
         >
-          {showImage && item.thumbnailUrl ? (
+          {showImage && displayThumbnail ? (
             <Image
-              src={item.thumbnailUrl}
+              src={displayThumbnail}
               alt=""
               fill
               sizes="280px"
               className="object-cover"
-              {...(bootcamperNextThumbnail ? {} : { referrerPolicy: "no-referrer" as const })}
+              {...(imgNoReferrer ? { referrerPolicy: "no-referrer" as const } : {})}
               unoptimized={
-                item.thumbnailUrl.includes("bootcamper.co.kr/_next/image") ||
-                item.category === "club" ||
-                item.category === "event"
+                item.category === "bootcamp" || item.category === "club" || item.category === "event"
               }
               onError={() => setThumbFailed(true)}
             />

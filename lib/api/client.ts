@@ -6,7 +6,10 @@ import type { RefreshTokenResponse } from "@/types/auth";
 /** 배포/로컬 프론트 모두 기본적으로 운영 API를 사용. 필요 시 NEXT_PUBLIC_API_BASE_URL 로 덮어쓰기 */
 const DEFAULT_API_URL = "https://3-39-96-126.sslip.io";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_URL;
+export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_URL;
+
+/** `<img>`·프록시 URL 등 공개 접근 리소스용 (후행 슬래시 없음). axios base 와 동일. */
+export const API_ORIGIN = BASE_URL.replace(/\/$/, "");
 
 /**
  * 메인 API 클라이언트
