@@ -28,6 +28,14 @@ export interface JobFilters {
   location: string | "ALL";
 }
 
+export const DEFAULT_JOB_FILTERS: JobFilters = {
+  category: "ALL",
+  experienceLevel: "ALL",
+  techStack: [],
+  companyNames: [],
+  location: "ALL",
+};
+
 interface JobFilterBarProps {
   filters: JobFilters;
   onChange: (filters: JobFilters) => void;

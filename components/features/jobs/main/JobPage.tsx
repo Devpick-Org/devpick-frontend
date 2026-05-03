@@ -9,7 +9,7 @@ import { resumeEndpoints } from "@/lib/api/endpoints/resume";
 import { mapJobListItem } from "@/lib/jobs/mapJobApi";
 import { masterJsonToResumeData } from "@/lib/resume/masterResumeJson";
 import { Skeleton } from "@/components/ui/skeleton";
-import { type JobFilters } from "./JobFilterBar";
+import { DEFAULT_JOB_FILTERS, type JobFilters } from "./JobFilterBar";
 import { JobSearchPanel } from "./JobSearchPanel";
 import { JobSortBar } from "./JobSortBar";
 import { JobList } from "./JobList";
@@ -18,14 +18,6 @@ import { ResumeSummaryBanner } from "./ResumeSummaryBanner";
 import type { Job } from "@/types/jobs";
 
 const PAGE_SIZE = 9;
-
-const DEFAULT_FILTERS: JobFilters = {
-  category: "ALL",
-  experienceLevel: "ALL",
-  techStack: [],
-  companyNames: [],
-  location: "ALL",
-};
 
 function JobListSkeleton() {
   return (
@@ -90,7 +82,7 @@ function JobResults({
 export function JobPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [filters, setFilters] = useState<JobFilters>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<JobFilters>(DEFAULT_JOB_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<JobSortBy>("MATCH");
 
@@ -178,7 +170,7 @@ export function JobPage() {
         onChange={handleFiltersChange}
         hasActiveFilters={hasActiveFilters}
         onReset={() => {
-          setFilters(DEFAULT_FILTERS);
+          setFilters(DEFAULT_JOB_FILTERS);
           setCurrentPage(1);
         }}
       />
