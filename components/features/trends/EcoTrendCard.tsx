@@ -32,6 +32,9 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
   const showImage = hasThumb && !thumbFailed;
   /** 동아리는 썸네일이 없거나 로드 실패 시 이미지 칸 없이 텍스트만 */
   const hideHero = item.category === "club" && (!hasThumb || thumbFailed);
+  /** 부트캠퍼 _next/image 일부 CDN/WAF 설정에서 Referer 없음(no-referrer) 요청을 거절함 */
+  const bootcamperNextThumbnail =
+    !!item.thumbnailUrl?.trim() && item.thumbnailUrl.includes("bootcamper.co.kr/_next/image");
 
   const share = async () => {
     try {
@@ -67,7 +70,7 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
               fill
               sizes="280px"
               className="object-cover"
-              referrerPolicy="no-referrer"
+              {...(bootcamperNextThumbnail ? {} : { referrerPolicy: "no-referrer" as const })}
               unoptimized={
                 item.thumbnailUrl.includes("bootcamper.co.kr/_next/image") ||
                 item.category === "club" ||
