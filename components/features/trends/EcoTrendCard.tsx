@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Share2 } from "lucide-react";
+import { Bookmark, Share2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
@@ -60,6 +60,13 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
             className="object-cover"
             unoptimized={item.thumbnailUrl.includes("bootcamper.co.kr/_next/image")}
           />
+        ) : item.category === "club" ? (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-sky-500/12 via-muted to-primary/10 px-2 text-center">
+            <Users className="h-11 w-11 text-primary/75" aria-hidden />
+            <span className="text-[10px] font-medium leading-tight text-muted-foreground">
+              테카 페이지는 카드 이미지 URL을 제공하지 않습니다.
+            </span>
+          </div>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 via-muted to-primary/5 text-3xl font-bold text-primary/80">
             {initial}

@@ -53,18 +53,19 @@ export function EcosystemTrendsPage() {
 
   const rawItems = data?.data.items ?? [];
 
-  const filteredItems = useMemo(() => {
-    if (catFilter === "all") return rawItems;
-    return rawItems.filter((i) => i.category === catFilter);
-  }, [rawItems, catFilter]);
-
+  /** 검색어는 API의 q만 반영. 카테고리 pill은 「보여 줄 섹션」만 줄여서 다른 행이 비지 않도록 함. */
   const bySection = useMemo(() => {
     return {
-      bootcamp: filteredItems.filter((i) => i.category === "bootcamp"),
-      club: filteredItems.filter((i) => i.category === "club"),
-      event: filteredItems.filter((i) => i.category === "event"),
+      bootcamp: rawItems.filter((i) => i.category === "bootcamp"),
+      club: rawItems.filter((i) => i.category === "club"),
+      event: rawItems.filter((i) => i.category === "event"),
     };
-  }, [filteredItems]);
+  }, [rawItems]);
+
+  const visibleSections = useMemo(() => {
+    if (catFilter === "all") return SECTIONS;
+    return SECTIONS.filter((s) => s.key === catFilter);
+  }, [catFilter]);
 
   const fetchedAt = data?.data.fetchedAt;
   const fetchedLabel = fetchedAt
@@ -137,7 +138,7 @@ export function EcosystemTrendsPage() {
       </div>
 
       <div className="flex flex-col gap-12">
-        {SECTIONS.map((s) => (
+        {visibleSections.map((s) => (
           <EcoMarqueeRow
             key={s.key}
             title={s.title}

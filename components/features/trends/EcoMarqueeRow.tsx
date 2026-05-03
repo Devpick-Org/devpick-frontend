@@ -20,7 +20,8 @@ export function EcoMarqueeRow({
   accentClass,
 }: EcoMarqueeRowProps) {
   const duplicated = [...items, ...items];
-  const durationSec = Math.min(72, Math.max(28, items.length * 9));
+  /** 한 줄이 너무 빨리 움직이지 않도록 하한을 길게 둠 (항목 많을수록 조금 더 길게). */
+  const durationSec = Math.min(180, Math.max(70, items.length * 22));
 
   return (
     <section className={cn("space-y-3", accentClass)}>
