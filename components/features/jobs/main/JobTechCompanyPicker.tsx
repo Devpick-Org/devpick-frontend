@@ -265,7 +265,7 @@ export function JobTechCompanyPicker({
   const selectedCount = techStack.length + companyNames.length;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col">
       <div className="shrink-0 space-y-3 border-b border-border bg-popover px-4 py-4 sm:px-5">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -354,7 +354,7 @@ export function JobTechCompanyPicker({
         ) : null}
       </div>
 
-      <div className="relative min-h-[200px] max-h-[min(42vh,360px)] shrink-0 overflow-y-auto bg-popover px-4 py-4 sm:max-h-[min(48vh,420px)] sm:px-5">
+      <div className="min-h-0 flex-1 overflow-y-auto bg-popover px-4 pb-10 pt-4 sm:px-5">
         {contentFacetError ? (
           <p className="mb-4 rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
             콘텐츠 태그를 불러오지 못했어요. 새로 고침 후 다시 시도해 보세요.

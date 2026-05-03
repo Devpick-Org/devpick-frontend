@@ -120,7 +120,7 @@ function ModalInner({
         className={cn(
           "fixed left-1/2 top-6 z-50 flex w-[calc(100%-32px)] max-w-[760px]",
           "-translate-x-1/2",
-          "max-h-[min(740px,calc(100vh-40px))] flex-col overflow-hidden rounded-3xl border border-border bg-popover text-popover-foreground shadow-xl",
+          "max-h-[min(820px,calc(100vh-24px))] flex-col overflow-hidden rounded-3xl border border-border bg-popover text-popover-foreground shadow-xl",
           "animate-in fade-in-0 zoom-in-[0.985] duration-200",
         )}
         onMouseDown={(e) => e.stopPropagation()}
@@ -179,9 +179,9 @@ function ModalInner({
           </div>
         </header>
 
-        <div className="relative min-h-0 flex-1 overflow-hidden bg-popover">
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-popover">
           {mainTab === "conditions" ? (
-            <div className="h-full max-h-[min(52vh,480px)] overflow-y-auto px-4 pb-6 pt-5 sm:max-h-[min(56vh,520px)] sm:px-6">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-5 sm:px-6">
               <div className="space-y-8">
                 <section className="space-y-3">
                   <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
@@ -231,7 +231,7 @@ function ModalInner({
               </div>
             </div>
           ) : (
-            <div className="flex h-full min-h-[320px] max-h-[min(58vh,540px)] flex-col overflow-hidden sm:max-h-[min(62vh,580px)]">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <JobTechCompanyPicker
                 techStack={draft.techStack}
                 companyNames={draft.companyNames}
