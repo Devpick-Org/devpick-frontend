@@ -8,6 +8,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import type { ResumeData, ResumeBasicInfo } from "@/types/resume";
 import { resumeEndpoints } from "@/lib/api/endpoints/resume";
 import { extractApiError } from "@/lib/api/extractApiError";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
+import { usersEndpoints } from "@/lib/api/endpoints/users";
 import {
   cloneResumeData,
   emptyResumeData,
@@ -15,7 +17,9 @@ import {
   resumeDataToMasterJson,
 } from "@/lib/resume/masterResumeJson";
 import { mergeProfileIntoResume } from "@/lib/resume/profileResumeSync";
+import { buildProfileUpdatesFromResumeBasicInfo } from "@/lib/resume/resumeBasicInfoProfileAlign";
 import { dedupeCi, suggestedTechFromJobTitle } from "@/lib/resume/skillSuggestions";
+import { dedupeTags } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { ResumeUploadSection } from "./ResumeUploadSection";
 import { ResumeSummarySection } from "./ResumeSummarySection";
@@ -28,15 +32,33 @@ const TRIGGER_CLASS =
   "data-[state=active]:bg-transparent data-[state=active]:shadow-none " +
   "hover:text-foreground";
 
+async function patchLearningProfileAfterResumeBasicInfo(
+  basicInfo: ResumeBasicInfo,
+): Promise<boolean> {
+  const { user: authUser, updateUser } = useAuthStore.getState();
+  const patch = buildProfileUpdatesFromResumeBasicInfo(authUser, basicInfo);
+  if (Object.keys(patch).length === 0) return false;
+
+  await usersEndpoints.updateMe(patch);
+  const { data: meData } = await authEndpoints.getMe();
+  updateUser({
+    nickname: meData.data.nickname,
+    job: meData.data.job ?? undefined,
+    level: meData.data.level ?? undefined,
+    tags: dedupeTags(meData.data.tags?.length ? meData.data.tags : authUser?.tags),
+    profileImage: meData.data.profileImage ?? authUser?.profileImage,
+  });
+  return true;
+}
+
 export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const router = useRouter();
   const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
-  const [isParsing, setIsParsing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<ResumeBasicInfo | null>(null);
   const [detailDraft, setDetailDraft] = useState<ResumeData | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const {
     data: masterJson,
@@ -68,11 +90,22 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
   const hasResume = resume != null;
 
   const saveMutation = useMutation({
-    mutationFn: (data: ResumeData) =>
-      resumeEndpoints.putMaster(resumeDataToMasterJson(data)),
-    onSuccess: () => {
+    mutationFn: async (data: ResumeData) => {
+      await resumeEndpoints.putMaster(resumeDataToMasterJson(data));
+      const profileSynced = await patchLearningProfileAfterResumeBasicInfo(
+        data.basicInfo,
+      );
+      return { profileSynced };
+    },
+    onSuccess: (result) => {
       void qc.invalidateQueries({ queryKey: ["master-resume"] });
       toast.success("이력서가 저장되었습니다.");
+      if (result.profileSynced) {
+        toast.message(
+          "마이페이지 학습 정보(직무·경력 레벨)를 이력서 기준에 맞췄어요.",
+          { duration: 5500 },
+        );
+      }
     },
     onError: (e) => {
       const { message } = extractApiError(e);
@@ -80,16 +113,47 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
     },
   });
 
-  const handleFileSelect = async (file: File) => {
-    void file;
-    setErrorMessage(null);
-    setIsParsing(true);
-    await new Promise((r) => setTimeout(r, 400));
-    setIsParsing(false);
-    setErrorMessage(
-      "현재 버전에서는 파일 자동 파싱을 지원하지 않습니다. 아래 「직접 작성하기」로 정보를 입력해 주세요.",
-    );
-  };
+  const importMutation = useMutation({
+    mutationFn: (file: File) => resumeEndpoints.importMasterFromFile(file),
+    onSuccess: async (json) => {
+      setErrorMessage(null);
+      qc.setQueryData(["master-resume"], json);
+      void qc.invalidateQueries({ queryKey: ["master-resume"] });
+      const data = masterJsonToResumeData(json);
+      const synced = await patchLearningProfileAfterResumeBasicInfo(data.basicInfo);
+      toast.success("업로드한 이력서를 분석해 저장했습니다.");
+      if (synced) {
+        toast.message(
+          "마이페이지 학습 정보(직무·경력 레벨)를 이력서 기준에 맞췄어요.",
+          { duration: 5500 },
+        );
+      }
+      toast.message(
+        "내용은 요약 페이지에서 수정한 뒤, 채용 상세에서 면접 Q&A를 만들 수 있어요.",
+        { duration: 6200 },
+      );
+    },
+    onError: (e) => {
+      const { message, code } = extractApiError(e);
+      let msg =
+        message ?? "파일 분석 또는 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+      if (
+        code === "FILE_002" ||
+        code === "GLOBAL_415" ||
+        /\b형식\b/i.exec(msg ?? "") !== null
+      ) {
+        msg = "현재 지원 형식은 PDF와 DOCX뿐이에요. 다른 형식이면 저장 후 다시 올려 주세요.";
+      } else if (code === "FILE_003" || code === "PAYLOAD_TOO_LARGE") {
+        msg = "파일이 너무 큽니다 (최대 10MB).";
+      } else if (code === "RESUME_003") {
+        msg =
+          message ??
+          "이 파일에서 글자를 거의 찾지 못했습니다. 검색 가능한 PDF/DOCX인지 확인해 주세요.";
+      }
+      setErrorMessage(msg);
+      toast.error(msg);
+    },
+  });
 
   const startManual = useCallback(() => {
     const initial = mergeProfileIntoResume(emptyResumeData(), user);
@@ -101,8 +165,31 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
     });
   }, [saveMutation, user]);
 
+  const handleFileSelect = (file: File) => {
+    setErrorMessage(null);
+    const name = file.name.toLowerCase();
+    const okExt = name.endsWith(".pdf") || name.endsWith(".docx");
+    if (!okExt) {
+      const msg =
+        "현재는 PDF 또는 DOCX만 분석할 수 있어요. HWP 등은 다른 형식으로 변환해서 올려 주세요.";
+      setErrorMessage(msg);
+      toast.error(msg);
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      const msg = "파일이 너무 큽니다 (최대 10MB).";
+      setErrorMessage(msg);
+      toast.error(msg);
+      return;
+    }
+    importMutation.mutate(file);
+  };
+
   const handleReupload = () => {
-    toast.message("이력서를 삭제하려면 내용을 비운 뒤 저장하거나 관리자에게 문의하세요.");
+    toast.message(
+      "새 파일로 덮어쓰려면 아래에서 다시 업로드하거나, 상세 편집에서 내용을 정리할 수 있어요.",
+    );
+    setErrorMessage(null);
   };
 
   const handleStartEdit = () => {
@@ -202,9 +289,9 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
       </TabsList>
 
       <TabsContent value="resume">
-        {!hasResume || isParsing ? (
+        {!hasResume || importMutation.isPending ? (
           <ResumeUploadSection
-            isParsing={isParsing}
+            isParsing={importMutation.isPending}
             onFileSelect={handleFileSelect}
             errorMessage={errorMessage}
             onStartManual={startManual}

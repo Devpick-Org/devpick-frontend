@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -21,6 +21,13 @@ import { ProfileTagSelector } from "@/components/features/profile/ProfileTagSele
 import { useAuthStore } from "@/store/auth.store";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { usersEndpoints } from "@/lib/api/endpoints/users";
+import { resumeEndpoints } from "@/lib/api/endpoints/resume";
+import { mergeProfileIntoResume } from "@/lib/resume/profileResumeSync";
+import {
+  masterJsonToResumeData,
+  resumeDataToMasterJson,
+} from "@/lib/resume/masterResumeJson";
+import type { User } from "@/types/auth";
 import { AlertCircle } from "lucide-react";
 
 /* ── Icons ── */
@@ -38,40 +45,6 @@ function CameraIcon({ className }: { className?: string }) {
     >
       <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
       <circle cx="12" cy="13" r="3" />
-    </svg>
-  );
-}
-
-function SearchIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}
-
-function XIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
     </svg>
   );
 }
@@ -154,7 +127,6 @@ export function ProfileEditForm() {
   const [selectedTags, setSelectedTags] = useState<string[]>(
     dedupeTags(user?.tags),
   );
-  const [tagSearch, setTagSearch] = useState("");
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -170,16 +142,6 @@ export function ProfileEditForm() {
     setSelectedTags(dedupeTags(user?.tags));
     if (user?.profileImage) setAvatarPreview(user.profileImage);
   }, [user?.nickname, user?.job, user?.level, user?.tags, user?.profileImage]);
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-    );
-  };
-
-  const removeTag = (tag: string) => {
-    setSelectedTags((prev) => prev.filter((t) => t !== tag));
-  };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -223,6 +185,41 @@ export function ProfileEditForm() {
         tags: dedupeTags(updatedUser.tags),
         profileImage: updatedUser.profileImage ?? undefined,
       });
+
+      if (user?.userId) {
+        try {
+          const masterJson = await resumeEndpoints.getMasterOrNull();
+          if (masterJson) {
+            const resumeData = masterJsonToResumeData(masterJson);
+            const mergedTags = dedupeTags(
+              updatedUser.tags?.length ? updatedUser.tags : selectedTags,
+            );
+            const userForMerge: User = {
+              userId: user.userId,
+              email: user.email,
+              nickname: updatedUser.nickname,
+              profileImage:
+                updatedUser.profileImage ?? user.profileImage,
+              job: updatedUser.job ?? user.job,
+              level: updatedUser.level ?? user.level,
+              tags: mergedTags,
+            };
+            const merged = mergeProfileIntoResume(resumeData, userForMerge);
+            await resumeEndpoints.putMaster(resumeDataToMasterJson(merged));
+            void queryClient.invalidateQueries({ queryKey: ["master-resume"] });
+            toast.message(
+              "이력서에도 프로필이 반영됐어요. (이미 채운 직무·이름 등은 그대로 두었어요.)",
+              { duration: 5500 },
+            );
+          }
+        } catch (e) {
+          console.error(e);
+          toast.message(
+            "이력서 자동 반영에 실패했어요. 이력서 화면에서 「프로필 반영하기」를 눌러 주세요.",
+            { duration: 6000 },
+          );
+        }
+      }
 
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       toast.success("프로필이 저장되었습니다.");

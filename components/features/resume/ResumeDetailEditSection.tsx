@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TechTagPickerModal } from "@/components/features/profile/TechTagPickerModal";
 import { filterNewSuggestions } from "@/lib/resume/skillSuggestions";
 import {
   suggestExampleProject,
@@ -12,6 +13,7 @@ import {
   suggestResumeSummary,
 } from "@/lib/resume/resumeDraftSuggestions";
 import type { ResumeCareer, ResumeData, ResumeProject } from "@/types/resume";
+import { dedupeTags } from "@/lib/utils";
 
 type SuggestionPreview =
   | { kind: "summary"; text: string }
@@ -57,6 +59,7 @@ export function ResumeDetailEditSection({
   suggestedTechPool = [],
 }: ResumeDetailEditSectionProps) {
   const [techInput, setTechInput] = useState("");
+  const [techPickerOpen, setTechPickerOpen] = useState(false);
   const [projTechInputs, setProjTechInputs] = useState<Record<number, string>>(
     {},
   );
@@ -226,6 +229,20 @@ export function ResumeDetailEditSection({
             </span>
           ))}
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="h-9"
+            onClick={() => setTechPickerOpen(true)}
+          >
+            목록에서 검색·선택
+          </Button>
+          <span className="text-[11px] text-muted-foreground">
+            검색해서 고르거나, 아래 입력으로 직접 추가하세요.
+          </span>
+        </div>
         <div className="flex gap-2">
           <Input
             value={techInput}
@@ -269,6 +286,18 @@ export function ResumeDetailEditSection({
             </div>
           </div>
         ) : null}
+        <TechTagPickerModal
+          open={techPickerOpen}
+          onOpenChange={setTechPickerOpen}
+          value={draft.techStack}
+          onApply={(tags) =>
+            applyDraftChange({
+              ...draft,
+              techStack: dedupeTags(tags),
+            })
+          }
+          title="기술 스택 선택"
+        />
       </section>
 
       {/* 경력 */}

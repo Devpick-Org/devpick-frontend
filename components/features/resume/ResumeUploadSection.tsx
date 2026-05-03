@@ -76,7 +76,7 @@ export function ResumeUploadSection({
         </Button>
 
         <p className="text-xs text-muted-foreground font-medium">
-          PDF, HWP, HWPX, DOC, DOCX 파일 지원 · 최대 10MB
+          PDF, DOCX · 최대 10MB · HWP는 변환 후 올려 주세요.
         </p>
 
         {onStartManual && (
@@ -99,7 +99,7 @@ export function ResumeUploadSection({
         <input
           ref={inputRef}
           type="file"
-          accept=".pdf,.hwp,.hwpx,.doc,.docx"
+          accept=".pdf,.docx"
           className="hidden"
           onChange={handleChange}
         />

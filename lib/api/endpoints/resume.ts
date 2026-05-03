@@ -26,4 +26,15 @@ export const resumeEndpoints = {
     apiClient
       .put<ApiResponse<MasterResumeJson>>("/resume/master", body)
       .then((r) => r.data.data),
+
+  /** PDF/DOCX 업로드 → 서버 텍스트 추출 + AI 분석 후 마스터 이력서 저장 */
+  importMasterFromFile: async (file: File): Promise<MasterResumeJson> => {
+    const form = new FormData();
+    form.append("file", file);
+    const r = await apiClient.post<ApiResponse<MasterResumeJson>>(
+      "/resume/master/import",
+      form,
+    );
+    return r.data.data;
+  },
 };
