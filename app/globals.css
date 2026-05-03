@@ -176,3 +176,20 @@ input[type="search"]::-webkit-search-cancel-button {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes ecosystem-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.eco-marquee-track {
+  animation: ecosystem-marquee var(--eco-marquee-duration, 45s) linear infinite;
+}
+
+.eco-marquee-wrap:hover .eco-marquee-track {
+  animation-play-state: paused;
+}

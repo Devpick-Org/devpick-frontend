@@ -16,3 +16,29 @@ export interface RankedKeyword {
   rank: number;
   tier: KeywordTier;
 }
+
+/** 부트캠퍼·테카·데브이벤트 통합 카드 */
+export type EcosystemTrendCategory = "bootcamp" | "club" | "event";
+
+export interface EcosystemTrendItemDto {
+  id: string;
+  category: EcosystemTrendCategory;
+  title: string;
+  organizer: string;
+  thumbnailUrl?: string | null;
+  detailUrl: string;
+  subtitle?: string | null;
+  startAt?: string | null;
+  endAt?: string | null;
+  tags?: string[];
+  source: string;
+}
+
+export interface EcosystemTrendPageData {
+  items: EcosystemTrendItemDto[];
+  total: number;
+  fetchedAt: string;
+  sourceCounts: Record<string, number>;
+}
+
+export type EcosystemTrendApiResponse = ApiResponse<EcosystemTrendPageData>;
