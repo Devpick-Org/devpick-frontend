@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import {
   mockInterviewsEndpoints,
   type MockInterviewMode,
 } from "@/lib/api/endpoints/mock-interviews";
+import { jobsEndpoints, type JobListItemApi } from "@/lib/api/endpoints/jobs";
 import { cn } from "@/lib/utils";
 
 interface MockInterviewSetupValues {
   modelKey: string;
   mode: MockInterviewMode;
+  /** 크롤링 공고 기반 시작 */
+  jobId?: string;
   companyName?: string;
   jobTitle?: string;
   jobCategory?: string;
@@ -59,6 +62,27 @@ export function MockInterviewSetup({
   const [jobTitle, setJobTitle] = useState(initialJobTitle);
   const [jobCategory, setJobCategory] = useState(initialJobCategory);
   const [rawJdText, setRawJdText] = useState("");
+  const [jobSearchInput, setJobSearchInput] = useState("");
+  const [debouncedJobSearch, setDebouncedJobSearch] = useState("");
+  const [selectedJob, setSelectedJob] = useState<JobListItemApi | null>(null);
+  const [manualJd, setManualJd] = useState(false);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setDebouncedJobSearch(jobSearchInput), 350);
+    return () => window.clearTimeout(t);
+  }, [jobSearchInput]);
+
+  const { data: jobSearchPage, isLoading: isLoadingJobs } = useQuery({
+    queryKey: ["mock-interview-setup-job-search", debouncedJobSearch],
+    queryFn: () =>
+      jobsEndpoints.list({
+        page: 0,
+        size: 30,
+        query: debouncedJobSearch.trim() ? debouncedJobSearch.trim() : undefined,
+        sortBy: "MATCH",
+      }),
+    staleTime: 20_000,
+  });
 
   useEffect(() => {
     if (!modelsData) return;
@@ -72,7 +96,9 @@ export function MockInterviewSetup({
     hasResume &&
     !submitting &&
     !!modelKey &&
-    (variant === "JOB" || jobTitle.trim().length > 0);
+    (variant === "JOB" ||
+      !!selectedJob?.id ||
+      (manualJd && jobTitle.trim().length > 0));
 
   return (
     <form
@@ -80,6 +106,14 @@ export function MockInterviewSetup({
       onSubmit={(e) => {
         e.preventDefault();
         if (!canSubmit) return;
+        if (selectedJob?.id) {
+          onSubmit({
+            modelKey,
+            mode,
+            jobId: selectedJob.id,
+          });
+          return;
+        }
         onSubmit({
           modelKey,
           mode,
@@ -97,51 +131,155 @@ export function MockInterviewSetup({
       )}
 
       {variant === "JD" && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
-            회사명 (선택)
-            <input
-              type="text"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              placeholder="예: 네이버"
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
-            직무명
-            <input
-              type="text"
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-              placeholder="예: Frontend Engineer"
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
-            />
-          </label>
-          <label className="flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
-            직무 카테고리
-            <select
-              value={jobCategory}
-              onChange={(e) => setJobCategory(e.target.value)}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
-            >
-              {CATEGORY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="col-span-full flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
-            JD 본문 (선택, 회사 맥락 강화)
-            <textarea
-              value={rawJdText}
-              onChange={(e) => setRawJdText(e.target.value)}
-              placeholder="회사 채용 본문을 그대로 붙여 넣으면 질문이 더 맞춤형으로 나와요."
-              rows={6}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-sm leading-relaxed"
-            />
-          </label>
+        <div className="flex flex-col gap-5">
+          {!manualJd ? (
+            <div className="flex flex-col gap-3">
+              <p className="text-xs font-semibold text-foreground">크롤링된 채용 공고 선택</p>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                DB에 수집된 공고 중에서 고르면 JD가 자동으로 반영돼요. 회사명·직무명으로 검색해 보세요.
+              </p>
+              <label className="relative flex items-center gap-2">
+                <Search className="pointer-events-none absolute left-3 size-4 text-muted-foreground" aria-hidden />
+                <input
+                  type="search"
+                  value={jobSearchInput}
+                  onChange={(e) => setJobSearchInput(e.target.value)}
+                  placeholder="예: 카카오, 백엔드, React…"
+                  autoComplete="off"
+                  className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-3 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-primary/40"
+                />
+              </label>
+              {isLoadingJobs ? (
+                <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
+                  <Loader2 className="size-4 animate-spin" aria-hidden /> 공고를 불러오는 중…
+                </div>
+              ) : (
+                <ul
+                  className={cn(
+                    "max-h-56 space-y-1 overflow-y-auto rounded-xl border border-border bg-muted/15 p-1.5",
+                    !jobSearchPage?.jobs?.length && "py-6 text-center text-sm text-muted-foreground",
+                  )}
+                  role="listbox"
+                  aria-label="채용 공고 검색 결과"
+                >
+                  {jobSearchPage?.jobs?.length ? (
+                    jobSearchPage.jobs.map((job) => {
+                      const active = selectedJob?.id === job.id;
+                      return (
+                        <li key={job.id}>
+                          <button
+                            type="button"
+                            role="option"
+                            aria-selected={active}
+                            onClick={() => {
+                              setSelectedJob(job);
+                              setCompanyName(job.companyName);
+                              setJobTitle(job.title);
+                              setJobCategory(
+                                job.jobCategory?.trim() ? job.jobCategory : "FRONTEND",
+                              );
+                            }}
+                            className={cn(
+                              "flex w-full flex-col gap-0.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
+                              active ? "bg-primary/12 ring-1 ring-primary/35" : "hover:bg-muted/60",
+                            )}
+                          >
+                            <span className="font-semibold text-foreground">{job.companyName}</span>
+                            <span className="line-clamp-2 text-xs text-muted-foreground">{job.title}</span>
+                            <span className="text-[11px] text-muted-foreground/90">
+                              {job.location ? `${job.location} · ` : ""}
+                              {job.jobCategory}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    })
+                  ) : (
+                    <li className="px-3">검색 결과가 없어요.</li>
+                  )}
+                </ul>
+              )}
+              {selectedJob ? (
+                <p className="rounded-lg bg-primary/8 px-3 py-2 text-xs text-muted-foreground">
+                  선택함:{" "}
+                  <span className="font-semibold text-foreground">
+                    {selectedJob.companyName} · {selectedJob.title}
+                  </span>
+                </p>
+              ) : null}
+              <button
+                type="button"
+                className="w-fit text-xs font-semibold text-primary underline-offset-4 hover:underline"
+                onClick={() => {
+                  setManualJd(true);
+                  setSelectedJob(null);
+                }}
+              >
+                공고가 없으면 직접 입력하기
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <button
+                type="button"
+                className="w-fit text-xs font-semibold text-muted-foreground hover:text-foreground"
+                onClick={() => {
+                  setManualJd(false);
+                  setCompanyName(initialCompanyName);
+                  setJobTitle(initialJobTitle);
+                  setRawJdText("");
+                }}
+              >
+                ← 공고 목록에서 다시 선택
+              </button>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
+                  회사명 (선택)
+                  <input
+                    type="text"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="예: 네이버"
+                    className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
+                  직무명
+                  <input
+                    type="text"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    placeholder="예: Frontend Engineer"
+                    className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
+                  직무 카테고리
+                  <select
+                    value={jobCategory}
+                    onChange={(e) => setJobCategory(e.target.value)}
+                    className="rounded-lg border border-border bg-card px-3 py-2 text-sm"
+                  >
+                    {CATEGORY_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="col-span-full flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
+                  JD 본문 (선택, 회사 맥락 강화)
+                  <textarea
+                    value={rawJdText}
+                    onChange={(e) => setRawJdText(e.target.value)}
+                    placeholder="회사 채용 본문을 그대로 붙여 넣으면 질문이 더 맞춤형으로 나와요."
+                    rows={6}
+                    className="rounded-lg border border-border bg-card px-3 py-2 text-sm leading-relaxed"
+                  />
+                </label>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

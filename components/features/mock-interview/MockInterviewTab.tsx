@@ -106,8 +106,23 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
     enabled: view.kind === "session",
   });
 
-  const startMutation = useMutation({
-    mutationFn: (body: { jobTitle: string; companyName: string; modelKey: string; jobCategory: string; rawJdText: string }) =>
+  const mockStartError = (e: unknown) => {
+    const { message, code } = extractApiError(e);
+    if (code === "RESUME_001") {
+      toast.error("먼저 마스터 이력서를 작성해 주세요.");
+      return;
+    }
+    toast.error(message ?? "모의면접 시작에 실패했습니다.");
+  };
+
+  const startFromJdMutation = useMutation({
+    mutationFn: (body: {
+      jobTitle: string;
+      companyName: string;
+      modelKey: string;
+      jobCategory: string;
+      rawJdText: string;
+    }) =>
       mockInterviewsEndpoints.startFromJd({
         modelKey: body.modelKey,
         mode: "FULL",
@@ -121,14 +136,21 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
       qc.setQueryData(["mock-interview-session", session.id], session);
       setView({ kind: "session", sessionId: session.id });
     },
-    onError: (e) => {
-      const { message, code } = extractApiError(e);
-      if (code === "RESUME_001") {
-        toast.error("먼저 마스터 이력서를 작성해 주세요.");
-        return;
-      }
-      toast.error(message ?? "모의면접 시작에 실패했습니다.");
+    onError: mockStartError,
+  });
+
+  const startFromJobMutation = useMutation({
+    mutationFn: (body: { jobId: string; modelKey: string }) =>
+      mockInterviewsEndpoints.startFromJob(body.jobId, {
+        modelKey: body.modelKey,
+        mode: "FULL",
+      }),
+    onSuccess: (session) => {
+      void qc.invalidateQueries({ queryKey: ["mock-interview-list"] });
+      qc.setQueryData(["mock-interview-session", session.id], session);
+      setView({ kind: "session", sessionId: session.id });
     },
+    onError: mockStartError,
   });
 
   const deleteMutation = useMutation({
@@ -193,21 +215,28 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
         <div className="rounded-2xl border border-border bg-card p-5">
           <h2 className="mb-1 text-lg font-bold text-foreground">새 모의면접 설정</h2>
           <p className="mb-5 text-sm text-muted-foreground">
-            JD를 그대로 붙여 넣거나, 회사명·직무명만 입력해도 시작할 수 있어요.
+            크롤링해 둔 채용 공고를 검색해서 고르면 JD가 자동 반영돼요. 목록에 없을 때만 직접 입력할 수 있어요.
           </p>
           <MockInterviewSetup
             variant="JD"
-            submitting={startMutation.isPending}
+            submitting={startFromJdMutation.isPending || startFromJobMutation.isPending}
             hasResume={hasResume}
-            onSubmit={(values) =>
-              startMutation.mutate({
+            onSubmit={(values) => {
+              if (values.jobId) {
+                startFromJobMutation.mutate({
+                  jobId: values.jobId,
+                  modelKey: values.modelKey,
+                });
+                return;
+              }
+              startFromJdMutation.mutate({
                 jobTitle: values.jobTitle ?? "",
                 companyName: values.companyName ?? "",
                 modelKey: values.modelKey,
                 jobCategory: values.jobCategory ?? "FRONTEND",
                 rawJdText: values.rawJdText ?? "",
-              })
-            }
+              });
+            }}
           />
         </div>
       </div>
