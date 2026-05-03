@@ -4,7 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ListChecks, MessageSquare, Plus, Trash2 } from "lucide-react";
+import {
+  AlertCircle,
+  Info,
+  ListChecks,
+  MessageSquare,
+  Plus,
+  RefreshCw,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { extractApiError } from "@/lib/api/extractApiError";
@@ -380,15 +388,34 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
           <Skeleton className="h-[88px] w-full rounded-xl" />
         </div>
       ) : isError ? (
-        <div className="flex flex-col items-start gap-2 rounded-2xl border border-destructive/30 bg-destructive/5 px-5 py-5">
-          <p className="text-sm font-semibold text-destructive">목록을 불러오지 못했습니다.</p>
-          <button
-            type="button"
-            onClick={() => void refetch()}
-            className="text-xs font-medium text-destructive hover:underline"
-          >
-            다시 시도
-          </button>
+        <div className="relative overflow-hidden rounded-3xl border border-destructive/20 bg-card shadow-sm ring-1 ring-destructive/10">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-gradient-to-br from-destructive/[0.08] via-transparent to-muted/25"
+          />
+          <div className="relative flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <div className="flex gap-3.5">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-destructive/12 text-destructive ring-1 ring-destructive/20">
+                <AlertCircle className="size-5" aria-hidden />
+              </span>
+              <div className="min-w-0 space-y-1.5">
+                <p className="text-sm font-semibold text-foreground">
+                  목록을 불러오지 못했습니다
+                </p>
+                <p className="text-pretty text-xs leading-relaxed text-muted-foreground">
+                  네트워크 탭에서 404면 모의면접 API Jar·DB 마이그레이션 배포 여부를, 401이면 로그인·토큰을 확인해 주세요. 잠시 뒤
+                  아래 버튼으로 다시 시도할 수 있어요.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => void refetch()}
+              className="inline-flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-destructive/25 bg-background/90 px-4 text-sm font-semibold text-destructive shadow-sm backdrop-blur-sm transition-[transform,box-shadow,background-color] hover:bg-destructive/10 hover:shadow-md active:scale-[0.98] sm:h-10 sm:w-auto sm:self-center"
+            >
+              <RefreshCw className="size-4" aria-hidden /> 다시 시도
+            </button>
+          </div>
         </div>
       ) : sessions.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card/50 px-5 py-8 text-center text-sm text-muted-foreground">
@@ -409,11 +436,20 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
         </ul>
       )}
 
-      <div className="rounded-2xl border border-border/60 bg-muted/20 px-4 py-3 text-xs leading-relaxed text-muted-foreground backdrop-blur-sm">
-        <p>
-          저장 한도 <span className="font-medium text-foreground">{max}개</span>를 넘으면 가장 오래된 기록부터 자동 삭제돼요. PDF는 저장하지 않으며,
-          AI 호출은 본인 Claude 구독 한도에서 차감돼요(면접 1회 약 20~35회 호출).
-        </p>
+      <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-muted/15 shadow-sm ring-1 ring-black/[0.03] backdrop-blur-sm dark:ring-white/[0.06]">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-transparent"
+        />
+        <div className="relative flex gap-3.5 px-4 py-4 sm:px-5">
+          <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/15">
+            <Info className="size-[18px]" aria-hidden />
+          </span>
+          <p className="text-pretty text-xs leading-relaxed text-muted-foreground">
+            저장 한도 <span className="font-semibold text-foreground">{max}개</span>를 넘으면 가장 오래된 기록부터 자동 삭제돼요. PDF는 저장하지 않으며,
+            AI 호출은 본인 Claude 구독 한도에서 차감돼요(면접 1회 약 20~35회 호출).
+          </p>
+        </div>
       </div>
     </div>
   );
