@@ -1,8 +1,21 @@
 "use client";
 
 import { useRef } from "react";
-import { Upload, Loader2, FileText, AlertCircle } from "lucide-react";
+import { Upload, FileText, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  MockInterviewLoadingStepList,
+  type MockInterviewLoadingStepItem,
+} from "@/components/features/mock-interview/MockInterviewLoadingStepList";
+
+/** 이력서 파일 업로드 → 서버 분석(참고용 단계 안내) */
+const RESUME_MASTER_IMPORT_STEPS: readonly MockInterviewLoadingStepItem[] = [
+  { key: "extract", title: "파일 읽기·텍스트 추출", subtitle: "PDF/DOCX 본문 확인" },
+  { key: "basic", title: "기본 정보·요약 분석", subtitle: "이름, 직무, 경력, 위치" },
+  { key: "skills", title: "기술 스택 정리", subtitle: "공고 매칭용 태그" },
+  { key: "experience", title: "경력·프로젝트 구조화", subtitle: "면접 Q&A·모의면접 근거" },
+  { key: "persist", title: "저장·반영", subtitle: "마스터 이력서로 기록" },
+];
 
 interface ResumeUploadSectionProps {
   isParsing: boolean;
@@ -27,18 +40,25 @@ export function ResumeUploadSection({
 
   if (isParsing) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-border bg-card py-20 shadow-sm">
-        <div className="rounded-2xl bg-primary/10 p-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-        <div className="text-center">
-          <p className="text-base font-bold text-foreground">
-            이력서를 분석하고 있어요
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground font-medium">
-            기본 정보, 기술 스택, 경력과 프로젝트를 추출하는 중입니다.
-          </p>
-        </div>
+      <div
+        role="status"
+        aria-busy="true"
+        aria-live="polite"
+        className="relative mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-primary/45 to-transparent"
+        />
+        <p className="text-center text-lg font-bold text-foreground">이력서를 분석하고 있어요</p>
+        <p className="mt-2 text-center text-[13px] leading-relaxed text-muted-foreground">
+          AI가 문서를 구조화합니다. 보통 수십 초 걸릴 수 있어요. 창을 닫지 마세요.
+        </p>
+        <MockInterviewLoadingStepList
+          steps={RESUME_MASTER_IMPORT_STEPS}
+          running={isParsing}
+          intervalMs={2100}
+        />
       </div>
     );
   }
