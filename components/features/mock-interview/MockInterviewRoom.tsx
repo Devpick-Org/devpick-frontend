@@ -21,6 +21,12 @@ import {
 } from "@/lib/api/endpoints/mock-interviews";
 import { cn } from "@/lib/utils";
 import { MockInterviewConversationLog } from "./MockInterviewConversationLog";
+import {
+  MockInterviewLoadingStepList,
+  ROOM_AI_LOADING_STEPS,
+  ROOM_FINISH_LOADING_STEPS,
+  ROOM_SAVE_LOADING_STEPS,
+} from "./MockInterviewLoadingStepList";
 import { MOCK_INTERVIEW_PHASE_STEPS, phaseTitleKo } from "./phaseLabels";
 
 interface MockInterviewRoomProps {
@@ -392,6 +398,15 @@ function BusyOverlay({
 
   const { title, body } = copyMap[variant];
 
+  const steps =
+    variant === "answer" || variant === "pass"
+      ? ROOM_AI_LOADING_STEPS
+      : variant === "save"
+        ? ROOM_SAVE_LOADING_STEPS
+        : ROOM_FINISH_LOADING_STEPS;
+  const intervalMs =
+    variant === "answer" || variant === "pass" ? 2200 : variant === "save" ? 700 : 900;
+
   return (
     <div
       role="dialog"
@@ -400,18 +415,16 @@ function BusyOverlay({
       aria-live="polite"
       className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 p-4 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
     >
-      <div className="relative w-full max-w-md rounded-3xl border border-border/80 bg-card p-8 shadow-2xl ring-1 ring-black/[0.05] dark:ring-white/[0.08]">
+      <div className="relative w-full max-w-md rounded-3xl border border-border/80 bg-card p-6 shadow-2xl ring-1 ring-black/[0.05] dark:ring-white/[0.08] sm:p-8">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-primary/45 to-transparent"
         />
-        <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" aria-hidden />
-        <p className="mt-6 text-center text-lg font-bold tracking-tight text-foreground">
-          {title}
-        </p>
-        <p className="mt-3 text-center text-pretty text-sm leading-relaxed text-muted-foreground">
+        <p className="text-center text-lg font-bold tracking-tight text-foreground">{title}</p>
+        <p className="mt-2 text-center text-pretty text-sm leading-relaxed text-muted-foreground">
           {body}
         </p>
+        <MockInterviewLoadingStepList steps={steps} running intervalMs={intervalMs} />
       </div>
     </div>
   );

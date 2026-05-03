@@ -9,6 +9,10 @@ import {
 } from "@/lib/api/endpoints/mock-interviews";
 import { jobsEndpoints, type JobListItemApi } from "@/lib/api/endpoints/jobs";
 import { cn } from "@/lib/utils";
+import {
+  MockInterviewLoadingStepList,
+  PLAN_START_LOADING_STEPS,
+} from "./MockInterviewLoadingStepList";
 
 interface MockInterviewSetupValues {
   modelKey: string;
@@ -141,16 +145,17 @@ export function MockInterviewSetup({
           aria-live="polite"
           className="fixed inset-0 z-[99] flex items-center justify-center bg-background/80 p-6 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
         >
-          <div className="w-full max-w-md rounded-3xl border border-border/80 bg-card p-8 text-center shadow-2xl ring-1 ring-black/[0.05] dark:ring-white/[0.08]">
-            <Loader2
-              className="mx-auto size-12 animate-spin text-primary"
-              aria-hidden
-            />
-            <p className="mt-6 text-lg font-bold text-foreground">모의면접을 시작하는 중</p>
-            <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
-              질문 플랜을 만들고 AI 세션을 여는 동안이라 잠시만 기다려 주세요. 통상 몇 초~1분 안에
-              첫 화면으로 들어가요.
+          <div className="w-full max-w-md rounded-3xl border border-border/80 bg-card p-6 shadow-2xl ring-1 ring-black/[0.05] dark:ring-white/[0.08] sm:p-8">
+            <p className="text-center text-lg font-bold text-foreground">모의면접을 시작하는 중</p>
+            <p className="mt-2 text-center text-[13px] text-muted-foreground">
+              고정 플랜(15문항)을 순서대로 준비해요. 실제 서버 응답이 오면 다음 화면으로 넘어갑니다.
             </p>
+
+            <MockInterviewLoadingStepList
+              steps={PLAN_START_LOADING_STEPS}
+              running={submitting}
+              intervalMs={2400}
+            />
           </div>
         </div>
       ) : null}
