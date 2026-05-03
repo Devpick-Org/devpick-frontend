@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { Building2, Search, Sparkles, X } from "lucide-react";
@@ -276,7 +283,7 @@ function ModalBody({ onOpenChange, value, companyNames, onApply }: BodyProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 animate-in fade-in-0 duration-200"
+      className="fixed inset-0 isolate z-[110] animate-in fade-in-0 duration-200"
       aria-hidden={false}
     >
       <button
@@ -292,12 +299,12 @@ function ModalBody({ onOpenChange, value, companyNames, onApply }: BodyProps) {
         className={cn(
           "fixed left-1/2 top-6 z-50 flex w-[calc(100%-32px)] max-w-[720px]",
           "-translate-x-1/2",
-          "max-h-[min(720px,calc(100vh-48px))] flex-col overflow-hidden rounded-3xl border border-border bg-background shadow-2xl",
+          "max-h-[min(720px,calc(100vh-48px))] flex-col overflow-hidden rounded-3xl border border-border bg-popover text-popover-foreground shadow-2xl",
           "animate-in fade-in-0 zoom-in-[0.985] duration-200",
         )}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <header className="relative border-b border-border bg-card px-4 pt-4 pb-3 sm:px-5">
+        <header className="relative shrink-0 border-b border-border bg-popover px-4 pt-4 pb-3 sm:px-5">
           <div className="flex items-start justify-between gap-2">
             <h2 id={titleId} className="sr-only">
               채용 검색 필터 선택
@@ -359,7 +366,7 @@ function ModalBody({ onOpenChange, value, companyNames, onApply }: BodyProps) {
           </p>
         </header>
 
-        <div className="mx-5 mt-3 flex shrink-0 items-center justify-between gap-2 text-xs text-muted-foreground">
+        <div className="mx-5 mt-3 flex shrink-0 items-center justify-between gap-2 bg-popover px-0 py-1 text-xs text-muted-foreground">
           <span>
             선택 합계{" "}
             <span className="font-semibold tabular-nums text-primary">
@@ -398,7 +405,7 @@ function ModalBody({ onOpenChange, value, companyNames, onApply }: BodyProps) {
           ) : null}
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
+        <div className="relative min-h-0 flex-1 overflow-y-auto bg-popover px-4 py-4 sm:px-5">
           {contentFacetError ? (
             <p className="mb-4 rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
               콘텐츠 태그를 불러오지 못했어요. 새로 고침 후 다시 시도해 보세요.
@@ -445,7 +452,7 @@ function ModalBody({ onOpenChange, value, companyNames, onApply }: BodyProps) {
           ) : null}
         </div>
 
-        <footer className="space-y-2 border-t border-border bg-card px-4 py-4 sm:px-5">
+        <footer className="shrink-0 space-y-2 border-t border-border bg-popover px-4 py-4 sm:px-5">
           {activeTab === "tech" ? (
             <div className="flex gap-2">
               <Input
@@ -497,14 +504,33 @@ function ModalBody({ onOpenChange, value, companyNames, onApply }: BodyProps) {
   );
 }
 
+const noopSubscribe = () => () => {};
+
+function useBrowserMounted() {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+}
+
 export function JobTechStackFilterModal({
   open,
-  ...rest
+  onOpenChange,
+  value,
+  companyNames,
+  onApply,
 }: JobTechStackFilterModalProps) {
-  if (!open) return null;
-  const mountKey = `${rest.value.slice().sort().join("\u0001")}:${rest.companyNames
-    .slice()
-    .sort()
-    .join("\u0001")}`;
-  return <ModalBody key={mountKey} {...rest} />;
+  const browserMounted = useBrowserMounted();
+
+  const mountKey = `${value.slice().sort().join("\u0001")}:${companyNames.slice().sort().join("\u0001")}`;
+
+  if (!open || !browserMounted) return null;
+
+  return createPortal(
+    <ModalBody
+      key={mountKey}
+      onOpenChange={onOpenChange}
+      value={value}
+      companyNames={companyNames}
+      onApply={onApply}
+    />,
+    document.body,
+  );
 }
