@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import {
   JOB_CATEGORY_OPTIONS,
   EXPERIENCE_LEVEL_OPTIONS,
+  locationFilterLabel,
 } from "./jobs.constants";
 import type { JobFilters } from "./JobFilterBar";
 import { JobUnifiedFilterModal } from "./JobUnifiedFilterModal";
@@ -34,7 +35,7 @@ function structuredFilterHint(f: JobFilters): string {
         "경력",
     );
   }
-  if (f.location !== "ALL") bits.push(f.location);
+  if (f.location !== "ALL") bits.push(locationFilterLabel(f.location));
   const tagParts: string[] = [];
   if (f.techStack.length) tagParts.push(`기술 ${f.techStack.length}`);
   if (f.companyNames.length) tagParts.push(`회사 ${f.companyNames.length}`);

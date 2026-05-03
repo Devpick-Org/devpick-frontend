@@ -46,17 +46,28 @@ export const EMPLOYMENT_TYPE_OPTIONS: { value: EmploymentType | "ALL"; label: st
   ),
 ];
 
-export const LOCATION_OPTIONS: string[] = [
-  "서울 전체",
-  "서울 강남구",
-  "서울 서초구",
-  "서울 마포구",
-  "서울 송파구",
-  "경기 성남시 분당구",
-  "부산",
-  "대전",
-  "원격 (Remote)",
+/**
+ * 근무지 필터: `value`는 API location 파라미터(LIKE %%)에 그대로 쓰입니다.
+ * 크롤 원문은 "서울특별시 강남구", "재택근무", "원격 근무" 등 제각각이라 짧은 토큰으로 맞춥니다.
+ */
+export const LOCATION_FILTER_OPTIONS: { value: string; label: string }[] = [
+  { value: "서울", label: "서울" },
+  { value: "강남", label: "강남구" },
+  { value: "서초", label: "서초구" },
+  { value: "마포", label: "마포구" },
+  { value: "송파", label: "송파구" },
+  { value: "분당", label: "성남·분당" },
+  { value: "판교", label: "판교" },
+  { value: "부산", label: "부산" },
+  { value: "대전", label: "대전" },
+  { value: "재택", label: "재택" },
+  { value: "원격", label: "원격" },
 ];
+
+export function locationFilterLabel(value: string): string {
+  const hit = LOCATION_FILTER_OPTIONS.find((o) => o.value === value);
+  return hit?.label ?? value;
+}
 
 export const TECH_STACK_OPTIONS: string[] = [
   "React",

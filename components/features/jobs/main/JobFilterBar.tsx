@@ -16,7 +16,8 @@ import type { JobCategory, ExperienceLevel } from "@/types/jobs";
 import {
   JOB_CATEGORY_OPTIONS,
   EXPERIENCE_LEVEL_OPTIONS,
-  LOCATION_OPTIONS,
+  LOCATION_FILTER_OPTIONS,
+  locationFilterLabel,
   TECH_STACK_OPTIONS,
 } from "./jobs.constants";
 
@@ -87,7 +88,8 @@ export function JobFilterBar({ filters, onChange }: JobFilterBarProps) {
         ? filters.techStack[0]
         : `기술스택 ${filters.techStack.length}`;
 
-  const locationLabel = filters.location === "ALL" ? "위치" : filters.location;
+  const locationLabel =
+    filters.location === "ALL" ? "위치" : locationFilterLabel(filters.location);
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -197,9 +199,9 @@ export function JobFilterBar({ filters, onChange }: JobFilterBarProps) {
             onValueChange={(v) => onChange({ ...filters, location: v })}
           >
             <DropdownMenuRadioItem value="ALL">전체</DropdownMenuRadioItem>
-            {LOCATION_OPTIONS.map((loc) => (
-              <DropdownMenuRadioItem key={loc} value={loc}>
-                {loc}
+            {LOCATION_FILTER_OPTIONS.map(({ value, label }) => (
+              <DropdownMenuRadioItem key={value} value={value}>
+                {label}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>

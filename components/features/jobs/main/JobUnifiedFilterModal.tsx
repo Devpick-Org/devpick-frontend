@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { JobCategory, ExperienceLevel } from "@/types/jobs";
 import {
-  JOB_CATEGORY_OPTIONS,
   EXPERIENCE_LEVEL_OPTIONS,
-  LOCATION_OPTIONS,
+  JOB_CATEGORY_OPTIONS,
+  LOCATION_FILTER_OPTIONS,
 } from "./jobs.constants";
 import { DEFAULT_JOB_FILTERS, type JobFilters } from "./JobFilterBar";
 import { JobTechCompanyPicker } from "./JobTechCompanyPicker";
@@ -97,7 +97,10 @@ function ModalInner({
   }, [onOpenChange]);
 
   const locationRadioOptions: { value: JobFilters["location"]; label: string }[] =
-    [{ value: "ALL", label: "전체" }, ...LOCATION_OPTIONS.map((loc) => ({ value: loc, label: loc }))];
+    [
+      { value: "ALL", label: "전체" },
+      ...LOCATION_FILTER_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+    ];
 
   return (
     <div
