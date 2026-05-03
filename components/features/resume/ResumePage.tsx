@@ -121,13 +121,19 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
 
   const importMutation = useMutation({
     mutationFn: (file: File) => resumeEndpoints.importMasterFromFile(file),
-    onSuccess: async (json) => {
+    onSuccess: async (result) => {
       setErrorMessage(null);
-      qc.setQueryData(["master-resume"], json);
+      qc.setQueryData(["master-resume"], result.resume);
       void qc.invalidateQueries({ queryKey: ["master-resume"] });
-      const data = masterJsonToResumeData(json);
+      const data = masterJsonToResumeData(result.resume);
       const synced = await patchLearningProfileAfterResumeBasicInfo(data.basicInfo);
       toast.success("업로드한 이력서를 분석해 저장했습니다.");
+      if (result.enrichment === "applied") {
+        toast.message(
+          "문서에서 일부만 읽혀 요약·경력·프로젝트 초안을 AI로 채웠습니다. 반드시 확인·수정해 주세요.",
+          { duration: 7600 },
+        );
+      }
       if (synced) {
         toast.message(
           "마이페이지 학습 정보(직무·경력 레벨)를 이력서 기준에 맞췄어요.",

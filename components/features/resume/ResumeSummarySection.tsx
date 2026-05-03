@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import type { ReactNode } from "react";
-import { Check, Circle, Pencil, RefreshCw } from "lucide-react";
+import { Check, Circle, FileText, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatDate, cn } from "@/lib/utils";
 import { getResumeCompleteness } from "@/lib/resume/resumeCompleteness";
@@ -85,8 +85,8 @@ export function ResumeSummarySection({
                 className="gap-1.5 bg-background/80"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <RefreshCw className="h-3.5 w-3.5" />
-                새 파일로 갱신
+                <FileText className="h-3.5 w-3.5" />
+                PDF나 DOCX로 이력서 넣기
               </Button>
               <Button
                 type="button"

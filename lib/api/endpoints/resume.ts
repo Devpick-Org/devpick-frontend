@@ -1,3 +1,4 @@
+import type { AxiosResponseHeaders } from "axios";
 import { isAxiosError } from "axios";
 import { apiClient } from "../client";
 import { extractApiError } from "../extractApiError";
@@ -5,6 +6,52 @@ import type { ApiResponse } from "@/types/api";
 
 /** 마스터 이력서 JSON (백엔드 JsonNode 그대로) */
 export type MasterResumeJson = Record<string, unknown>;
+
+/** POST /resume/master/import 응답 헤더 X-Resume-Enrichment 값 */
+export type ResumeImportEnrichmentHeader =
+  | "applied"
+  | "skipped_disabled"
+  | "skipped_short_text"
+  | "skipped_no_need"
+  | "skipped_error";
+
+export type MasterResumeImportResult = {
+  resume: MasterResumeJson;
+  enrichment: ResumeImportEnrichmentHeader | null;
+};
+
+function readResumeEnrichmentHeader(
+  headers: AxiosResponseHeaders,
+): ResumeImportEnrichmentHeader | null {
+  const normalized = normalizeHeaderValue(headers, "x-resume-enrichment");
+  if (
+    normalized === "applied" ||
+    normalized === "skipped_disabled" ||
+    normalized === "skipped_short_text" ||
+    normalized === "skipped_no_need" ||
+    normalized === "skipped_error"
+  ) {
+    return normalized;
+  }
+  return null;
+}
+
+function normalizeHeaderValue(
+  headers: AxiosResponseHeaders,
+  nameLc: string,
+): string | undefined {
+  if (typeof headers.get === "function") {
+    const fromGet =
+      headers.get(nameLc) ?? headers.get("X-Resume-Enrichment") ?? "";
+    const s = String(fromGet).trim();
+    if (s.length > 0) return s.toLowerCase();
+  }
+  const rec = headers as unknown as Record<string, string>;
+  const key = Object.keys(rec).find((k) => k.toLowerCase() === nameLc);
+  if (!key) return undefined;
+  const raw = rec[key];
+  return typeof raw === "string" ? raw.trim().toLowerCase() : undefined;
+}
 
 export const resumeEndpoints = {
   /**
@@ -28,13 +75,14 @@ export const resumeEndpoints = {
       .then((r) => r.data.data),
 
   /** PDF/DOCX 업로드 → 서버 텍스트 추출 + AI 분석 후 마스터 이력서 저장 */
-  importMasterFromFile: async (file: File): Promise<MasterResumeJson> => {
+  importMasterFromFile: async (file: File): Promise<MasterResumeImportResult> => {
     const form = new FormData();
     form.append("file", file);
-    const r = await apiClient.post<ApiResponse<MasterResumeJson>>(
-      "/resume/master/import",
-      form,
-    );
-    return r.data.data;
+    const r = await apiClient.post<ApiResponse<MasterResumeJson>>("/resume/master/import", form);
+    const enrichment = readResumeEnrichmentHeader(r.headers);
+    return {
+      resume: r.data.data,
+      enrichment,
+    };
   },
 };
