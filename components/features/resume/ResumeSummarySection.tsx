@@ -72,9 +72,9 @@ export function ResumeSummarySection({
               <h2 className="mt-2 text-xl font-bold tracking-[-0.02em] text-foreground">
                 {basicInfo.name ? `${basicInfo.name}님의 이력서` : "마스터 이력서"}
               </h2>
-              <p className="mt-2 max-w-2xl text-sm font-medium leading-relaxed text-muted-foreground">
-                공고 매칭, 면접 Q&A, 부족 역량 추천에 쓰이는 기준 정보입니다.
-                수정하면 프로필 정보도 저장 시점에 자동으로 최신화됩니다.
+              <p className="mt-2 min-w-0 text-sm font-medium leading-snug text-muted-foreground break-keep xl:whitespace-nowrap">
+                공고 매칭, 면접 Q&A, 부족 역량 추천에 쓰이는 기준 정보입니다. 수정하면
+                프로필 정보도 저장 시점에 자동으로 최신화됩니다.
               </p>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
@@ -112,17 +112,17 @@ export function ResumeSummarySection({
           />
         </div>
 
-        <div className="grid gap-4 p-5 sm:grid-cols-[1fr_260px] sm:p-6">
-          <div className="grid gap-3 sm:grid-cols-4">
+        <div className="grid gap-4 p-5 sm:grid-cols-[1fr_260px] sm:items-start sm:p-6">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3 sm:items-start">
             {infoCards.map((item) => (
               <div
                 key={item.label}
-                className="rounded-2xl border border-border bg-background px-4 py-3"
+                className="flex min-h-0 flex-col gap-0.5 rounded-xl border border-border bg-background px-3 py-2 sm:flex-row sm:items-baseline sm:gap-2 sm:py-2"
               >
-                <p className="text-xs font-semibold text-muted-foreground">
+                <p className="shrink-0 text-[11px] font-semibold text-muted-foreground sm:min-w-[2rem]">
                   {item.label}
                 </p>
-                <p className="mt-2 text-base font-bold text-foreground">
+                <p className="text-sm font-bold leading-tight text-foreground sm:text-base">
                   {item.value}
                 </p>
               </div>
