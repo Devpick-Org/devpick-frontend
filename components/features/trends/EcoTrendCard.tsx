@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Share2 } from "lucide-react";
 import { useState } from "react";
-import { bootcampProxiedThumbnailUrl } from "@/lib/trends/bootcampThumbnail";
 import { cn } from "@/lib/utils";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
@@ -29,18 +28,12 @@ function categoryBadge(category: EcosystemTrendItemDto["category"]): string {
 export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
   const [thumbFailed, setThumbFailed] = useState(false);
   const initial = (item.title?.trim() ? item.title.trim() : "?").slice(0, 1);
-  /** 부트캠퍼 썸네일은 API 프록시(Referer 차단 회피) */
-  const displayThumbnail =
-    item.category === "bootcamp"
-      ? bootcampProxiedThumbnailUrl(item.thumbnailUrl) ?? item.thumbnailUrl?.trim()
-      : item.thumbnailUrl?.trim();
-  const hasThumb = Boolean(displayThumbnail?.trim());
+  /** API에 저장된 썸네일 URL(api.devpick 에서 제공하는 목록 문자열 그대로) */
+  const displayThumbnail = item.thumbnailUrl?.trim();
+  const hasThumb = Boolean(displayThumbnail);
   const showImage = hasThumb && !thumbFailed;
   /** 동아리는 썸네일이 없거나 로드 실패 시 이미지 칸 없이 텍스트만 */
   const hideHero = item.category === "club" && (!hasThumb || thumbFailed);
-  /** 프록시·동일 도메인 썸네일은 브라우저 기본 Referer 로 충분 */
-  const imgNoReferrer =
-    !(displayThumbnail && displayThumbnail.includes("/trends/ecosystem/bootcamp-thumbnail"));
 
   const share = async () => {
     try {
@@ -70,18 +63,29 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
           className="relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-muted"
         >
           {showImage && displayThumbnail ? (
-            <Image
-              src={displayThumbnail}
-              alt=""
-              fill
-              sizes="280px"
-              className="object-cover"
-              {...(imgNoReferrer ? { referrerPolicy: "no-referrer" as const } : {})}
-              unoptimized={
-                item.category === "bootcamp" || item.category === "club" || item.category === "event"
-              }
-              onError={() => setThumbFailed(true)}
-            />
+            item.category === "bootcamp" ? (
+              // eslint-disable-next-line @next/next/no-img-element -- 부트캠퍼 _next/image는 서버 프록시(데이터센터 IP)보다 브라우저 직링크가 안정적
+              <img
+                src={displayThumbnail}
+                alt=""
+                referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover"
+                onError={() => setThumbFailed(true)}
+              />
+            ) : (
+              <Image
+                src={displayThumbnail}
+                alt=""
+                fill
+                sizes="280px"
+                className="object-cover"
+                referrerPolicy="no-referrer"
+                unoptimized={item.category === "club" || item.category === "event"}
+                onError={() => setThumbFailed(true)}
+              />
+            )
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 via-muted to-primary/5 text-3xl font-bold text-primary/80">
               {initial}

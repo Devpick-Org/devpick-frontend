@@ -8,9 +8,6 @@ const DEFAULT_API_URL = "https://3-39-96-126.sslip.io";
 
 export const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? DEFAULT_API_URL;
 
-/** `<img>`·프록시 URL 등 공개 접근 리소스용 (후행 슬래시 없음). axios base 와 동일. */
-export const API_ORIGIN = BASE_URL.replace(/\/$/, "");
-
 /**
  * 메인 API 클라이언트
  * - 요청 인터셉터: Zustand auth store에서 accessToken을 읽어 Authorization 헤더 자동 첨부
