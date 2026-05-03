@@ -4,7 +4,7 @@ import { useRef } from "react";
 import type { ReactNode } from "react";
 import { Check, Circle, Pencil, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
+import { formatDate, cn } from "@/lib/utils";
 import { getResumeCompleteness } from "@/lib/resume/resumeCompleteness";
 import type { ResumeData } from "@/types/resume";
 import { ResumeDetailEditSection } from "./ResumeDetailEditSection";
@@ -112,24 +112,84 @@ export function ResumeSummarySection({
           />
         </div>
 
-        <div className="grid gap-4 p-5 sm:grid-cols-[1fr_260px] sm:items-start sm:p-6">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3 sm:items-start">
-            {infoCards.map((item) => (
-              <div
-                key={item.label}
-                className="flex min-h-0 flex-col gap-0.5 rounded-xl border border-border bg-background px-3 py-2 sm:flex-row sm:items-baseline sm:gap-2 sm:py-2"
-              >
-                <p className="shrink-0 text-[11px] font-semibold text-muted-foreground sm:min-w-[2rem]">
-                  {item.label}
-                </p>
-                <p className="text-sm font-bold leading-tight text-foreground sm:text-base">
-                  {item.value}
-                </p>
-              </div>
-            ))}
+        <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-stretch sm:gap-6 sm:p-6">
+          <div className="flex min-w-0 flex-1 flex-col gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+              {infoCards.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex min-h-0 flex-col gap-0.5 rounded-xl border border-border bg-background px-3 py-2 sm:flex-row sm:items-baseline sm:gap-2 sm:py-2"
+                >
+                  <p className="shrink-0 text-[11px] font-semibold text-muted-foreground sm:min-w-[2rem]">
+                    {item.label}
+                  </p>
+                  <p className="text-sm font-bold leading-tight text-foreground sm:text-base">
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* 완성도 패널 옆 높이에 맞춰 비는 영역에 미완료 항목 미리보기 */}
+            <div
+              className={cn(
+                "flex flex-col justify-center gap-3 rounded-2xl border px-4 py-4 sm:min-h-0 sm:flex-1 sm:py-5",
+                completeness.doneCount >= completeness.total
+                  ? "border-primary/25 bg-primary/5"
+                  : "border-border/80 bg-muted/20",
+              )}
+            >
+              {completeness.doneCount >= completeness.total ? (
+                <>
+                  <p className="text-sm font-semibold text-foreground">
+                    체크리스트 항목을 모두 채웠습니다
+                  </p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    새 공고 준비나 경력 업데이트가 있으면 정보 편집하기로 반영하면
+                    매칭·면접 Q&A 결과가 더 정확해집니다.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                    우선 채우면 좋은 항목
+                  </p>
+                  <ul className="space-y-2.5 text-xs">
+                    {completeness.items
+                      .filter((x) => !x.done)
+                      .slice(0, 5)
+                      .map((item) => (
+                        <li
+                          key={item.id}
+                          className="flex gap-2 text-muted-foreground"
+                        >
+                          <Circle className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground/70" />
+                          <span className="min-w-0 leading-snug">
+                            <span className="font-semibold text-foreground">
+                              {item.label}
+                            </span>
+                            <span className="mt-0.5 block line-clamp-2 text-[11px] text-muted-foreground">
+                              {item.description}
+                            </span>
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-1 w-fit font-semibold"
+                    onClick={onStartEdit}
+                  >
+                    정보 편집하기
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
 
-          <aside className="rounded-2xl border border-border bg-muted/25 p-4">
+          <aside className="w-full shrink-0 sm:w-[260px] lg:w-[272px]">
             <div className="mb-3 flex items-center justify-between gap-2">
               <p className="text-sm font-bold text-foreground">완성도</p>
               <p className="text-sm font-bold text-primary">
