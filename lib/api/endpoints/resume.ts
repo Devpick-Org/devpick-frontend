@@ -1,4 +1,4 @@
-import type { AxiosResponseHeaders } from "axios";
+import type { AxiosResponse } from "axios";
 import { isAxiosError } from "axios";
 import { apiClient } from "../client";
 import { extractApiError } from "../extractApiError";
@@ -20,8 +20,11 @@ export type MasterResumeImportResult = {
   enrichment: ResumeImportEnrichmentHeader | null;
 };
 
+/** axios post 응답 headers (AxiosResponseHeaders | Partial<...> 유니온) */
+type AxiosImportHeaders = AxiosResponse<unknown>["headers"];
+
 function readResumeEnrichmentHeader(
-  headers: AxiosResponseHeaders,
+  headers: AxiosImportHeaders,
 ): ResumeImportEnrichmentHeader | null {
   const normalized = normalizeHeaderValue(headers, "x-resume-enrichment");
   if (
@@ -37,10 +40,10 @@ function readResumeEnrichmentHeader(
 }
 
 function normalizeHeaderValue(
-  headers: AxiosResponseHeaders,
+  headers: AxiosImportHeaders,
   nameLc: string,
 ): string | undefined {
-  if (typeof headers.get === "function") {
+  if (headers && typeof headers === "object" && typeof headers.get === "function") {
     const fromGet =
       headers.get(nameLc) ?? headers.get("X-Resume-Enrichment") ?? "";
     const s = String(fromGet).trim();
