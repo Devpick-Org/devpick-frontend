@@ -161,20 +161,20 @@ export function JobCard({ job }: JobCardProps) {
           ))}
         </div>
 
-        {/* 위치 + 마감일 */}
+        {/* 위치 + 마감일(있을 때만) */}
         <div className="mt-auto flex items-center gap-3 text-xs text-muted-foreground font-medium">
           <span className="flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
             {job.location}
           </span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5 shrink-0" />
-            {!job.deadline?.trim()
-              ? "마감일 미정"
-              : job.deadline === "채용 시 마감"
+          {job.deadline?.trim() ? (
+            <span className="flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              {job.deadline === "채용 시 마감"
                 ? "채용 시 마감"
                 : `${formatDate(job.deadline)}까지`}
-          </span>
+            </span>
+          ) : null}
         </div>
       </article>
     </Link>

@@ -36,17 +36,19 @@ export function JobDetailHeader({ job }: JobDetailHeaderProps) {
     },
   });
 
-  const deadlineLabel = !job.deadline?.trim()
-    ? "마감일 미정"
-    : job.deadline === "채용 시 마감"
+  const deadlineLabel =
+    job.deadline?.trim() &&
+    (job.deadline === "채용 시 마감"
       ? "채용 시 마감"
-      : `${formatDate(job.deadline)}까지`;
+      : `${formatDate(job.deadline)}까지`);
 
-  const infoRows = [
+  const infoRows: Array<{ label: string; value: string }> = [
     { label: "직무", value: JOB_CATEGORY_LABEL[job.jobCategory] },
     { label: "경력", value: EXPERIENCE_LEVEL_LABEL[job.experienceLevel] },
     { label: "연봉", value: job.salary },
-    { label: "마감일", value: deadlineLabel },
+    ...(deadlineLabel
+      ? [{ label: "마감일", value: deadlineLabel }]
+      : []),
     { label: "근무지", value: job.location },
   ];
 
