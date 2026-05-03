@@ -61,9 +61,9 @@ export function ResumeSummarySection({
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-        <div className="border-b border-border bg-gradient-to-br from-primary/10 via-background to-background px-5 py-5 sm:px-6">
+        <div className="border-b border-border bg-gradient-to-br from-primary/10 via-background to-background px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-xs font-bold uppercase tracking-wide text-primary">
@@ -112,28 +112,27 @@ export function ResumeSummarySection({
           />
         </div>
 
-        <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-stretch sm:gap-6 sm:p-6">
-          <div className="flex min-w-0 flex-1 flex-col gap-3">
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-start sm:gap-5 sm:p-5">
+          <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+            <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-x-2 md:gap-y-2">
               {infoCards.map((item) => (
                 <div
                   key={item.label}
-                  className="flex min-h-0 flex-col gap-0.5 rounded-xl border border-border bg-background px-3 py-2 sm:flex-row sm:items-baseline sm:gap-2 sm:py-2"
+                  className="flex min-h-0 min-w-0 flex-col gap-1 rounded-lg border border-border bg-background px-3 py-2 md:py-2.5"
                 >
-                  <p className="shrink-0 text-[11px] font-semibold text-muted-foreground sm:min-w-[2rem]">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
                     {item.label}
                   </p>
-                  <p className="text-sm font-bold leading-tight text-foreground sm:text-base">
+                  <p className="min-w-0 text-sm font-bold leading-snug text-foreground text-balance md:text-[0.9375rem]">
                     {item.value}
                   </p>
                 </div>
               ))}
             </div>
 
-            {/* 완성도 패널 옆 높이에 맞춰 비는 영역에 미완료 항목 미리보기 */}
             <div
               className={cn(
-                "flex flex-col justify-center gap-3 rounded-2xl border px-4 py-4 sm:min-h-0 sm:flex-1 sm:py-5",
+                "rounded-xl border px-3 py-3 sm:px-4 sm:py-3",
                 completeness.doneCount >= completeness.total
                   ? "border-primary/25 bg-primary/5"
                   : "border-border/80 bg-muted/20",
@@ -141,12 +140,12 @@ export function ResumeSummarySection({
             >
               {completeness.doneCount >= completeness.total ? (
                 <>
-                  <p className="text-sm font-semibold text-foreground">
+                  <p className="text-sm font-semibold leading-snug text-foreground">
                     체크리스트 항목을 모두 채웠습니다
                   </p>
-                  <p className="text-xs leading-relaxed text-muted-foreground">
-                    새 공고 준비나 경력 업데이트가 있으면 정보 편집하기로 반영하면
-                    매칭·면접 Q&A 결과가 더 정확해집니다.
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                    새 공고 준비나 경력 업데이트가 있으면 정보 편집하기로 반영하면 매칭·면접 Q&A
+                    결과가 더 정확해집니다.
                   </p>
                 </>
               ) : (
@@ -154,7 +153,7 @@ export function ResumeSummarySection({
                   <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
                     우선 채우면 좋은 항목
                   </p>
-                  <ul className="space-y-2.5 text-xs">
+                  <ul className="mt-2 space-y-2 text-xs">
                     {completeness.items
                       .filter((x) => !x.done)
                       .slice(0, 5)
@@ -189,8 +188,8 @@ export function ResumeSummarySection({
             </div>
           </div>
 
-          <aside className="w-full shrink-0 sm:w-[260px] lg:w-[272px]">
-            <div className="mb-3 flex items-center justify-between gap-2">
+          <aside className="w-full shrink-0 border-t border-border pt-4 sm:w-[232px] sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0 lg:w-60">
+            <div className="mb-2 flex items-center justify-between gap-2">
               <p className="text-sm font-bold text-foreground">완성도</p>
               <p className="text-sm font-bold text-primary">
                 {completeness.percent}%
@@ -202,10 +201,10 @@ export function ResumeSummarySection({
                 style={{ width: `${completeness.percent}%` }}
               />
             </div>
-            <p className="mt-3 text-xs font-medium text-muted-foreground">
+            <p className="mt-2 text-xs font-medium text-muted-foreground">
               {completeness.doneCount}/{completeness.total}개 항목 충족
             </p>
-            <ul className="mt-4 space-y-2">
+            <ul className="mt-3 space-y-1.5">
               {completeness.items.map((item) => (
                 <li
                   key={item.id}
@@ -227,7 +226,7 @@ export function ResumeSummarySection({
           </aside>
         </div>
 
-        <div className="border-t border-border px-5 py-3 text-xs font-medium text-muted-foreground sm:px-6">
+        <div className="border-t border-border px-4 py-2.5 text-xs font-medium text-muted-foreground sm:px-5">
           {fileName?.trim() ? fileName : "직접 작성한 이력서"} · {formatDate(uploadedAt)} 저장
         </div>
       </section>
