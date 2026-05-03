@@ -70,7 +70,8 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
               referrerPolicy="no-referrer"
               unoptimized={
                 item.thumbnailUrl.includes("bootcamper.co.kr/_next/image") ||
-                item.category === "club"
+                item.category === "club" ||
+                item.category === "event"
               }
               onError={() => setThumbFailed(true)}
             />
