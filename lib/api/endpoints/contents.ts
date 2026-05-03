@@ -1,4 +1,5 @@
 import { apiClient } from "../client";
+import type { ApiResponse } from "@/types/api";
 import { normalizeAiLevel } from "@/lib/content/normalizeAiLevel";
 import type {
   Content,
@@ -9,6 +10,12 @@ import type {
   AiSummaryLevel,
   AiSummaryResponse,
 } from "@/types/content";
+
+export interface ContentTagFacetApi {
+  name: string;
+  count: number;
+  source?: string;
+}
 
 /** GET /summary 응답 discriminated union */
 type SummaryResult =
@@ -61,6 +68,13 @@ export const contentsEndpoints = {
       .then((r) => r.data);
   },
 
+  /** GET /contents/tag-facets — 크롤 콘텐츠에 붙은 태그 빈도(RDS facet) */
+  listTagFacets: (limit = 80): Promise<ContentTagFacetApi[]> =>
+    apiClient
+      .get<ApiResponse<ContentTagFacetApi[]>>("/contents/tag-facets", {
+        params: { limit },
+      })
+      .then((r) => r.data.data),
   /**
    * GET /contents/:contentId/summary — AI 요약 조회 (DP-352)
    * - `level` 생략 시 백엔드가 프로필 경력 수준으로 해석 (비로그인은 JUNIOR).
