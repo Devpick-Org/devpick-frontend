@@ -81,7 +81,14 @@ export const resumeEndpoints = {
   importMasterFromFile: async (file: File): Promise<MasterResumeImportResult> => {
     const form = new FormData();
     form.append("file", file);
-    const r = await apiClient.post<ApiResponse<MasterResumeJson>>("/resume/master/import", form);
+    const r = await apiClient.post<ApiResponse<MasterResumeJson>>(
+      "/resume/master/import",
+      form,
+      {
+        // 기본 json Content-Type을 제거해야 브라우저가 multipart boundary를 넣음 — 아니면 서버 415
+        headers: { "Content-Type": undefined },
+      },
+    );
     const enrichment = readResumeEnrichmentHeader(r.headers);
     return {
       resume: r.data.data,

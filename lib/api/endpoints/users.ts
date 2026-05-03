@@ -33,6 +33,9 @@ export const usersEndpoints = {
     return apiClient.post<ApiResponse<UploadProfileImageResponse>>(
       "/users/me/profile-image",
       formData,
+      {
+        headers: { "Content-Type": undefined },
+      },
     );
   },
 
