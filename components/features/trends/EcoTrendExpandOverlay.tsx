@@ -59,7 +59,11 @@ export function EcoTrendExpandOverlay({
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item) => (
-                <EcoTrendCard key={item.id} item={item} className="w-full max-w-none" />
+                <EcoTrendCard
+                  key={`${item.id}-${item.thumbnailUrl ?? ""}`}
+                  item={item}
+                  className="w-full max-w-none"
+                />
               ))}
             </div>
           )}

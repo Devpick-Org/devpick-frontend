@@ -51,7 +51,10 @@ export function EcoMarqueeRow({
             style={{ ["--eco-marquee-duration" as string]: `${durationSec}s` }}
           >
             {duplicated.map((item, i) => (
-              <EcoTrendCard key={`${item.id}-${i}`} item={item} />
+              <EcoTrendCard
+                key={`${item.id}-${i}-${item.thumbnailUrl ?? ""}`}
+                item={item}
+              />
             ))}
           </div>
         </div>

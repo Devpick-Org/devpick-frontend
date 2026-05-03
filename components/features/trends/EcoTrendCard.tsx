@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Share2, Users } from "lucide-react";
+import { Bookmark, Share2 } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
@@ -25,7 +26,13 @@ function categoryBadge(category: EcosystemTrendItemDto["category"]): string {
 }
 
 export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
+  const [thumbFailed, setThumbFailed] = useState(false);
   const initial = (item.title?.trim() ? item.title.trim() : "?").slice(0, 1);
+  const hasThumb = Boolean(item.thumbnailUrl?.trim());
+  const showImage = hasThumb && !thumbFailed;
+  /** 동아리는 썸네일이 없거나 로드 실패 시 이미지 칸 없이 텍스트만 */
+  const hideHero = item.category === "club" && (!hasThumb || thumbFailed);
+
   const share = async () => {
     try {
       if (navigator.share) {
@@ -42,37 +49,38 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
     <article
       className={cn(
         "flex w-[min(100vw-2rem,280px)] shrink-0 flex-col gap-2.5 rounded-2xl border border-border/60 bg-card p-2.5 shadow-sm transition-shadow hover:shadow-md",
+        hideHero && "gap-2",
         className,
       )}
     >
-      <Link
-        href={item.detailUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-muted"
-      >
-        {item.thumbnailUrl ? (
-          <Image
-            src={item.thumbnailUrl}
-            alt=""
-            fill
-            sizes="280px"
-            className="object-cover"
-            unoptimized={item.thumbnailUrl.includes("bootcamper.co.kr/_next/image")}
-          />
-        ) : item.category === "club" ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br from-sky-500/12 via-muted to-primary/10 px-2 text-center">
-            <Users className="h-11 w-11 text-primary/75" aria-hidden />
-            <span className="text-[10px] font-medium leading-tight text-muted-foreground">
-              테카 페이지는 카드 이미지 URL을 제공하지 않습니다.
-            </span>
-          </div>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 via-muted to-primary/5 text-3xl font-bold text-primary/80">
-            {initial}
-          </div>
-        )}
-      </Link>
+      {!hideHero && (
+        <Link
+          href={item.detailUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-muted"
+        >
+          {showImage && item.thumbnailUrl ? (
+            <Image
+              src={item.thumbnailUrl}
+              alt=""
+              fill
+              sizes="280px"
+              className="object-cover"
+              referrerPolicy="no-referrer"
+              unoptimized={
+                item.thumbnailUrl.includes("bootcamper.co.kr/_next/image") ||
+                item.category === "club"
+              }
+              onError={() => setThumbFailed(true)}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 via-muted to-primary/5 text-3xl font-bold text-primary/80">
+              {initial}
+            </div>
+          )}
+        </Link>
+      )}
       <div className="flex flex-col gap-1.5 px-0.5 pb-1">
         <div className="flex items-start justify-between gap-2">
           <span className="line-clamp-1 text-xs font-medium text-primary/90">
