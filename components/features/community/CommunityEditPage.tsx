@@ -99,6 +99,7 @@ export function CommunityEditPage({ postId }: Props) {
   }
 
   const initialDraft: PostDraft = {
+    postType: post.postType,
     title: post.title,
     content: post.content,
     level: post.level,

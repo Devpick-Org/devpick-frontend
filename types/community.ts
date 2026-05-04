@@ -1,4 +1,4 @@
-import type { PostLevel } from "./post";
+import type { PostLevel, PostType } from "./post";
 import type { ApiResponse } from "./api";
 import type { UserJob } from "./userProfile";
 
@@ -22,6 +22,7 @@ export interface PostAttachmentDTO {
 /** GET /posts/{postId} 응답 DTO */
 export interface PostDetailDTO {
   id: string;
+  postType: PostType;
   title: string;
   content: string;
   level: PostLevel;
@@ -66,12 +67,14 @@ export interface AnswerDTO {
 
 /** 질문 작성 폼의 임시 상태 (UI 전용) */
 export interface PostDraft {
+  postType: PostType;
   title: string;
   content: string;
   level: PostLevel;
 }
 
 export interface CreatePostRequest {
+  postType: PostType;
   title: string;
   content: string;
   level: PostLevel;

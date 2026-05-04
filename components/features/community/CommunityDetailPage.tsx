@@ -51,6 +51,8 @@ export function CommunityDetailPage({ postId }: Props) {
     enabled: !!postRes?.data,
   });
 
+  const isTechPost = postRes?.data?.postType === "TECH";
+
   const {
     data: aiAnswerRes,
     isLoading: isAiLoading,
@@ -60,7 +62,7 @@ export function CommunityDetailPage({ postId }: Props) {
   } = useQuery({
     queryKey: ["post-ai-answer", postId],
     queryFn: () => postsEndpoints.getAiAnswer(postId),
-    enabled: !!postRes?.data,
+    enabled: !!postRes?.data && isTechPost,
     retry: 0,
   });
 
@@ -127,15 +129,17 @@ export function CommunityDetailPage({ postId }: Props) {
             onDelete={handleDelete}
             isDeleting={deleteMutation.isPending}
           />
-          <AiAnswerSection
-            status={aiStatus}
-            content={aiContent}
-            keyPoints={aiKeyPoints}
-            suggestedTags={aiSuggestedTags}
-            confidence={aiConfidence}
-            onRetry={() => refetchAiAnswer()}
-            isRetrying={isAiRetrying}
-          />
+          {isTechPost && (
+            <AiAnswerSection
+              status={aiStatus}
+              content={aiContent}
+              keyPoints={aiKeyPoints}
+              suggestedTags={aiSuggestedTags}
+              confidence={aiConfidence}
+              onRetry={() => refetchAiAnswer()}
+              isRetrying={isAiRetrying}
+            />
+          )}
           <AnswerSection
             postId={postId}
             postAuthorId={post.authorId}

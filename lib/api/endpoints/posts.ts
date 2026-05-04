@@ -1,5 +1,5 @@
 import { apiClient } from "../client";
-import type { PostListResponse } from "@/types/post";
+import type { PostListResponse, PostType } from "@/types/post";
 import type {
   PostDetailResponse,
   PostAttachmentDTO,
@@ -44,7 +44,7 @@ export const postsEndpoints = {
 
   /** GET /posts — 게시글 목록 */
   getPosts: (
-    params: { page?: number; size?: number } = {},
+    params: { page?: number; size?: number; postType?: PostType } = {},
   ): Promise<PostListResponse> => {
     return apiClient
       .get<PostListResponse>("/posts", { params })
@@ -56,6 +56,7 @@ export const postsEndpoints = {
     query: string;
     page?: number;
     size?: number;
+    postType?: PostType;
   }): Promise<PostListResponse> => {
     return apiClient
       .get<PostListResponse>("/posts", { params })

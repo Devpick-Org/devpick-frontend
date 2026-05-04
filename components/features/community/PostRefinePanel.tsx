@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { LocalFileItem, PostDraft, RefinePostData } from "@/types/community";
-import type { PostLevel } from "@/types/post";
+import type { PostLevel, PostType } from "@/types/post";
 
 // ─── 상수 ──────────────────────────────────────────────────────────────────
 
@@ -27,6 +27,7 @@ interface PostRefinePanelProps {
   refineResult: RefinePostData | null;
   /** 원본 레벨 — 개선안에 그대로 사용, read-only 표시 */
   originalLevel: PostLevel;
+  originalPostType: PostType;
   /** 원본 첨부파일 — 개선안에 그대로 표시 */
   originalFiles: LocalFileItem[];
   isLoading: boolean;
@@ -43,6 +44,7 @@ interface PostRefinePanelProps {
 export function PostRefinePanel({
   refineResult,
   originalLevel,
+  originalPostType,
   originalFiles,
   isLoading,
   isSubmitting,
@@ -350,7 +352,6 @@ export function PostRefinePanel({
           disabled={isSubmitting}
           className="flex-1 gap-2 border-0 bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground"
         >
-          <Send className="h-4 w-4" />
           원본으로 게시
         </Button>
         <Button
@@ -358,7 +359,7 @@ export function PostRefinePanel({
           onClick={() => {
             if (validateRefined()) {
               onSubmitRefined({
-                draft: { title: editedTitle, content: editedContent, level: originalLevel },
+                draft: { postType: originalPostType, title: editedTitle, content: editedContent, level: originalLevel },
                 files: refinedFiles,
               });
             }

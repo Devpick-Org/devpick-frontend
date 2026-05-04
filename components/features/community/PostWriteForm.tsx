@@ -5,7 +5,7 @@ import { Paperclip, Send, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { LocalFileItem, PostAttachmentDTO, PostDraft } from "@/types/community";
-import type { PostLevel } from "@/types/post";
+import type { PostLevel, PostType } from "@/types/post";
 
 // ─── 상수 ──────────────────────────────────────────────────────────────────
 
@@ -67,6 +67,7 @@ export function PostWriteForm({
   submitError,
   submitLabel,
 }: PostWriteFormProps) {
+  const [postType, setPostType] = useState<PostType>(initialDraft?.postType ?? "TECH");
   const [title, setTitle] = useState(initialDraft?.title ?? "");
   const [content, setContent] = useState(initialDraft?.content ?? "");
   const [level, setLevel] = useState<PostLevel | null>(
@@ -160,13 +161,41 @@ export function PostWriteForm({
   };
 
   // validate()가 level null을 차단하므로 이 시점에서 level은 항상 non-null
-  const draft: PostDraft = { title, content, level: level! };
+  const draft: PostDraft = { postType, title, content, level: level! };
   const isPending = isRefining || isSubmitting;
 
   return (
     <div className="flex flex-col gap-5">
       {/* 입력 필드 카드 */}
       <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
+        {/* 게시글 유형 */}
+        <div>
+          <label className="mb-2 block text-sm font-semibold text-foreground">
+            유형 <span className="text-destructive">*</span>
+          </label>
+          <div className="flex gap-2">
+            {([
+              { id: "TECH" as PostType, label: "기술", desc: "기술 질문·토론" },
+              { id: "CAREER" as PostType, label: "커리어", desc: "커리어·취업·이직" },
+            ]).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setPostType(t.id)}
+                className={cn(
+                  "rounded-lg border px-4 py-2 text-sm font-medium transition-all cursor-pointer",
+                  postType === t.id
+                    ? "bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:border-border/80 hover:text-foreground",
+                )}
+              >
+                {t.label}
+                <span className="ml-1.5 text-xs opacity-60">{t.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* 제목 */}
         <div>
           <div className="mb-1.5 flex items-center justify-between">
@@ -193,7 +222,7 @@ export function PostWriteForm({
             }}
             placeholder="예: React useState 업데이트가 즉시 반영되지 않는 이유가 궁금합니다"
             className={cn(
-              "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground font-medium placeholder:text-muted-foreground/50 outline-none transition-colors focus:border-primary",
+              "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground font-medium placeholder:text-muted-foreground/50 outline-none transition-colors focus:border-border",
               errors.title ? "border-destructive" : "border-border",
             )}
           />
@@ -251,7 +280,7 @@ export function PostWriteForm({
             placeholder={CONTENT_PLACEHOLDER}
             rows={14}
             className={cn(
-              "w-full resize-y rounded-xl border bg-background px-4 py-3 text-sm font-medium leading-relaxed text-foreground placeholder:text-muted-foreground/40 outline-none transition-colors focus:border-primary",
+              "w-full resize-y rounded-xl border bg-background px-4 py-3 text-sm font-medium leading-relaxed text-foreground placeholder:text-muted-foreground/40 outline-none transition-colors focus:border-border",
               errors.content ? "border-destructive" : "border-border",
             )}
           />
@@ -376,10 +405,9 @@ export function PostWriteForm({
           disabled={isPending}
           className={cn("flex-1 gap-2 border-0 bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground")}
         >
-          <Send className="h-4 w-4" />
           {isSubmitting ? "저장 중..." : (submitLabel ?? "바로 게시하기")}
         </Button>
-        {onRefine && (
+        {onRefine && postType === "TECH" && (
           <Button
             type="button"
             onClick={() => {

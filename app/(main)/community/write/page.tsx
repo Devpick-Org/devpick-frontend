@@ -190,6 +190,7 @@ export default function CommunityWritePage() {
               key={refineState.key}
               refineResult={refineState.result}
               originalLevel={savedDraft?.level ?? "JUNIOR"}
+              originalPostType={savedDraft?.postType ?? "TECH"}
               originalFiles={savedFiles}
               isLoading={refineMutation.isPending}
               isSubmitting={createMutation.isPending}

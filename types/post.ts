@@ -2,10 +2,12 @@ import type { ApiResponse } from "./api";
 import type { UserJob } from "./userProfile";
 
 export type PostLevel = "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
+export type PostType = "TECH" | "CAREER";
 
 /** GET /posts 응답 아이템 (API spec 기준) */
 export interface PostSummary {
   id: string;
+  postType: PostType;
   title: string;
   level: PostLevel;
   authorId: string;

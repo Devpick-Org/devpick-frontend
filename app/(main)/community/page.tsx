@@ -9,8 +9,10 @@ import { CommunityCard } from "@/components/features/community/CommunityCard";
 import { CommunitySearch } from "@/components/features/community/CommunitySearch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
+import type { PostType } from "@/types/post";
 
 const PAGE_SIZE = 6;
 
@@ -61,6 +63,7 @@ export default function CommunityPage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [postType, setPostType] = useState<PostType | "ALL">("ALL");
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const handleWriteClick = () => {
@@ -79,17 +82,19 @@ export default function CommunityPage() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["posts", searchQuery],
+    queryKey: ["posts", searchQuery, postType],
     initialPageParam: 0,
     queryFn: ({ pageParam }) => {
+      const type = postType === "ALL" ? undefined : postType;
       if (searchQuery.trim()) {
         return postsEndpoints.searchPosts({
           query: searchQuery,
           page: pageParam,
           size: PAGE_SIZE,
+          postType: type,
         });
       }
-      return postsEndpoints.getPosts({ page: pageParam, size: PAGE_SIZE });
+      return postsEndpoints.getPosts({ page: pageParam, size: PAGE_SIZE, postType: type });
     },
     getNextPageParam: (lastPage) => {
       const { page, totalPages } = lastPage.data;
@@ -146,8 +151,31 @@ export default function CommunityPage() {
         </section>
 
         {/* Search */}
-        <div className="mb-8">
+        <div className="mb-4">
           <CommunitySearch onSearch={setSearchQuery} />
+        </div>
+
+        {/* Filters */}
+        <div className="mb-6 flex flex-wrap gap-1.5">
+          {([
+            { id: "ALL", label: "전체" },
+            { id: "TECH", label: "기술" },
+            { id: "CAREER", label: "커리어" },
+          ] as { id: PostType | "ALL"; label: string }[]).map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setPostType(tab.id)}
+              className={cn(
+                "rounded-full px-3.5 py-1 text-sm font-medium transition-colors cursor-pointer",
+                postType === tab.id
+                  ? "bg-primary/10 text-primary"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Post list */}
