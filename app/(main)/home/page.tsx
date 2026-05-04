@@ -14,21 +14,6 @@ import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog"
 
 const PAGE_SIZE = 6;
 
-function WaveIcon({ className }: { className?: string }) {
-  return (
-    <span
-      className={className}
-      style={{
-        display: "inline-block",
-        transformOrigin: "70% 70%",
-        animation: "wave 2s ease-in-out infinite",
-      }}
-    >
-      👋
-    </span>
-  );
-}
-
 export default function HomePage() {
   const user = useAuthStore((s) => s.user);
   /** 검색·피드 응답의 스크랩/좋아요는 로그인 시에만 의미 있음 — 로그인 전환 시 목록 재조회 */
@@ -126,7 +111,6 @@ export default function HomePage() {
             <h1 className="text-xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
               {nickname}님을 위한 오늘의 추천
             </h1>
-            <WaveIcon className="text-xl md:text-3xl" />
           </div>
           <p className="text-sm font-medium text-muted-foreground md:text-base">
             관심 기술과 학습 흐름에 맞춘 개발 콘텐츠를 모아봤어요.

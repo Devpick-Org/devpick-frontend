@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ExternalLink, Brain } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { ContentRenderer as HtmlContentRenderer } from "./ContentRenderer";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import { hideInlineOriginalSource } from "@/lib/content/sourceGuards";
@@ -34,7 +35,7 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
       <section className="flex flex-col items-center gap-4 rounded-2xl bg-card px-6 py-8">
         {showNoInlineBodyNotice && (
           <p className="text-sm text-muted-foreground font-medium">
-            저작권 보호를 위해 본문이 제공되지 않습니다.
+            저작권 보호를 위해 원문이 제공되지 않습니다.
           </p>
         )}
         <div className="flex gap-3">
@@ -42,7 +43,7 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
             href={`/home/${content.id}/quiz`}
             className="inline-flex items-center gap-2.5 rounded-xl bg-secondary px-6 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-secondary/80"
           >
-            <Brain className="h-4 w-4" />
+            <Icon icon="material-symbols:quiz-outline-rounded" width={16} height={16} />
             AI 퀴즈 풀기
           </Link>
           <a

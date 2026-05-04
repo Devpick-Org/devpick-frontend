@@ -135,9 +135,9 @@ export function QuizResult(props: QuizResultProps) {
                 >
                   <div className="flex items-start gap-2">
                     {correct ? (
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
+                      <CheckCircle2 className="mt-[3px] h-4 w-4 shrink-0 text-green-500" />
                     ) : (
-                      <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                      <XCircle className="mt-[3px] h-4 w-4 shrink-0 text-red-500" />
                     )}
                     <p className="text-sm font-medium text-foreground leading-relaxed">
                       Q{idx + 1}. {q.question}
@@ -263,9 +263,9 @@ export function QuizResult(props: QuizResultProps) {
             >
               <div className="flex items-start gap-2">
                 {correct ? (
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
+                  <CheckCircle2 className="mt-[3px] h-4 w-4 shrink-0 text-green-500" />
                 ) : (
-                  <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                  <XCircle className="mt-[3px] h-4 w-4 shrink-0 text-red-500" />
                 )}
                 <p className="text-sm font-medium text-foreground leading-relaxed">
                   Q{idx + 1}. {q.question}
