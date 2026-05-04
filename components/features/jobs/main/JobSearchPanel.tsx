@@ -89,11 +89,11 @@ export function JobSearchPanel({
           type="button"
           onClick={openFilterModal}
           className={cn(
-            "inline-flex shrink-0 items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-all",
+            "inline-flex shrink-0 items-center gap-2 rounded-xl border px-4 py-3 text-sm font-semibold transition-all cursor-pointer",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
             activeCount > 0
-              ? "border-primary/45 bg-primary/8 text-primary shadow-sm"
-              : "border-border bg-muted/50 text-foreground hover:bg-muted/80",
+              ? "border-transparent bg-primary/8 text-primary shadow-sm"
+              : "border-transparent bg-muted/60 text-foreground hover:bg-muted/80",
           )}
           aria-haspopup="dialog"
         >

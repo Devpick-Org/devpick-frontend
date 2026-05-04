@@ -21,18 +21,27 @@ function TagSection({
   tags,
   draft,
   onToggle,
+  selectedCount,
 }: {
   title: string;
   tags: SectionTag[];
   draft: string[];
   onToggle: (tag: string) => void;
+  selectedCount?: number;
 }) {
   if (tags.length === 0) return null;
   return (
     <section className="mb-8 last:mb-0">
-      <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-        {title}
-      </h3>
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
+          {title}
+        </h3>
+        {selectedCount !== undefined && (
+          <p className="text-xs font-medium text-muted-foreground">
+            <span className="tabular-nums text-primary">{selectedCount}</span>개 선택됨
+          </p>
+        )}
+      </div>
       <div className="flex flex-wrap gap-2">
         {tags.map(({ tag, count }) => {
           const on = draft.some((x) => x.toLowerCase() === tag.toLowerCase());
@@ -42,22 +51,15 @@ function TagSection({
               type="button"
               onClick={() => onToggle(tag)}
               className={cn(
-                "inline-flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-xs font-semibold transition-colors",
+                "inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-semibold transition-colors leading-none cursor-pointer",
                 on
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-secondary text-foreground hover:border-primary/40",
+                  ? "bg-primary/10 text-primary"
+                  : "bg-secondary text-muted-foreground",
               )}
             >
               <span>{tag}</span>
               {count !== undefined && count > 0 ? (
-                <span
-                  className={cn(
-                    "rounded-full px-1.5 text-[10px] font-bold tabular-nums",
-                    on
-                      ? "bg-primary/15 text-primary"
-                      : "bg-background text-muted-foreground",
-                  )}
-                >
+                <span className="text-[10px] font-bold tabular-nums leading-none">
                   {count}
                 </span>
               ) : null}
@@ -87,10 +89,8 @@ function CompanyOption({
       type="button"
       onClick={() => onToggle(company.name)}
       className={cn(
-        "group flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition-all",
-        selected
-          ? "border-primary bg-primary/10 shadow-sm"
-          : "border-border bg-card hover:border-primary/40 hover:bg-muted/40",
+        "group flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition-all cursor-pointer",
+        "border-border bg-card",
       )}
     >
       <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-muted text-xs font-bold text-muted-foreground">
@@ -135,8 +135,9 @@ export interface JobTechCompanyPickerProps {
   companyNames: string[];
   onTechStackChange: (next: string[]) => void;
   onCompanyNamesChange: (next: string[]) => void;
-  /** 초기 검색 입력 포커스 (모달 진입 등) */
   autoFocusSearch?: boolean;
+  initialTab?: TechCompanySearchTab;
+  hideTabSwitcher?: boolean;
 }
 
 export function JobTechCompanyPicker({
@@ -145,11 +146,13 @@ export function JobTechCompanyPicker({
   onTechStackChange,
   onCompanyNamesChange,
   autoFocusSearch = false,
+  initialTab = "tech",
+  hideTabSwitcher = false,
 }: JobTechCompanyPickerProps) {
   const accessToken = useAuthStore((s) => s.accessToken);
   const loggedIn = Boolean(accessToken);
 
-  const [activeTab, setActiveTab] = useState<TechCompanySearchTab>("tech");
+  const [activeTab, setActiveTab] = useState<TechCompanySearchTab>(initialTab);
   const [q, setQ] = useState("");
   const [manual, setManual] = useState("");
 
@@ -219,6 +222,16 @@ export function JobTechCompanyPicker({
       .filter((x) => (query ? x.tag.toLowerCase().includes(query) : true));
   }, [mergedJobFacetNames, contentFacets, jobFacets, query]);
 
+  const manualTags = useMemo((): SectionTag[] => {
+    const knownNames = new Set([
+      ...contentFacets.map((f) => f.name.trim().toLowerCase()),
+      ...jobFacets.map((f) => f.name.trim().toLowerCase()),
+    ]);
+    return techStack
+      .filter((t) => !knownNames.has(t.toLowerCase()))
+      .map((tag) => ({ tag }));
+  }, [techStack, contentFacets, jobFacets]);
+
   const toggle = (tag: string) => {
     const t = tag.trim();
     if (!t) return;
@@ -262,13 +275,14 @@ export function JobTechCompanyPicker({
     [companyFacets, query],
   );
 
-  const selectedCount = techStack.length + companyNames.length;
+  const techSelectedCount = techStack.length;
+  const companySelectedCount = companyNames.length;
 
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-col">
-      <div className="shrink-0 space-y-3 border-b border-border bg-popover px-4 py-4 sm:px-5">
+      <div className="shrink-0 space-y-3 border-b border-border bg-popover px-4 pb-4 pt-2 sm:px-5">
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             autoFocus={autoFocusSearch}
             value={q}
@@ -278,10 +292,10 @@ export function JobTechCompanyPicker({
                 ? "기술 스택을 검색해 보세요..."
                 : "회사명을 검색해 보세요..."
             }
-            className="h-12 rounded-2xl border-border bg-background pl-10 pr-3 text-[15px] shadow-sm placeholder:text-muted-foreground/65 focus-visible:ring-2"
+            className="h-12 rounded-lg bg-muted/60 pl-11 pr-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
           />
         </div>
-        <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted p-1">
+        {!hideTabSwitcher && <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted p-1">
           {[
             { id: "tech" as const, label: "기술 스택", icon: Sparkles },
             { id: "company" as const, label: "회사", icon: Building2 },
@@ -297,7 +311,7 @@ export function JobTechCompanyPicker({
                   setQ("");
                 }}
                 className={cn(
-                  "flex h-10 items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all",
+                  "flex h-10 items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all cursor-pointer",
                   on
                     ? "bg-background text-primary shadow-sm"
                     : "text-muted-foreground hover:text-foreground",
@@ -308,50 +322,12 @@ export function JobTechCompanyPicker({
               </button>
             );
           })}
-        </div>
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          기술은 수집 콘텐츠 RDS 태그를 우선 보여 주고, 회사는 크롤링된 공고
-          데이터를 기준으로 검색합니다.
+        </div>}
+        <p className="pl-3 text-xs leading-relaxed text-muted-foreground">
+          {activeTab === "tech"
+            ? "기술은 수집 콘텐츠 RDS 태그를 우선 보여 줍니다."
+            : "회사는 크롤링된 공고 데이터를 기준으로 검색합니다."}
         </p>
-      </div>
-
-      <div className="mx-5 mt-3 flex shrink-0 items-center justify-between gap-2 bg-popover px-0 py-1 text-xs text-muted-foreground">
-        <span>
-          선택 합계{" "}
-          <span className="font-semibold tabular-nums text-primary">
-            {selectedCount}
-          </span>
-          개
-        </span>
-        {selectedCount > 0 ? (
-          <div className="flex max-w-[70%] flex-wrap justify-end gap-1">
-            {techStack.slice(0, 12).map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => toggle(tag)}
-                className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary hover:bg-primary/15"
-              >
-                {tag} ×
-              </button>
-            ))}
-            {companyNames.slice(0, Math.max(0, 12 - techStack.length)).map((name) => (
-              <button
-                key={name}
-                type="button"
-                onClick={() => toggleCompany(name)}
-                className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-[11px] font-semibold text-foreground hover:bg-secondary/80"
-              >
-                {name} ×
-              </button>
-            ))}
-            {selectedCount > 12 ? (
-              <span className="self-center px-1 text-[11px]">
-                +{selectedCount - 12}
-              </span>
-            ) : null}
-          </div>
-        ) : null}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto bg-popover px-4 pb-10 pt-4 sm:px-5">
@@ -364,10 +340,18 @@ export function JobTechCompanyPicker({
         {activeTab === "tech" ? (
           <>
             <TagSection
+              title="직접 추가"
+              tags={manualTags}
+              draft={techStack}
+              onToggle={toggle}
+              selectedCount={manualTags.length > 0 ? techSelectedCount : undefined}
+            />
+            <TagSection
               title="크롤·수집 콘텐츠 태그"
               tags={contentSectionTags}
               draft={techStack}
               onToggle={toggle}
+              selectedCount={manualTags.length === 0 ? techSelectedCount : undefined}
             />
 
             {loggedIn && jobFacets.length > 0 ? (
@@ -380,6 +364,13 @@ export function JobTechCompanyPicker({
             ) : null}
           </>
         ) : (
+          <>
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">회사</h3>
+              <p className="text-xs font-medium text-muted-foreground">
+                <span className="tabular-nums text-primary">{companySelectedCount}</span>개 선택됨
+              </p>
+            </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {filteredCompanies.map((company) => (
               <CompanyOption
@@ -392,6 +383,7 @@ export function JobTechCompanyPicker({
               />
             ))}
           </div>
+          </>
         )}
 
         {showEmpty ? (
@@ -414,7 +406,7 @@ export function JobTechCompanyPicker({
                 }
               }}
               placeholder="목록에 없으면 이름을 직접 입력해 추가"
-              className="h-10 flex-1 bg-background"
+              className="h-9 flex-1 bg-background border border-border text-xs focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
             />
             <Button type="button" variant="secondary" onClick={addManual}>
               추가

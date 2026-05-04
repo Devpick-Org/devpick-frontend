@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { Tags, X, ClipboardList } from "lucide-react";
+import { Tags, X, ClipboardList, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { JobCategory, ExperienceLevel } from "@/types/jobs";
@@ -14,7 +14,7 @@ import {
 import { DEFAULT_JOB_FILTERS, type JobFilters } from "./JobFilterBar";
 import { JobTechCompanyPicker } from "./JobTechCompanyPicker";
 
-type MainTab = "conditions" | "tags";
+type MainTab = "conditions" | "tech" | "company";
 
 interface JobUnifiedFilterModalProps {
   open: boolean;
@@ -50,10 +50,10 @@ function ConditionPills<T extends string>({
             type="button"
             onClick={() => onChange(opt.value)}
             className={cn(
-              "rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-all sm:text-[13px]",
+              "inline-flex items-center rounded-full px-3 py-2 text-xs font-semibold transition-colors leading-none cursor-pointer",
               on
-                ? "border-primary bg-primary/10 text-primary shadow-sm"
-                : "border-border bg-secondary/80 text-foreground hover:border-primary/35",
+                ? "bg-primary/10 text-primary"
+                : "bg-secondary text-muted-foreground",
             )}
           >
             {opt.label}
@@ -118,14 +118,14 @@ function ModalInner({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "fixed left-1/2 top-6 z-50 flex w-[calc(100%-32px)] max-w-[760px]",
-          "-translate-x-1/2",
+          "fixed left-1/2 top-1/2 z-50 flex w-[calc(100%-32px)] max-w-[760px]",
+          "-translate-x-1/2 -translate-y-1/2",
           "max-h-[min(820px,calc(100vh-24px))] flex-col overflow-hidden rounded-3xl border border-border bg-popover text-popover-foreground shadow-xl",
           "animate-in fade-in-0 zoom-in-[0.985] duration-200",
         )}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <header className="shrink-0 border-b border-border bg-popover px-4 pb-4 pt-4 sm:px-6">
+        <header className="shrink-0 bg-popover px-4 pb-4 pt-4 sm:px-6">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h2
@@ -142,22 +142,18 @@ function ModalInner({
               type="button"
               aria-label="닫기"
               onClick={() => onOpenChange(false)}
-              className="shrink-0 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="shrink-0 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl bg-muted p-1">
+          <div className="mt-6 flex border-b border-border">
             {[
-              {
-                id: "conditions" as const,
-                label: "직무 · 경력 · 근무지",
-                icon: ClipboardList,
-              },
-              { id: "tags" as const, label: "태그 · 회사", icon: Tags },
+              { id: "conditions" as const, label: "직무 · 경력 · 근무지" },
+              { id: "tech" as const, label: "태그" },
+              { id: "company" as const, label: "회사" },
             ].map((tab) => {
-              const Icon = tab.icon;
               const on = mainTab === tab.id;
               return (
                 <button
@@ -165,14 +161,13 @@ function ModalInner({
                   type="button"
                   onClick={() => setMainTab(tab.id)}
                   className={cn(
-                    "flex min-h-11 items-center justify-center gap-2 rounded-xl px-2 text-[13px] font-semibold transition-all sm:text-sm",
+                    "flex-1 rounded-none border-b-2 border-transparent px-4 pb-3 pt-1 text-sm font-semibold transition-colors cursor-pointer",
                     on
-                      ? "bg-popover text-primary shadow-md"
+                      ? "border-primary text-foreground"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="text-center leading-tight">{tab.label}</span>
+                  {tab.label}
                 </button>
               );
             })}
@@ -184,48 +179,37 @@ function ModalInner({
             <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-8 pt-5 sm:px-6">
               <div className="space-y-8">
                 <section className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
                     직무
                   </h3>
                   <ConditionPills
                     options={JOB_CATEGORY_OPTIONS}
                     value={draft.category}
                     onChange={(v) =>
-                      setDraft((d) => ({
-                        ...d,
-                        category: v as JobCategory | "ALL",
-                      }))
+                      setDraft((d) => ({ ...d, category: v as JobCategory | "ALL" }))
                     }
                   />
                 </section>
                 <section className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
                     경력
                   </h3>
                   <ConditionPills
                     options={EXPERIENCE_LEVEL_OPTIONS}
                     value={draft.experienceLevel}
                     onChange={(v) =>
-                      setDraft((d) => ({
-                        ...d,
-                        experienceLevel: v as ExperienceLevel | "ALL",
-                      }))
+                      setDraft((d) => ({ ...d, experienceLevel: v as ExperienceLevel | "ALL" }))
                     }
                   />
                 </section>
                 <section className="space-y-3">
-                  <h3 className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
                     근무지
                   </h3>
                   <ConditionPills
                     options={locationRadioOptions}
                     value={draft.location}
-                    onChange={(v) =>
-                      setDraft((d) => ({
-                        ...d,
-                        location: v,
-                      }))
-                    }
+                    onChange={(v) => setDraft((d) => ({ ...d, location: v }))}
                   />
                 </section>
               </div>
@@ -233,23 +217,24 @@ function ModalInner({
           ) : (
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <JobTechCompanyPicker
+                key={mainTab}
+                initialTab={mainTab}
+                hideTabSwitcher
                 techStack={draft.techStack}
                 companyNames={draft.companyNames}
                 onTechStackChange={(techStack) => setDraft((d) => ({ ...d, techStack }))}
-                onCompanyNamesChange={(companyNames) =>
-                  setDraft((d) => ({ ...d, companyNames }))
-                }
+                onCompanyNamesChange={(companyNames) => setDraft((d) => ({ ...d, companyNames }))}
               />
             </div>
           )}
         </div>
 
-        <footer className="shrink-0 space-y-2 border-t border-border bg-popover px-4 py-4 sm:px-6">
+        <footer className="shrink-0 space-y-2 bg-popover px-4 py-4 sm:px-6">
           <div className="grid grid-cols-2 gap-2">
             <Button
               type="button"
               variant="outline"
-              className="h-11 font-semibold"
+              className="h-11 font-semibold hover:bg-muted hover:text-foreground"
               onClick={() => setDraft(cloneDraft(DEFAULT_JOB_FILTERS))}
             >
               초기화
