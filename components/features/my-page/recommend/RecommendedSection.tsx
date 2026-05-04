@@ -83,9 +83,9 @@ export function RecommendedSection() {
     queryFn: getRecommendBooks,
   });
 
-  const homePosts = homePostsData?.contents ?? [];
-  const videos = videosData?.videos ?? [];
-  const books = booksData?.books ?? [];
+  const homePosts = (homePostsData?.contents ?? []).slice(0, 8);
+  const videos = (videosData?.videos ?? []).slice(0, 8);
+  const books = (booksData?.books ?? []).slice(0, 8);
 
   return (
     <section>
