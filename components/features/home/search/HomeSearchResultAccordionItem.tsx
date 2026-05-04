@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { SearchResultItem } from "@/types/search";
 import { SourceLogo } from "@/components/features/home/SourceLogo";
+import { formatDate } from "@/lib/utils";
 
 interface HomeSearchResultAccordionItemProps {
   item: SearchResultItem;
@@ -29,7 +30,7 @@ export function HomeSearchResultAccordionItem({
           {item.title}
         </span>
         <span className="shrink-0 text-xs text-muted-foreground">
-          {item.publishedAt}
+          {formatDate(item.publishedAt)}
         </span>
         {isOpen ? (
           <ChevronUp className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -52,7 +53,7 @@ export function HomeSearchResultAccordionItem({
             </div>
           )}
           <div className="flex flex-col gap-2">
-            <p className="text-sm leading-relaxed text-muted-foreground">
+            <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
               {item.summary}
             </p>
             <div className="flex flex-wrap gap-1.5">

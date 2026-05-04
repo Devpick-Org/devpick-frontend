@@ -122,7 +122,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
     const contents = searchData?.data?.contents ?? [];
     return contents.map((c) => ({
       id: c.id,
-      title: c.title,
+      title: c.translatedTitle ?? c.title,
       sourceName: c.sourceName,
       publishedAt: c.publishedAt,
       thumbnailUrl: c.thumbnailUrl,

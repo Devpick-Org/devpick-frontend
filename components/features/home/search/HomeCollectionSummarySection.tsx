@@ -1,3 +1,5 @@
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface HomeCollectionSummarySectionProps {
@@ -23,7 +25,32 @@ export function HomeCollectionSummarySection({
           <Skeleton className="h-3.5 w-9/12 rounded" />
         </div>
       ) : (
-        <p className="text-sm leading-relaxed text-foreground">{summary}</p>
+        <div className="text-sm leading-relaxed text-foreground">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p({ children }) {
+                return <p className="mb-2 last:mb-0">{children}</p>;
+              },
+              ul({ children }) {
+                return <ul className="mt-2 flex flex-col gap-1.5">{children}</ul>;
+              },
+              li({ children }) {
+                return (
+                  <li className="flex gap-1.5">
+                    <span className="mt-1 shrink-0 text-muted-foreground">•</span>
+                    <span>{children}</span>
+                  </li>
+                );
+              },
+              strong({ children }) {
+                return <strong className="font-semibold text-foreground">{children}</strong>;
+              },
+            }}
+          >
+            {summary}
+          </ReactMarkdown>
+        </div>
       )}
     </section>
   );
