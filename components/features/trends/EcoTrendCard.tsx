@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Bookmark, Share2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { bootcampTrendThumbnailSrc } from "@/lib/bootcamper-thumbnail";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
 type EcoTrendCardProps = {
@@ -64,11 +65,10 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
         >
           {showImage && displayThumbnail ? (
             item.category === "bootcamp" ? (
-              // eslint-disable-next-line @next/next/no-img-element -- 부트캠퍼 _next/image는 서버 프록시(데이터센터 IP)보다 브라우저 직링크가 안정적
+              /* eslint-disable-next-line @next/next/no-img-element -- 외부 프록시(URL/리퍼러) 제약으로 최적화 Image 대신 필요 */
               <img
-                src={displayThumbnail}
+                src={bootcampTrendThumbnailSrc(displayThumbnail) ?? displayThumbnail}
                 alt=""
-                referrerPolicy="no-referrer"
                 loading="lazy"
                 decoding="async"
                 className="absolute inset-0 h-full w-full object-cover"
