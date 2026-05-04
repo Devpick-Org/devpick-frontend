@@ -117,50 +117,53 @@ function TechTagPickerBody({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-full max-w-lg",
+          "fixed left-1/2 top-1/2 z-50 w-full max-w-3xl",
           "-translate-x-1/2 -translate-y-1/2",
-          "max-h-[min(560px,calc(100vh-48px))] flex flex-col overflow-hidden rounded-xl",
+          "max-h-[min(680px,calc(100vh-48px))] flex flex-col overflow-hidden rounded-xl",
           "border border-border bg-card shadow-xl",
           "animate-in fade-in-0 zoom-in-95 duration-200",
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="border-b border-border px-5 py-4">
+        <div className="px-5 py-4">
           <h2 id={titleId} className="text-lg font-semibold text-foreground">
             {title}
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            공고에서 자주 등장하는 기술을 먼저 보여드려요. 목록에 없으면 아래 입력으로
+            공고에서 자주 등장하는 기술을 먼저 보여드려요. 목록에 없으면 하단의 직접 입력으로
             추가할 수 있습니다.
           </p>
-          <div className="relative mt-3">
+          <div className="relative mt-6">
             <SearchGlyph className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="예: kafka, graphql, terraform…"
-              className="h-10 bg-secondary pl-9"
+              className="h-10 bg-secondary pl-9 focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
             />
           </div>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
-          <p className="mb-3 text-[11px] font-medium text-muted-foreground">
-            선택됨{" "}
-            <span className="text-primary tabular-nums">{draft.length}</span>개
-          </p>
-          <div className="space-y-5">
+          <div className="space-y-8">
             {isError ? (
               <p className="rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
                 공고 태그를 불러오지 못해 기본 기술 목록을 보여드리고 있어요.
               </p>
             ) : null}
-            {filteredGroups.map((group) => (
-              <section key={group.label} className="space-y-2">
-                <h3 className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  {group.label}
-                </h3>
+            {filteredGroups.map((group, idx) => (
+              <section key={group.label} className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-foreground">
+                    {group.label}
+                  </h3>
+                  {idx === 0 && (
+                    <p className="text-xs font-medium text-muted-foreground">
+                      <span className="text-primary tabular-nums">{draft.length}</span>개 선택됨
+                    </p>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {group.tags.map((tag) => {
                     const on = draft.some(
@@ -172,17 +175,17 @@ function TechTagPickerBody({
                         type="button"
                         onClick={() => toggle(tag)}
                         className={cn(
-                          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold transition-colors",
+                          "inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-colors leading-none cursor-pointer",
                           on
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-secondary text-foreground hover:border-primary/40",
+                            ? "bg-primary/10 text-primary"
+                            : "bg-secondary text-muted-foreground",
                         )}
                       >
                         <span>{tag}</span>
                         {facetCounts.has(tag.toLowerCase()) ? (
                           <span className={cn(
-                            "rounded-full px-1.5 text-[10px] font-bold tabular-nums",
-                            on ? "bg-primary/15 text-primary" : "bg-background text-muted-foreground",
+                            "text-[10px] font-bold tabular-nums leading-none",
+                            on ? "text-primary" : "text-muted-foreground",
                           )}>
                             {facetCounts.get(tag.toLowerCase())}
                           </span>
@@ -201,7 +204,7 @@ function TechTagPickerBody({
           </div>
         </div>
 
-        <div className="space-y-2 border-t border-border bg-muted/20 px-5 py-4">
+        <div className="space-y-3 border-t border-border bg-muted/20 px-5 py-4">
           <div className="flex gap-2">
             <Input
               value={manual}
@@ -213,7 +216,7 @@ function TechTagPickerBody({
                 }
               }}
               placeholder="목록에 없는 기술 직접 입력"
-              className="h-9 flex-1 bg-background"
+              className="h-8 flex-1 bg-background border border-border text-xs focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
             />
             <Button type="button" variant="secondary" size="sm" onClick={addManual}>
               추가
@@ -224,6 +227,7 @@ function TechTagPickerBody({
               type="button"
               variant="ghost"
               size="sm"
+              className="hover:bg-muted hover:text-foreground"
               onClick={() => onOpenChange(false)}
             >
               취소

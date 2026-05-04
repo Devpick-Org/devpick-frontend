@@ -81,7 +81,7 @@ export function ProfileTagSelector({
       <button
         type="button"
         className={cn(
-          "flex h-11 w-full items-center gap-2 rounded-lg border border-border bg-secondary px-3 text-left text-sm font-medium transition-colors hover:border-primary/40 cursor-pointer text-foreground",
+          "flex h-11 w-full items-center gap-2 rounded-lg bg-secondary px-3 text-left text-sm font-medium transition-colors cursor-pointer text-foreground",
         )}
         onClick={() => setPickerOpen(true)}
       >

@@ -332,7 +332,7 @@ export function ProfileEditForm() {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}
-              className="h-11 bg-secondary text-foreground font-medium placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/50"
+              className="h-11 bg-secondary text-foreground font-medium placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
               placeholder="닉네임을 입력하세요"
             />
             <p className="mt-1.5 text-xs text-muted-foreground font-medium">
@@ -446,7 +446,7 @@ export function ProfileEditForm() {
       </section>
 
       {/* Danger Zone */}
-      <section className="rounded-2xl  bg-red-500/5 p-6">
+      <section className="rounded-2xl bg-red-500/5 p-6 mx-6">
         <h2 className="mb-2 text-base font-semibold text-red-400">
           Danger Zone
         </h2>

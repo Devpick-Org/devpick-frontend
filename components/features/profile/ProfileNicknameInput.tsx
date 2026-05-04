@@ -19,7 +19,7 @@ export function ProfileNicknameInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         maxLength={20}
-        className="h-11 bg-secondary text-foreground font-medium placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/50"
+        className="h-11 bg-secondary text-foreground font-medium placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
       />
       <p className="mt-1.5 text-xs text-muted-foreground font-medium">{`${value.length}/20자`}</p>
     </div>
