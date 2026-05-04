@@ -11,7 +11,13 @@ import { postsEndpoints } from "@/lib/api/endpoints/posts";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { PostWriteForm } from "@/components/features/community/PostWriteForm";
 import { PostRefinePanel } from "@/components/features/community/PostRefinePanel";
-import type { LocalFileItem, PostDraft, RefinePostData } from "@/types/community";
+import { cn } from "@/lib/utils";
+import type {
+  LocalFileItem,
+  PostDraft,
+  RefinePostData,
+} from "@/types/community";
+import type { PostType } from "@/types/post";
 
 // ─── 첨부파일 업로드 ──────────────────────────────────────────────────────────
 // 파일 배열을 S3에 업로드하고 URL 배열을 반환한다.
@@ -31,6 +37,8 @@ export default function CommunityWritePage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const mounted = useHydrated();
+
+  const [postType, setPostType] = useState<PostType>("TECH");
 
   // ─── 첨부파일 — source of truth ────────────────────────────────────────────
   // 왼쪽 폼의 현재 파일 목록. 오른쪽 패널에는 refine 시점 스냅샷(savedFiles)을 전달한다.
@@ -105,7 +113,13 @@ export default function CommunityWritePage() {
   };
 
   /** 오른쪽 패널: 개선안으로 게시 — 패널에서 수정된 files 기준 */
-  const handleSubmitRefined = async ({ draft, files: refinedFiles }: { draft: PostDraft; files: LocalFileItem[] }) => {
+  const handleSubmitRefined = async ({
+    draft,
+    files: refinedFiles,
+  }: {
+    draft: PostDraft;
+    files: LocalFileItem[];
+  }) => {
     const attachmentUrls = await uploadFiles(refinedFiles);
     createMutation.mutate({ ...draft, attachmentUrls });
   };
@@ -146,23 +160,52 @@ export default function CommunityWritePage() {
             질문하기
           </h1>
           <p className="mt-1 text-sm font-medium text-muted-foreground">
-            막히는 부분을 자유롭게 질문해 보세요. AI가 질문을 더 명확하게 다듬어
-            드릴 수 있어요.
+            {postType === "TECH"
+              ? "막히는 부분을 자유롭게 질문해 보세요. AI가 질문을 더 명확하게 다듬어 드릴 수 있어요."
+              : "커리어 고민을 자유롭게 나눠 보세요. 취업, 이직, 성장에 관한 이야기를 나눌 수 있어요."}
           </p>
+          <div className="mt-8 flex gap-4 border-b border-border">
+            {(
+              [
+                { id: "TECH" as PostType, label: "기술" },
+                { id: "CAREER" as PostType, label: "커리어" },
+              ] as const
+            ).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => {
+                  setPostType(t.id);
+                  setRefineState({ key: 0, result: null });
+                  setSavedDraft(null);
+                  setSavedFiles([]);
+                }}
+                className={cn(
+                  "-mb-px pb-2.5 text-sm font-medium transition-all cursor-pointer border-b-2",
+                  postType === t.id
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </header>
 
-        {/* 2컬럼 레이아웃 — 모바일은 세로 스택 */}
+        {/* 레이아웃 — 기술: 2컬럼 / 커리어: 1컬럼 중앙 */}
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* 왼쪽: 입력 폼 */}
+          {/* 왼쪽(기술) / 중앙(커리어): 입력 폼 */}
           <section>
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               내 질문
             </h2>
             <PostWriteForm
+              postType={postType}
               files={files}
               onFilesChange={handleFilesChange}
               onRemoveFile={handleRemoveFile}
-              onRefine={handleRefine}
+              onRefine={postType === "TECH" ? handleRefine : undefined}
               onSubmit={handleSubmitDirect}
               isRefining={refineMutation.isPending}
               isSubmitting={createMutation.isPending}
@@ -173,7 +216,8 @@ export default function CommunityWritePage() {
               }
               submitError={
                 createMutation.isError
-                  ? extractApiError(createMutation.error).code === "COMMUNITY_013"
+                  ? extractApiError(createMutation.error).code ===
+                    "COMMUNITY_013"
                     ? "잠시 후 다시 시도해 주세요."
                     : "게시 중 문제가 발생했습니다. 다시 시도해 주세요."
                   : null
@@ -181,30 +225,96 @@ export default function CommunityWritePage() {
             />
           </section>
 
-          {/* 오른쪽: AI 개선 결과 패널 */}
-          <section>
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              AI 개선 결과
-            </h2>
-            <PostRefinePanel
-              key={refineState.key}
-              refineResult={refineState.result}
-              originalLevel={savedDraft?.level ?? "JUNIOR"}
-              originalPostType={savedDraft?.postType ?? "TECH"}
-              originalFiles={savedFiles}
-              isLoading={refineMutation.isPending}
-              isSubmitting={createMutation.isPending}
-              submitError={
-                createMutation.isError
-                  ? extractApiError(createMutation.error).code === "COMMUNITY_013"
-                    ? "잠시 후 다시 시도해 주세요."
-                    : "게시 중 문제가 발생했습니다. 다시 시도해 주세요."
-                  : null
-              }
-              onSubmitRefined={handleSubmitRefined}
-              onSubmitOriginal={handleSubmitOriginal}
-            />
-          </section>
+          {/* 오른쪽: AI 개선 결과 패널 (기술) / 커리어 가이드 (커리어) */}
+          {postType === "TECH" ? (
+            <section>
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                AI 개선 결과
+              </h2>
+              <PostRefinePanel
+                key={refineState.key}
+                refineResult={refineState.result}
+                originalLevel={savedDraft?.level ?? "JUNIOR"}
+                originalPostType={savedDraft?.postType ?? "TECH"}
+                originalFiles={savedFiles}
+                isLoading={refineMutation.isPending}
+                isSubmitting={createMutation.isPending}
+                submitError={
+                  createMutation.isError
+                    ? extractApiError(createMutation.error).code ===
+                      "COMMUNITY_013"
+                      ? "잠시 후 다시 시도해 주세요."
+                      : "게시 중 문제가 발생했습니다. 다시 시도해 주세요."
+                    : null
+                }
+                onSubmitRefined={handleSubmitRefined}
+                onSubmitOriginal={handleSubmitOriginal}
+              />
+            </section>
+          ) : (
+            <section className="flex flex-col">
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                작성 가이드
+              </h2>
+              <div className="flex flex-1 flex-col gap-8 rounded-xl border border-border bg-card p-5">
+                <div>
+                  <p className="mb-3 text-sm font-semibold text-foreground">
+                    이런 주제를 나눠보세요
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    {[
+                      {
+                        title: "취업 · 이직",
+                        desc: "포트폴리오 방향, 면접 준비, 연봉 협상, 회사 선택 기준",
+                      },
+                      {
+                        title: "성장 · 학습",
+                        desc: "공부 방법, 사이드 프로젝트, 기술 로드맵, 멘토링",
+                      },
+                      {
+                        title: "직장 생활",
+                        desc: "팀 문화, 업무 고민, 워라밸, 커리어 전환",
+                      },
+                      {
+                        title: "커리어 설계",
+                        desc: "전공 · 비전공 고민, 직무 탐색, 장기 목표 설정",
+                      },
+                    ].map((item) => (
+                      <div
+                        key={item.title}
+                        className="flex flex-col gap-0.5 rounded-lg border border-border px-3.5 py-3"
+                      >
+                        <span className="text-sm font-semibold text-foreground">
+                          {item.title}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {item.desc}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="mb-3 text-sm font-semibold text-foreground">
+                    좋은 질문 작성 팁
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    {[
+                      "현재 상황과 배경을 구체적으로 적어주세요.",
+                      "어떤 시도를 해봤는지 함께 공유하면 더 도움이 돼요.",
+                      "원하는 것이 조언인지, 경험 공유인지 명확히 해주세요.",
+                      "민감한 회사 정보나 개인정보는 포함하지 마세요.",
+                    ].map((tip) => (
+                      <div key={tip} className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary/50" />
+                        <p className="text-sm text-muted-foreground">{tip}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </div>

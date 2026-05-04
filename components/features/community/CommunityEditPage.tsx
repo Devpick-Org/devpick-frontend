@@ -132,6 +132,7 @@ export function CommunityEditPage({ postId }: Props) {
         </header>
 
         <PostWriteForm
+          postType={initialDraft?.postType ?? "TECH"}
           initialDraft={initialDraft}
           files={files}
           onFilesChange={(added) => setFiles((prev) => [...prev, ...added])}
