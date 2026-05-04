@@ -5,7 +5,10 @@ import Link from "next/link";
 import { Bookmark, Share2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { bootcampTrendThumbnailSrc } from "@/lib/bootcamper-thumbnail";
+import {
+  bootcampTrendThumbnailSrc,
+  bootcampTrendUpstreamNextImageSrc,
+} from "@/lib/bootcamper-thumbnail";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
 type EcoTrendCardProps = {
@@ -28,6 +31,8 @@ function categoryBadge(category: EcosystemTrendItemDto["category"]): string {
 
 export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
   const [thumbFailed, setThumbFailed] = useState(false);
+  /** 0=동일출처 프록시, 1=부트캠퍼 _next/image 직접 호출 */
+  const [bootcampThumbStep, setBootcampThumbStep] = useState(0);
   const initial = (item.title?.trim() ? item.title.trim() : "?").slice(0, 1);
   /** API에 저장된 썸네일 URL(api.devpick 에서 제공하는 목록 문자열 그대로) */
   const displayThumbnail = item.thumbnailUrl?.trim();
@@ -35,6 +40,21 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
   const showImage = hasThumb && !thumbFailed;
   /** 동아리는 썸네일이 없거나 로드 실패 시 이미지 칸 없이 텍스트만 */
   const hideHero = item.category === "club" && (!hasThumb || thumbFailed);
+
+  const bootcampImgSrc =
+    item.category === "bootcamp" && displayThumbnail
+      ? bootcampThumbStep === 0
+        ? (bootcampTrendThumbnailSrc(displayThumbnail) ?? displayThumbnail)
+        : (bootcampTrendUpstreamNextImageSrc(displayThumbnail) ?? displayThumbnail)
+      : displayThumbnail;
+
+  const onBootcampImgError = () => {
+    if (bootcampThumbStep === 0) {
+      setBootcampThumbStep(1);
+      return;
+    }
+    setThumbFailed(true);
+  };
 
   const share = async () => {
     try {
@@ -67,12 +87,13 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
             item.category === "bootcamp" ? (
               /* eslint-disable-next-line @next/next/no-img-element -- 외부 프록시(URL/리퍼러) 제약으로 최적화 Image 대신 필요 */
               <img
-                src={bootcampTrendThumbnailSrc(displayThumbnail) ?? displayThumbnail}
+                key={`${bootcampThumbStep}:${bootcampImgSrc}`}
+                src={bootcampImgSrc}
                 alt=""
                 loading="lazy"
                 decoding="async"
                 className="absolute inset-0 h-full w-full object-cover"
-                onError={() => setThumbFailed(true)}
+                onError={onBootcampImgError}
               />
             ) : (
               <Image
