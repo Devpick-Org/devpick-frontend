@@ -240,7 +240,7 @@ function LoadingState() {
           <div className="h-3 w-20 animate-pulse rounded bg-muted" />
           <div className="h-6 w-36 animate-pulse rounded-md bg-muted" />
         </div>
-        <div className="grid grid-cols-2 gap-3 @sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 @sm:gap-4 @xl:grid-cols-4 @xl:gap-5">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
@@ -256,7 +256,7 @@ function LoadingState() {
           <div className="h-3 w-16 animate-pulse rounded bg-muted" />
           <div className="h-6 w-28 animate-pulse rounded-md bg-muted" />
         </div>
-        <div className="grid gap-4 @md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 @lg:grid-cols-2 @lg:gap-8">
           <div className="h-56 animate-pulse rounded-xl bg-muted/70" />
           <div className="h-56 animate-pulse rounded-xl bg-muted/70" />
         </div>
@@ -267,7 +267,7 @@ function LoadingState() {
           <div className="h-3 w-24 animate-pulse rounded bg-muted" />
           <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
         </div>
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-4 @md:gap-5">
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}

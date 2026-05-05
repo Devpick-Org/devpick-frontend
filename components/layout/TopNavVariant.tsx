@@ -84,7 +84,11 @@ export function TopNavVariant() {
         <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 lg:gap-6 lg:px-8">
           {/* [왼쪽 영역] Logo */}
           <div className="flex shrink-0 items-center">
-            <Link href="/home" className="flex items-center gap-2.5 shrink-0">
+            <Link
+              href="/"
+              aria-label="Trace 소개 페이지로 이동"
+              className="flex shrink-0 items-center gap-2.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            >
               <TraceMark variant="nav" />
               <span className="text-xl font-bold tracking-tight text-foreground">
                 Trace
