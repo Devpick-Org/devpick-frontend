@@ -200,7 +200,7 @@ export interface JobsPage {
   totalCount: number;
 }
 
-export type JobSortBy = "MATCH" | "LATEST" | "DEADLINE";
+export type JobSortBy = "MATCH" | "LATEST";
 
 export async function fetchJobsPaginated(params: {
   page: number;
@@ -237,12 +237,10 @@ export async function fetchJobsPaginated(params: {
     );
 
   const sortBy = params.sortBy ?? "MATCH";
-  if (sortBy === "MATCH") {
-    filtered.sort((a, b) => b.matchScore - a.matchScore);
-  } else if (sortBy === "LATEST") {
+  if (sortBy === "LATEST") {
     filtered.sort((a, b) => Number(b.id) - Number(a.id));
-  } else if (sortBy === "DEADLINE") {
-    filtered.sort((a, b) => a.deadline.localeCompare(b.deadline));
+  } else {
+    filtered.sort((a, b) => b.matchScore - a.matchScore);
   }
 
   const totalCount = filtered.length;

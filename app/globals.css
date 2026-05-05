@@ -42,6 +42,10 @@
   --sidebar-accent-foreground: oklch(0.14 0.005 260);
   --sidebar-border: oklch(0.9 0.005 260);
   --sidebar-ring: oklch(0.55 0.22 250);
+
+  /* Report — editorial wash + deep ink (primary 패밀리와 어울리는 남색 헤딩) */
+  --report-wash: #e1ebfe;
+  --report-ink: #003366;
 }
 
 .dark {
@@ -77,6 +81,9 @@
   --sidebar-accent-foreground: oklch(0.96 0 0);
   --sidebar-border: oklch(0.26 0.012 260);
   --sidebar-ring: oklch(0.65 0.2 250);
+
+  --report-wash: color-mix(in oklch, var(--primary) 14%, transparent);
+  --report-ink: oklch(0.9 0.04 250);
 }
 
 /* 2. 테마 연결 (로컬에만 있던 확장 반경 radius-2xl 등도 안전하게 포함했습니다) */
@@ -126,6 +133,10 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Report — Tailwind 유틸(text-report-ink, bg-report-wash/80 등)과 CSS 변수 연동 */
+  --color-report-wash: var(--report-wash);
+  --color-report-ink: var(--report-ink);
 
   --animate-wave: wave 2s ease-in-out infinite;
 }

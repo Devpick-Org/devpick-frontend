@@ -87,30 +87,32 @@ export default function WeeklyReportPage() {
 
   return (
     <>
-      <div className="space-y-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+      <div className="space-y-10">
+        <div className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_55%,white)] to-card px-4 py-4 shadow-[0_1px_0_0_color-mix(in_srgb,var(--report-ink)_6%,transparent)] @sm:flex-row @sm:items-center @sm:justify-between @sm:gap-6 @sm:px-6 @sm:py-5 dark:from-primary/[0.08] dark:to-card dark:shadow-none">
           <WeekHeader
             report={report}
             reportList={reportList}
             selectedReportId={selectedReportId}
             onSelect={setSelectedReportId}
           />
-          <div className="flex gap-2 shrink-0 sm:mt-0.5">
+          <div className="flex shrink-0 gap-2.5 @sm:justify-end">
             <button
               onClick={() =>
                 exportMutation.mutate({ weekStart: report.weekStart })
               }
               disabled={exportMutation.isPending}
-              className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 text-sm border border-border rounded-lg hover:bg-muted transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary/15 bg-card/80 px-4 py-2.5 text-sm font-medium text-report-ink shadow-sm backdrop-blur-md transition-[color,box-shadow,background-color,border-color] hover:border-primary/25 hover:bg-primary/[0.06] hover:shadow @sm:flex-none cursor-pointer disabled:pointer-events-none disabled:opacity-50 dark:text-foreground dark:hover:bg-primary/10"
+              type="button"
             >
-              <Download className="w-4 h-4 shrink-0" />
+              <Download className="h-4 w-4 shrink-0 opacity-80" />
               {exportMutation.isPending ? "저장 중..." : "저장 (PDF)"}
             </button>
             <button
               onClick={() => shareMutation.mutate(report.reportId)}
-              className="flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors cursor-pointer"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_1px_2px_color-mix(in_srgb,var(--report-ink)_12%,transparent)] transition-[filter,transform] hover:brightness-[1.03] active:scale-[0.99] @sm:flex-none cursor-pointer dark:shadow-md"
+              type="button"
             >
-              <Share2 className="w-4 h-4 shrink-0" />
+              <Share2 className="h-4 w-4 shrink-0 opacity-95" />
               공유
             </button>
           </div>
@@ -166,13 +168,16 @@ function WeekHeader({
   const currentId = selectedReportId ?? report.reportId;
 
   return (
-    <div>
+    <div className="min-w-0 space-y-1.5">
       {reportList.length > 1 ? (
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-1 text-lg font-semibold hover:text-foreground/80 transition-colors cursor-pointer">
-              {formatWeekLabel(report.weekStart)}
-              <ChevronDown className="w-4 h-4 text-muted-foreground" />
+            <button
+              className="flex max-w-full items-center gap-1.5 text-left text-xl font-bold tracking-tight text-report-ink transition-colors hover:text-primary @md:text-2xl cursor-pointer dark:text-report-ink"
+              type="button"
+            >
+              <span className="truncate">{formatWeekLabel(report.weekStart)}</span>
+              <ChevronDown className="h-4 w-4 shrink-0 text-primary/70" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
@@ -191,10 +196,12 @@ function WeekHeader({
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <p className="font-semibold">{formatWeekLabel(report.weekStart)}</p>
+        <p className="text-balance text-xl font-bold tracking-tight text-report-ink @md:text-2xl">
+          {formatWeekLabel(report.weekStart)}
+        </p>
       )}
-      <p className="text-sm text-muted-foreground mt-0.5">
-        {formatDate(report.weekStart)} ~ {formatDate(report.weekEnd)}
+      <p className="text-sm font-medium tabular-nums tracking-tight text-muted-foreground">
+        {formatDate(report.weekStart)} — {formatDate(report.weekEnd)}
       </p>
     </div>
   );
@@ -202,10 +209,12 @@ function WeekHeader({
 
 function NoReportState() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-foreground">
-      <CalendarClock className="w-8 h-8" />
-      <p className="text-md font-medium">아직 생성된 리포트가 없어요</p>
-      <p className="text-sm font-medium text-muted-foreground">
+    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-primary/15 bg-[color-mix(in_srgb,var(--report-wash)_35%,transparent)] px-6 py-16 text-foreground dark:bg-primary/[0.06]">
+      <CalendarClock className="h-9 w-9 text-primary/80" />
+      <p className="text-balance text-base font-semibold text-report-ink">
+        아직 생성된 리포트가 없어요
+      </p>
+      <p className="max-w-sm text-pretty text-center text-sm leading-relaxed text-muted-foreground">
         매주 월요일에 지난 주 학습 리포트가 자동으로 생성됩니다.
       </p>
     </div>
@@ -214,45 +223,56 @@ function NoReportState() {
 
 function LoadingState() {
   return (
-    <div className="space-y-8">
-      {/* 헤더: 주차 텍스트 + 날짜 + 버튼 */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
-        <div className="space-y-1.5">
-          <div className="h-5 w-36 bg-muted rounded animate-pulse" />
-          <div className="h-4 w-44 bg-muted rounded animate-pulse" />
+    <div className="space-y-10">
+      <div className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-primary/[0.04] px-4 py-4 @sm:flex-row @sm:items-center @sm:justify-between @sm:px-6 @sm:py-5">
+        <div className="space-y-2">
+          <div className="h-6 w-40 animate-pulse rounded-md bg-muted" />
+          <div className="h-4 w-48 animate-pulse rounded-md bg-muted" />
         </div>
-        <div className="flex gap-2">
-          <div className="h-9 w-24 bg-muted rounded-lg animate-pulse" />
-          <div className="h-9 w-16 bg-muted rounded-lg animate-pulse" />
+        <div className="flex gap-2.5">
+          <div className="h-10 w-28 animate-pulse rounded-xl bg-muted" />
+          <div className="h-10 w-20 animate-pulse rounded-xl bg-muted" />
         </div>
       </div>
 
-      {/* 섹션 1: 이번 주 활동 요약 */}
-      <div className="space-y-4">
-        <div className="h-5 w-28 bg-muted rounded animate-pulse" />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="space-y-5 rounded-2xl border border-primary/10 bg-card p-6 @md:p-8">
+        <div className="space-y-2">
+          <div className="h-3 w-20 animate-pulse rounded bg-muted" />
+          <div className="h-6 w-36 animate-pulse rounded-md bg-muted" />
+        </div>
+        <div className="grid grid-cols-2 gap-3 @sm:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
+            <div
+              key={i}
+              className="h-28 animate-pulse rounded-xl bg-muted/80"
+            />
           ))}
         </div>
-        <div className="h-16 bg-muted rounded-xl animate-pulse" />
+        <div className="h-16 animate-pulse rounded-xl bg-muted/80" />
       </div>
 
-      {/* 섹션 2: 활동 분석 */}
-      <div className="space-y-4">
-        <div className="h-5 w-20 bg-muted rounded animate-pulse" />
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="h-56 bg-muted rounded-xl animate-pulse" />
-          <div className="h-56 bg-muted rounded-xl animate-pulse" />
+      <div className="space-y-5 rounded-2xl border border-primary/10 bg-[color-mix(in_srgb,var(--report-wash)_25%,transparent)] p-6 @md:p-8 dark:bg-primary/[0.05]">
+        <div className="space-y-2">
+          <div className="h-3 w-16 animate-pulse rounded bg-muted" />
+          <div className="h-6 w-28 animate-pulse rounded-md bg-muted" />
+        </div>
+        <div className="grid gap-4 @md:grid-cols-2">
+          <div className="h-56 animate-pulse rounded-xl bg-muted/70" />
+          <div className="h-56 animate-pulse rounded-xl bg-muted/70" />
         </div>
       </div>
 
-      {/* 섹션 3: AI 인사이트 */}
-      <div className="space-y-4">
-        <div className="h-5 w-24 bg-muted rounded animate-pulse" />
+      <div className="space-y-5 rounded-2xl border border-primary/10 bg-card p-6 @md:p-8">
+        <div className="space-y-2">
+          <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+          <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
+        </div>
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-20 bg-muted rounded-xl animate-pulse" />
+            <div
+              key={i}
+              className="h-24 animate-pulse rounded-xl bg-muted/80"
+            />
           ))}
         </div>
       </div>
@@ -262,9 +282,9 @@ function LoadingState() {
 
 function ErrorState() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-foreground">
-      <AlertCircle className="w-8 h-8" />
-      <p className="text-md font-medium">리포트를 불러오지 못했습니다.</p>
+    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl border border-destructive/20 bg-destructive/5 px-6 py-12 text-foreground">
+      <AlertCircle className="h-9 w-9 text-destructive" />
+      <p className="text-base font-semibold">리포트를 불러오지 못했습니다.</p>
     </div>
   );
 }

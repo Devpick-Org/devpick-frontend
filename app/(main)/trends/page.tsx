@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { EcosystemTrendsPage } from "@/components/features/trends/EcosystemTrendsPage";
+import { isTrendsFeatureEnabled } from "@/lib/env/publicFeatureFlags";
 
 export default function Page() {
-  if (process.env.NEXT_PUBLIC_FEATURE_TRENDS !== "true") {
+  if (!isTrendsFeatureEnabled()) {
     redirect("/home");
   }
 

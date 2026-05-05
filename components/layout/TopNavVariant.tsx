@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useHydrated } from "@/lib/hooks/useHydrated";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -30,11 +31,10 @@ import { useAuthStore } from "@/store/auth.store";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { cn } from "@/lib/utils";
 import { TraceMark } from "@/components/brand/TraceMark";
+import { isTrendsFeatureEnabled } from "@/lib/env/publicFeatureFlags";
 
 // 로고 마크 — `components/brand/TraceMark` (public/trace-mark.png)
 // 사이드바에 있던 메뉴들을 이쪽으로 가져옵니다.
-const TRENDS_ENABLED = process.env.NEXT_PUBLIC_FEATURE_TRENDS === "true";
-
 const ALL_NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/home", label: "홈", icon: Home },
   { href: "/community", label: "커뮤니티", icon: Users },
@@ -45,16 +45,22 @@ const ALL_NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/my-page", label: "마이페이지", icon: LayoutDashboard },
 ];
 
-const NAV_ITEMS = ALL_NAV_ITEMS.filter(
-  (item) => item.href !== "/trends" || TRENDS_ENABLED,
-);
-
 export function TopNavVariant() {
   const router = useRouter();
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const mounted = useHydrated();
+
+  const navItems = useMemo(
+    () =>
+      ALL_NAV_ITEMS.filter((item) => {
+        if (item.href === "/trends" && !isTrendsFeatureEnabled()) return false;
+        if (item.href === "/my-page" && !user) return false;
+        return true;
+      }),
+    [user],
+  );
 
   const displayName = user?.nickname ?? "Guest";
   const displayInitial = displayName.charAt(0).toUpperCase();
@@ -75,9 +81,9 @@ export function TopNavVariant() {
     <>
       <header className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-card shadow-md shadow-black/1">
         {/* relative 속성을 추가해서 중앙 정렬의 기준점이 되게 합니다 */}
-        <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 lg:px-8">
+        <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 lg:gap-6 lg:px-8">
           {/* [왼쪽 영역] Logo */}
-          <div className="flex items-center">
+          <div className="flex shrink-0 items-center">
             <Link href="/home" className="flex items-center gap-2.5 shrink-0">
               <TraceMark variant="nav" />
               <span className="text-xl font-bold tracking-tight text-foreground">
@@ -87,12 +93,10 @@ export function TopNavVariant() {
           </div>
 
           {/* [오른쪽 영역] 네비게이션 메뉴 + 유저 프로필*/}
-          <div className="flex items-center gap-8">
-            {" "}
-            {/* gap-8로 메뉴와 유저 프로필 사이 간격 조절 */}
-            {/* 1. 네비게이션 (absolute 제거, 일반 flex로 변경) */}
-            <nav className="hidden items-center gap-8 md:flex">
-              {NAV_ITEMS.map((item) => {
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-4 md:gap-6 lg:gap-8">
+            {/* 1. 네비게이션 — 좁은 뷰에서 잘리지 않도록 가로 스크롤 */}
+            <nav className="hidden max-w-full min-w-0 flex-1 flex-nowrap items-center justify-end gap-4 overflow-x-auto overflow-y-hidden [scrollbar-width:thin] md:flex md:[scrollbar-gutter:stable] lg:gap-6 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/25">
+              {navItems.map((item) => {
                 const isActive =
                   pathname === item.href ||
                   pathname.startsWith(item.href + "/");
@@ -102,7 +106,7 @@ export function TopNavVariant() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-2 text-sm transition-colors duration-200",
+                      "flex shrink-0 items-center gap-2 text-sm whitespace-nowrap transition-colors duration-200",
                       isActive
                         ? "font-semibold text-primary"
                         : "font-medium text-muted-foreground hover:text-foreground",
@@ -115,7 +119,7 @@ export function TopNavVariant() {
               })}
             </nav>
             {/* 2. 프로필 영역 */}
-            <div className="flex items-center">
+            <div className="flex shrink-0 items-center">
               {!mounted ? (
                 <Skeleton className="h-9 w-9 rounded-full" />
               ) : !user ? (
@@ -186,7 +190,7 @@ export function TopNavVariant() {
 
       {/* 모바일 하단 탭 (기존 사이드바에 있던 걸 이쪽으로 옮겨옴) */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-border bg-card/80 backdrop-blur-xl md:hidden">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;

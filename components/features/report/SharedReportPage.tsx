@@ -34,7 +34,7 @@ export default function SharedReportPage({ token }: Props) {
 
   if (report.status === "EMPTY" || !activity) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-4">
+      <div className="mx-auto max-w-4xl @container space-y-8 px-4 py-12 md:px-6">
         <Header weekStart={report.weekStart} weekEnd={report.weekEnd} />
         <EmptyState />
       </div>
@@ -42,7 +42,7 @@ export default function SharedReportPage({ token }: Props) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
+    <div className="mx-auto max-w-4xl @container space-y-10 px-4 py-12 md:px-6">
       <Header weekStart={report.weekStart} weekEnd={report.weekEnd} />
       <ReportContent
         activity={activity}
@@ -61,44 +61,51 @@ function Header({
   weekEnd: string;
 }) {
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <LinkIcon className="w-3 h-3" />
+    <header className="space-y-3 border-b border-primary/10 pb-8">
+      <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-primary">
+        공유 리포트
+      </p>
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <LinkIcon className="h-3.5 w-3.5 shrink-0 opacity-80" />
         <span>공유된 주간 리포트</span>
       </div>
-      <h1 className="text-2xl font-bold">주간 리포트</h1>
-      <p className="text-sm text-muted-foreground">
-        {formatDate(weekStart)} ~ {formatDate(weekEnd)}
+      <h1 className="text-balance text-2xl font-bold tracking-tight text-report-ink @md:text-3xl">
+        주간 리포트
+      </h1>
+      <p className="text-sm font-medium tabular-nums tracking-tight text-muted-foreground">
+        {formatDate(weekStart)} — {formatDate(weekEnd)}
       </p>
-    </div>
+    </header>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
-      <FileText className="w-8 h-8" />
-      <p className="text-sm font-medium">활동 내역이 없는 리포트입니다</p>
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-primary/15 bg-[color-mix(in_srgb,var(--report-wash)_30%,transparent)] py-20 text-muted-foreground dark:bg-primary/[0.05]">
+      <FileText className="h-9 w-9 text-primary/70" />
+      <p className="text-pretty text-sm font-semibold text-report-ink">
+        활동 내역이 없는 리포트입니다
+      </p>
     </div>
   );
 }
 
 function LoadingState() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
-      <div className="space-y-2">
-        <div className="h-3 w-24 bg-muted rounded animate-pulse" />
-        <div className="h-7 w-36 bg-muted rounded animate-pulse" />
-        <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+    <div className="mx-auto max-w-4xl @container space-y-10 px-4 py-12 md:px-6">
+      <div className="space-y-3 border-b border-primary/10 pb-8">
+        <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+        <div className="h-8 w-48 animate-pulse rounded-md bg-muted" />
+        <div className="h-4 w-56 animate-pulse rounded-md bg-muted" />
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3 @sm:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
+          <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/80" />
         ))}
       </div>
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="h-56 bg-muted rounded-xl animate-pulse" />
-        <div className="h-56 bg-muted rounded-xl animate-pulse" />
+      <div className="grid gap-4 @md:grid-cols-2">
+        <div className="h-56 animate-pulse rounded-xl bg-muted/70" />
+        <div className="h-56 animate-pulse rounded-xl bg-muted/70" />
       </div>
     </div>
   );
@@ -106,10 +113,10 @@ function LoadingState() {
 
 function ErrorState() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-3 text-foreground">
-      <AlertCircle className="w-8 h-8" />
-      <p className="text-md font-medium">리포트를 불러올 수 없습니다</p>
-      <p className="text-sm font-medium">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-foreground">
+      <AlertCircle className="h-9 w-9 text-destructive" />
+      <p className="text-base font-semibold">리포트를 불러올 수 없습니다</p>
+      <p className="text-center text-sm font-medium text-muted-foreground">
         유효하지 않거나 만료된 공유 링크입니다.
       </p>
     </div>

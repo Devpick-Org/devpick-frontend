@@ -1,5 +1,12 @@
 import type { ApiResponse } from "./api";
 
+/** 전주 대비 증감 — 백엔드가 JSON 객체로 내리거나 JSON 문자열로 직렬화할 수 있음 */
+export interface PrevWeekComparisonDeltas {
+  contentsRead: number;
+  questionsCreated: number;
+  scrapsCount: number;
+}
+
 /** 이번 주 활동 요약 — GET /reports/weekly 응답의 activities 항목 */
 export interface WeeklyActivity {
   contentsRead: number;
@@ -7,8 +14,8 @@ export interface WeeklyActivity {
   scrapsCount: number;
   /** JSON 배열 문자열 또는 쉼표 구분 — 백엔드에서 null 가능 */
   topTags: string | null;
-  /** 전주 대비 — 미계산 시 null */
-  prevWeekComparison: string | null;
+  /** 전주 대비 — 객체·JSON 문자열·레거시 요약 문자열 가능, 미계산 시 null */
+  prevWeekComparison: string | PrevWeekComparisonDeltas | null;
 }
 
 /** 요일별 활동량 — chartData.dailyActivities 항목 */

@@ -13,7 +13,6 @@ import type { JobSortBy } from "@/lib/mock/jobs";
 const SORT_OPTIONS: { value: JobSortBy; label: string }[] = [
   { value: "MATCH", label: "매칭순" },
   { value: "LATEST", label: "최신순" },
-  { value: "DEADLINE", label: "마감임박순" },
 ];
 
 interface JobSortBarProps {

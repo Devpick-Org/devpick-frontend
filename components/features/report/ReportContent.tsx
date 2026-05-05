@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import type { WeeklyActivity, ChartData, AiInsight } from "@/types/report";
+import { formatPrevWeekComparison } from "@/lib/report/formatPrevWeekComparison";
 import { parseReportTopTags } from "@/lib/report/parseTopTags";
 import { cn } from "@/lib/utils";
 
@@ -41,69 +42,78 @@ export default function ReportContent({
 }: Props) {
   const topTags = parseReportTopTags(activity.topTags);
 
-  const prevCmp = activity.prevWeekComparison ?? "";
-  const isPositiveTrend = prevCmp.startsWith("+");
-  const isNegativeTrend = prevCmp.startsWith("-");
+  const { primary: prevWeekPrimary, trend: prevWeekTrend } =
+    formatPrevWeekComparison(activity.prevWeekComparison);
 
   return (
-    <div className="space-y-8">
+    <div className="@container space-y-10">
       {/* 섹션 1: 이번 주 활동 요약 */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">이번 주 활동 요약</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="space-y-6 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_28%,var(--card))] to-card p-6 shadow-sm @md:p-8 dark:from-primary/[0.07] dark:to-card">
+        <div className="space-y-1">
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
+            Summary
+          </p>
+          <h2 className="text-balance text-xl font-bold tracking-tight text-report-ink @md:text-[1.35rem]">
+            이번 주 활동 요약
+          </h2>
+        </div>
+        <div className="grid grid-cols-2 gap-3 @sm:grid-cols-4 @sm:gap-4">
           <StatCard
             icon={BookOpen}
             label="읽은 글"
             value={activity.contentsRead}
             unit="개"
-            accentClass="text-blue-600"
-            iconBgClass="bg-blue-50"
+            accentClass="text-primary"
+            iconBgClass="bg-primary/10"
           />
           <StatCard
             icon={HelpCircle}
             label="질문"
             value={activity.questionsCreated}
             unit="개"
-            accentClass="text-blue-600"
-            iconBgClass="bg-blue-50"
+            accentClass="text-primary"
+            iconBgClass="bg-primary/10"
           />
           <StatCard
             icon={Bookmark}
             label="스크랩"
             value={activity.scrapsCount}
             unit="개"
-            accentClass="text-blue-600"
-            iconBgClass="bg-blue-50"
+            accentClass="text-primary"
+            iconBgClass="bg-primary/10"
           />
-          <div className="bg-card border border-border rounded-xl p-4 flex flex-col justify-between">
-            <div className="flex items-center gap-1.5 text-muted-foreground font-medium mb-2">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
-                <TrendingUp className="w-4 h-4 text-blue-600" />
+          <div className="flex flex-col justify-between rounded-xl border border-primary/10 bg-card/90 p-4 shadow-[inset_0_1px_0_0_color-mix(in_srgb,var(--report-wash)_80%,transparent)] dark:bg-card/80 dark:shadow-none">
+            <div className="mb-2 flex items-center gap-2 font-medium text-muted-foreground">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                <TrendingUp className="h-4 w-4 text-primary" />
               </span>
               <span className="text-sm">전주 대비</span>
             </div>
             <p
               className={cn(
-                "text-2xl font-bold ml-2",
-                isPositiveTrend && "text-green-600",
-                isNegativeTrend && "text-red-500",
+                "text-balance text-base font-semibold leading-snug @md:text-lg ms-2 pe-1",
+                prevWeekTrend === "up" && "text-green-600",
+                prevWeekTrend === "down" && "text-red-500",
+                prevWeekTrend === "flat" && "text-muted-foreground",
               )}
             >
-              {prevCmp || "-"}
+              {prevWeekPrimary}
             </p>
           </div>
         </div>
 
         {topTags.length > 0 && (
-          <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-sm font-medium mb-3">많이 본 태그 TOP3</p>
+          <div className="rounded-xl border border-primary/10 bg-[color-mix(in_srgb,var(--report-wash)_18%,var(--card))] p-4 @md:p-5 dark:bg-primary/[0.05]">
+            <p className="mb-3 text-sm font-semibold text-report-ink">
+              많이 본 태그 TOP3
+            </p>
             <div className="flex flex-wrap gap-2">
               {topTags.slice(0, 3).map((tag, i) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm bg-primary/10 text-primary font-medium"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-primary/10 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary"
                 >
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs font-semibold text-primary/70">
                     #{i + 1}
                   </span>
                   {tag}
@@ -115,20 +125,33 @@ export default function ReportContent({
       </section>
 
       {/* 섹션 2: 차트 */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">활동 분석</h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-sm font-medium mb-4">요일별 활동량</p>
-            <ResponsiveContainer width="100%" height={180}>
+      <section className="space-y-6 rounded-2xl border border-primary/10 bg-gradient-to-b from-muted/40 to-card p-6 shadow-sm @md:p-8 dark:from-muted/25 dark:to-card">
+        <div className="space-y-1">
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
+            Analytics
+          </p>
+          <h2 className="text-balance text-xl font-bold tracking-tight text-report-ink @md:text-[1.35rem]">
+            활동 분석
+          </h2>
+        </div>
+        <div className="grid gap-5 @md:grid-cols-2 @md:gap-6">
+          <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:p-5 dark:bg-card/80">
+            <p className="mb-4 text-sm font-semibold text-report-ink">
+              요일별 활동량
+            </p>
+            <ResponsiveContainer width="100%" height={192}>
               <BarChart
                 data={chartData.dailyActivities}
-                margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                margin={{ top: 6, right: 4, left: -18, bottom: 0 }}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid
+                  strokeDasharray="3 6"
+                  vertical={false}
+                  stroke="color-mix(in srgb, var(--report-ink) 9%, transparent)"
+                />
                 <XAxis
                   dataKey="dayOfWeek"
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(v: string) =>
@@ -136,47 +159,62 @@ export default function ReportContent({
                   }
                 />
                 <YAxis
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
                   axisLine={false}
                   tickLine={false}
                   allowDecimals={false}
                 />
                 <Tooltip
-                  contentStyle={{ borderRadius: 8, fontSize: 12 }}
+                  contentStyle={{
+                    borderRadius: 10,
+                    fontSize: 12,
+                    border: "1px solid color-mix(in srgb, var(--report-ink) 12%, transparent)",
+                    boxShadow: "0 4px 20px color-mix(in srgb, var(--report-ink) 8%, transparent)",
+                  }}
                   formatter={(value) => [value, "활동"]}
-                  cursor={false}
+                  cursor={{ fill: "color-mix(in srgb, var(--primary) 8%, transparent)" }}
                 />
-                {/* --chart-1: globals.css 차트 전용 CSS 변수 */}
                 <Bar
                   dataKey="count"
                   fill="var(--chart-1)"
-                  radius={[4, 4, 0, 0]}
+                  fillOpacity={0.92}
+                  radius={[6, 6, 0, 0]}
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-card border border-border rounded-xl p-4">
-            <p className="text-sm font-medium mb-4">태그별 활동</p>
-            <ResponsiveContainer width="100%" height={180}>
+          <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:p-5 dark:bg-card/80">
+            <p className="mb-4 text-sm font-semibold text-report-ink">
+              태그별 활동
+            </p>
+            <ResponsiveContainer width="100%" height={192}>
               <RadarChart data={chartData.tagActivities}>
-                <PolarGrid />
+                <PolarGrid
+                  stroke="color-mix(in srgb, var(--report-ink) 12%, transparent)"
+                  strokeDasharray="4 6"
+                />
                 <PolarAngleAxis
                   dataKey="tagName"
                   tick={{
                     fontSize: 11,
-                    fill: "var(--color-foreground)",
-                    fontWeight: 500,
+                    fill: "var(--muted-foreground)",
+                    fontWeight: 600,
                   }}
                 />
                 <Radar
                   dataKey="count"
                   fill="var(--chart-1)"
-                  fillOpacity={0.3}
+                  fillOpacity={0.22}
                   stroke="var(--chart-1)"
+                  strokeWidth={1.25}
                 />
                 <Tooltip
-                  contentStyle={{ borderRadius: 8, fontSize: 12 }}
+                  contentStyle={{
+                    borderRadius: 10,
+                    fontSize: 12,
+                    border: "1px solid color-mix(in srgb, var(--report-ink) 12%, transparent)",
+                  }}
                   formatter={(value) => [value, "활동"]}
                 />
               </RadarChart>
@@ -186,11 +224,18 @@ export default function ReportContent({
       </section>
 
       {/* 섹션 3: AI 인사이트 */}
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">AI 인사이트</h2>
+      <section className="space-y-6 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_24%,var(--card))] to-card p-6 shadow-sm @md:p-8 dark:from-primary/[0.06] dark:to-card">
+        <div className="space-y-1">
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
+            Insights
+          </p>
+          <h2 className="text-balance text-xl font-bold tracking-tight text-report-ink @md:text-[1.35rem]">
+            AI 인사이트
+          </h2>
+        </div>
         {aiInsight === null ||
         (!aiInsight.wellDone && !aiInsight.lacking && !aiInsight.nextWeek) ? (
-          <div className="bg-card border border-border rounded-xl p-6 text-center text-sm text-muted-foreground font-medium">
+          <div className="rounded-xl border border-dashed border-primary/20 bg-card/80 p-8 text-center text-sm font-medium leading-relaxed text-muted-foreground">
             AI 인사이트를 준비 중입니다.
           </div>
         ) : (
@@ -214,7 +259,7 @@ export default function ReportContent({
             {aiInsight.nextWeek && (
               <InsightCard
                 icon={ArrowRight}
-                iconClass="text-blue-500"
+                iconClass="text-primary"
                 title="다음 주 추천 방향"
                 content={aiInsight.nextWeek}
               />
@@ -246,21 +291,21 @@ function StatCard({
   iconBgClass,
 }: StatCardProps) {
   return (
-    <div className="bg-card border border-border rounded-xl p-3 md:p-4 flex flex-col justify-between">
-      <div className="flex items-center gap-1.5 text-muted-foreground font-medium mb-2">
+    <div className="flex flex-col justify-between rounded-xl border border-primary/10 bg-card/95 p-3 shadow-sm @md:p-4 dark:bg-card/70 dark:shadow-none">
+      <div className="mb-2 flex items-center gap-2 font-medium text-muted-foreground">
         <span
           className={cn(
-            "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full md:h-8 md:w-8",
+            "inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full @md:h-8 @md:w-8",
             iconBgClass,
           )}
         >
-          <Icon className={cn("w-3.5 h-3.5 md:w-4 md:h-4", accentClass)} />
+          <Icon className={cn("h-3.5 w-3.5 @md:h-4 @md:w-4", accentClass)} />
         </span>
-        <span className="text-xs md:text-sm truncate">{label}</span>
+        <span className="truncate text-xs @md:text-sm">{label}</span>
       </div>
-      <p className="text-xl font-bold ml-1 md:ml-2 md:text-2xl">
+      <p className="ms-0.5 text-xl font-bold tabular-nums tracking-tight text-report-ink @md:ms-1 @md:text-2xl dark:text-foreground">
         {value}
-        <span className="text-xs font-medium text-muted-foreground ml-1 md:text-sm">
+        <span className="ms-1 text-xs font-semibold text-muted-foreground @md:text-sm">
           {unit}
         </span>
       </p>
@@ -282,12 +327,16 @@ function InsightCard({
   content,
 }: InsightCardProps) {
   return (
-    <div className="bg-card border border-border rounded-xl p-4">
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className={cn("w-4 h-4", iconClass)} />
-        <p className="text-[15px] font-medium">{title}</p>
+    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:p-5 dark:bg-card/75 dark:shadow-none">
+      <div className="mb-2 flex items-center gap-2.5">
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+          <Icon className={cn("h-4 w-4", iconClass)} />
+        </span>
+        <p className="text-[15px] font-semibold text-report-ink">
+          {title}
+        </p>
       </div>
-      <p className="pl-6 text-sm text-muted-foreground font-medium leading-relaxed">
+      <p className="ps-0.5 text-pretty text-sm font-medium leading-relaxed text-muted-foreground @md:ps-11">
         {content}
       </p>
     </div>
