@@ -69,7 +69,8 @@ export function CommunityDetailPage({ postId }: Props) {
   const { data: similarRes } = useQuery({
     queryKey: ["post-similar", postId],
     queryFn: () => postsEndpoints.getSimilarPosts(postId),
-    enabled: !!postRes?.data,
+    enabled: !!postRes?.data && isTechPost,
+    retry: 0,
   });
 
   const post = postRes?.data;
@@ -118,8 +119,8 @@ export function CommunityDetailPage({ postId }: Props) {
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleteMutation.mutate()}
       />
-      <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className={`mx-auto w-full px-4 py-8 lg:px-8 ${isTechPost ? "max-w-7xl" : "max-w-4xl"}`}>
+      <div className={`grid gap-10 ${isTechPost ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}>
         {/* 메인 콘텐츠 */}
         <main className="min-w-0">
           <PostDetail
@@ -148,17 +149,21 @@ export function CommunityDetailPage({ postId }: Props) {
         </main>
 
         {/* 사이드바 — 데스크탑 */}
-        <aside className="hidden lg:block">
-          <div className="sticky top-24">
-            <SimilarPosts posts={similarPosts} />
-          </div>
-        </aside>
+        {isTechPost && (
+          <aside className="hidden lg:block">
+            <div className="sticky top-24">
+              <SimilarPosts posts={similarPosts} />
+            </div>
+          </aside>
+        )}
       </div>
 
       {/* 사이드바 — 모바일 */}
-      <div className="mt-8 lg:hidden">
-        <SimilarPosts posts={similarPosts} />
-      </div>
+      {isTechPost && (
+        <div className="mt-8 lg:hidden">
+          <SimilarPosts posts={similarPosts} />
+        </div>
+      )}
     </div>
     </>
   );
