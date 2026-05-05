@@ -6,7 +6,9 @@ import type {
   MyPageRecommendBooksResponse,
   MyPageScrapResponse,
   MyPageQuizHistoryResponse,
+  MyPageJobBookmarkResponse,
 } from "@/types/myPage";
+
 
 export const MY_PAGE_QUERY_KEYS = {
   recommendContents: ["myPage", "recommendContents"] as const,
@@ -52,5 +54,18 @@ export async function getMyScraps(params?: {
   size?: number;
 }): Promise<MyPageScrapResponse> {
   const res = await apiClient.get("/users/me/scraps", { params });
+  return res.data.data;
+}
+
+export async function getMyJobBookmarks(params?: {
+  q?: string;
+  sort?: "newest" | "oldest";
+  page?: number;
+  size?: number;
+}): Promise<MyPageJobBookmarkResponse> {
+  const res = await apiClient.get<ApiResponse<MyPageJobBookmarkResponse>>(
+    "/users/me/bookmarks",
+    { params },
+  );
   return res.data.data;
 }

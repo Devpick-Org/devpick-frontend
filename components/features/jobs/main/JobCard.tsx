@@ -8,6 +8,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cn, formatDate } from "@/lib/utils";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { extractApiError } from "@/lib/api/extractApiError";
+import {
+  updateJobBookmarkCache,
+  invalidateJobBookmarkQueries,
+} from "@/lib/jobs/updateJobBookmarkCache";
 import type { Job } from "@/types/jobs";
 import { EXPERIENCE_LEVEL_LABEL, JOB_CATEGORY_LABEL } from "./jobs.constants";
 import { toast } from "sonner";
@@ -24,22 +28,25 @@ export function JobCard({ job }: JobCardProps) {
   const hasLogo = Boolean(job.companyLogo?.trim()) && !logoFailed;
 
   const toggleBookmark = useMutation({
-    mutationFn: () =>
-      bookmarked ? jobsEndpoints.unbookmark(job.id) : jobsEndpoints.bookmark(job.id),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["jobs"] });
-      void qc.invalidateQueries({ queryKey: ["job-detail", job.id] });
-    },
+    mutationFn: (wasBookmarked: boolean) =>
+      wasBookmarked
+        ? jobsEndpoints.unbookmark(job.id)
+        : jobsEndpoints.bookmark(job.id),
+    onMutate: (wasBookmarked) =>
+      updateJobBookmarkCache(qc, job.id, !wasBookmarked),
     onError: (e) => {
+      invalidateJobBookmarkQueries(qc, job.id);
       const { message } = extractApiError(e);
       toast.error(message ?? "북마크 처리에 실패했습니다.");
     },
+    onSettled: () => invalidateJobBookmarkQueries(qc, job.id),
   });
 
   const handleScrap = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleBookmark.mutate();
+    if (toggleBookmark.isPending) return;
+    toggleBookmark.mutate(bookmarked);
   };
 
   const scoreColor =

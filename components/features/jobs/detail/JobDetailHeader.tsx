@@ -8,6 +8,10 @@ import { toast } from "sonner";
 import { cn, formatDate } from "@/lib/utils";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { extractApiError } from "@/lib/api/extractApiError";
+import {
+  updateJobBookmarkCache,
+  invalidateJobBookmarkQueries,
+} from "@/lib/jobs/updateJobBookmarkCache";
 import type { JobDetail } from "@/types/jobs";
 import {
   JOB_CATEGORY_LABEL,
@@ -24,16 +28,23 @@ export function JobDetailHeader({ job }: JobDetailHeaderProps) {
   const expired = job.postingStatus === "EXPIRED";
 
   const toggleBookmark = useMutation({
-    mutationFn: () =>
-      bookmarked ? jobsEndpoints.unbookmark(job.id) : jobsEndpoints.bookmark(job.id),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["job-detail", job.id] });
-      void qc.invalidateQueries({ queryKey: ["jobs"] });
+    mutationFn: (wasBookmarked: boolean) =>
+      wasBookmarked
+        ? jobsEndpoints.unbookmark(job.id)
+        : jobsEndpoints.bookmark(job.id),
+    onMutate: async (wasBookmarked) => {
+      await qc.cancelQueries({ queryKey: ["job-detail", job.id] });
+      const previous = qc.getQueryData<JobDetail>(["job-detail", job.id]);
+      updateJobBookmarkCache(qc, job.id, !wasBookmarked);
+      return { previous };
     },
-    onError: (e) => {
+    onError: (e, _vars, context) => {
+      qc.setQueryData(["job-detail", job.id], context?.previous);
+      invalidateJobBookmarkQueries(qc, job.id);
       const { message } = extractApiError(e);
       toast.error(message ?? "북마크 처리에 실패했습니다.");
     },
+    onSettled: () => invalidateJobBookmarkQueries(qc, job.id),
   });
 
   const deadlineLabel =
@@ -89,7 +100,9 @@ export function JobDetailHeader({ job }: JobDetailHeaderProps) {
 
         <button
           type="button"
-          onClick={() => toggleBookmark.mutate()}
+          onClick={() => {
+              if (!toggleBookmark.isPending) toggleBookmark.mutate(bookmarked);
+            }}
           disabled={toggleBookmark.isPending}
           aria-label={bookmarked ? "스크랩 해제" : "스크랩"}
           className={cn(

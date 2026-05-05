@@ -1,6 +1,7 @@
 "use client";
 
 import { ScrappedPostsSection } from "./scraps/ScrappedPostsSection";
+import { BookmarkedJobsSection } from "./scraps/BookmarkedJobsSection";
 import { WrongQuizSection } from "./quizzes/WrongQuizSection";
 import { RecommendedSection } from "./recommend/RecommendedSection";
 
@@ -19,7 +20,10 @@ export default function MyPage() {
       {/* 1. 스크랩한 글들 */}
       <ScrappedPostsSection />
 
-      {/* 2. 틀린 퀴즈들 */}
+      {/* 2. 스크랩한 공고들 */}
+      <BookmarkedJobsSection />
+
+      {/* 3. 틀린 퀴즈들 */}
       <WrongQuizSection />
 
       {/* 3. 추천 */}

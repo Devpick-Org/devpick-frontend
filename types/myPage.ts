@@ -130,3 +130,24 @@ export interface MyPageRecommendBooksResponse {
   isPersonalized: boolean;
   message?: string;
 }
+
+export interface MyPageJobBookmark {
+  jobPostingId: string;
+  companyName: string;
+  companyLogo: string;
+  title: string;
+  employmentType: string;
+  experienceLevel: string;
+  location: string;
+  deadline: string;
+  techStack: string[];
+  bookmarkedAt: string;
+}
+
+export interface MyPageJobBookmarkResponse {
+  bookmarks: MyPageJobBookmark[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
