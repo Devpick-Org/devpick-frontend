@@ -42,16 +42,16 @@ export function EcoTrendExpandOverlay({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="flex max-h-[min(88vh,900px)] w-full max-w-5xl flex-col rounded-t-2xl border border-border bg-card shadow-2xl sm:rounded-2xl"
+        className="flex max-h-[min(88vh,900px)] w-full max-w-5xl flex-col overflow-hidden rounded-t-2xl border border-border bg-card shadow-2xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-3 sm:px-5">
           <h2 id={titleId} className="text-lg font-bold text-foreground">
             {title}
           </h2>
-          <Button type="button" variant="ghost" size="icon" onClick={onClose} aria-label="닫기">
+          <button type="button" onClick={onClose} aria-label="닫기" className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground">
             <X className="h-5 w-5" />
-          </Button>
+          </button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
           {items.length === 0 ? (

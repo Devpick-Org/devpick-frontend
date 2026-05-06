@@ -142,7 +142,7 @@ function ModalInner({
               type="button"
               aria-label="닫기"
               onClick={() => onOpenChange(false)}
-              className="shrink-0 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
+              className="shrink-0 cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
             >
               <X className="h-5 w-5" />
             </button>

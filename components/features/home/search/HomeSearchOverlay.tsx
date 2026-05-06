@@ -190,7 +190,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
       {/* 닫기 버튼 — 우상단 고정 */}
       <button
         onClick={onClose}
-        className="absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:right-10 md:top-8 cursor-pointer"
+        className="absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground md:right-10 md:top-8 cursor-pointer"
         aria-label="닫기"
       >
         <X className="h-5 w-5" />

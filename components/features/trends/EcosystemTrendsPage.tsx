@@ -49,6 +49,7 @@ export function EcosystemTrendsPage() {
         offset: 0,
       }),
     staleTime: 5 * 60_000,
+    placeholderData: (prev) => prev,
   });
 
   const rawItems = data?.data.items ?? [];
@@ -97,17 +98,17 @@ export function EcosystemTrendsPage() {
     <>
       <div className="mb-8 space-y-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="제목, 주최, 태그, 출처 검색…"
-            className="rounded-xl border-border bg-card py-6 pl-10 pr-4 text-[15px] shadow-sm"
+            className="h-12 rounded-lg bg-muted/60 pl-11 pr-4 text-center text-sm text-foreground font-medium placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
             aria-label="검색"
           />
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {(
             [
               ["all", "전체"],
@@ -121,10 +122,10 @@ export function EcosystemTrendsPage() {
               type="button"
               onClick={() => setCatFilter(key)}
               className={cn(
-                "rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors",
+                "cursor-pointer rounded-full px-3.5 py-1 text-sm font-medium transition-colors",
                 catFilter === key
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-secondary/50 text-muted-foreground hover:bg-secondary",
+                  ? "bg-primary/10 text-primary"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground",
               )}
             >
               {label}
@@ -144,6 +145,7 @@ export function EcosystemTrendsPage() {
             title={s.title}
             description={s.description}
             items={bySection[s.key]}
+            initialOffset={s.key === "club" ? 148 : 0}
             onExpand={() =>
               setExpand({
                 title: s.title,
