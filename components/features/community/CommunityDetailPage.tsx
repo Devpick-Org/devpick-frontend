@@ -221,29 +221,37 @@ function CommunityDetailSkeleton() {
           </div>
 
           {/* 답변 섹션 제목 */}
-          <Skeleton className="mb-6 h-5 w-16" />
+          <Skeleton className="mb-6 h-6 w-16" />
 
-          {/* 답변 카드 1 */}
-          <div className="mb-5 rounded-xl bg-card p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-3.5 w-3.5 rounded-full" />
-              <Skeleton className="h-3.5 w-20" />
-              <Skeleton className="h-3.5 w-14" />
+          {/* 답변 카드 1, 2 */}
+          {[0, 1].map((i) => (
+            <div key={i} className="border-b border-border py-7">
+              <div className="mb-3 flex items-start gap-3">
+                <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+                <div className="flex flex-col gap-1.5">
+                  <Skeleton className="h-4 w-20" />
+                  <div className="flex gap-1.5">
+                    <Skeleton className="h-3 w-14" />
+                    <Skeleton className="h-3 w-10" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-[80%]" />
+              </div>
             </div>
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-[80%]" />
-          </div>
+          ))}
 
-          {/* 답변 카드 2 */}
-          <div className="rounded-xl bg-card p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-3.5 w-3.5 rounded-full" />
-              <Skeleton className="h-3.5 w-24" />
-              <Skeleton className="h-3.5 w-14" />
+          {/* 답변 작성 폼 */}
+          <div className="mt-10 pt-8">
+            <Skeleton className="mb-4 h-5 w-16" />
+            <Skeleton className="h-[140px] w-full rounded-xl" />
+            <div className="mt-3 flex justify-end">
+              <Skeleton className="h-9 w-20 rounded-lg" />
             </div>
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-[88%]" />
           </div>
         </div>
 
