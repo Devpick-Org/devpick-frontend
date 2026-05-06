@@ -47,9 +47,9 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
   const card = (
     <div
       className={cn(
-        "bg-card border border-border rounded-xl px-4 py-3",
+        "bg-card border border-border/60 rounded-2xl px-4 py-3 shadow-sm",
         "flex items-start justify-between gap-3",
-        href && "transition-colors hover:bg-muted/40",
+        href && "transition-colors hover:bg-muted/40 hover:border-border",
       )}
     >
       {/* 본문 */}

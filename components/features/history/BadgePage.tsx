@@ -48,17 +48,23 @@ export default function BadgePage() {
           onRetry={refetchPoints}
         />
       ) : points ? (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <SummaryCard
-            label="총 포인트"
-            value={`${points.totalPoints}p`}
-            highlight
-          />
-          <SummaryCard
-            label="이번 주 획득 포인트"
-            value={`${points.weeklyPoints}p`}
-          />
-          <SummaryCard label="연속 출석" value={`${points.streak}일`} />
+        <div className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_20%,var(--card))] to-card p-6 shadow-sm dark:from-primary/[0.05] dark:to-card">
+          <div className="space-y-1">
+            <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
+              Points
+            </p>
+            <h2 className="text-xl font-bold tracking-tight text-report-ink dark:text-foreground">
+              포인트 & 출석 현황
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <SummaryCard label="총 포인트" value={`${points.totalPoints}p`} />
+            <SummaryCard
+              label="이번 주 획득 포인트"
+              value={`${points.weeklyPoints}p`}
+            />
+            <SummaryCard label="연속 출석" value={`${points.streak}일`} />
+          </div>
         </div>
       ) : null}
 
@@ -71,7 +77,7 @@ export default function BadgePage() {
           onRetry={refetchBadges}
         />
       ) : (
-        <div className="space-y-12">
+        <div className="space-y-12 px-6">
           {acquired.length > 0 && (
             <div className="space-y-3">
               <h3 className="text-md font-semibold text-foreground">
@@ -130,27 +136,20 @@ function SectionError({
 function SummaryCard({
   label,
   value,
-  highlight,
   icon,
 }: {
   label: string;
   value: string;
-  highlight?: boolean;
   icon?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card px-4 py-3 flex items-center justify-between sm:flex-col sm:items-center sm:text-center">
-      <p className="text-xs font-medium text-muted-foreground sm:mb-2">
+    <div className="flex flex-col justify-between gap-2 md:gap-3 rounded-xl border border-primary/10 bg-card/95 p-4 md:p-5 shadow-sm dark:bg-card/70 dark:shadow-none">
+      <p className="text-xs md:text-sm font-medium leading-snug text-muted-foreground">
         {label}
       </p>
-      <div className="flex items-center justify-center gap-1">
+      <div className="flex items-center gap-1">
         {icon}
-        <p
-          className={cn(
-            "text-lg font-bold",
-            highlight ? "text-primary" : "text-foreground",
-          )}
-        >
+        <p className="text-xl md:text-2xl font-bold tabular-nums tracking-tight text-report-ink dark:text-foreground">
           {value}
         </p>
       </div>
@@ -165,7 +164,7 @@ function BadgeGrid({ badges }: { badges: BadgeItem[] }) {
         <div
           key={badge.badgeId}
           className={cn(
-            "rounded-xl bg-card px-4 py-4 flex flex-col items-center gap-0 text-center",
+            "rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 flex flex-col items-center gap-0 text-center",
             !badge.acquired && "opacity-40",
           )}
         >

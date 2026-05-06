@@ -14,11 +14,11 @@ export default function ActivityTimeline({ groups }: Props) {
       {groups.map((group) => (
         <div key={group.dateKey}>
           {/* 날짜 헤더 */}
-          <div className="flex items-center gap-2 mb-3">
+          <div className="sticky top-16 z-10 -mx-1 px-1 py-2 mb-1 bg-background/80 backdrop-blur-sm flex items-center gap-2">
             <span className="text-sm font-semibold text-foreground">
               {group.dateLabel}
             </span>
-            <span className="text-xs font-medium text-muted-foreground bg-muted rounded-full px-2 py-0.5">
+            <span className="text-xs font-medium text-primary bg-primary/10 rounded-full px-2 py-0.5">
               {group.count}
             </span>
           </div>

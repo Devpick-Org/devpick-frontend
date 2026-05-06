@@ -7,7 +7,8 @@ import { PERIOD_OPTIONS } from "./history.constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -82,23 +83,30 @@ function HistoryFilterBar<T extends string>({
 
         {/* 기간 dropdown — 가장 약한 강조 */}
         <DropdownMenu modal={false}>
-          <DropdownMenuTrigger className="flex items-center gap-0.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors outline-none cursor-pointer">
-            {currentPeriodLabel}
-            <ChevronDown className="h-3 w-3 opacity-60" />
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              {currentPeriodLabel}
+              <ChevronDown className="h-3.5 w-3.5" />
+            </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[6rem]">
-            {PERIOD_OPTIONS.map((opt) => (
-              <DropdownMenuItem
-                key={opt.value}
-                onSelect={() => onPeriodChange(opt.value)}
-                className={cn(
-                  "text-xs cursor-pointer",
-                  period === opt.value && "font-semibold text-primary",
-                )}
-              >
-                {opt.label}
-              </DropdownMenuItem>
-            ))}
+          <DropdownMenuContent align="end" className="min-w-[120px] p-1">
+            <DropdownMenuRadioGroup
+              value={period}
+              onValueChange={(v) => onPeriodChange(v as PeriodFilter)}
+            >
+              {PERIOD_OPTIONS.map((opt) => (
+                <DropdownMenuRadioItem
+                  key={opt.value}
+                  value={opt.value}
+                  className="cursor-pointer"
+                >
+                  {opt.label}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
