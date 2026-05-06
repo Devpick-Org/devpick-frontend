@@ -8,6 +8,7 @@ import {
   historyEndpoints,
   HISTORY_QUERY_KEYS,
 } from "@/lib/api/endpoints/history";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { BadgeItem } from "@/types/history";
 import { cn } from "@/lib/utils";
 
@@ -204,32 +205,45 @@ function EmptyState() {
 
 function PointsSummarySkeleton() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className="rounded-xl border border-border bg-card px-4 py-3 text-center"
-        >
-          <div className="h-3 w-14 bg-muted rounded animate-pulse mx-auto mb-2" />
-          <div className="h-6 w-16 bg-muted rounded animate-pulse mx-auto" />
-        </div>
-      ))}
+    <div className="space-y-5 rounded-2xl border border-primary/10 bg-card p-6 shadow-sm">
+      <div className="space-y-1">
+        <Skeleton className="h-3 w-10" />
+        <Skeleton className="h-6 w-40" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex flex-col justify-between gap-2 rounded-xl border border-primary/10 bg-card/95 p-4"
+          >
+            <Skeleton className="h-3.5 w-20" />
+            <Skeleton className="h-7 w-16" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
 function BadgeGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-      {Array.from({ length: 7 }).map((_, i) => (
-        <div
-          key={i}
-          className="rounded-xl bg-card px-4 py-4 flex flex-col items-center gap-0"
-        >
-          <div className="w-[156px] h-[156px] bg-muted rounded-xl animate-pulse" />
-          <div className="space-y-1.5 w-full mt-1">
-            <div className="h-3.5 w-2/3 bg-muted rounded animate-pulse mx-auto" />
-            <div className="h-3 w-4/5 bg-muted rounded animate-pulse mx-auto" />
+    <div className="space-y-12 px-6">
+      {[4, 3].map((count, si) => (
+        <div key={si} className="space-y-3">
+          <Skeleton className="h-5 w-24" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            {Array.from({ length: count }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 flex flex-col items-center gap-0"
+              >
+                <Skeleton className="w-[156px] h-[156px] rounded-xl" />
+                <div className="space-y-1.5 w-full mt-1">
+                  <Skeleton className="h-3.5 w-2/3 mx-auto" />
+                  <Skeleton className="h-3 w-4/5 mx-auto" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       ))}
