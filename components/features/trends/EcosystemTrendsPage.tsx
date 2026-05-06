@@ -7,6 +7,7 @@ import { EcoMarqueeRow } from "./EcoMarqueeRow";
 import { EcoTrendExpandOverlay } from "./EcoTrendExpandOverlay";
 import { Input } from "@/components/ui/input";
 import { trendsEndpoints, TREND_QUERY_KEYS } from "@/lib/api/endpoints/trends";
+import { EcosystemTrendsSkeleton } from "./EcosystemTrendsSkeleton";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 import { cn } from "@/lib/utils";
 
@@ -76,14 +77,7 @@ export function EcosystemTrendsPage() {
       })
     : null;
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-muted-foreground">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-        <p className="text-sm font-medium">불러오는 중입니다…</p>
-      </div>
-    );
-  }
+  if (isLoading) return <EcosystemTrendsSkeleton />;
 
   if (isError || !data?.success) {
     return (
