@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { cn, formatDateTime } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
-import { formatRelativeDate } from "./CommunityCard";
 import { ContentRenderer } from "./ContentRenderer";
 import { UserProfileModal } from "./UserProfileModal";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -285,7 +284,10 @@ function AnswerItem({
             {/* 댓글 달기 */}
             {answer.comments.length > 0 ? (
               <button
-                onClick={() => { setShowCommentForm(true); setShowComments(true); }}
+                onClick={() => {
+                  setShowCommentForm(true);
+                  setShowComments(true);
+                }}
                 className="flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted/40 cursor-pointer"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
