@@ -3,7 +3,6 @@
 import { useEffect, useId } from "react";
 import { X } from "lucide-react";
 import { EcoTrendCard } from "./EcoTrendCard";
-import { Button } from "@/components/ui/button";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
 type EcoTrendExpandOverlayProps = {
@@ -49,13 +48,20 @@ export function EcoTrendExpandOverlay({
           <h2 id={titleId} className="text-lg font-bold text-foreground">
             {title}
           </h2>
-          <button type="button" onClick={onClose} aria-label="닫기" className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="닫기"
+            className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-5">
           {items.length === 0 ? (
-            <p className="py-16 text-center text-sm text-muted-foreground">항목이 없습니다.</p>
+            <p className="py-16 text-center text-sm text-muted-foreground">
+              항목이 없습니다.
+            </p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item) => (

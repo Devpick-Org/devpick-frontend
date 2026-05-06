@@ -53,16 +53,15 @@ export function EcosystemTrendsPage() {
     placeholderData: (prev) => prev,
   });
 
-  const rawItems = data?.data.items ?? [];
-
   /** 검색어는 API의 q만 반영. 카테고리 pill은 「보여 줄 섹션」만 줄여서 다른 행이 비지 않도록 함. */
   const bySection = useMemo(() => {
+    const items = data?.data.items ?? [];
     return {
-      bootcamp: rawItems.filter((i) => i.category === "bootcamp"),
-      club: rawItems.filter((i) => i.category === "club"),
-      event: rawItems.filter((i) => i.category === "event"),
+      bootcamp: items.filter((i) => i.category === "bootcamp"),
+      club: items.filter((i) => i.category === "club"),
+      event: items.filter((i) => i.category === "event"),
     };
-  }, [rawItems]);
+  }, [data]);
 
   const visibleSections = useMemo(() => {
     if (catFilter === "all") return SECTIONS;

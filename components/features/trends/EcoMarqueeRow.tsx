@@ -53,7 +53,7 @@ export function EcoMarqueeRow({
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, []);
+  }, [initialOffset]);
 
   const scroll = (dir: 1 | -1) => {
     const wrap = wrapRef.current;
