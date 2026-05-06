@@ -8,12 +8,12 @@ import {
   MessageSquare,
   Send,
   X,
+  ChevronDown,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDateTime } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { formatRelativeDate } from "./CommunityCard";
 import { ContentRenderer } from "./ContentRenderer";
-import { AuthorButton } from "./AuthorButton";
 import { UserProfileModal } from "./UserProfileModal";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { CommunityAnswer, CommentDTO } from "@/types/community";
@@ -51,7 +51,10 @@ export function AnswerList({
   onDeleteComment,
 }: AnswerListProps) {
   const { user } = useAuthStore();
-  const [profileInfo, setProfileInfo] = useState<{ userId: string; nickname: string } | null>(null);
+  const [profileInfo, setProfileInfo] = useState<{
+    userId: string;
+    nickname: string;
+  } | null>(null);
   const hasAdopted = answers.some((a) => a.isAdopted);
   const isPostAuthor = user?.userId === postAuthorId;
 
@@ -70,7 +73,7 @@ export function AnswerList({
         nickname={profileInfo?.nickname}
         onClose={() => setProfileInfo(null)}
       />
-      <div className="space-y-5">
+      <div className="divide-y divide-border border-b border-border">
         {answers.map((answer) => (
           <AnswerItem
             key={answer.id}
@@ -82,7 +85,9 @@ export function AnswerList({
             onUpdate={onUpdateAnswer}
             onAddComment={onAddComment}
             onDeleteComment={onDeleteComment}
-            openUserProfile={(userId, nickname) => setProfileInfo({ userId, nickname })}
+            openUserProfile={(userId, nickname) =>
+              setProfileInfo({ userId, nickname })
+            }
           />
         ))}
       </div>
@@ -119,6 +124,7 @@ function AnswerItem({
   const [editContent, setEditContent] = useState(answer.content);
   const [commentInput, setCommentInput] = useState("");
   const [showCommentForm, setShowCommentForm] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   const isMyAnswer = currentUserId === answer.authorId;
 
@@ -141,15 +147,7 @@ function AnswerItem({
   };
 
   return (
-    <div
-      id={`answer-${answer.id}`}
-      className={cn(
-        "rounded-xl p-5",
-        answer.isAdopted
-          ? "bg-card border border-border"
-          : "bg-card border border-border",
-      )}
-    >
+    <div id={`answer-${answer.id}`} className="py-7">
       {/* 채택 배지 — 모바일에서 작성자 위에 표시 */}
       {answer.isAdopted && (
         <div className="mb-2 flex items-center gap-1 text-sm font-semibold text-primary sm:hidden">
@@ -159,36 +157,54 @@ function AnswerItem({
       )}
 
       {/* 헤더: 작성자 + 액션 버튼 */}
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs font-medium text-foreground">
-          <AuthorButton
-            userId={answer.authorId}
-            nickname={answer.authorNickname}
-            profileImage={answer.authorProfileImage}
-            onOpenProfile={(userId) => openUserProfile(userId, answer.authorNickname)}
-          />
-          {(answer.authorJob || answer.authorLevel) && (
-            <>
-              <span className="text-muted-foreground">·</span>
-              <span className="font-medium">
-                {[
-                  answer.authorJob
-                    ? (JOB_LABELS[answer.authorJob] ?? answer.authorJob)
-                    : null,
-                  answer.authorLevel
-                    ? (LEVEL_LABELS[answer.authorLevel] ?? answer.authorLevel)
-                    : null,
-                ]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </span>
-            </>
-          )}
-          <span className="text-muted-foreground/40">·</span>
-          <span>{formatRelativeDate(answer.createdAt)}</span>
-          {answer.updatedAt !== answer.createdAt && (
-            <span className="text-muted-foreground/50">(수정됨)</span>
-          )}
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <div className="flex items-start gap-3">
+          <button
+            type="button"
+            onClick={() =>
+              openUserProfile(answer.authorId, answer.authorNickname)
+            }
+            className="shrink-0 cursor-pointer rounded-full transition-opacity hover:opacity-70"
+          >
+            <Avatar className="h-9 w-9">
+              {answer.authorProfileImage && (
+                <AvatarImage
+                  src={answer.authorProfileImage}
+                  alt={answer.authorNickname}
+                />
+              )}
+              <AvatarFallback>
+                {answer.authorNickname.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </button>
+          <div className="flex flex-col gap-0.5">
+            <button
+              type="button"
+              onClick={() =>
+                openUserProfile(answer.authorId, answer.authorNickname)
+              }
+              className="cursor-pointer text-left text-sm font-semibold text-foreground transition-opacity hover:opacity-70"
+            >
+              {answer.authorNickname}
+            </button>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              {[
+                answer.authorJob
+                  ? (JOB_LABELS[answer.authorJob] ?? answer.authorJob)
+                  : null,
+                answer.authorLevel
+                  ? (LEVEL_LABELS[answer.authorLevel] ?? answer.authorLevel)
+                  : null,
+                formatDateTime(answer.createdAt),
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+              {answer.updatedAt !== answer.createdAt && (
+                <span className="text-muted-foreground/50">(수정됨)</span>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5">
@@ -231,8 +247,6 @@ function AnswerItem({
         </div>
       </div>
 
-      <div className="border-t border-border" />
-
       {/* 본문 또는 편집 폼 */}
       {isEditing ? (
         <div className="pt-3">
@@ -266,27 +280,21 @@ function AnswerItem({
       {/* 댓글 영역 */}
       {!isEditing && (
         <>
-          {answer.comments.length > 0 && (
-            <div className="mt-5 space-y-3 border-t border-border/50 pt-4">
-              {answer.comments.map((comment) => (
-                <CommentItem
-                  key={comment.id}
-                  comment={comment}
-                  currentUserId={currentUserId}
-                  onDelete={(commentId) =>
-                    onDeleteComment(answer.id, commentId)
-                  }
-                  onOpenProfile={(userId) => openUserProfile(userId, comment.nickname)}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="mt-4">
-            {!showCommentForm ? (
+          {/* 하단 버튼 행 */}
+          <div className="mt-4 space-y-4 pt-3">
+            {/* 댓글 달기 */}
+            {answer.comments.length > 0 ? (
+              <button
+                onClick={() => { setShowCommentForm(true); setShowComments(true); }}
+                className="flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted/40 cursor-pointer"
+              >
+                <MessageSquare className="h-3.5 w-3.5" />
+                댓글 달기
+              </button>
+            ) : !showCommentForm ? (
               <button
                 onClick={() => setShowCommentForm(true)}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium transition-colors hover:text-foreground cursor-pointer"
+                className="flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted/40 cursor-pointer"
               >
                 <MessageSquare className="h-3.5 w-3.5" />
                 댓글 달기
@@ -305,7 +313,7 @@ function AnswerItem({
                     }
                   }}
                   placeholder="댓글을 입력하세요..."
-                  className="flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground font-medium placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                  className="flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
                   autoFocus
                 />
                 <button
@@ -328,7 +336,95 @@ function AnswerItem({
                 </button>
               </div>
             )}
+            {/* 댓글 N개 토글 */}
+            {answer.comments.length > 0 && (
+              <button
+                onClick={() => setShowComments((v) => !v)}
+                className="flex items-center gap-1 text-sm font-semibold text-primary transition-colors hover:text-primary/90 cursor-pointer"
+              >
+                <ChevronDown
+                  className={cn(
+                    "h-3 w-3 transition-transform duration-200",
+                    showComments && "rotate-180",
+                  )}
+                />
+                댓글 {answer.comments.length}개
+              </button>
+            )}
           </div>
+
+          {/* 댓글 목록 (토글) */}
+          {showComments && answer.comments.length > 0 && (
+            <div className="mt-5 space-y-6">
+              {answer.comments.map((comment) => (
+                <div key={comment.id} className="flex items-start gap-2">
+                  <div className="ml-3 mt-0 h-3 w-3 shrink-0 rounded-bl border-b-2 border-l-2 border-border/50" />
+                  <div className="flex-1 min-w-0">
+                    <CommentItem
+                      comment={comment}
+                      currentUserId={currentUserId}
+                      onDelete={(commentId) =>
+                        onDeleteComment(answer.id, commentId)
+                      }
+                      onOpenProfile={(userId) =>
+                        openUserProfile(userId, comment.nickname)
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+              <div className="flex items-start gap-2 pt-1">
+                <div className="ml-3 w-3 shrink-0" />
+                <div className="flex-1">
+                  {!showCommentForm ? (
+                    <button
+                      onClick={() => setShowCommentForm(true)}
+                      className="flex items-center gap-1.5 rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground cursor-pointer"
+                    >
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      댓글 달기
+                    </button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={commentInput}
+                        onChange={(e) => setCommentInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleCommentSubmit();
+                          if (e.key === "Escape") {
+                            setShowCommentForm(false);
+                            setCommentInput("");
+                          }
+                        }}
+                        placeholder="댓글을 입력하세요..."
+                        className="flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleCommentSubmit}
+                        disabled={!commentInput.trim()}
+                        className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40 cursor-pointer"
+                        aria-label="댓글 등록"
+                      >
+                        <Send className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowCommentForm(false);
+                          setCommentInput("");
+                        }}
+                        className="rounded-lg p-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
+                        aria-label="취소"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -344,38 +440,56 @@ interface CommentItemProps {
   onOpenProfile: (userId: string) => void;
 }
 
-function CommentItem({ comment, currentUserId, onDelete, onOpenProfile }: CommentItemProps) {
+function CommentItem({
+  comment,
+  currentUserId,
+  onDelete,
+  onOpenProfile,
+}: CommentItemProps) {
   const isMyComment = currentUserId === comment.userId;
 
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="flex flex-1 items-start gap-1.5 text-xs leading-5 min-w-0">
-        <button
-          type="button"
-          onClick={() => onOpenProfile(comment.userId)}
-          className="inline-flex shrink-0 items-center gap-1 font-semibold text-foreground/80 hover:opacity-70 cursor-pointer"
-        >
-          <Avatar className="size-4">
-            {comment.profileImage && (
-              <AvatarImage src={comment.profileImage} alt={comment.nickname} />
-            )}
-            <AvatarFallback className="text-[9px]">
-              {comment.nickname.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          {comment.nickname}
-        </button>
-        <span className="text-muted-foreground min-w-0 break-words">{comment.content}</span>
+    <div className="flex items-start gap-2.5">
+      <button
+        type="button"
+        onClick={() => onOpenProfile(comment.userId)}
+        className="shrink-0 cursor-pointer rounded-full transition-opacity hover:opacity-70"
+      >
+        <Avatar className="h-8 w-8">
+          {comment.profileImage && (
+            <AvatarImage src={comment.profileImage} alt={comment.nickname} />
+          )}
+          <AvatarFallback className="text-xs">
+            {comment.nickname.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+      </button>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => onOpenProfile(comment.userId)}
+            className="text-sm font-semibold text-foreground cursor-pointer transition-opacity hover:opacity-70"
+          >
+            {comment.nickname}
+          </button>
+          {isMyComment && (
+            <button
+              onClick={() => onDelete(comment.id)}
+              className="cursor-pointer shrink-0 text-muted-foreground/50 transition-colors hover:text-destructive"
+              aria-label="댓글 삭제"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        <p className="mb-1 text-[11px] text-muted-foreground">
+          {formatDateTime(comment.createdAt)}
+        </p>
+        <p className="text-sm text-foreground/90 break-words leading-5">
+          {comment.content}
+        </p>
       </div>
-      {isMyComment && (
-        <button
-          onClick={() => onDelete(comment.id)}
-          className="cursor-pointer shrink-0 text-muted-foreground/50 transition-colors hover:text-destructive"
-          aria-label="댓글 삭제"
-        >
-          <Trash2 className="h-3 w-3" />
-        </button>
-      )}
     </div>
   );
 }

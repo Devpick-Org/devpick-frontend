@@ -119,52 +119,56 @@ export function CommunityDetailPage({ postId }: Props) {
         isLoading={deleteMutation.isPending}
         onConfirm={() => deleteMutation.mutate()}
       />
-      <div className={`mx-auto w-full px-4 py-8 lg:px-8 ${isTechPost ? "max-w-7xl" : "max-w-4xl"}`}>
-      <div className={`grid gap-10 ${isTechPost ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}>
-        {/* 메인 콘텐츠 */}
-        <main className="min-w-0">
-          <PostDetail
-            post={post}
-            isAuthor={isAuthor}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            isDeleting={deleteMutation.isPending}
-          />
-          {isTechPost && (
-            <AiAnswerSection
-              status={aiStatus}
-              content={aiContent}
-              keyPoints={aiKeyPoints}
-              suggestedTags={aiSuggestedTags}
-              confidence={aiConfidence}
-              onRetry={() => refetchAiAnswer()}
-              isRetrying={isAiRetrying}
+      <div
+        className={`mx-auto w-full px-4 py-8 lg:px-8 ${isTechPost ? "max-w-7xl" : "max-w-4xl"}`}
+      >
+        <div
+          className={`grid gap-10 ${isTechPost ? "lg:grid-cols-[minmax(0,1fr)_320px]" : ""}`}
+        >
+          {/* 메인 콘텐츠 */}
+          <main className="min-w-0">
+            <PostDetail
+              post={post}
+              isAuthor={isAuthor}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              isDeleting={deleteMutation.isPending}
             />
-          )}
-          <AnswerSection
-            postId={postId}
-            postAuthorId={post.authorId}
-            answers={answers}
-          />
-        </main>
+            {isTechPost && (
+              <AiAnswerSection
+                status={aiStatus}
+                content={aiContent}
+                keyPoints={aiKeyPoints}
+                suggestedTags={aiSuggestedTags}
+                confidence={aiConfidence}
+                onRetry={() => refetchAiAnswer()}
+                isRetrying={isAiRetrying}
+              />
+            )}
+            <AnswerSection
+              postId={postId}
+              postAuthorId={post.authorId}
+              answers={answers}
+            />
+          </main>
 
-        {/* 사이드바 — 데스크탑 */}
+          {/* 사이드바 — 데스크탑 */}
+          {isTechPost && (
+            <aside className="hidden lg:block">
+              <div className="sticky top-24">
+                <SimilarPosts posts={similarPosts} />
+              </div>
+            </aside>
+          )}
+        </div>
+
+        {/* 사이드바 — 모바일 */}
         {isTechPost && (
-          <aside className="hidden lg:block">
-            <div className="sticky top-24">
-              <SimilarPosts posts={similarPosts} />
-            </div>
-          </aside>
+          <div className="mt-8 lg:hidden">
+            <SimilarPosts posts={similarPosts} />
+          </div>
         )}
       </div>
-
-      {/* 사이드바 — 모바일 */}
-      {isTechPost && (
-        <div className="mt-8 lg:hidden">
-          <SimilarPosts posts={similarPosts} />
-        </div>
-      )}
-    </div>
     </>
   );
 }
@@ -173,7 +177,6 @@ function CommunityDetailSkeleton() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-
         {/* 메인 */}
         <div className="min-w-0">
           {/* 뒤로가기 */}
@@ -278,7 +281,6 @@ function CommunityDetailSkeleton() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

@@ -139,7 +139,7 @@ export function AnswerSection({
       />
 
       {/* 답변 작성 폼 */}
-      <div className="mt-10 border-t border-border/60 pt-8">
+      <div className="mt-10 pt-8">
         <h3 className="mb-4 font-semibold text-foreground">답변 작성</h3>
         <textarea
           value={newAnswerContent}
