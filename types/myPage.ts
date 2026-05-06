@@ -142,6 +142,7 @@ export interface MyPageJobBookmark {
   deadline: string;
   techStack: string[];
   bookmarkedAt: string;
+  matchScore?: number;
 }
 
 export interface MyPageJobBookmarkResponse {

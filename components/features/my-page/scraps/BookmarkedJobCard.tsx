@@ -3,13 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import type { MyPageJobBookmark } from "@/types/myPage";
 
 
 export function BookmarkedJobCard({ bookmark }: { bookmark: MyPageJobBookmark }) {
   const [logoFailed, setLogoFailed] = useState(false);
-  const { jobPostingId, companyName, companyLogo, title, location, deadline, techStack } = bookmark;
+  const { jobPostingId, companyName, companyLogo, title, location, deadline, techStack, matchScore } = bookmark;
 
   const hasLogo = Boolean(companyLogo?.trim()) && !logoFailed;
   const companyInitial = (companyName?.trim()?.[0] ?? "회").toUpperCase();
@@ -50,6 +50,26 @@ export function BookmarkedJobCard({ bookmark }: { bookmark: MyPageJobBookmark })
         </div>
       </div>
 
+      {matchScore !== undefined && (
+        <div className="mt-2.5">
+          <div className="mb-1 flex items-center justify-between">
+            <span className="text-[11px] font-medium text-muted-foreground">매칭 점수</span>
+            <span className={cn(
+              "text-[11px] font-bold",
+              matchScore >= 80 ? "text-emerald-600" : matchScore >= 60 ? "text-primary" : "text-muted-foreground",
+            )}>{matchScore}%</span>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className={cn(
+                "h-full rounded-full transition-all",
+                matchScore >= 80 ? "bg-emerald-500" : matchScore >= 60 ? "bg-primary" : "bg-muted-foreground/40",
+              )}
+              style={{ width: `${matchScore}%` }}
+            />
+          </div>
+        </div>
+      )}
       <div className="mt-2.5 flex flex-col gap-1.5">
         <span className="text-xs text-muted-foreground">
           {[location, deadlineLabel].filter(Boolean).join(" · ")}

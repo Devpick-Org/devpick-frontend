@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import type { MyPageJobBookmark } from "@/types/myPage";
 
 const EXPERIENCE_LABEL: Record<string, string> = {
@@ -21,20 +21,36 @@ const EMPLOYMENT_LABEL: Record<string, string> = {
   INTERNSHIP: "인턴",
 };
 
-export function BookmarkedJobListItem({ bookmark }: { bookmark: MyPageJobBookmark }) {
+export function BookmarkedJobListItem({
+  bookmark,
+}: {
+  bookmark: MyPageJobBookmark;
+}) {
   const [logoFailed, setLogoFailed] = useState(false);
-  const { jobPostingId, companyName, companyLogo, title, experienceLevel, employmentType, location, deadline, techStack } = bookmark;
+  const {
+    jobPostingId,
+    companyName,
+    companyLogo,
+    title,
+    experienceLevel,
+    employmentType,
+    location,
+    deadline,
+    techStack,
+    matchScore,
+  } = bookmark;
 
   const hasLogo = Boolean(companyLogo?.trim()) && !logoFailed;
   const companyInitial = (companyName?.trim()?.[0] ?? "회").toUpperCase();
   const deadlineLabel =
-    deadline === "채용 시 마감" ? "채용 시 마감" : deadline ? `~${formatDate(deadline)}` : null;
+    deadline === "채용 시 마감"
+      ? "채용 시 마감"
+      : deadline
+        ? `~${formatDate(deadline)}`
+        : null;
 
   return (
-    <Link
-      href={`/jobs/${jobPostingId}`}
-      className="-mx-2 flex gap-4 px-2 py-3"
-    >
+    <Link href={`/jobs/${jobPostingId}`} className="-mx-2 flex gap-4 px-2 py-3">
       {/* 회사 로고 */}
       {hasLogo ? (
         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-border">
@@ -60,8 +76,49 @@ export function BookmarkedJobListItem({ bookmark }: { bookmark: MyPageJobBookmar
         <p className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-[-0.01em] text-foreground">
           {title}
         </p>
-        <span className="text-xs text-muted-foreground">
-          {[EXPERIENCE_LABEL[experienceLevel], EMPLOYMENT_LABEL[employmentType], location, deadlineLabel].filter(Boolean).join(" · ")}
+        {matchScore !== undefined && (
+          <div className="mt-1 w-3/5">
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-[11px] font-medium text-muted-foreground">
+                매칭 점수
+              </span>
+              <span
+                className={cn(
+                  "text-[11px] font-bold",
+                  matchScore >= 80
+                    ? "text-emerald-600"
+                    : matchScore >= 60
+                      ? "text-primary"
+                      : "text-muted-foreground",
+                )}
+              >
+                {matchScore}%
+              </span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className={cn(
+                  "h-full rounded-full transition-all",
+                  matchScore >= 80
+                    ? "bg-emerald-500"
+                    : matchScore >= 60
+                      ? "bg-primary"
+                      : "bg-muted-foreground/40",
+                )}
+                style={{ width: `${matchScore}%` }}
+              />
+            </div>
+          </div>
+        )}
+        <span className="mt-1.5 text-xs text-muted-foreground">
+          {[
+            EXPERIENCE_LABEL[experienceLevel],
+            EMPLOYMENT_LABEL[employmentType],
+            location,
+            deadlineLabel,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
         </span>
         {techStack.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
