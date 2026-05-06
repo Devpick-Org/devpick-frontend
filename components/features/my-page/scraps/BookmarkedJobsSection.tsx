@@ -45,6 +45,13 @@ export function BookmarkedJobsSection() {
                   <Skeleton className="h-3.5 w-4/5 rounded" />
                 </div>
               </div>
+              <div className="mt-2.5">
+                <div className="mb-1 flex items-center justify-between">
+                  <Skeleton className="h-3 w-14" />
+                  <Skeleton className="h-3 w-8" />
+                </div>
+                <Skeleton className="h-1.5 w-full rounded-full" />
+              </div>
               <div className="mt-2.5 flex flex-col gap-1.5">
                 <Skeleton className="h-3 w-24 rounded" />
                 <div className="flex gap-1">

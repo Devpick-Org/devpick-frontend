@@ -25,6 +25,13 @@ function ListItemSkeleton() {
         <Skeleton className="h-3 w-20 rounded" />
         <Skeleton className="h-4 w-full rounded" />
         <Skeleton className="h-4 w-4/5 rounded" />
+        <div className="mt-1 w-3/5">
+          <div className="mb-1 flex items-center justify-between">
+            <Skeleton className="h-3 w-14" />
+            <Skeleton className="h-3 w-8" />
+          </div>
+          <Skeleton className="h-1.5 w-full rounded-full" />
+        </div>
         <Skeleton className="h-3 w-24 rounded" />
         <div className="mt-2 flex gap-1">
           <Skeleton className="h-4 w-12 rounded-full" />
