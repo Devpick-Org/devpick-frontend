@@ -133,7 +133,7 @@ export default function ReportContent({ activity, chartData }: Props) {
             interestTagMatchRate={activity.contentKeywords?.interestTagMatchRate ?? 0}
           />
           <QuestionAnalysisCard analysis={activity.questionAnalysis} />
-          <JobAnalysisCard jobTechStacks={activity.jobTechStacks} />
+          <JobAnalysisCard jobTechStacks={activity.jobTechStacks ?? []} />
         </div>
       </section>
 
@@ -149,7 +149,7 @@ export default function ReportContent({ activity, chartData }: Props) {
         </div>
         {!activity.highlights || activity.highlights.length === 0 ? (
           <div className="rounded-xl border border-dashed border-primary/20 bg-card/80 p-8 text-center text-sm font-medium leading-relaxed text-muted-foreground @md:p-10">
-            하이라이트를 준비 중입니다.
+            이번 주 하이라이트를 분석 중이에요.
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 @md:gap-5">
@@ -246,19 +246,23 @@ function QuestionAnalysisCard({ analysis }: QuestionAnalysisCardProps) {
     <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:p-5 dark:bg-card/80">
       <p className="mb-4 text-sm font-semibold text-report-ink">질문 분석</p>
 
-      {/* 수치 행 */}
-      <div className="space-y-2">
-        <QuestionCountRow label="기술 질문" total={analysis.tech.total} resolved={analysis.tech.resolved} />
-        <QuestionCountRow label="커리어 질문" total={analysis.career.total} resolved={analysis.career.resolved} />
-      </div>
+      {!analysis ? (
+        <p className="text-sm text-muted-foreground">질문 데이터가 없어요.</p>
+      ) : (
+        <>
+          <div className="space-y-2">
+            <QuestionCountRow label="기술 질문" total={analysis.tech.total} resolved={analysis.tech.resolved} />
+            <QuestionCountRow label="커리어 질문" total={analysis.career.total} resolved={analysis.career.resolved} />
+          </div>
 
-      <div className="my-3 border-t border-primary/10" />
+          <div className="my-3 border-t border-primary/10" />
 
-      {/* 키워드 */}
-      <div className="space-y-2.5">
-        <QuestionKeywordRow label="기술 질문 키워드" keywords={analysis.tech.keywords} />
-        <QuestionKeywordRow label="커리어 질문 키워드" keywords={analysis.career.keywords} />
-      </div>
+          <div className="space-y-2.5">
+            <QuestionKeywordRow label="기술 질문 키워드" keywords={analysis.tech.keywords} />
+            <QuestionKeywordRow label="커리어 질문 키워드" keywords={analysis.career.keywords} />
+          </div>
+        </>
+      )}
     </div>
   );
 }

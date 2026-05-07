@@ -50,12 +50,14 @@ export interface WeeklyActivity {
   contentsRead: number;
   questionsCreated: number;
   jobPostingsViewed: number;
-  prevWeekComparison: PrevWeekComparisonDeltas | null;
-  topTags: TopTag[] | null;
-  contentKeywords: ContentKeywords;
-  questionAnalysis: QuestionAnalysis;
-  jobTechStacks: JobTechStack[];
-  highlights: Highlight[];
+  /** 백엔드가 JSON 문자열 또는 객체로 내릴 수 있음 */
+  prevWeekComparison: string | PrevWeekComparisonDeltas | null;
+  /** 백엔드가 JSON 문자열 또는 배열로 내릴 수 있음 */
+  topTags: string | TopTag[] | null;
+  contentKeywords: ContentKeywords | null;
+  questionAnalysis: QuestionAnalysis | null;
+  jobTechStacks: JobTechStack[] | null;
+  highlights: Highlight[] | null;
 }
 
 /** 요일별 활동량 — chartData.dailyActivities 항목 */
