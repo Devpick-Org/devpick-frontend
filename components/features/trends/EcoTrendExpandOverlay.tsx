@@ -33,7 +33,7 @@ export function EcoTrendExpandOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4 animate-in fade-in-0 duration-200"
       onClick={onClose}
       aria-hidden
     >
@@ -41,7 +41,7 @@ export function EcoTrendExpandOverlay({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="flex max-h-[min(80vh,720px)] w-full max-w-5xl flex-col overflow-hidden rounded-t-2xl border border-border bg-card shadow-2xl sm:rounded-2xl"
+        className="flex max-h-[min(80vh,720px)] w-full max-w-5xl flex-col overflow-hidden rounded-t-2xl border border-border bg-card shadow-2xl sm:rounded-2xl animate-in fade-in-0 zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-3 sm:px-5">

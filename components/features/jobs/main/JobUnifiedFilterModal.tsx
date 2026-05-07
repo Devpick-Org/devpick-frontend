@@ -109,7 +109,7 @@ function ModalInner({
     >
       <button
         type="button"
-        className="absolute inset-0 z-40 cursor-default bg-black/50 outline-none ring-0 backdrop-blur-[2px]"
+        className="absolute inset-0 z-40 cursor-default bg-black/50 outline-none ring-0"
         aria-label="모달 닫기"
         onClick={() => onOpenChange(false)}
       />
