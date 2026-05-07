@@ -182,7 +182,7 @@ export function PostRefinePanel({
   return (
     <div className="flex flex-col gap-5">
       {/* 입력 필드 카드 */}
-      <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
+      <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5 shadow-sm">
         {/* 개선된 제목 */}
         <div>
           <div className="mb-1.5 flex items-center justify-between">

@@ -256,7 +256,7 @@ export default function CommunityWritePage() {
               <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 작성 가이드
               </h2>
-              <div className="flex flex-1 flex-col gap-8 rounded-xl border border-border bg-card p-5">
+              <div className="flex flex-1 flex-col gap-8 rounded-xl border border-border bg-card p-5 shadow-sm">
                 <div>
                   <p className="mb-3 text-sm font-semibold text-foreground">
                     이런 주제를 나눠보세요
