@@ -47,7 +47,6 @@ export default function SharedReportPage({ token }: Props) {
       <ReportContent
         activity={activity}
         chartData={report.chartData}
-        aiInsight={report.aiInsight}
       />
     </div>
   );

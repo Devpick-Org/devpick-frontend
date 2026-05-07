@@ -121,7 +121,6 @@ export default function WeeklyReportPage() {
         <ReportContent
           activity={activity}
           chartData={report.chartData}
-          aiInsight={report.aiInsight}
         />
       </div>
       {/* PDF 저장 전용 영역 */}
@@ -139,7 +138,6 @@ export default function WeeklyReportPage() {
           <ReportContent
             activity={activity}
             chartData={report.chartData}
-            aiInsight={report.aiInsight}
           />
         </div>
       </div>
@@ -176,7 +174,9 @@ function WeekHeader({
               className="flex max-w-full items-center gap-1.5 text-left text-xl font-bold tracking-tight text-report-ink transition-colors hover:text-primary @md:text-2xl cursor-pointer dark:text-report-ink"
               type="button"
             >
-              <span className="truncate">{formatWeekLabel(report.weekStart)}</span>
+              <span className="truncate">
+                {formatWeekLabel(report.weekStart)}
+              </span>
               <ChevronDown className="h-4 w-4 shrink-0 text-primary/70" />
             </button>
           </DropdownMenuTrigger>
@@ -282,7 +282,7 @@ function LoadingState() {
 
 function ErrorState() {
   return (
-    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl border border-destructive/20 bg-destructive/5 px-6 py-12 text-foreground">
+    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl px-6 py-12 text-foreground">
       <AlertCircle className="h-9 w-9 text-destructive" />
       <p className="text-base font-semibold">리포트를 불러오지 못했습니다.</p>
     </div>

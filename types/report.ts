@@ -1,21 +1,61 @@
 import type { ApiResponse } from "./api";
 
-/** 전주 대비 증감 — 백엔드가 JSON 객체로 내리거나 JSON 문자열로 직렬화할 수 있음 */
 export interface PrevWeekComparisonDeltas {
   contentsRead: number;
   questionsCreated: number;
-  scrapsCount: number;
+  jobPostingsViewed: number;
+}
+
+export interface ContentKeywordItem {
+  keyword: string;
+  count: number;
+}
+
+export interface ContentKeywords {
+  keywords: ContentKeywordItem[];
+  interestTagMatchRate: number;
+}
+
+export interface QuestionCategory {
+  total: number;
+  resolved: number;
+  keywords: string[];
+}
+
+export interface QuestionAnalysis {
+  tech: QuestionCategory;
+  career: QuestionCategory;
+}
+
+export interface JobTechStack {
+  tech: string;
+  count: number;
+}
+
+export type HighlightType = "success" | "info" | "warning";
+
+export interface Highlight {
+  type: HighlightType;
+  title: string;
+  description: string;
+}
+
+export interface TopTag {
+  tag: string;
+  count: number;
 }
 
 /** 이번 주 활동 요약 — GET /reports/weekly 응답의 activities 항목 */
 export interface WeeklyActivity {
   contentsRead: number;
   questionsCreated: number;
-  scrapsCount: number;
-  /** JSON 배열 문자열 또는 쉼표 구분 — 백엔드에서 null 가능 */
-  topTags: string | null;
-  /** 전주 대비 — 객체·JSON 문자열·레거시 요약 문자열 가능, 미계산 시 null */
-  prevWeekComparison: string | PrevWeekComparisonDeltas | null;
+  jobPostingsViewed: number;
+  prevWeekComparison: PrevWeekComparisonDeltas | null;
+  topTags: TopTag[] | null;
+  contentKeywords: ContentKeywords;
+  questionAnalysis: QuestionAnalysis;
+  jobTechStacks: JobTechStack[];
+  highlights: Highlight[];
 }
 
 /** 요일별 활동량 — chartData.dailyActivities 항목 */
@@ -30,17 +70,10 @@ export interface TagActivity {
   count: number;
 }
 
-/** 차트 데이터 — 바 차트(요일별) + 레이더 차트(태그별) */
+/** 차트 데이터 */
 export interface ChartData {
   dailyActivities: DailyActivity[];
   tagActivities: TagActivity[];
-}
-
-/** AI 인사이트 */
-export interface AiInsight {
-  wellDone: string | null;
-  lacking: string | null;
-  nextWeek: string | null;
 }
 
 /** 주간 리포트 DTO — GET /reports/weekly, /reports/weekly/{reportId} 공통 응답 */
@@ -52,7 +85,6 @@ export interface WeeklyReport {
   isShared: boolean;
   activities: WeeklyActivity[];
   chartData: ChartData;
-  aiInsight: AiInsight | null;
 }
 
 /** POST /reports/weekly/{reportId}/share 응답 data */
@@ -75,9 +107,6 @@ export type WeeklyShareCreateResponse = ApiResponse<ShareReportData>;
 export type WeeklySharedReportResponse = ApiResponse<WeeklyReport>;
 export type WeeklyReportListResponse = ApiResponse<WeeklyReportSummary[]>;
 
-// ── 클라이언트 export 전용 타입 (서버 저장 API 아님) ──────────────────────────
-
-/** 저장 포맷 — 추후 "image" | "csv" 확장 가능 */
 export type ReportExportFormat = "pdf";
 
 export interface ReportExportOptions {
