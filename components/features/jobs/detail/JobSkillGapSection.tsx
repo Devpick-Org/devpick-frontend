@@ -99,9 +99,15 @@ export function JobSkillGapSection({
         </button>
       }
     >
-      {!hasResult && !mutation.isPending && (
+      {!hasResult && !mutation.isPending && !mutation.isSuccess && (
         <p className="text-sm font-medium text-muted-foreground">
           필수 기술 대비 부족한 부분을 기준으로 학습 로드맵과 추천 콘텐츠를 받을 수 있어요.
+        </p>
+      )}
+
+      {!hasResult && mutation.isSuccess && (
+        <p className="text-sm font-medium text-muted-foreground">
+          이력서 기술 스택이 이 공고 요구사항을 충분히 충족하고 있어요. 추가로 보완할 역량이 없습니다.
         </p>
       )}
 

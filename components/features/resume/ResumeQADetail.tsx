@@ -32,7 +32,7 @@ export function ResumeQADetail({ qa, onDelete }: ResumeQADetailProps) {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col">
       {/* 헤더 */}
       <div className="flex items-start justify-between gap-4 border-b border-border pb-4">
         <div>
@@ -47,7 +47,9 @@ export function ResumeQADetail({ qa, onDelete }: ResumeQADetailProps) {
               매칭 {qa.matchScore}%
             </p>
           ) : (
-            <p className="mt-1 text-xs font-medium text-muted-foreground">매칭 —</p>
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
+              매칭 —
+            </p>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-3">

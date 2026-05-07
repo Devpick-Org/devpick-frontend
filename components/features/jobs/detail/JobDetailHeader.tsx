@@ -124,25 +124,24 @@ export function JobDetailHeader({ job }: JobDetailHeaderProps) {
         {job.title}
       </h1>
 
-      {/* 기본 정보 */}
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-3">
-        {infoRows.map(({ label, value }) => (
-          <div key={label} className="flex flex-col gap-0.5">
-            <dt className="text-[11px] font-medium text-muted-foreground">
-              {label}
-            </dt>
-            <dd className="text-sm font-medium text-foreground">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      {/* 기본 정보 + 원문 보기 */}
+      <div className="flex items-end justify-between gap-4">
+        <dl className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-3">
+          {infoRows.map(({ label, value }) => (
+            <div key={label} className="flex flex-col gap-0.5">
+              <dt className="text-[11px] font-medium text-muted-foreground">
+                {label}
+              </dt>
+              <dd className="text-sm font-medium text-foreground">{value}</dd>
+            </div>
+          ))}
+        </dl>
 
-      {/* 지원하러 가기 */}
-      <div className="flex justify-end -mt-16">
         <a
           href={job.applyUrl || "#"}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
         >
           원문 보기
           <ExternalLink className="h-4 w-4" />

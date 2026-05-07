@@ -35,7 +35,7 @@ export function JobDetailStructuredList({ items }: JobDetailStructuredListProps)
                   className="flex items-start gap-2 text-sm font-medium leading-relaxed text-foreground"
                 >
                   <span
-                    className="mt-[0.4em] shrink-0 font-normal text-muted-foreground"
+                    className="shrink-0 font-normal text-muted-foreground"
                     aria-hidden
                   >
                     -

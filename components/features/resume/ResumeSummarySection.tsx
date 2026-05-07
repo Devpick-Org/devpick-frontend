@@ -36,8 +36,15 @@ export function ResumeSummarySection({
   isSaving = false,
   suggestedTechPool = [],
 }: ResumeSummarySectionProps) {
-  const { fileName, uploadedAt, basicInfo, summary, techStack, careers, projects } =
-    resume;
+  const {
+    fileName,
+    uploadedAt,
+    basicInfo,
+    summary,
+    techStack,
+    careers,
+    projects,
+  } = resume;
   const completeness = getResumeCompleteness(resume);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const infoCards = [
@@ -70,11 +77,13 @@ export function ResumeSummarySection({
                 Master Resume
               </p>
               <h2 className="mt-2 text-xl font-bold tracking-[-0.02em] text-foreground">
-                {basicInfo.name ? `${basicInfo.name}님의 이력서` : "마스터 이력서"}
+                {basicInfo.name
+                  ? `${basicInfo.name}님의 이력서`
+                  : "마스터 이력서"}
               </h2>
               <p className="mt-2 min-w-0 text-sm font-medium leading-snug text-muted-foreground break-keep xl:whitespace-nowrap">
-                공고 매칭, 면접 Q&A, 부족 역량 추천에 쓰이는 기준 정보입니다. 수정하면
-                프로필 정보도 저장 시점에 자동으로 최신화됩니다.
+                공고 매칭, 면접 Q&A, 부족 역량 추천에 쓰이는 기준 정보입니다.
+                수정하면 프로필 정보도 저장 시점에 자동으로 최신화됩니다.
               </p>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
@@ -82,7 +91,7 @@ export function ResumeSummarySection({
                 type="button"
                 variant="outline"
                 size="sm"
-                className="gap-1.5 bg-background/80"
+                className="gap-1.5 bg-background/80 hover:bg-muted hover:text-foreground"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <FileText className="h-3.5 w-3.5" />
@@ -132,10 +141,10 @@ export function ResumeSummarySection({
 
             <div
               className={cn(
-                "rounded-xl border px-3 py-3 sm:px-4 sm:py-3",
+                "rounded-xl px-3 py-3 sm:px-4 sm:py-3",
                 completeness.doneCount >= completeness.total
-                  ? "border-primary/25 bg-primary/5"
-                  : "border-border/80 bg-muted/20",
+                  ? "mt-6"
+                  : "border border-border/80 bg-muted/20",
               )}
             >
               {completeness.doneCount >= completeness.total ? (
@@ -144,8 +153,8 @@ export function ResumeSummarySection({
                     체크리스트 항목을 모두 채웠습니다
                   </p>
                   <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-                    새 공고 준비나 경력 업데이트가 있으면 정보 편집하기로 반영하면 매칭·면접 Q&A
-                    결과가 더 정확해집니다.
+                    새 공고 준비나 경력 업데이트가 있으면 정보 편집하기로
+                    반영하면 매칭·면접 Q&A 결과가 더 정확해집니다.
                   </p>
                 </>
               ) : (
@@ -174,15 +183,6 @@ export function ResumeSummarySection({
                         </li>
                       ))}
                   </ul>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="mt-1 w-fit font-semibold"
-                    onClick={onStartEdit}
-                  >
-                    정보 편집하기
-                  </Button>
                 </>
               )}
             </div>
@@ -216,7 +216,9 @@ export function ResumeSummarySection({
                     <Circle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                   )}
                   <span
-                    className={item.done ? "text-foreground" : "text-muted-foreground"}
+                    className={
+                      item.done ? "text-foreground" : "text-muted-foreground"
+                    }
                   >
                     {item.label}
                   </span>
@@ -227,14 +229,15 @@ export function ResumeSummarySection({
         </div>
 
         <div className="border-t border-border px-4 py-2.5 text-xs font-medium text-muted-foreground sm:px-5">
-          {fileName?.trim() ? fileName : "직접 작성한 이력서"} · {formatDate(uploadedAt)} 저장
+          {fileName?.trim() ? fileName : "직접 작성한 이력서"} ·{" "}
+          {formatDate(uploadedAt)} 저장
         </div>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle>강점 요약</SectionTitle>
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground">
             첫 자기소개와 면접 첫 질문에 바로 쓸 수 있는 핵심 문장입니다.
           </p>
           {summary.trim() ? (
@@ -250,7 +253,7 @@ export function ResumeSummarySection({
 
         <div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-6">
           <SectionTitle>기술 스택</SectionTitle>
-          <p className="mt-2 text-xs text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground">
             공고의 기술 요구사항과 직접 매칭됩니다.
           </p>
           {techStack.length === 0 ? (
@@ -276,17 +279,21 @@ export function ResumeSummarySection({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <SectionTitle>경력 · 프로젝트</SectionTitle>
-            <p className="mt-2 text-xs text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               면접 질문과 경험 기반 추천에 쓰이는 구체적인 근거입니다.
             </p>
           </div>
-          <Button type="button" variant="outline" size="sm" onClick={onStartEdit}>
+          <Button
+            type="button"
+            size="sm"
+            onClick={onStartEdit}
+          >
             경험 추가하기
           </Button>
         </div>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-2">
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               Career
             </p>
@@ -298,7 +305,7 @@ export function ResumeSummarySection({
               careers.map((career, i) => (
                 <article
                   key={i}
-                  className="rounded-2xl border border-border bg-background p-4"
+                  className="rounded-2xl border border-border bg-background p-4 lg:flex-1"
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-sm font-bold text-foreground">
@@ -319,7 +326,7 @@ export function ResumeSummarySection({
             )}
           </div>
 
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
               Project
             </p>
@@ -331,7 +338,7 @@ export function ResumeSummarySection({
               projects.map((project, i) => (
                 <article
                   key={i}
-                  className="rounded-2xl border border-border bg-background p-4"
+                  className="rounded-2xl border border-border bg-background p-4 lg:flex-1"
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-sm font-bold text-foreground">
@@ -351,7 +358,7 @@ export function ResumeSummarySection({
                       {project.techStack.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-foreground"
+                          className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary"
                         >
                           {tag}
                         </span>
