@@ -65,7 +65,7 @@ export function JobMockInterviewCta({ jobId }: JobMockInterviewCtaProps) {
           type="button"
           disabled={!hasResume || startMutation.isPending}
           onClick={() => startMutation.mutate()}
-          className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {startMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
           {hasResume ? "모의면접 시작" : "이력서가 필요해요"}

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { AlertCircle, ArrowLeft, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { extractApiError } from "@/lib/api/extractApiError";
@@ -187,9 +187,10 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
         <button
           type="button"
           onClick={() => setView({ kind: "list" })}
-          className="w-fit text-xs font-medium text-muted-foreground hover:text-foreground"
+          className="group/back inline-flex w-fit cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
         >
-          ← 목록으로 돌아가기
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover/back:-translate-x-0.5" />
+          목록으로 돌아가기
         </button>
         <div className="rounded-2xl border border-border bg-card p-5">
           <h2 className="mb-1 text-lg font-bold text-foreground">새 모의면접 설정</h2>
@@ -237,9 +238,10 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
           <button
             type="button"
             onClick={() => setView({ kind: "list" })}
-            className="w-fit text-xs font-medium text-muted-foreground hover:text-foreground"
+            className="group/back inline-flex w-fit cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
           >
-            ← 모의면접 목록으로
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover/back:-translate-x-0.5" />
+            모의면접 목록으로
           </button>
           <MockInterviewRoom
             session={activeSession}
@@ -259,9 +261,10 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
         <button
           type="button"
           onClick={() => setView({ kind: "list" })}
-          className="w-fit text-xs font-medium text-muted-foreground hover:text-foreground"
+          className="group/back inline-flex w-fit cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
         >
-          ← 모의면접 목록으로
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover/back:-translate-x-0.5" />
+          모의면접 목록으로
         </button>
         <MockInterviewResult
           session={activeSession}
@@ -301,7 +304,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
               <button
                 type="button"
                 onClick={() => setView({ kind: "setup" })}
-                className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,box-shadow,background-color] hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 active:scale-[0.98] lg:hidden"
+                className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,box-shadow,background-color] hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 active:scale-[0.98] lg:hidden"
               >
                 <Plus className="size-4" aria-hidden /> 새 모의면접
               </button>
@@ -366,7 +369,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
             <button
               type="button"
               onClick={() => setView({ kind: "setup" })}
-              className="hidden w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,box-shadow,background-color] hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 active:scale-[0.98] lg:inline-flex"
+              className="hidden w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,box-shadow,background-color] hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 active:scale-[0.98] lg:inline-flex"
             >
               <Plus className="size-4" aria-hidden /> 새 모의면접
             </button>
@@ -459,7 +462,7 @@ function SessionCard({
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-w-0 flex-1 flex-col items-start gap-1 text-left"
+        className="flex min-w-0 flex-1 cursor-pointer flex-col items-start gap-1 text-left"
       >
         <span
           className={cn(
@@ -486,12 +489,12 @@ function SessionCard({
       </button>
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <span className="hidden sm:inline">
-          {new Date(item.updatedAt).toLocaleString("ko-KR")}
+          {new Date(item.updatedAt.endsWith("Z") ? item.updatedAt : item.updatedAt + "Z").toLocaleString("ko-KR")}
         </span>
         <button
           type="button"
           onClick={onDelete}
-          className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 font-medium hover:bg-muted/40"
+          className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 font-medium hover:bg-muted/40"
           aria-label="모의면접 삭제"
         >
           <Trash2 className="h-3.5 w-3.5" /> 삭제

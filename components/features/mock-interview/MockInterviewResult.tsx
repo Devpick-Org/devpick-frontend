@@ -77,7 +77,7 @@ export function MockInterviewResult({
           <button
             type="button"
             onClick={handleDownload}
-            className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted/40"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted/40"
           >
             <Download className="h-4 w-4" /> .md 내보내기
           </button>
@@ -85,7 +85,7 @@ export function MockInterviewResult({
             <button
               type="button"
               onClick={onRestart}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
             >
               새 모의면접 시작
             </button>

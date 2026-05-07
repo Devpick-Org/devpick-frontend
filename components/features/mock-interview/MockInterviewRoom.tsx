@@ -173,7 +173,7 @@ export function MockInterviewRoom({
       <div className="flex min-w-0 flex-col gap-5">
         <PhaseBar currentNo={currentQuestion.questionNo} />
 
-        <article className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/95 px-6 py-6 shadow-lg ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
+        <article className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/95 px-6 py-6 shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(600px_120px_at_50%_-20%,var(--color-primary)_0%,transparent_70%)] opacity-[0.09]"
@@ -225,7 +225,7 @@ export function MockInterviewRoom({
             placeholder="답변을 입력하세요. Enter로 전송 · Shift+Enter로 줄바꿈."
             rows={6}
             disabled={blockingAnswerOrPass}
-            className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-sm leading-relaxed outline-none transition-shadow placeholder:text-muted-foreground focus-visible:border-primary/40 focus-visible:ring-[3px] focus-visible:ring-primary/25 disabled:opacity-65"
+            className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-sm leading-relaxed outline-none transition-shadow placeholder:text-muted-foreground disabled:opacity-65"
           />
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -233,7 +233,7 @@ export function MockInterviewRoom({
                 type="button"
                 onClick={() => passMutation.mutate()}
                 disabled={blockingAnswerOrPass}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border/90 bg-background/80 px-3.5 py-2 text-xs font-semibold hover:bg-muted/50 disabled:pointer-events-none disabled:opacity-50"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border/90 bg-background/80 px-3.5 py-2 text-xs font-semibold hover:bg-muted/50 disabled:pointer-events-none disabled:opacity-50"
               >
                 <SkipForward className="h-3.5 w-3.5" aria-hidden /> 질문 패스
               </button>
@@ -241,7 +241,7 @@ export function MockInterviewRoom({
                 type="button"
                 onClick={() => saveExitMutation.mutate()}
                 disabled={blockingAnswerOrPass || saveExitMutation.isPending}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border/90 bg-background/80 px-3.5 py-2 text-xs font-semibold hover:bg-muted/50 disabled:pointer-events-none disabled:opacity-50"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border/90 bg-background/80 px-3.5 py-2 text-xs font-semibold hover:bg-muted/50 disabled:pointer-events-none disabled:opacity-50"
               >
                 {saveExitMutation.isPending ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" aria-hidden />
@@ -254,7 +254,7 @@ export function MockInterviewRoom({
                 type="button"
                 onClick={() => finishEarlyMutation.mutate()}
                 disabled={blockingAnswerOrPass || finishEarlyMutation.isPending}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/45 bg-rose-500/[0.04] px-3.5 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-500/10 dark:text-rose-300 disabled:pointer-events-none disabled:opacity-50"
+                className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-rose-500/45 bg-rose-500/[0.04] px-3.5 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-500/10 dark:text-rose-300 disabled:pointer-events-none disabled:opacity-50"
               >
                 {finishEarlyMutation.isPending ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
@@ -268,7 +268,7 @@ export function MockInterviewRoom({
               type="button"
               onClick={handleSubmit}
               disabled={blockingAnswerOrPass || !draft.trim()}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold tracking-tight text-primary-foreground shadow-md shadow-primary/25 transition-[transform,box-shadow] hover:bg-primary/90 hover:shadow-lg active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold tracking-tight text-primary-foreground shadow-md shadow-primary/25 transition-[transform,box-shadow] hover:bg-primary/90 hover:shadow-lg active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55"
             >
               {answerMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
@@ -318,7 +318,7 @@ export function MockInterviewRoom({
 function PhaseBar({ currentNo }: { currentNo: number }) {
   return (
     <nav
-      className="-mx-1 flex items-stretch gap-1.5 overflow-x-auto pb-2 pt-0.5 [scrollbar-width:thin] snap-x snap-mandatory px-1"
+      className="flex items-stretch gap-1.5 overflow-x-auto pb-2 pt-0.5 [scrollbar-width:thin] snap-x snap-mandatory px-1 scroll-pl-1"
       aria-label="모의면접 단계"
     >
       {MOCK_INTERVIEW_PHASE_STEPS.map((step, i) => {
@@ -328,7 +328,7 @@ function PhaseBar({ currentNo }: { currentNo: number }) {
           <Fragment key={step.phase}>
             <div
               className={cn(
-                "flex min-w-[108px] max-w-[128px] shrink-0 snap-start flex-col rounded-2xl border px-3 py-2.5 text-left transition-[border-color,box-shadow,background-color]",
+                "flex min-w-[108px] max-w-[128px] shrink-0 snap-start flex-col items-center rounded-2xl border px-3 py-2.5 text-center transition-[border-color,box-shadow,background-color]",
                 active &&
                   "border-primary/55 bg-gradient-to-br from-primary/[0.14] via-primary/[0.05] to-transparent shadow-md shadow-primary/10 ring-[1.5px] ring-primary/35",
                 done &&
@@ -337,7 +337,7 @@ function PhaseBar({ currentNo }: { currentNo: number }) {
                 !active && !done && "border-border/70 bg-muted/25 opacity-95",
               )}
             >
-              <div className="flex items-start justify-between gap-1">
+              <div className="flex items-center justify-center gap-1">
                 <span
                   className={cn(
                     "text-[13px] font-bold leading-tight",
