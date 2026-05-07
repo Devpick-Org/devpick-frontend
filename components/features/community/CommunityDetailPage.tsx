@@ -175,8 +175,8 @@ export function CommunityDetailPage({ postId }: Props) {
 
 function CommunityDetailSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="mx-auto w-full max-w-4xl px-4 py-8 lg:px-8">
+      <div className="grid gap-10">
         {/* 메인 */}
         <div className="min-w-0">
           {/* 뒤로가기 */}
@@ -255,40 +255,6 @@ function CommunityDetailSkeleton() {
           </div>
         </div>
 
-        {/* 사이드바 */}
-        <div className="hidden lg:block">
-          <div className="sticky top-24 space-y-4">
-            {/* 유사 질문 제목 */}
-            <Skeleton className="h-5 w-20" />
-
-            {/* 유사 질문 카드 5개 */}
-            <div className="rounded-xl border border-border p-4 space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-[75%]" />
-              <Skeleton className="h-3.5 w-16" />
-            </div>
-            <div className="rounded-xl border border-border p-4 space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-[60%]" />
-              <Skeleton className="h-3.5 w-16" />
-            </div>
-            <div className="rounded-xl border border-border p-4 space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-[80%]" />
-              <Skeleton className="h-3.5 w-16" />
-            </div>
-            <div className="rounded-xl border border-border p-4 space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-[70%]" />
-              <Skeleton className="h-3.5 w-16" />
-            </div>
-            <div className="rounded-xl border border-border p-4 space-y-2">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-[85%]" />
-              <Skeleton className="h-3.5 w-16" />
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
