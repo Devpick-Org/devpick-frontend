@@ -1,11 +1,14 @@
+"use client";
+
+import { Suspense, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useHydrated } from "@/lib/hooks/useHydrated";
+import { useAuthStore } from "@/store/auth.store";
 import { ResumePage } from "@/components/features/resume/ResumePage";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ tab?: string }>;
-}) {
-  const { tab } = await searchParams;
+function ResumePageInner() {
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
   const defaultTab =
     tab === "qa" ? "qa" : tab === "mock" ? "mock" : "resume";
 
@@ -27,5 +30,26 @@ export default async function Page({
         <ResumePage defaultTab={defaultTab} />
       </div>
     </div>
+  );
+}
+
+export default function Page() {
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
+  const mounted = useHydrated();
+
+  useEffect(() => {
+    if (mounted && isInitialized && !isAuthenticated) {
+      router.replace("/jobs");
+    }
+  }, [mounted, isInitialized, isAuthenticated, router]);
+
+  if (!mounted || !isInitialized || !isAuthenticated) return null;
+
+  return (
+    <Suspense>
+      <ResumePageInner />
+    </Suspense>
   );
 }

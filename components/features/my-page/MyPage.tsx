@@ -7,7 +7,8 @@ import { RecommendedSection } from "./recommend/RecommendedSection";
 
 export default function MyPage() {
   return (
-    <div className="mx-auto max-w-5xl space-y-10 px-4 pt-8 pb-12 lg:px-8">
+    <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
+      <div className="mx-auto max-w-5xl space-y-10 pb-12">
       <div>
         <h1 className="text-xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
           마이페이지
@@ -28,6 +29,7 @@ export default function MyPage() {
 
       {/* 3. 추천 */}
       <RecommendedSection />
+      </div>
     </div>
   );
 }

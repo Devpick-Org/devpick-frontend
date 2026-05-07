@@ -9,6 +9,8 @@ import { resumeEndpoints } from "@/lib/api/endpoints/resume";
 import { mapJobListItem } from "@/lib/jobs/mapJobApi";
 import { masterJsonToResumeData } from "@/lib/resume/masterResumeJson";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuthStore } from "@/store/auth.store";
+import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 import { DEFAULT_JOB_FILTERS, type JobFilters } from "./JobFilterBar";
 import { JobSearchPanel } from "./JobSearchPanel";
 import { JobSortBar } from "./JobSortBar";
@@ -66,6 +68,7 @@ interface JobResultsProps {
   isError: boolean;
   jobs: Job[];
   searchQuery: string;
+  onLoginRequired?: () => void;
 }
 
 function JobResults({
@@ -73,10 +76,11 @@ function JobResults({
   isError,
   jobs,
   searchQuery,
+  onLoginRequired,
 }: JobResultsProps) {
   if (isLoading) return <JobListSkeleton />;
   if (isError) return <JobErrorState searchQuery={searchQuery} />;
-  return <JobList jobs={jobs} searchQuery={searchQuery} />;
+  return <JobList jobs={jobs} searchQuery={searchQuery} onLoginRequired={onLoginRequired} />;
 }
 
 export function JobPage() {
@@ -85,6 +89,12 @@ export function JobPage() {
   const [filters, setFilters] = useState<JobFilters>(DEFAULT_JOB_FILTERS);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<JobSortBy>("MATCH");
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const handleLoginRequired = () => {
+    if (!isAuthenticated) setLoginDialogOpen(true);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(searchQuery), 300);
@@ -157,11 +167,19 @@ export function JobPage() {
     setCurrentPage(1);
   };
 
+  const loginGuard = isAuthenticated ? undefined : handleLoginRequired;
+
   return (
     <div className="flex flex-col gap-5">
+      <LoginPromptDialog
+        open={loginDialogOpen}
+        onOpenChange={setLoginDialogOpen}
+        message="채용 서비스를 이용하려면"
+      />
       <ResumeSummaryBanner
         hasResume={hasResume}
         resume={hasResume ? resumeForBanner : undefined}
+        onLoginRequired={loginGuard}
       />
       <JobSearchPanel
         searchQuery={searchQuery}
@@ -173,6 +191,7 @@ export function JobPage() {
           setFilters(DEFAULT_JOB_FILTERS);
           setCurrentPage(1);
         }}
+        onLoginRequired={loginGuard}
       />
       <JobSortBar
         totalCount={data?.totalCount ?? 0}
@@ -184,6 +203,7 @@ export function JobPage() {
         isError={isError}
         jobs={filteredJobs}
         searchQuery={searchQuery}
+        onLoginRequired={loginGuard}
       />
       <JobPagination
         currentPage={currentPage}

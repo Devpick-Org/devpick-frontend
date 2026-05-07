@@ -18,9 +18,10 @@ import { toast } from "sonner";
 
 interface JobCardProps {
   job: Job;
+  onLoginRequired?: () => void;
 }
 
-export function JobCard({ job }: JobCardProps) {
+export function JobCard({ job, onLoginRequired }: JobCardProps) {
   const qc = useQueryClient();
   const bookmarked = job.bookmarked ?? false;
   const [logoFailed, setLogoFailed] = useState(false);
@@ -46,6 +47,10 @@ export function JobCard({ job }: JobCardProps) {
     e.preventDefault();
     e.stopPropagation();
     if (toggleBookmark.isPending) return;
+    if (onLoginRequired) {
+      onLoginRequired();
+      return;
+    }
     toggleBookmark.mutate(bookmarked);
   };
 
@@ -63,8 +68,15 @@ export function JobCard({ job }: JobCardProps) {
         ? "bg-primary"
         : "bg-muted-foreground/40";
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (onLoginRequired) {
+      e.preventDefault();
+      onLoginRequired();
+    }
+  };
+
   return (
-    <Link href={`/jobs/${job.id}`} className="h-full">
+    <Link href={`/jobs/${job.id}`} className="h-full" onClick={handleCardClick}>
       <article className="h-full flex flex-col bg-card p-5 border-b border-border cursor-pointer">
         {/* Header: 로고 + 회사명 + 고용형태 + 스크랩 */}
         <div className="mb-3 flex items-start justify-between gap-3">

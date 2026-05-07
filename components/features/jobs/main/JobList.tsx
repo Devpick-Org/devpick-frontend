@@ -4,9 +4,10 @@ import type { Job } from "@/types/jobs";
 interface JobListProps {
   jobs: Job[];
   searchQuery?: string;
+  onLoginRequired?: () => void;
 }
 
-export function JobList({ jobs, searchQuery = "" }: JobListProps) {
+export function JobList({ jobs, searchQuery = "", onLoginRequired }: JobListProps) {
   if (jobs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
@@ -22,7 +23,7 @@ export function JobList({ jobs, searchQuery = "" }: JobListProps) {
   return (
     <div className="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-3">
       {jobs.map((job) => (
-        <JobCard key={job.id} job={job} />
+        <JobCard key={job.id} job={job} onLoginRequired={onLoginRequired} />
       ))}
     </div>
   );

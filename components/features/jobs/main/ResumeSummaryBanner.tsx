@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { FileText } from "lucide-react";
 import type { ResumeData } from "@/types/resume";
@@ -5,11 +7,13 @@ import type { ResumeData } from "@/types/resume";
 interface ResumeSummaryBannerProps {
   hasResume: boolean;
   resume?: ResumeData;
+  onLoginRequired?: () => void;
 }
 
 export function ResumeSummaryBanner({
   hasResume,
   resume,
+  onLoginRequired,
 }: ResumeSummaryBannerProps) {
   if (!hasResume) {
     return (
@@ -18,12 +22,22 @@ export function ResumeSummaryBanner({
           <FileText className="h-4 w-4 shrink-0" />
           이력서를 등록하면 공고 매칭과 면접 Q&A를 활용할 수 있어요
         </div>
-        <Link
-          href="/my-resume"
-          className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          이력서 등록하기
-        </Link>
+        {onLoginRequired ? (
+          <button
+            type="button"
+            onClick={onLoginRequired}
+            className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 cursor-pointer"
+          >
+            이력서 등록하기
+          </button>
+        ) : (
+          <Link
+            href="/my-resume"
+            className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            이력서 등록하기
+          </Link>
+        )}
       </div>
     );
   }
@@ -57,12 +71,22 @@ export function ResumeSummaryBanner({
           ))}
         </div>
       </div>
-      <Link
-        href="/my-resume"
-        className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
-      >
-        이력서 관리
-      </Link>
+      {onLoginRequired ? (
+        <button
+          type="button"
+          onClick={onLoginRequired}
+          className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 cursor-pointer"
+        >
+          이력서 관리
+        </button>
+      ) : (
+        <Link
+          href="/my-resume"
+          className="inline-flex w-fit shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+        >
+          이력서 관리
+        </Link>
+      )}
     </div>
   );
 }

@@ -15,7 +15,7 @@ const TRIGGER_CLASS =
 export default function HistoryTabsPage() {
   return (
     <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-5xl">
         <h1 className="text-xl font-bold tracking-[-0.01em] text-foreground md:text-2xl">
           히스토리
         </h1>

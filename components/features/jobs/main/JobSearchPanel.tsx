@@ -52,6 +52,7 @@ interface JobSearchPanelProps {
   onChange: (filters: JobFilters) => void;
   hasActiveFilters: boolean;
   onReset: () => void;
+  onLoginRequired?: () => void;
 }
 
 export function JobSearchPanel({
@@ -61,14 +62,27 @@ export function JobSearchPanel({
   onChange,
   hasActiveFilters,
   onReset,
+  onLoginRequired,
 }: JobSearchPanelProps) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterRemount, setFilterRemount] = useState(0);
   const activeCount = countStructuredFilters(filters);
 
   const openFilterModal = () => {
+    if (onLoginRequired) {
+      onLoginRequired();
+      return;
+    }
     setFilterRemount((n) => n + 1);
     setFilterOpen(true);
+  };
+
+  const handleSearch = (query: string) => {
+    if (onLoginRequired) {
+      onLoginRequired();
+      return;
+    }
+    onSearch(query);
   };
 
   return (
@@ -79,7 +93,7 @@ export function JobSearchPanel({
           type="search"
           placeholder="채용 공고, 회사명, 기술 스택으로 검색..."
           value={searchQuery}
-          onChange={(e) => onSearch(e.target.value)}
+          onChange={(e) => handleSearch(e.target.value)}
           className="h-14 border-0 bg-transparent pl-13 pr-5 text-base font-medium shadow-none focus-visible:ring-0 placeholder:text-muted-foreground"
         />
       </div>
