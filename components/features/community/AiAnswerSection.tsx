@@ -34,16 +34,21 @@ export function AiAnswerSection({
         {status === "loading" && <AiAnswerLoading />}
         {status === "success" && content && (
           <div className="space-y-4">
-            {confidence !== null && confidence !== undefined && confidence < 0.5 && (
-              <div className="flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
-                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                AI 답변이 불확실할 수 있습니다
-              </div>
-            )}
+            {confidence !== null &&
+              confidence !== undefined &&
+              confidence < 0.5 && (
+                <div className="flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700 dark:bg-amber-950/30 dark:text-amber-400">
+                  <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                  AI 답변이 불확실할 수 있습니다
+                </div>
+              )}
             {keyPoints && keyPoints.length > 0 && (
               <ul className="space-y-1.5 rounded-lg bg-muted/50 px-4 py-3">
                 {keyPoints.map((point, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
+                  <li
+                    key={i}
+                    className="flex items-start gap-2 text-sm text-foreground/80"
+                  >
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                     {point}
                   </li>
@@ -104,7 +109,7 @@ function AiAnswerError({
             "flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer",
             isRetrying
               ? "cursor-not-allowed text-muted-foreground/50"
-              : "text-muted-foreground hover:text-primary",
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
           )}
         >
           <RefreshCw className={cn("h-3 w-3", isRetrying && "animate-spin")} />
