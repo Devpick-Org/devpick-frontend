@@ -18,7 +18,7 @@ export function BookmarkedJobCard({ bookmark }: { bookmark: MyPageJobBookmark })
   return (
     <Link
       href={`/jobs/${jobPostingId}`}
-      className="group flex h-full flex-col justify-between overflow-hidden rounded-md border border-border bg-card p-3"
+      className="group flex h-full flex-col overflow-hidden rounded-md border border-border bg-card p-3"
     >
       <div className="flex gap-3">
         {/* 회사 로고 or 이니셜 박스 */}
@@ -44,7 +44,7 @@ export function BookmarkedJobCard({ bookmark }: { bookmark: MyPageJobBookmark })
           <span className="truncate text-xs font-medium text-muted-foreground">
             {companyName}
           </span>
-          <p className="line-clamp-2 text-sm font-medium leading-snug tracking-[-0.01em] text-foreground">
+          <p className="line-clamp-2 min-h-[2.5rem] text-sm font-medium leading-snug tracking-[-0.01em] text-foreground">
             {title}
           </p>
         </div>
@@ -70,28 +70,28 @@ export function BookmarkedJobCard({ bookmark }: { bookmark: MyPageJobBookmark })
           </div>
         </div>
       )}
-      <div className="mt-2.5 flex flex-col gap-1.5">
-        <span className="text-xs text-muted-foreground">
-          {[location, deadlineLabel].filter(Boolean).join(" · ")}
-        </span>
-        {techStack.length > 0 && (
-          <div className="mt-1 flex flex-wrap gap-1">
-            {techStack.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
-              >
-                {tag}
-              </span>
-            ))}
-            {techStack.length > 3 && (
-              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                +{techStack.length - 3}
-              </span>
-            )}
-          </div>
-        )}
-      </div>
+
+      <p className="mt-2 text-xs leading-tight text-muted-foreground">
+        {[location, deadlineLabel].filter(Boolean).join(" · ")}
+      </p>
+
+      {techStack.length > 0 && (
+        <div className="mt-auto pt-2.5 flex flex-wrap gap-1">
+          {techStack.slice(0, 3).map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+            >
+              {tag}
+            </span>
+          ))}
+          {techStack.length > 3 && (
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+              +{techStack.length - 3}
+            </span>
+          )}
+        </div>
+      )}
     </Link>
   );
 }
