@@ -81,9 +81,9 @@ export function TopNavVariant() {
     <>
       <header className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-card shadow-md shadow-black/1">
         {/* relative 속성을 추가해서 중앙 정렬의 기준점이 되게 합니다 */}
-        <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 lg:gap-6 lg:px-8">
+        <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-4 lg:px-8">
           {/* [왼쪽 영역] Logo */}
-          <div className="flex shrink-0 items-center">
+          <div className="flex items-center justify-self-start">
             <Link
               href="/"
               aria-label="Trace 소개 페이지로 이동"
@@ -96,34 +96,33 @@ export function TopNavVariant() {
             </Link>
           </div>
 
-          {/* [오른쪽 영역] 네비게이션 메뉴 + 유저 프로필*/}
-          <div className="flex min-w-0 flex-1 items-center justify-end gap-4 md:gap-6 lg:gap-8">
-            {/* 1. 네비게이션 — 좁은 뷰에서 잘리지 않도록 가로 스크롤 */}
-            <nav className="hidden max-w-full min-w-0 flex-1 flex-nowrap items-center justify-end gap-4 overflow-x-auto overflow-y-hidden [scrollbar-width:thin] md:flex md:[scrollbar-gutter:stable] lg:gap-6 [&::-webkit-scrollbar]:h-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-muted-foreground/25">
-              {navItems.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  pathname.startsWith(item.href + "/");
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "flex shrink-0 items-center gap-2 text-sm whitespace-nowrap transition-colors duration-200",
-                      isActive
-                        ? "font-semibold text-primary"
-                        : "font-medium text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    <Icon className="h-[18px] w-[18px] shrink-0" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-            {/* 2. 프로필 영역 */}
-            <div className="flex shrink-0 items-center">
+          {/* [가운데 영역] 네비게이션 메뉴 — absolute 중앙 정렬 */}
+          <nav className="hidden flex-nowrap items-center justify-center gap-4 md:flex lg:gap-6">
+            {navItems.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                pathname.startsWith(item.href + "/");
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex shrink-0 items-center gap-2 text-sm whitespace-nowrap transition-colors duration-200",
+                    isActive
+                      ? "font-semibold text-primary"
+                      : "font-medium text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Icon className="h-[18px] w-[18px] shrink-0" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* [오른쪽 영역] 유저 프로필 */}
+          <div className="col-start-3 flex shrink-0 items-center justify-self-end">
               {!mounted ? (
                 <Skeleton className="h-9 w-9 rounded-full" />
               ) : !user ? (
@@ -188,7 +187,6 @@ export function TopNavVariant() {
                 </DropdownMenu>
               )}
             </div>
-          </div>
         </div>
       </header>
 
