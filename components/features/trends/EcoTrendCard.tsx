@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Share2, Users } from "lucide-react";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, copyShareLink } from "@/lib/utils";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
 type EcoTrendCardProps = {
@@ -33,17 +33,6 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
   const hasThumb = Boolean(displayThumbnail);
   const showImage = hasThumb && !thumbFailed;
 
-  const share = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: item.title, url: item.detailUrl });
-      } else {
-        await navigator.clipboard.writeText(item.detailUrl);
-      }
-    } catch {
-      /* 사용자 취소 등 무시 */
-    }
-  };
 
   return (
     <article
@@ -91,7 +80,7 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
               type="button"
               onClick={(e) => {
                 e.preventDefault();
-                void share();
+                copyShareLink(item.detailUrl);
               }}
               className="cursor-pointer rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
               aria-label="공유"
