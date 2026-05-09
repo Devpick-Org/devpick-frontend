@@ -42,9 +42,9 @@ export default function HistoryTimelineItem({ item, isLast }: Props) {
   const card = (
     <div
       className={cn(
-        "bg-card border border-border/60 rounded-2xl px-4 py-3 shadow-sm",
+        "bg-card border border-border/60 rounded-2xl px-4 py-3",
         "flex items-start justify-between gap-3",
-        href && "transition-colors hover:bg-muted/40 hover:border-border",
+        href && "transition-colors",
       )}
     >
       {/* 본문 */}
