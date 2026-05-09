@@ -97,24 +97,22 @@ export function TopNavVariant() {
           </div>
 
           {/* [가운데 영역] 네비게이션 메뉴 — absolute 중앙 정렬 */}
-          <nav className="hidden flex-nowrap items-center justify-center gap-4 md:flex lg:gap-6">
+          <nav className="hidden flex-nowrap items-center justify-center gap-6 md:flex lg:gap-8">
             {navItems.map((item) => {
               const isActive =
                 pathname === item.href ||
                 pathname.startsWith(item.href + "/");
-              const Icon = item.icon;
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex shrink-0 items-center gap-2 text-sm whitespace-nowrap transition-colors duration-200",
+                    "shrink-0 text-base whitespace-nowrap transition-colors duration-200",
                     isActive
                       ? "font-semibold text-primary"
                       : "font-medium text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <Icon className="h-[18px] w-[18px] shrink-0" />
                   {item.label}
                 </Link>
               );
@@ -158,7 +156,7 @@ export function TopNavVariant() {
                       {displayBadge && (
                         <Badge
                           variant="secondary"
-                          className="max-w-[80px] truncate border-0 bg-primary/10 text-[11px] font-semibold text-primary px-2.5 py-[3px] leading-none"
+                          className="max-w-[80px] truncate border-0 bg-primary/10 text-[11px] font-semibold text-primary px-2.5 py-[3px] leading-none md:hidden lg:block"
                         >
                           {displayBadge}
                         </Badge>
