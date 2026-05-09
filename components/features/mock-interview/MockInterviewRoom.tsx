@@ -173,7 +173,7 @@ export function MockInterviewRoom({
       <div className="flex min-w-0 flex-col gap-5">
         <PhaseBar currentNo={currentQuestion.questionNo} />
 
-        <article className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/95 px-6 py-6 shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
+        <article className="relative overflow-hidden rounded-3xl border border-border/70 bg-card/95 px-6 py-6 ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[radial-gradient(600px_120px_at_50%_-20%,var(--color-primary)_0%,transparent_70%)] opacity-[0.09]"
@@ -212,7 +212,7 @@ export function MockInterviewRoom({
           ) : null}
         </article>
 
-        <div className="rounded-3xl border border-border/70 bg-card/90 p-5 shadow-md ring-1 ring-black/[0.03] dark:bg-card dark:ring-white/[0.05]">
+        <div className="rounded-3xl border border-border/70 bg-card/90 p-5 ring-1 ring-black/[0.03] dark:bg-card dark:ring-white/[0.05]">
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -268,7 +268,7 @@ export function MockInterviewRoom({
               type="button"
               onClick={handleSubmit}
               disabled={blockingAnswerOrPass || !draft.trim()}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold tracking-tight text-primary-foreground shadow-md shadow-primary/25 transition-[transform,box-shadow] hover:bg-primary/90 hover:shadow-lg active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold tracking-tight text-primary-foreground transition-[transform,background-color] hover:bg-primary/90 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-55"
             >
               {answerMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
@@ -300,7 +300,7 @@ export function MockInterviewRoom({
       </div>
 
       <aside className="flex min-h-0 min-w-0 flex-col gap-4">
-        <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-gradient-to-r from-muted/35 to-muted/15 px-4 py-3.5 shadow-sm ring-1 ring-black/[0.03] backdrop-blur-sm dark:from-muted/20 dark:to-muted/10">
+        <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-gradient-to-r from-muted/35 to-muted/15 px-4 py-3.5 ring-1 ring-black/[0.03] backdrop-blur-sm dark:from-muted/20 dark:to-muted/10">
           <p className="font-bold text-foreground">대화 로그</p>
           <span className="tabular-nums text-[11px] font-semibold text-muted-foreground">
             진행 {session.answeredCount}/{session.totalQuestions}

@@ -113,7 +113,7 @@ export function ResumeDetailEditSection({
     });
 
   return (
-    <div className="flex flex-col gap-5 rounded-3xl border border-border bg-card p-4 shadow-sm sm:p-6">
+    <div className="flex flex-col gap-5 rounded-3xl border border-border bg-card p-4 sm:p-6">
       <div className="flex flex-col gap-2 rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-background to-background p-4">
         <h3 className="text-lg font-bold tracking-[-0.01em] text-foreground">
           이력서 정보 편집

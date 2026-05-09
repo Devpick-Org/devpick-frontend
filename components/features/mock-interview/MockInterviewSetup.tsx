@@ -294,7 +294,7 @@ export function MockInterviewSetup({
                             );
                           }}
                           className={cn(
-                            "flex min-h-[260px] w-[260px] shrink-0 cursor-pointer snap-start flex-col overflow-hidden rounded-2xl border bg-card text-left shadow-sm outline-none transition-transform active:scale-[0.99] sm:w-[272px]",
+                            "flex min-h-[260px] w-[260px] shrink-0 cursor-pointer snap-start flex-col overflow-hidden rounded-2xl border bg-card text-left outline-none transition-transform active:scale-[0.99] sm:w-[272px]",
                             active ? "border-border" : "border-border",
                           )}
                         >

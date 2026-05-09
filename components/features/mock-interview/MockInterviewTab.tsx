@@ -281,7 +281,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
+      <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(700px_320px_at_100%_0%,var(--color-primary)_0%,transparent_55%)] opacity-[0.11] dark:opacity-[0.14]"
@@ -304,7 +304,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
               <button
                 type="button"
                 onClick={() => setView({ kind: "setup" })}
-                className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,box-shadow,background-color] hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 active:scale-[0.98] lg:hidden"
+                className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,background-color] hover:bg-primary/90 active:scale-[0.98] lg:hidden"
               >
                 <Plus className="size-4" aria-hidden /> 새 모의면접
               </button>
@@ -369,7 +369,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
             <button
               type="button"
               onClick={() => setView({ kind: "setup" })}
-              className="hidden w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,box-shadow,background-color] hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25 active:scale-[0.98] lg:inline-flex"
+              className="hidden w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,background-color] hover:bg-primary/90 active:scale-[0.98] lg:inline-flex"
             >
               <Plus className="size-4" aria-hidden /> 새 모의면접
             </button>
@@ -384,7 +384,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
           <Skeleton className="h-[88px] w-full rounded-xl" />
         </div>
       ) : isError ? (
-        <div className="relative overflow-hidden rounded-3xl border border-destructive/20 bg-card shadow-sm ring-1 ring-destructive/10">
+        <div className="relative overflow-hidden rounded-3xl border border-destructive/20 bg-card ring-1 ring-destructive/10">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-gradient-to-br from-destructive/[0.08] via-transparent to-muted/25"
@@ -432,7 +432,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
         </ul>
       )}
 
-      <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-muted/15 shadow-sm ring-1 ring-black/[0.03] backdrop-blur-sm dark:ring-white/[0.06]">
+      <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-muted/15 ring-1 ring-black/[0.03] backdrop-blur-sm dark:ring-white/[0.06]">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-transparent"
@@ -466,7 +466,7 @@ function SessionCard({
       >
         <span
           className={cn(
-            "rounded-full px-2 py-0.5 text-[11px] font-semibold",
+            "mb-1 rounded-full px-2 py-0.5 text-[11px] font-semibold",
             STATUS_TONE[item.status] ?? "bg-muted text-foreground",
           )}
         >

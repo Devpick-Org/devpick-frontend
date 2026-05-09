@@ -69,7 +69,7 @@ export function ResumeSummarySection({
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+      <section className="overflow-hidden rounded-3xl border border-border bg-card">
         <div className="border-b border-border bg-gradient-to-br from-primary/10 via-background to-background px-4 py-4 sm:px-5">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
@@ -235,7 +235,7 @@ export function ResumeSummarySection({
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <div className="rounded-3xl border border-border bg-card p-5 sm:p-6">
           <SectionTitle>강점 요약</SectionTitle>
           <p className="mt-2 text-sm text-muted-foreground">
             첫 자기소개와 면접 첫 질문에 바로 쓸 수 있는 핵심 문장입니다.
@@ -251,7 +251,7 @@ export function ResumeSummarySection({
           )}
         </div>
 
-        <div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <div className="rounded-3xl border border-border bg-card p-5 sm:p-6">
           <SectionTitle>기술 스택</SectionTitle>
           <p className="mt-2 text-sm text-muted-foreground">
             공고의 기술 요구사항과 직접 매칭됩니다.
@@ -275,7 +275,7 @@ export function ResumeSummarySection({
         </div>
       </section>
 
-      <section className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <section className="rounded-3xl border border-border bg-card p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <SectionTitle>경력 · 프로젝트</SectionTitle>
