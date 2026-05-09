@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, ChevronDown, Loader2, Search } from "lucide-react";
+import { Building2, Check, ChevronDown, Loader2, Search } from "lucide-react";
 import {
   mockInterviewsEndpoints,
   type MockInterviewMode,
@@ -322,8 +322,8 @@ export function MockInterviewSetup({
                               </div>
                             )}
                             {active ? (
-                              <span className="absolute right-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground shadow-sm">
-                                선택됨
+                              <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                                <Check className="h-3 w-3" strokeWidth={3} />
                               </span>
                             ) : null}
                           </div>
@@ -362,14 +362,6 @@ export function MockInterviewSetup({
                     })}
                   </div>
                 )}
-                {selectedJob ? (
-                  <p className="rounded-lg bg-primary/8 px-3 py-2 text-xs text-muted-foreground">
-                    선택함:{" "}
-                    <span className="font-semibold text-foreground">
-                      {selectedJob.companyName} · {selectedJob.title}
-                    </span>
-                  </p>
-                ) : null}
                 <button
                   type="button"
                   className="w-fit cursor-pointer text-xs font-semibold text-primary underline-offset-4 hover:underline"
@@ -522,7 +514,7 @@ export function MockInterviewSetup({
         <button
           type="submit"
           disabled={!canSubmit}
-          className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="ml-auto inline-flex w-fit cursor-pointer items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
           모의면접 시작하기
