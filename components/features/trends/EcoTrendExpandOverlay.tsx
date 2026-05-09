@@ -68,7 +68,7 @@ export function EcoTrendExpandOverlay({
                 <EcoTrendCard
                   key={`${item.id}-${item.thumbnailUrl ?? ""}`}
                   item={item}
-                  className="w-full max-w-none"
+                  className="w-full max-w-none hover:shadow-sm"
                 />
               ))}
             </div>
