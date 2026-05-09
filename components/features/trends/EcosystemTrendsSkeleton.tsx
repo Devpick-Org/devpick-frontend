@@ -5,12 +5,17 @@ function CardSkeleton() {
     <div className="flex w-[280px] shrink-0 flex-col gap-2.5 rounded-2xl border border-border/60 bg-card p-2.5">
       <Skeleton className="aspect-[16/10] w-full rounded-xl" />
       <div className="flex flex-col gap-1.5 px-0.5 pb-1">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <Skeleton className="h-3 w-24" />
           <Skeleton className="h-6 w-6 rounded-md" />
         </div>
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
+        <div className="flex items-start gap-2">
+          <div className="flex flex-1 flex-col gap-1">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+          <Skeleton className="mt-px h-4 w-10 shrink-0 rounded-md" />
+        </div>
         <Skeleton className="h-3 w-1/2" />
         <Skeleton className="h-2.5 w-20" />
       </div>
