@@ -99,7 +99,8 @@ export type BadgeId =
   | "POINT_100"
   | "POINT_500"
   | "POINT_1000"
-  | "STREAK_7";
+  | "STREAK_7"
+  | "INTERVIEW_MASTER";
 
 /** 단일 배지 */
 export interface BadgeItem {

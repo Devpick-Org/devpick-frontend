@@ -4,7 +4,6 @@ import {
   Sparkles,
   Bookmark,
   HelpCircle,
-  Brain,
   Heart,
   MessageSquare,
   MessageCircle,
@@ -13,6 +12,7 @@ import {
   BriefcaseBusiness,
   Mic,
 } from "lucide-react";
+import { QuizIconWrapper } from "./QuizIconWrapper";
 
 import type {
   HistoryActionType,
@@ -93,7 +93,7 @@ export const ACTION_META: Record<HistoryActionType, ActionMeta> = {
   },
   ai_quiz_completed: {
     label: "AI 퀴즈를 풀었어요",
-    icon: Brain,
+    icon: QuizIconWrapper,
     iconClass: "text-blue-500",
     iconBgClass: "bg-blue-50",
   },

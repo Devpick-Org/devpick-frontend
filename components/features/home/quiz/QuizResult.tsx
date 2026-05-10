@@ -3,7 +3,6 @@ import {
   XCircle,
   RotateCcw,
   ArrowLeft,
-  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { calculateQuizResult, isQuestionCorrect } from "@/lib/quiz/quizResult";
@@ -107,7 +106,6 @@ export function QuizResult(props: QuizResultProps) {
           </div>
           {pointsEarned > 0 && (
             <div className="mt-2 flex items-center gap-2 rounded-xl bg-yellow-500/10 px-4 py-2.5">
-              <Star className="h-4 w-4 text-yellow-500" />
               <span className="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
                 퀴즈 통과! +{pointsEarned} 포인트 획득
               </span>
@@ -240,7 +238,6 @@ export function QuizResult(props: QuizResultProps) {
         </div>
         {submitResult && submitResult.pointsEarned > 0 && (
           <div className="mt-2 flex items-center gap-2 rounded-xl bg-yellow-500/10 px-4 py-2.5">
-            <Star className="h-4 w-4 text-yellow-500" />
             <span className="text-sm font-semibold text-yellow-600 dark:text-yellow-400">
               퀴즈 통과! +{submitResult.pointsEarned} 포인트 획득
             </span>

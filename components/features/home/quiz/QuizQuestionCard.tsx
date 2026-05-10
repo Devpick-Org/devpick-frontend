@@ -70,7 +70,7 @@ function QuizShortAnswerCard({
         value={answerText}
         onChange={(e) => onChange(e.target.value)}
         placeholder="정답을 입력하세요 (단답형)"
-        className="w-full rounded-xl border border-border bg-card px-4 py-3.5 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 outline-none focus:border-primary/50 transition-colors"
+        className="w-full rounded-xl border border-border bg-card px-4 py-3.5 text-sm font-medium text-foreground placeholder:text-muted-foreground/60 outline-none transition-colors"
       />
     </div>
   );
