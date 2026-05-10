@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Bookmark, ExternalLink } from "lucide-react";
@@ -25,6 +26,9 @@ interface JobDetailHeaderProps {
 export function JobDetailHeader({ job }: JobDetailHeaderProps) {
   const qc = useQueryClient();
   const bookmarked = job.bookmarked ?? false;
+  const [logoFailed, setLogoFailed] = useState(false);
+  const companyInitial = (job.companyName?.trim()?.[0] ?? "회").toUpperCase();
+  const hasLogo = Boolean(job.companyLogo?.trim()) && !logoFailed;
   const expired = job.postingStatus === "EXPIRED";
 
   const toggleBookmark = useMutation({
@@ -77,14 +81,19 @@ export function JobDetailHeader({ job }: JobDetailHeaderProps) {
       {/* 회사 로고 + 회사명 + 스크랩 */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
-            <Image
-              src={job.companyLogo}
-              alt={job.companyName}
-              fill
-              className="object-cover"
-              unoptimized
-            />
+          <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted text-xs font-bold text-muted-foreground">
+            {hasLogo ? (
+              <Image
+                src={job.companyLogo}
+                alt={job.companyName}
+                fill
+                className="object-cover"
+                unoptimized
+                onError={() => setLogoFailed(true)}
+              />
+            ) : (
+              <span aria-hidden>{companyInitial}</span>
+            )}
           </div>
           <div>
             <p className="text-sm font-bold text-foreground">
