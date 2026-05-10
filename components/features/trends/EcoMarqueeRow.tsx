@@ -15,7 +15,7 @@ type EcoMarqueeRowProps = {
   initialOffset?: number;
 };
 
-const SPEED = 0.35;
+const SPEED = 1;
 const CARD_SCROLL = 300;
 
 export function EcoMarqueeRow({
