@@ -59,7 +59,7 @@ export async function getMyScraps(params?: {
 
 export async function getMyJobBookmarks(params?: {
   q?: string;
-  sort?: "newest" | "oldest";
+  sort?: "newest" | "oldest" | "match";
   page?: number;
   size?: number;
 }): Promise<MyPageJobBookmarkResponse> {
