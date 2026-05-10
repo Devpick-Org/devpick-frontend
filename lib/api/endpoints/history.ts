@@ -22,6 +22,8 @@ const ACTIVITY_ACTION_TYPES = [
   "answer_adopted",
   "comment_created",
   "daily_login",
+  "job_bookmarked",
+  "mock_interview_completed",
 ];
 
 // ── query key 상수 ─────────────────────────────────────────────────────────────

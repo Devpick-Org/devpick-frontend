@@ -14,7 +14,9 @@ export type ActivityActionType =
   | "answer_written"
   | "answer_adopted"
   | "comment_created"
-  | "daily_login";
+  | "daily_login"
+  | "job_bookmarked"
+  | "mock_interview_completed";
 
 /**
  * 활동 탭 필터 칩 값 — "answer"는 answer_written + answer_adopted를 묶는 가상 값
@@ -48,6 +50,13 @@ export interface HistoryCommentRef {
   preview: string | null;
 }
 
+/** 히스토리 아이템이 참조하는 채용공고 (job_bookmarked / mock_interview_completed 시 존재) */
+export interface HistoryJobPostingRef {
+  id: string;
+  title: string;
+  companyName: string;
+}
+
 /**
  * GET /history 단일 행동 기록 — 학습 탭
  * createdAt: "YYYY-MM-DDTHH:mm:ssZ" — UTC ISO 8601 (KST = UTC+9)
@@ -77,6 +86,7 @@ export interface ActivityItem {
   post: HistoryPostRef | null;
   answer: HistoryAnswerRef | null;
   comment: HistoryCommentRef | null;
+  jobPosting: HistoryJobPostingRef | null;
   createdAt: string;
   points?: number | null;
 }

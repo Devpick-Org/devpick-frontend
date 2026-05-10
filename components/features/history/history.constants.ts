@@ -10,6 +10,8 @@ import {
   MessageCircle,
   LogIn,
   Award,
+  BriefcaseBusiness,
+  Mic,
 } from "lucide-react";
 
 import type {
@@ -38,7 +40,7 @@ export const ACTION_FILTER_OPTIONS: {
   { value: "ai_summary_viewed", label: "AI 요약" },
   { value: "ai_quiz_completed", label: "AI 퀴즈" },
   { value: "question_created", label: "질문 작성" },
-  { value: "scrapped", label: "스크랩" },
+  { value: "scrapped", label: "글 스크랩" },
 ];
 
 /** 액션 필터 chip 옵션 — 활동 탭 전용
@@ -52,6 +54,8 @@ export const ACTIVITY_FILTER_OPTIONS: {
   { value: "content_liked", label: "좋아요" },
   { value: "answer", label: "답변" },
   { value: "comment_created", label: "댓글" },
+  { value: "job_bookmarked", label: "채용 스크랩" },
+  { value: "mock_interview_completed", label: "모의면접" },
 ];
 
 /** 기간 필터 옵션 — 학습/활동 공용 */
@@ -125,6 +129,18 @@ export const ACTIVITY_ACTION_META: Record<ActivityActionType, ActionMeta> = {
   daily_login: {
     label: "출석했어요",
     icon: LogIn,
+    iconClass: "text-blue-600",
+    iconBgClass: "bg-blue-50",
+  },
+  job_bookmarked: {
+    label: "채용공고를 저장했어요",
+    icon: BriefcaseBusiness,
+    iconClass: "text-blue-600",
+    iconBgClass: "bg-blue-50",
+  },
+  mock_interview_completed: {
+    label: "모의면접을 완료했어요",
+    icon: Mic,
     iconClass: "text-blue-600",
     iconBgClass: "bg-blue-50",
   },

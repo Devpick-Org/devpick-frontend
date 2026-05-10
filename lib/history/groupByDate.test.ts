@@ -43,6 +43,7 @@ function makeActivityItem(
     post: null,
     answer: null,
     comment: null,
+    jobPosting: null,
     points: null,
     ...overrides,
   };

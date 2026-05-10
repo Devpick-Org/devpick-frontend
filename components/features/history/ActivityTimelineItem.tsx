@@ -22,6 +22,10 @@ function getHref(item: ActivityItem): string | null {
     return item.content?.id ? `/home/${item.content.id}` : null;
   }
   if (item.actionType === "daily_login") return null;
+  if (item.actionType === "mock_interview_completed") return null;
+  if (item.actionType === "job_bookmarked") {
+    return item.jobPosting?.id ? `/jobs/${item.jobPosting.id}` : null;
+  }
   // answer_written / answer_adopted / comment_created
   if (!item.post?.id) return null;
   if (item.answer?.id) return `/community/${item.post.id}#answer-${item.answer.id}`;
@@ -33,10 +37,12 @@ export default function ActivityTimelineItem({ item, isLast }: Props) {
   const Icon = meta.icon;
   const href = getHref(item);
   const title =
-    item.content?.translatedTitle ??
-    item.content?.title ??
-    item.post?.title ??
-    (item.actionType === "daily_login" ? "출석을 완료했어요" : null);
+    item.actionType === "job_bookmarked" || item.actionType === "mock_interview_completed"
+      ? (item.jobPosting ? `${item.jobPosting.companyName} · ${item.jobPosting.title}` : null)
+      : item.content?.translatedTitle ??
+        item.content?.title ??
+        item.post?.title ??
+        (item.actionType === "daily_login" ? "출석을 완료했어요" : null);
   const preview =
     item.actionType === "comment_created"
       ? (item.comment?.preview ?? null)
