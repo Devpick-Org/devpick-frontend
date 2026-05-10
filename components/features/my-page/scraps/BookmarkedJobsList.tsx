@@ -15,7 +15,7 @@ import { BookmarkedJobListItem } from "./BookmarkedJobListItem";
 import { MyPagePagination } from "../MyPagePagination";
 import { getMyJobBookmarks } from "@/lib/api/endpoints/myPage";
 
-type SortOrder = "newest" | "oldest";
+type SortOrder = "newest" | "oldest" | "match";
 
 function ListItemSkeleton() {
   return (
@@ -44,7 +44,7 @@ function ListItemSkeleton() {
 
 export function BookmarkedJobsList() {
   const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<SortOrder>("newest");
+  const [sort, setSort] = useState<SortOrder>("match");
   const [page, setPage] = useState(0);
 
   const { data, isLoading, isError } = useQuery({
@@ -91,11 +91,14 @@ export function BookmarkedJobsList() {
           </div>
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger className="flex h-8 w-24 cursor-pointer items-center justify-between rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none">
-              {sort === "newest" ? "최신순" : "오래된순"}
+              {sort === "newest" ? "최신순" : sort === "oldest" ? "오래된순" : "매칭순"}
               <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[6rem] p-1">
               <DropdownMenuRadioGroup value={sort} onValueChange={handleSortChange}>
+                <DropdownMenuRadioItem className="cursor-pointer" value="match">
+                  매칭순
+                </DropdownMenuRadioItem>
                 <DropdownMenuRadioItem className="cursor-pointer" value="newest">
                   최신순
                 </DropdownMenuRadioItem>
