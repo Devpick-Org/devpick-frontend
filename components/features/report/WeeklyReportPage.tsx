@@ -101,7 +101,7 @@ export default function WeeklyReportPage() {
                 exportMutation.mutate({ weekStart: report.weekStart })
               }
               disabled={exportMutation.isPending}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary/15 bg-card/80 px-4 py-2.5 text-sm font-medium text-report-ink shadow-sm backdrop-blur-md transition-[color,box-shadow,background-color,border-color] hover:border-primary/25 hover:bg-primary/[0.06] hover:shadow @sm:flex-none cursor-pointer disabled:pointer-events-none disabled:opacity-50 dark:text-foreground dark:hover:bg-primary/10"
+              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary/15 bg-card/80 px-4 py-2.5 text-sm font-medium text-report-ink shadow-xs backdrop-blur-md transition-[color,box-shadow,background-color,border-color] hover:border-border hover:bg-muted @sm:flex-none cursor-pointer disabled:pointer-events-none disabled:opacity-50 dark:text-foreground"
               type="button"
             >
               <Download className="h-4 w-4 shrink-0 opacity-80" />

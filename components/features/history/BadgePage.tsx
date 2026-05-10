@@ -49,7 +49,7 @@ export default function BadgePage() {
           onRetry={refetchPoints}
         />
       ) : points ? (
-        <div className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_20%,var(--card))] to-card p-6 shadow-sm dark:from-primary/[0.05] dark:to-card">
+        <div className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_20%,var(--card))] to-card p-6 shadow-xs dark:from-primary/[0.05] dark:to-card">
           <div className="space-y-1">
             <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
               Points
@@ -144,7 +144,7 @@ function SummaryCard({
   icon?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col justify-between gap-2 md:gap-3 rounded-xl border border-primary/10 bg-card/95 p-4 md:p-5 shadow-sm dark:bg-card/70 dark:shadow-none">
+    <div className="flex flex-col justify-between gap-2 md:gap-3 rounded-xl border border-primary/10 bg-card/95 p-4 md:p-5 shadow-xs dark:bg-card/70 dark:shadow-none">
       <p className="text-xs md:text-sm font-medium leading-snug text-muted-foreground">
         {label}
       </p>
@@ -165,7 +165,7 @@ function BadgeGrid({ badges }: { badges: BadgeItem[] }) {
         <div
           key={badge.badgeId}
           className={cn(
-            "rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 flex flex-col items-center gap-0 text-center",
+            "rounded-2xl bg-card border border-border/60 shadow-xs px-4 py-4 flex flex-col items-center gap-0 text-center",
             !badge.acquired && "opacity-40",
           )}
         >
@@ -205,7 +205,7 @@ function EmptyState() {
 
 function PointsSummarySkeleton() {
   return (
-    <div className="space-y-5 rounded-2xl border border-primary/10 bg-card p-6 shadow-sm">
+    <div className="space-y-5 rounded-2xl border border-primary/10 bg-card p-6 shadow-xs">
       <div className="space-y-1">
         <Skeleton className="h-3 w-10" />
         <Skeleton className="h-6 w-40" />
@@ -235,7 +235,7 @@ function BadgeGridSkeleton() {
             {Array.from({ length: count }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-2xl bg-card border border-border/60 shadow-sm px-4 py-4 flex flex-col items-center gap-0"
+                className="rounded-2xl bg-card border border-border/60 shadow-xs px-4 py-4 flex flex-col items-center gap-0"
               >
                 <Skeleton className="w-[156px] h-[156px] rounded-xl" />
                 <div className="space-y-1.5 w-full mt-1">

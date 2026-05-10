@@ -43,7 +43,7 @@ export default function ReportContent({ activity, chartData }: Props) {
   return (
     <div className="@container space-y-8 @md:space-y-10">
       {/* 섹션 1: 이번 주 활동 요약 */}
-      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_28%,var(--card))] to-card p-6 shadow-sm @md:space-y-6 @md:p-8 dark:from-primary/[0.07] dark:to-card">
+      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_28%,var(--card))] to-card p-6 shadow-xs @md:space-y-6 @md:p-8 dark:from-primary/[0.07] dark:to-card">
         <div className="space-y-1">
           <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
             Summary
@@ -74,7 +74,7 @@ export default function ReportContent({ activity, chartData }: Props) {
       </section>
 
       {/* 섹션 2: 활동 분석 — 요일별 바 차트 (full-width) */}
-      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-muted/40 to-card p-6 shadow-sm @md:space-y-6 @md:p-8 dark:from-muted/25 dark:to-card">
+      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-muted/40 to-card p-6 shadow-xs @md:space-y-6 @md:p-8 dark:from-muted/25 dark:to-card">
         <div className="space-y-1">
           <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
             Analytics
@@ -84,7 +84,7 @@ export default function ReportContent({ activity, chartData }: Props) {
           </h2>
         </div>
 
-        <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:p-6 dark:bg-card/80">
+        <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:p-6 dark:bg-card/80">
           <p className="mb-4 text-sm font-semibold text-report-ink @md:mb-5">요일별 활동량</p>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart
@@ -138,7 +138,7 @@ export default function ReportContent({ activity, chartData }: Props) {
       </section>
 
       {/* 섹션 3: 이번 주 하이라이트 */}
-      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_24%,var(--card))] to-card p-6 shadow-sm @md:space-y-6 @md:p-8 dark:from-primary/[0.06] dark:to-card">
+      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_24%,var(--card))] to-card p-6 shadow-xs @md:space-y-6 @md:p-8 dark:from-primary/[0.06] dark:to-card">
         <div className="space-y-1">
           <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
             Highlights
@@ -173,7 +173,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, unit }: StatCardProps) {
   return (
-    <div className="flex flex-col justify-between gap-2 rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:gap-3 @md:p-5 dark:bg-card/70 dark:shadow-none">
+    <div className="flex flex-col justify-between gap-2 rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:gap-3 @md:p-5 dark:bg-card/70 dark:shadow-none">
       <p className="text-xs font-medium leading-snug text-muted-foreground @md:text-sm">{label}</p>
       <p className="text-xl font-bold tabular-nums tracking-tight text-report-ink @md:text-2xl dark:text-foreground">
         {value}
@@ -194,7 +194,7 @@ function ContentAnalysisCard({ tagActivities, interestTagMatchRate }: ContentAna
   const total = tagActivities.reduce((sum, t) => sum + t.count, 0);
 
   return (
-    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:p-5 dark:bg-card/80">
+    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:p-5 dark:bg-card/80">
       <p className="mb-4 text-sm font-semibold text-report-ink">읽은 글 분석</p>
       {total === 0 ? (
         <p className="text-sm text-muted-foreground">이번 주 읽은 글이 없어요.</p>
@@ -243,7 +243,7 @@ interface QuestionAnalysisCardProps {
 
 function QuestionAnalysisCard({ analysis }: QuestionAnalysisCardProps) {
   return (
-    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:p-5 dark:bg-card/80">
+    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:p-5 dark:bg-card/80">
       <p className="mb-4 text-sm font-semibold text-report-ink">질문 분석</p>
 
       {!analysis ? (
@@ -318,7 +318,7 @@ function JobAnalysisCard({ jobTechStacks }: JobAnalysisCardProps) {
   const hasData = jobTechStacks && jobTechStacks.length > 0;
 
   return (
-    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-sm @md:p-5 dark:bg-card/80">
+    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:p-5 dark:bg-card/80">
       <p className="mb-4 text-sm font-semibold text-report-ink">확인 공고 분석</p>
       {!hasData ? (
         <p className="text-sm text-muted-foreground">이번 주 확인한 공고가 없어요.</p>
@@ -407,7 +407,7 @@ function HighlightCard({ highlight }: HighlightCardProps) {
   return (
     <article
       className={cn(
-        "flex items-start gap-3.5 rounded-xl p-4 shadow-sm @md:gap-4 @md:p-5",
+        "flex items-start gap-3.5 rounded-xl p-4 shadow-xs @md:gap-4 @md:p-5",
         style.bg,
       )}
     >
