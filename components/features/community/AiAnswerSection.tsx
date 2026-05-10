@@ -43,24 +43,27 @@ export function AiAnswerSection({
                 </div>
               )}
             {keyPoints && keyPoints.length > 0 && (
-              <ul className="space-y-1.5 rounded-lg bg-muted/50 px-4 py-3">
-                {keyPoints.map((point, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-2 text-sm text-foreground/80"
-                  >
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
+              <div className="border-b border-border pb-4">
+                <p className="mb-2 text-sm font-bold text-foreground">핵심 포인트</p>
+                <ul className="space-y-1.5">
+                  {keyPoints.map((point, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-[15px] leading-7 text-foreground/85 font-medium"
+                    >
+                      <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             )}
             <ContentRenderer
               content={content}
               className="space-y-3 text-[15px] leading-7 text-foreground/85 font-medium"
             />
             {suggestedTags && suggestedTags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 border-t border-border pt-3">
+              <div className="flex flex-wrap gap-1.5 border-t border-border pt-4">
                 {suggestedTags.map((tag) => (
                   <Badge key={tag} variant="secondary" className="text-xs">
                     {tag}

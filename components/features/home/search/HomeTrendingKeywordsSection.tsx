@@ -95,7 +95,7 @@ export function HomeTrendingKeywordsSection({
               </span>
               <div className="flex w-24 shrink-0 items-center justify-end gap-1.5">
                 {item.count !== undefined && (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-[10px] leading-none text-muted-foreground">
                     ({item.count})
                   </span>
                 )}

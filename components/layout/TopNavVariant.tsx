@@ -35,10 +35,15 @@ import { isTrendsFeatureEnabled } from "@/lib/env/publicFeatureFlags";
 
 // 로고 마크 — `components/brand/TraceMark` (public/trace-mark.png)
 // 사이드바에 있던 메뉴들을 이쪽으로 가져옵니다.
-const ALL_NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
+const ALL_NAV_ITEMS: {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  relatedPaths?: string[];
+}[] = [
   { href: "/home", label: "홈", icon: Home },
   { href: "/community", label: "커뮤니티", icon: Users },
-  { href: "/jobs", label: "채용", icon: Briefcase },
+  { href: "/jobs", label: "채용", icon: Briefcase, relatedPaths: ["/my-resume"] },
   { href: "/trends", label: "트렌드", icon: Flame },
   { href: "/history", label: "히스토리", icon: BookOpen },
   { href: "/report", label: "리포트", icon: TrendingUp },
@@ -101,7 +106,8 @@ export function TopNavVariant() {
             {navItems.map((item) => {
               const isActive =
                 pathname === item.href ||
-                pathname.startsWith(item.href + "/");
+                pathname.startsWith(item.href + "/") ||
+                (item.relatedPaths?.some((p) => pathname === p || pathname.startsWith(p + "/")) ?? false);
               return (
                 <Link
                   key={item.href}

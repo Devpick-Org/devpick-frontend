@@ -241,7 +241,7 @@ function ModalInner({
             </Button>
             <Button
               type="button"
-              className="h-11 font-semibold shadow-md"
+              className="h-11 font-semibold"
               onClick={() => {
                 onApply(draft);
                 onOpenChange(false);

@@ -138,7 +138,7 @@ export default function CommunityWritePage() {
       {/* 게시 중 모달 */}
       {createMutation.isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-4 rounded-2xl bg-card px-20 py-14 shadow-lg">
+          <div className="flex flex-col items-center gap-4 rounded-2xl bg-card px-20 py-14">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-sm font-semibold text-foreground">게시 중...</p>
           </div>
@@ -256,7 +256,7 @@ export default function CommunityWritePage() {
               <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 작성 가이드
               </h2>
-              <div className="flex flex-1 flex-col gap-8 rounded-xl border border-border bg-card p-5 shadow-sm">
+              <div className="flex flex-1 flex-col gap-8 rounded-xl border border-border bg-card p-5">
                 <div>
                   <p className="mb-3 text-sm font-semibold text-foreground">
                     이런 주제를 나눠보세요

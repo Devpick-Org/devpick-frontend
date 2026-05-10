@@ -86,6 +86,7 @@ export function JobQASection({
         return parsed.length ? parsed : null;
       } catch (e) {
         if (isAxiosError(e) && e.response?.status === 404) return null;
+        if (extractApiError(e).code === "JOB_003") return null;
         throw e;
       }
     },
