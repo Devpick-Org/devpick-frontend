@@ -61,24 +61,6 @@ export function ScrappedPostsList() {
     setPage(nextPage - 1);
   };
 
-  if (isLoading) {
-    return (
-      <div className="divide-y divide-border">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <ListItemSkeleton key={i} />
-        ))}
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <p className="py-10 text-center text-sm text-muted-foreground">
-        불러오는 중 오류가 발생했습니다.
-      </p>
-    );
-  }
-
   return (
     <div>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -121,7 +103,17 @@ export function ScrappedPostsList() {
         </div>
       </div>
 
-      {data?.totalElements === 0 ? (
+      {isLoading ? (
+        <div className="divide-y divide-border">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <ListItemSkeleton key={i} />
+          ))}
+        </div>
+      ) : isError ? (
+        <p className="py-10 text-center text-sm text-muted-foreground">
+          불러오는 중 오류가 발생했습니다.
+        </p>
+      ) : data?.totalElements === 0 ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
           {query ? "검색 결과가 없습니다." : "스크랩한 글이 없습니다."}
         </p>
