@@ -57,10 +57,12 @@ export default function ReportContent({
   const summaryBlock = (
     <DashboardCard>
       <SectionHeader kicker="Summary" title="이번 주 활동 요약" />
-      <div className="grid grid-cols-2 gap-4 @sm:gap-5 @xl:grid-cols-4">
-        <StatCard label="읽은 글" value={activity.contentsRead} unit="개" />
-        <StatCard label="질문" value={activity.questionsCreated} unit="개" />
-        <StatCard label="확인 공고" value={activity.jobPostingsViewed} unit="개" />
+      <div className="space-y-4 @sm:space-y-5">
+        <div className="grid grid-cols-1 gap-4 @sm:grid-cols-3 @sm:gap-5">
+          <StatCard label="읽은 글" value={activity.contentsRead} unit="개" />
+          <StatCard label="질문" value={activity.questionsCreated} unit="개" />
+          <StatCard label="확인 공고" value={activity.jobPostingsViewed} unit="개" />
+        </div>
         <PrevWeekComparisonCard
           activity={activity}
           previous={prevWeek}
