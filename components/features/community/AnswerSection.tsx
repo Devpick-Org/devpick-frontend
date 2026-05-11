@@ -145,7 +145,7 @@ export function AnswerSection({
           value={newAnswerContent}
           onChange={(e) => setNewAnswerContent(e.target.value)}
           placeholder="답변을 작성해 주세요..."
-          className="w-full min-h-[140px] resize-y rounded-xl border border-border bg-card px-4 py-3 text-sm leading-6 text-foreground font-medium placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-colors"
+          className="w-full min-h-[140px] resize-y rounded-xl border border-border bg-card px-4 py-3 text-sm leading-6 text-foreground font-medium placeholder:text-muted-foreground focus:border-border focus:outline-none focus:ring-0 transition-colors"
         />
         <div className="mt-3 flex justify-end">
           <button

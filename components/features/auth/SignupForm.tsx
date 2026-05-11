@@ -160,7 +160,7 @@ export function SignupForm() {
           placeholder="사용할 닉네임을 입력해 주세요 (2~20자)"
           value={nickname}
           onChange={(e) => handleNicknameChange(e.target.value)}
-          className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+          className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-border"
         />
         <p className="h-5 text-sm text-red-500">{nicknameError}</p>
       </div>
@@ -189,7 +189,7 @@ export function SignupForm() {
           placeholder="8~20자, 영문·숫자·특수문자 포함"
           value={password}
           onChange={(e) => handlePasswordChange(e.target.value)}
-          className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+          className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-border"
         />
         <p className="h-5 text-sm text-red-500">{passwordError}</p>
       </div>
@@ -209,7 +209,7 @@ export function SignupForm() {
           placeholder="비밀번호를 다시 입력해 주세요"
           value={confirmPassword}
           onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-          className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+          className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-border"
         />
         <p className="h-5 text-sm text-red-500">{confirmPasswordError}</p>
       </div>

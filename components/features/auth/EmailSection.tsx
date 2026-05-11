@@ -125,7 +125,7 @@ export function EmailSection({
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
             disabled={isEmailVerified}
-            className="h-11 flex-1 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary disabled:opacity-60"
+            className="h-11 flex-1 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-border disabled:opacity-60"
           />
           <Button
             type="button"
@@ -165,7 +165,7 @@ export function EmailSection({
                 }}
                 maxLength={6}
                 disabled={isEmailVerified}
-                className="h-11 pr-16 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary disabled:opacity-60"
+                className="h-11 pr-16 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-border disabled:opacity-60"
               />
               {!isEmailVerified && timerSeconds > 0 && (
                 <span

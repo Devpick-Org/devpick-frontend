@@ -252,7 +252,7 @@ function AnswerItem({
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
-            className="w-full min-h-[120px] resize-y rounded-xl border border-border bg-background px-4 py-3 text-sm leading-6 text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30 transition-colors"
+            className="w-full min-h-[120px] resize-y rounded-xl border border-border bg-background px-4 py-3 text-sm leading-6 text-foreground focus:border-border focus:outline-none focus:ring-0 transition-colors"
           />
           <div className="mt-2 flex justify-end gap-2">
             <button
@@ -315,7 +315,7 @@ function AnswerItem({
                     }
                   }}
                   placeholder="댓글을 입력하세요..."
-                  className="flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                  className="flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground placeholder:text-muted-foreground focus:border-border focus:outline-none transition-colors"
                   autoFocus
                 />
                 <button
@@ -400,7 +400,7 @@ function AnswerItem({
                           }
                         }}
                         placeholder="댓글을 입력하세요..."
-                        className="flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition-colors"
+                        className="flex-1 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground placeholder:text-muted-foreground focus:border-border focus:outline-none transition-colors"
                         autoFocus
                       />
                       <button

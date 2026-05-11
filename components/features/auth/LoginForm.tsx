@@ -157,7 +157,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
             value={email}
             onChange={handleEmailChange}
             disabled={isDisabled}
-            className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+            className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-border"
           />
           <p className="h-5 text-sm text-red-500">{emailError}</p>
         </div>
@@ -179,7 +179,7 @@ export function LoginForm({ isLoading }: LoginFormProps) {
             value={password}
             onChange={handlePasswordChange}
             disabled={isDisabled}
-            className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 focus-visible:border-primary"
+            className="h-11 bg-secondary border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:border-border"
           />
           <p className="h-5 text-sm text-red-500">{passwordError}</p>
         </div>

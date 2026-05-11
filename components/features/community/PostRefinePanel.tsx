@@ -208,7 +208,7 @@ export function PostRefinePanel({
               setErrors((p) => ({ ...p, title: undefined }));
             }}
             className={cn(
-              "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary",
+              "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-border",
               errors.title ? "border-destructive" : "border-border",
             )}
           />
@@ -242,7 +242,7 @@ export function PostRefinePanel({
             }}
             rows={14}
             className={cn(
-              "w-full resize-y rounded-xl border bg-background px-4 py-3 text-sm leading-relaxed text-foreground outline-none transition-colors focus:border-primary",
+              "w-full resize-y rounded-xl border bg-background px-4 py-3 text-sm leading-relaxed text-foreground outline-none transition-colors focus:border-border",
               errors.content ? "border-destructive" : "border-border",
             )}
           />
