@@ -220,30 +220,29 @@ function WeekVsPrevBars({ activity }: { activity: WeeklyActivity }) {
           const curPct = (row.cur / max) * 100;
           const prvPct = (row.prv / max) * 100;
           return (
-            <div key={row.key} className="space-y-2">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 text-xs">
-                <span className="font-semibold text-report-ink">{row.label}</span>
-                <span className="tabular-nums text-muted-foreground">
-                  {row.cur} / 전주 {row.prv}
-                </span>
-              </div>
-              <div className="space-y-1">
-                <div className="h-2 overflow-hidden rounded-full bg-muted">
-                  <div
-                    className="h-full rounded-full bg-muted-foreground/30"
-                    style={{ width: `${prvPct}%` }}
-                  />
+            <div key={row.key} className="flex flex-col gap-2">
+              <span className="text-xs font-semibold text-report-ink">{row.label}</span>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="w-10 shrink-0 text-[10px] font-medium text-muted-foreground">전주</span>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-muted-foreground/30"
+                      style={{ width: `${prvPct}%` }}
+                    />
+                  </div>
+                  <span className="w-4 shrink-0 text-right text-[10px] tabular-nums text-muted-foreground">{row.prv}</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-primary/15">
-                  <div
-                    className="h-full rounded-full bg-primary"
-                    style={{ width: `${curPct}%` }}
-                  />
+                <div className="flex items-center gap-2">
+                  <span className="w-10 shrink-0 text-[10px] font-medium text-primary">이번 주</span>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-primary/15">
+                    <div
+                      className="h-full rounded-full bg-primary"
+                      style={{ width: `${curPct}%` }}
+                    />
+                  </div>
+                  <span className="w-4 shrink-0 text-right text-[10px] tabular-nums text-primary">{row.cur}</span>
                 </div>
-              </div>
-              <div className="flex justify-between text-[10px] font-medium text-muted-foreground">
-                <span>전주</span>
-                <span className="text-primary">이번 주</span>
               </div>
             </div>
           );
