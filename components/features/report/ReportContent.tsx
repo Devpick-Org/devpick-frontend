@@ -76,7 +76,7 @@ export default function ReportContent({
   const analyticsBlock = (
     <DashboardCard>
       <SectionHeader kicker="Analytics" title="이번 주 활동 분석" />
-      <div className="mb-8 rounded-xl border border-border/60 bg-card p-4 shadow-inner @md:p-6 dark:border-border/40">
+      <div className="mb-8 rounded-xl border border-border/60 bg-card p-4 @md:p-6 dark:border-border/40">
         <p className="mb-4 text-sm font-semibold text-report-ink @md:mb-5">요일별 활동량</p>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart
@@ -193,7 +193,7 @@ function DashboardCard({
     <section
       id={id}
       className={cn(
-        "rounded-xl border border-border/80 bg-card p-6 shadow-sm @md:p-8 dark:border-border/60",
+        "rounded-xl border border-border/80 bg-card p-6 @md:p-8 dark:border-border/60",
         className,
       )}
     >
@@ -368,7 +368,7 @@ function PrevWeekComparisonCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-border/80 bg-card p-4 shadow-sm dark:border-border/60",
+        "rounded-xl border border-border/80 bg-card p-4 dark:border-border/60",
         compact ? "@md:p-5" : "@md:p-5",
       )}
     >
@@ -440,7 +440,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, unit }: StatCardProps) {
   return (
-    <div className="flex flex-col justify-between gap-2 rounded-xl border border-border/80 bg-card p-4 shadow-sm @md:gap-3 @md:p-5 dark:border-border/60">
+    <div className="flex flex-col justify-between gap-2 rounded-xl border border-border/80 bg-card p-4 @md:gap-3 @md:p-5 dark:border-border/60">
       <p className="text-xs font-medium leading-snug text-muted-foreground @md:text-sm">{label}</p>
       <p className="text-xl font-bold tabular-nums tracking-tight text-report-ink @md:text-2xl dark:text-foreground">
         {value}
@@ -461,7 +461,7 @@ function ContentAnalysisCard({ tagActivities, interestTagMatchRate }: ContentAna
   const total = tagActivities.reduce((sum, t) => sum + t.count, 0);
 
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm @md:p-5 dark:border-border/60">
+    <div className="rounded-xl border border-border/80 bg-card p-4 @md:p-5 dark:border-border/60">
       <p className="mb-4 text-sm font-semibold text-report-ink">읽은 글 분석</p>
       {total === 0 ? (
         <p className="text-sm text-muted-foreground">이번 주 읽은 글이 없어요.</p>
@@ -510,7 +510,7 @@ interface QuestionAnalysisCardProps {
 
 function QuestionAnalysisCard({ analysis }: QuestionAnalysisCardProps) {
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm @md:p-5 dark:border-border/60">
+    <div className="rounded-xl border border-border/80 bg-card p-4 @md:p-5 dark:border-border/60">
       <p className="mb-4 text-sm font-semibold text-report-ink">질문 분석</p>
 
       {!analysis ? (
@@ -585,7 +585,7 @@ function JobAnalysisCard({ jobTechStacks }: JobAnalysisCardProps) {
   const hasData = jobTechStacks && jobTechStacks.length > 0;
 
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm @md:p-5 dark:border-border/60">
+    <div className="rounded-xl border border-border/80 bg-card p-4 @md:p-5 dark:border-border/60">
       <p className="mb-4 text-sm font-semibold text-report-ink">확인 공고 분석</p>
       {!hasData ? (
         <p className="text-sm text-muted-foreground">이번 주 확인한 공고가 없어요.</p>
@@ -672,7 +672,7 @@ function HighlightCard({ highlight }: HighlightCardProps) {
 
   return (
     <article
-      className="rounded-xl border border-border/80 bg-card p-4 shadow-sm dark:border-border/60 @md:p-5"
+      className="rounded-xl border border-border/80 bg-card p-4 dark:border-border/60 @md:p-5"
     >
       <div className="flex gap-3">
         <span

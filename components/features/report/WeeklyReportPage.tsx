@@ -149,7 +149,7 @@ function HeroBand({
   exportPending,
 }: HeroBandProps) {
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-6 shadow-sm @md:p-8 dark:border-border/60">
+    <div className="rounded-xl border border-border/80 bg-card p-6 @md:p-8 dark:border-border/60">
       <div className="flex flex-col gap-8 @lg:flex-row @lg:items-start @lg:justify-between">
         <div className="min-w-0 flex-1 space-y-5">
           <div className="space-y-1">
@@ -174,7 +174,7 @@ function HeroBand({
             type="button"
             onClick={onExportPdf}
             disabled={exportPending}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-4 py-2.5 text-sm font-medium text-report-ink shadow-sm transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50 @lg:flex-none dark:border-border/60 dark:text-foreground"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-4 py-2.5 text-sm font-medium text-report-ink transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50 @lg:flex-none dark:border-border/60 dark:text-foreground"
           >
             <Download className="h-4 w-4 shrink-0 opacity-80" />
             {exportPending ? "저장 중..." : "저장 (PDF)"}
@@ -182,7 +182,7 @@ function HeroBand({
           <button
             type="button"
             onClick={onShare}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-[filter,transform] hover:brightness-[1.03] active:scale-[0.99] @lg:flex-none cursor-pointer dark:shadow-md"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-[filter,transform] hover:brightness-[1.03] active:scale-[0.99] @lg:flex-none cursor-pointer"
           >
             <Share2 className="h-4 w-4 shrink-0 opacity-95" />
             공유
@@ -330,7 +330,7 @@ function NoReportState() {
 function LoadingState() {
   return (
     <div className="space-y-10">
-      <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm @md:p-8 dark:border-border/50">
+      <div className="rounded-xl border border-border/60 bg-card p-6 @md:p-8 dark:border-border/50">
         <div className="flex flex-col gap-6 @lg:flex-row @lg:justify-between">
           <div className="space-y-4">
             <div className="h-4 w-24 animate-pulse rounded bg-muted" />
@@ -346,7 +346,7 @@ function LoadingState() {
 
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-3 lg:items-start">
         <div className="space-y-10 lg:col-span-2">
-          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm @md:p-8 dark:border-border/50">
+          <div className="rounded-xl border border-border/60 bg-card p-6 @md:p-8 dark:border-border/50">
             <div className="mb-6 space-y-2">
               <div className="h-3 w-20 animate-pulse rounded bg-muted" />
               <div className="h-6 w-36 animate-pulse rounded-md bg-muted" />
@@ -358,7 +358,7 @@ function LoadingState() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm @md:p-8 dark:border-border/50">
+          <div className="rounded-xl border border-border/60 bg-card p-6 @md:p-8 dark:border-border/50">
             <div className="mb-6 space-y-2">
               <div className="h-3 w-16 animate-pulse rounded bg-muted" />
               <div className="h-6 w-28 animate-pulse rounded-md bg-muted" />
@@ -371,7 +371,7 @@ function LoadingState() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm @md:p-8 dark:border-border/50">
+          <div className="rounded-xl border border-border/60 bg-card p-6 @md:p-8 dark:border-border/50">
             <div className="mb-6 space-y-2">
               <div className="h-3 w-24 animate-pulse rounded bg-muted" />
               <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
@@ -385,7 +385,7 @@ function LoadingState() {
         </div>
 
         <div className="space-y-6 lg:col-span-1">
-          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-sm dark:border-border/50">
+          <div className="rounded-xl border border-border/60 bg-card p-5 dark:border-border/50">
             <div className="mb-4 h-4 w-24 animate-pulse rounded bg-muted" />
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
