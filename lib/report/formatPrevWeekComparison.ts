@@ -22,7 +22,9 @@ function coerceNumber(value: unknown): number {
 }
 
 /** JSON 문자열 또는 객체에서 prevWeek 수치를 파싱한다. */
-function parsePrevRaw(raw: unknown): PrevWeekComparisonDeltas | null {
+export function parsePrevWeekComparisonRaw(
+  raw: unknown,
+): PrevWeekComparisonDeltas | null {
   if (raw == null) return null;
 
   let obj: Record<string, unknown> | null = null;
@@ -56,7 +58,7 @@ export function formatPrevWeekComparison(
   current: { contentsRead: number; questionsCreated: number; jobPostingsViewed: number },
   raw: unknown,
 ): PrevWeekFormatted {
-  const prev = parsePrevRaw(raw);
+  const prev = parsePrevWeekComparisonRaw(raw);
 
   if (prev === null) {
     return { primary: "-", trend: "unknown" };

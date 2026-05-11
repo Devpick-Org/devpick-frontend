@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentType } from "react";
 import {
   BarChart,
   Bar,
@@ -22,15 +23,26 @@ import type {
   TagActivity,
   JobTechStack,
 } from "@/types/report";
-import { formatPrevWeekComparison } from "@/lib/report/formatPrevWeekComparison";
+import {
+  formatPrevWeekComparison,
+  type PrevWeekTrend,
+} from "@/lib/report/formatPrevWeekComparison";
 import { cn } from "@/lib/utils";
+
+export type ReportContentVariant = "default" | "print";
 
 interface Props {
   activity: WeeklyActivity;
   chartData: ChartData;
+  /** `print`: PDF용 단일 열, 사이드바 생략 */
+  variant?: ReportContentVariant;
 }
 
-export default function ReportContent({ activity, chartData }: Props) {
+export default function ReportContent({
+  activity,
+  chartData,
+  variant = "default",
+}: Props) {
   const { primary: prevWeekPrimary, trend: prevWeekTrend } = formatPrevWeekComparison(
     {
       contentsRead: activity.contentsRead,
@@ -40,130 +52,272 @@ export default function ReportContent({ activity, chartData }: Props) {
     activity.prevWeekComparison,
   );
 
+  const isPrint = variant === "print";
+
+  const summaryBlock = (
+    <DashboardCard>
+      <SectionHeader kicker="Summary" title="이번 주 활동 요약" />
+      <div className="grid grid-cols-2 gap-4 @sm:gap-5 @xl:grid-cols-4">
+        <StatCard label="읽은 글" value={activity.contentsRead} unit="개" />
+        <StatCard label="질문" value={activity.questionsCreated} unit="개" />
+        <StatCard label="확인 공고" value={activity.jobPostingsViewed} unit="개" />
+        <div className="flex flex-col justify-between gap-2 rounded-xl border border-border/80 bg-muted/30 p-4 @md:p-5 dark:border-border/50 dark:bg-muted/20">
+          <p className="text-xs font-medium text-muted-foreground @md:text-sm">전주 대비</p>
+          <p
+            className={cn(
+              "text-balance text-base font-semibold leading-snug @md:text-lg",
+              prevWeekTrend === "up" && "text-green-600 dark:text-green-500",
+              prevWeekTrend === "down" && "text-red-500 dark:text-red-400",
+              prevWeekTrend === "flat" && "text-muted-foreground",
+              prevWeekTrend === "unknown" && "text-muted-foreground",
+            )}
+          >
+            {prevWeekPrimary}
+          </p>
+        </div>
+      </div>
+    </DashboardCard>
+  );
+
+  const analyticsBlock = (
+    <DashboardCard>
+      <SectionHeader kicker="Analytics" title="이번 주 활동 분석" />
+      <div className="mb-8 rounded-xl border border-border/60 bg-card p-4 shadow-inner @md:p-6 dark:border-border/40">
+        <p className="mb-4 text-sm font-semibold text-report-ink @md:mb-5">요일별 활동량</p>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart
+            data={chartData.dailyActivities}
+            margin={{ top: 6, right: 4, left: -18, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 6"
+              vertical={false}
+              stroke="color-mix(in srgb, var(--report-ink) 9%, transparent)"
+            />
+            <XAxis
+              dataKey="dayOfWeek"
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+              axisLine={false}
+              tickLine={false}
+              tickFormatter={(v: string) =>
+                ({ MON: "월", TUE: "화", WED: "수", THU: "목", FRI: "금", SAT: "토", SUN: "일" }[v] ?? v)
+              }
+            />
+            <YAxis
+              tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+              axisLine={false}
+              tickLine={false}
+              allowDecimals={false}
+            />
+            <Tooltip
+              contentStyle={{
+                borderRadius: 10,
+                fontSize: 12,
+                border: "1px solid color-mix(in srgb, var(--report-ink) 12%, transparent)",
+                boxShadow: "0 4px 20px color-mix(in srgb, var(--report-ink) 8%, transparent)",
+              }}
+              formatter={(value) => [value, "활동"]}
+              cursor={{ fill: "color-mix(in srgb, var(--primary) 8%, transparent)" }}
+            />
+            <Bar dataKey="count" fill="var(--chart-1)" fillOpacity={0.92} radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 @lg:grid-cols-3 @lg:gap-6">
+        <ContentAnalysisCard
+          tagActivities={chartData.tagActivities}
+          interestTagMatchRate={activity.contentKeywords?.interestTagMatchRate ?? 0}
+        />
+        <QuestionAnalysisCard analysis={activity.questionAnalysis} />
+        <JobAnalysisCard jobTechStacks={activity.jobTechStacks ?? []} />
+      </div>
+    </DashboardCard>
+  );
+
+  const highlightsBlock = (
+    <DashboardCard id="report-highlights">
+      <SectionHeader kicker="Insights" title="이번 주 하이라이트" />
+      {!activity.highlights || activity.highlights.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border/80 bg-muted/20 p-8 text-center text-sm font-medium leading-relaxed text-muted-foreground @md:p-10 dark:border-border/50">
+          이번 주 하이라이트를 분석 중이에요.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 @md:gap-5">
+          {activity.highlights.map((highlight, i) => (
+            <HighlightCard key={i} highlight={highlight} />
+          ))}
+        </div>
+      )}
+    </DashboardCard>
+  );
+
+  if (isPrint) {
+    return (
+      <div className="space-y-8">
+        {summaryBlock}
+        {analyticsBlock}
+        {highlightsBlock}
+      </div>
+    );
+  }
+
   return (
-    <div className="@container space-y-8 @md:space-y-10">
-      {/* 섹션 1: 이번 주 활동 요약 */}
-      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_28%,var(--card))] to-card p-6 shadow-xs @md:space-y-6 @md:p-8 dark:from-primary/[0.07] dark:to-card">
-        <div className="space-y-1">
-          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
-            Summary
-          </p>
-          <h2 className="text-balance text-xl font-bold tracking-tight text-report-ink @md:text-[1.35rem]">
-            이번 주 활동 요약
-          </h2>
+    <div className="@container">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-3 lg:items-start lg:gap-10">
+        <div className="space-y-10 lg:col-span-2">
+          {summaryBlock}
+          {analyticsBlock}
+          {highlightsBlock}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 @sm:gap-4 @xl:grid-cols-4 @xl:gap-5">
-          <StatCard label="읽은 글" value={activity.contentsRead} unit="개" />
-          <StatCard label="질문" value={activity.questionsCreated} unit="개" />
-          <StatCard label="확인 공고" value={activity.jobPostingsViewed} unit="개" />
-          <div className="flex flex-col justify-between gap-2 rounded-xl border border-primary/10 bg-card/90 p-4 shadow-[inset_0_1px_0_0_color-mix(in_srgb,var(--report-wash)_80%,transparent)] @md:p-5 dark:bg-card/80 dark:shadow-none">
-            <p className="text-xs font-medium text-muted-foreground @md:text-sm">전주 대비</p>
-            <p
-              className={cn(
-                "text-balance text-base font-semibold leading-snug @md:text-lg",
-                prevWeekTrend === "up" && "text-green-600",
-                prevWeekTrend === "down" && "text-red-500",
-                prevWeekTrend === "flat" && "text-muted-foreground",
-              )}
-            >
-              {prevWeekPrimary}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 섹션 2: 활동 분석 — 요일별 바 차트 (full-width) */}
-      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-muted/40 to-card p-6 shadow-xs @md:space-y-6 @md:p-8 dark:from-muted/25 dark:to-card">
-        <div className="space-y-1">
-          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
-            Analytics
-          </p>
-          <h2 className="text-balance text-xl font-bold tracking-tight text-report-ink @md:text-[1.35rem]">
-            이번 주 활동 분석
-          </h2>
-        </div>
-
-        <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:p-6 dark:bg-card/80">
-          <p className="mb-4 text-sm font-semibold text-report-ink @md:mb-5">요일별 활동량</p>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart
-              data={chartData.dailyActivities}
-              margin={{ top: 6, right: 4, left: -18, bottom: 0 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 6"
-                vertical={false}
-                stroke="color-mix(in srgb, var(--report-ink) 9%, transparent)"
-              />
-              <XAxis
-                dataKey="dayOfWeek"
-                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(v: string) =>
-                  ({ MON: "월", TUE: "화", WED: "수", THU: "목", FRI: "금", SAT: "토", SUN: "일" }[v] ?? v)
-                }
-              />
-              <YAxis
-                tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
-                axisLine={false}
-                tickLine={false}
-                allowDecimals={false}
-              />
-              <Tooltip
-                contentStyle={{
-                  borderRadius: 10,
-                  fontSize: 12,
-                  border: "1px solid color-mix(in srgb, var(--report-ink) 12%, transparent)",
-                  boxShadow: "0 4px 20px color-mix(in srgb, var(--report-ink) 8%, transparent)",
-                }}
-                formatter={(value) => [value, "활동"]}
-                cursor={{ fill: "color-mix(in srgb, var(--primary) 8%, transparent)" }}
-              />
-              <Bar dataKey="count" fill="var(--chart-1)" fillOpacity={0.92} radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* 3개 분석 카드 */}
-        <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3 @lg:gap-5">
-          <ContentAnalysisCard
-            tagActivities={chartData.tagActivities}
-            interestTagMatchRate={activity.contentKeywords?.interestTagMatchRate ?? 0}
+        <aside className="space-y-6 lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
+          <ReportSidebar
+            activity={activity}
+            prevWeekPrimary={prevWeekPrimary}
+            prevWeekTrend={prevWeekTrend}
           />
-          <QuestionAnalysisCard analysis={activity.questionAnalysis} />
-          <JobAnalysisCard jobTechStacks={activity.jobTechStacks ?? []} />
-        </div>
-      </section>
-
-      {/* 섹션 3: 이번 주 하이라이트 */}
-      <section className="space-y-5 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_24%,var(--card))] to-card p-6 shadow-xs @md:space-y-6 @md:p-8 dark:from-primary/[0.06] dark:to-card">
-        <div className="space-y-1">
-          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-primary/90">
-            Highlights
-          </p>
-          <h2 className="text-balance text-xl font-bold tracking-tight text-report-ink @md:text-[1.35rem]">
-            이번 주 하이라이트
-          </h2>
-        </div>
-        {!activity.highlights || activity.highlights.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-primary/20 bg-card/80 p-8 text-center text-sm font-medium leading-relaxed text-muted-foreground @md:p-10">
-            이번 주 하이라이트를 분석 중이에요.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 @md:gap-5">
-            {activity.highlights.map((highlight, i) => (
-              <HighlightCard key={i} highlight={highlight} />
-            ))}
-          </div>
-        )}
-      </section>
+        </aside>
+      </div>
     </div>
   );
 }
 
-// ── 내부 컴포넌트 ──────────────────────────────────────────────────────────────
+// ── 레이아웃 프리미티브 ─────────────────────────────────────────────────────────
+
+function DashboardCard({
+  id,
+  children,
+  className,
+}: {
+  id?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      id={id}
+      className={cn(
+        "rounded-xl border border-border/80 bg-card p-6 shadow-sm @md:p-8 dark:border-border/60",
+        className,
+      )}
+    >
+      {children}
+    </section>
+  );
+}
+
+function SectionHeader({
+  kicker,
+  title,
+  action,
+}: {
+  kicker: string;
+  title: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="mb-6 flex flex-col gap-1 @sm:mb-8 @md:flex-row @md:items-end @md:justify-between">
+      <div className="space-y-1">
+        <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-primary">
+          {kicker}
+        </p>
+        <h2 className="text-balance text-xl font-semibold tracking-tight text-report-ink @md:text-2xl">
+          {title}
+        </h2>
+      </div>
+      {action}
+    </div>
+  );
+}
+
+// ── 사이드바 ───────────────────────────────────────────────────────────────────
+
+function ReportSidebar({
+  activity,
+  prevWeekPrimary,
+  prevWeekTrend,
+}: {
+  activity: WeeklyActivity;
+  prevWeekPrimary: string;
+  prevWeekTrend: PrevWeekTrend;
+}) {
+  const highlights = activity.highlights ?? [];
+  const showViewAll = highlights.length > 3;
+
+  return (
+    <div className="space-y-6">
+      <DashboardCard className="p-5 @md:p-6">
+        <div className="mb-5 space-y-1">
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-primary">
+            Snapshot
+          </p>
+          <h3 className="text-lg font-semibold tracking-tight text-report-ink">이번 주 스냅샷</h3>
+        </div>
+        <div className="grid grid-cols-1 gap-3">
+          <MiniStat label="읽은 글" value={activity.contentsRead} suffix="개" />
+          <MiniStat label="질문" value={activity.questionsCreated} suffix="개" />
+          <MiniStat label="확인 공고" value={activity.jobPostingsViewed} suffix="개" />
+        </div>
+      </DashboardCard>
+
+      <DashboardCard className="p-5 @md:p-6">
+        <h3 className="mb-2 text-sm font-semibold text-report-ink">전주 대비</h3>
+        <p
+          className={cn(
+            "text-sm font-medium leading-relaxed",
+            prevWeekTrend === "up" && "text-green-600 dark:text-green-500",
+            prevWeekTrend === "down" && "text-red-500 dark:text-red-400",
+            prevWeekTrend === "flat" && "text-muted-foreground",
+            prevWeekTrend === "unknown" && "text-muted-foreground",
+          )}
+        >
+          {prevWeekPrimary}
+        </p>
+      </DashboardCard>
+
+      <DashboardCard className="p-5 @md:p-6">
+        <div className="mb-4 flex items-start justify-between gap-2">
+          <h3 className="text-sm font-semibold text-report-ink">하이라이트 요약</h3>
+          {showViewAll ? (
+            <a
+              href="#report-highlights"
+              className="shrink-0 text-xs font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              전체 보기
+            </a>
+          ) : null}
+        </div>
+        {highlights.length === 0 ? (
+          <p className="text-sm text-muted-foreground">아직 표시할 인사이트가 없어요.</p>
+        ) : (
+          <ul className="space-y-3 text-sm text-muted-foreground">
+            {highlights.slice(0, 3).map((h, i) => (
+              <li key={i} className="flex gap-2 leading-snug">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+                <span className="min-w-0 font-medium text-report-ink">{h.title}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </DashboardCard>
+    </div>
+  );
+}
+
+function MiniStat({ label, value, suffix }: { label: string; value: number; suffix: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-muted/20 px-3 py-2.5 dark:border-border/40 dark:bg-muted/15">
+      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+      <span className="tabular-nums text-sm font-semibold text-report-ink dark:text-foreground">
+        {value}
+        <span className="ms-0.5 text-xs font-medium text-muted-foreground">{suffix}</span>
+      </span>
+    </div>
+  );
+}
+
+// ── 통계 카드 ──────────────────────────────────────────────────────────────────
 
 interface StatCardProps {
   label: string;
@@ -173,7 +327,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, unit }: StatCardProps) {
   return (
-    <div className="flex flex-col justify-between gap-2 rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:gap-3 @md:p-5 dark:bg-card/70 dark:shadow-none">
+    <div className="flex flex-col justify-between gap-2 rounded-xl border border-border/80 bg-card p-4 shadow-sm @md:gap-3 @md:p-5 dark:border-border/60">
       <p className="text-xs font-medium leading-snug text-muted-foreground @md:text-sm">{label}</p>
       <p className="text-xl font-bold tabular-nums tracking-tight text-report-ink @md:text-2xl dark:text-foreground">
         {value}
@@ -183,7 +337,7 @@ function StatCard({ label, value, unit }: StatCardProps) {
   );
 }
 
-// ── 읽은 글 분석 카드 ──────────────────────────────────────────────────────────
+// ── 읽은 글 분석 카드 ───────────────────────────────────────────────────────────
 
 interface ContentAnalysisCardProps {
   tagActivities: TagActivity[];
@@ -194,7 +348,7 @@ function ContentAnalysisCard({ tagActivities, interestTagMatchRate }: ContentAna
   const total = tagActivities.reduce((sum, t) => sum + t.count, 0);
 
   return (
-    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:p-5 dark:bg-card/80">
+    <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm @md:p-5 dark:border-border/60">
       <p className="mb-4 text-sm font-semibold text-report-ink">읽은 글 분석</p>
       {total === 0 ? (
         <p className="text-sm text-muted-foreground">이번 주 읽은 글이 없어요.</p>
@@ -217,7 +371,7 @@ function ContentAnalysisCard({ tagActivities, interestTagMatchRate }: ContentAna
               </div>
             );
           })}
-          <div className="mt-3 border-t border-primary/10 pt-3">
+          <div className="mt-3 border-t border-border/60 pt-3 dark:border-border/50">
             <div className="mb-1 flex items-center justify-between text-xs">
               <span className="font-medium text-muted-foreground">내 관심태그 매칭률</span>
               <span className="font-semibold tabular-nums text-primary">{interestTagMatchRate}%</span>
@@ -235,7 +389,7 @@ function ContentAnalysisCard({ tagActivities, interestTagMatchRate }: ContentAna
   );
 }
 
-// ── 질문 분석 카드 ─────────────────────────────────────────────────────────────
+// ── 질문 분석 카드 ───────────────────────────────────────────────────────────────
 
 interface QuestionAnalysisCardProps {
   analysis: WeeklyActivity["questionAnalysis"];
@@ -243,7 +397,7 @@ interface QuestionAnalysisCardProps {
 
 function QuestionAnalysisCard({ analysis }: QuestionAnalysisCardProps) {
   return (
-    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:p-5 dark:bg-card/80">
+    <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm @md:p-5 dark:border-border/60">
       <p className="mb-4 text-sm font-semibold text-report-ink">질문 분석</p>
 
       {!analysis ? (
@@ -255,7 +409,7 @@ function QuestionAnalysisCard({ analysis }: QuestionAnalysisCardProps) {
             <QuestionCountRow label="커리어 질문" total={analysis.career.total} resolved={analysis.career.resolved} />
           </div>
 
-          <div className="my-3 border-t border-primary/10" />
+          <div className="my-3 border-t border-border/60 dark:border-border/50" />
 
           <div className="space-y-2.5">
             <QuestionKeywordRow label="기술 질문 키워드" keywords={analysis.tech.keywords} />
@@ -300,7 +454,7 @@ function QuestionKeywordRow({ label, keywords }: { label: string; keywords: stri
   );
 }
 
-// ── 확인 공고 분석 카드 ────────────────────────────────────────────────────────
+// ── 확인 공고 분석 카드 ─────────────────────────────────────────────────────────
 
 const PIE_COLORS = [
   "var(--chart-1)",
@@ -318,7 +472,7 @@ function JobAnalysisCard({ jobTechStacks }: JobAnalysisCardProps) {
   const hasData = jobTechStacks && jobTechStacks.length > 0;
 
   return (
-    <div className="rounded-xl border border-primary/10 bg-card/95 p-4 shadow-xs @md:p-5 dark:bg-card/80">
+    <div className="rounded-xl border border-border/80 bg-card p-4 shadow-sm @md:p-5 dark:border-border/60">
       <p className="mb-4 text-sm font-semibold text-report-ink">확인 공고 분석</p>
       {!hasData ? (
         <p className="text-sm text-muted-foreground">이번 주 확인한 공고가 없어요.</p>
@@ -377,21 +531,21 @@ function JobAnalysisCard({ jobTechStacks }: JobAnalysisCardProps) {
 
 const HIGHLIGHT_STYLES: Record<
   HighlightType,
-  { bg: string; iconColor: string; Icon: React.ComponentType<{ className?: string }> }
+  { border: string; iconColor: string; Icon: ComponentType<{ className?: string }> }
 > = {
   success: {
-    bg: "bg-green-50 dark:bg-green-950/30",
+    border: "border-l-green-500",
     iconColor: "text-green-500",
     Icon: CheckCircle,
   },
   info: {
-    bg: "bg-blue-50 dark:bg-blue-950/30",
-    iconColor: "text-blue-500",
+    border: "border-l-primary",
+    iconColor: "text-primary",
     Icon: Info,
   },
   warning: {
-    bg: "bg-yellow-50 dark:bg-yellow-950/30",
-    iconColor: "text-yellow-500",
+    border: "border-l-amber-500",
+    iconColor: "text-amber-500",
     Icon: AlertTriangle,
   },
 };
@@ -407,15 +561,13 @@ function HighlightCard({ highlight }: HighlightCardProps) {
   return (
     <article
       className={cn(
-        "flex items-start gap-3.5 rounded-xl p-4 shadow-xs @md:gap-4 @md:p-5",
-        style.bg,
+        "flex items-start gap-3.5 rounded-xl border border-border/80 border-l-4 bg-card p-4 shadow-sm @md:gap-4 @md:p-5 dark:border-border/60",
+        style.border,
       )}
     >
       <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", style.iconColor)} />
       <div className="min-w-0 space-y-1">
-        <h3 className="text-[15px] font-semibold leading-snug text-report-ink">
-          {highlight.title}
-        </h3>
+        <h3 className="text-[15px] font-semibold leading-snug text-report-ink">{highlight.title}</h3>
         <p className="text-pretty text-sm font-medium leading-relaxed text-muted-foreground">
           {highlight.description}
         </p>

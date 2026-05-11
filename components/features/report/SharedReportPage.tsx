@@ -34,7 +34,7 @@ export default function SharedReportPage({ token }: Props) {
 
   if (report.status === "EMPTY" || !activity) {
     return (
-      <div className="mx-auto max-w-4xl @container space-y-8 px-4 py-12 md:px-6">
+      <div className="mx-auto max-w-[1200px] @container space-y-8 px-4 py-12 md:px-6">
         <Header weekStart={report.weekStart} weekEnd={report.weekEnd} />
         <EmptyState />
       </div>
@@ -42,7 +42,7 @@ export default function SharedReportPage({ token }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl @container space-y-10 px-4 py-12 md:px-6">
+    <div className="mx-auto max-w-[1200px] @container space-y-10 px-4 py-12 md:px-6">
       <Header weekStart={report.weekStart} weekEnd={report.weekEnd} />
       <ReportContent
         activity={activity}
@@ -91,7 +91,7 @@ function EmptyState() {
 
 function LoadingState() {
   return (
-    <div className="mx-auto max-w-4xl @container space-y-10 px-4 py-12 md:px-6">
+    <div className="mx-auto max-w-[1200px] @container space-y-10 px-4 py-12 md:px-6">
       <div className="space-y-3 border-b border-primary/10 pb-8">
         <div className="h-3 w-24 animate-pulse rounded bg-muted" />
         <div className="h-8 w-48 animate-pulse rounded-md bg-muted" />

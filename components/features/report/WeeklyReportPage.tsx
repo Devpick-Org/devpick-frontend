@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ReportContent from "./ReportContent";
 import { exportReportAsPdf } from "@/lib/report/exportPdf";
+import { parsePrevWeekComparisonRaw } from "@/lib/report/formatPrevWeekComparison";
+import type { WeeklyActivity } from "@/types/report";
 
 export default function WeeklyReportPage() {
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
@@ -65,7 +67,6 @@ export default function WeeklyReportPage() {
 
   const exportMutation = useMutation({
     mutationFn: ({ weekStart }: { weekStart: string }) => {
-      console.log("contentRef", contentRef.current);
       if (!contentRef.current)
         return Promise.reject(new Error("저장할 영역을 찾을 수 없습니다"));
       return exportReportAsPdf(contentRef.current, weekStart);
@@ -88,60 +89,164 @@ export default function WeeklyReportPage() {
   return (
     <>
       <div className="space-y-10">
-        <div className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-gradient-to-b from-[color-mix(in_srgb,var(--report-wash)_55%,white)] to-card px-4 py-4 shadow-[0_1px_0_0_color-mix(in_srgb,var(--report-ink)_6%,transparent)] @sm:flex-row @sm:items-center @sm:justify-between @sm:gap-6 @sm:px-6 @sm:py-5 dark:from-primary/[0.08] dark:to-card dark:shadow-none">
-          <WeekHeader
-            report={report}
-            reportList={reportList}
-            selectedReportId={selectedReportId}
-            onSelect={setSelectedReportId}
-          />
-          <div className="flex shrink-0 gap-2.5 @sm:justify-end">
-            <button
-              onClick={() =>
-                exportMutation.mutate({ weekStart: report.weekStart })
-              }
-              disabled={exportMutation.isPending}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-primary/15 bg-card/80 px-4 py-2.5 text-sm font-medium text-report-ink shadow-xs backdrop-blur-md transition-[color,box-shadow,background-color,border-color] hover:border-border hover:bg-muted @sm:flex-none cursor-pointer disabled:pointer-events-none disabled:opacity-50 dark:text-foreground"
-              type="button"
-            >
-              <Download className="h-4 w-4 shrink-0 opacity-80" />
-              {exportMutation.isPending ? "저장 중..." : "저장 (PDF)"}
-            </button>
-            <button
-              onClick={() => shareMutation.mutate(report.reportId)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_1px_2px_color-mix(in_srgb,var(--report-ink)_12%,transparent)] transition-[filter,transform] hover:brightness-[1.03] active:scale-[0.99] @sm:flex-none cursor-pointer dark:shadow-md"
-              type="button"
-            >
-              <Share2 className="h-4 w-4 shrink-0 opacity-95" />
-              공유
-            </button>
-          </div>
-        </div>
-
-        <ReportContent
+        <HeroBand
+          report={report}
+          reportList={reportList}
+          selectedReportId={selectedReportId}
+          onSelect={setSelectedReportId}
           activity={activity}
-          chartData={report.chartData}
+          onExportPdf={() => exportMutation.mutate({ weekStart: report.weekStart })}
+          onShare={() => shareMutation.mutate(report.reportId)}
+          exportPending={exportMutation.isPending}
         />
+
+        <ReportContent activity={activity} chartData={report.chartData} />
       </div>
-      {/* PDF 저장 전용 영역 */}
-      <div className="fixed -left-[99999px] top-0 pointer-events-none">
+      {/* PDF 저장 전용 영역 — 화면과 동일 데이터, 단일 열 레이아웃 */}
+      <div className="pointer-events-none fixed top-0 -left-[99999px]">
         <div ref={contentRef} className="w-[900px] bg-white p-8">
           <div className="mb-6">
-            <p className="text-xl font-bold">
-              {formatWeekLabel(report.weekStart)}
-            </p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xl font-bold">{formatWeekLabel(report.weekStart)}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
               {formatDate(report.weekStart)} ~ {formatDate(report.weekEnd)}
             </p>
           </div>
 
-          <ReportContent
-            activity={activity}
-            chartData={report.chartData}
-          />
+          <ReportContent activity={activity} chartData={report.chartData} variant="print" />
         </div>
       </div>
     </>
+  );
+}
+
+interface HeroBandProps {
+  report: { reportId: string; weekStart: string; weekEnd: string };
+  reportList: {
+    reportId: string;
+    weekStart: string;
+    weekEnd: string;
+    status: string;
+  }[];
+  selectedReportId: string | null;
+  onSelect: (id: string) => void;
+  activity: WeeklyActivity;
+  onExportPdf: () => void;
+  onShare: () => void;
+  exportPending: boolean;
+}
+
+function HeroBand({
+  report,
+  reportList,
+  selectedReportId,
+  onSelect,
+  activity,
+  onExportPdf,
+  onShare,
+  exportPending,
+}: HeroBandProps) {
+  return (
+    <div className="rounded-xl border border-border/80 bg-card p-6 shadow-sm @md:p-8 dark:border-border/60">
+      <div className="flex flex-col gap-8 @lg:flex-row @lg:items-start @lg:justify-between">
+        <div className="min-w-0 flex-1 space-y-5">
+          <div className="space-y-1">
+            <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-primary">
+              Weekly report
+            </p>
+            <WeekHeader
+              report={report}
+              reportList={reportList}
+              selectedReportId={selectedReportId}
+              onSelect={onSelect}
+            />
+          </div>
+          <p className="max-w-xl text-sm font-medium leading-relaxed text-muted-foreground">
+            읽기·질문·채용 탐색 활동을 한곳에 모았어요. 아래 카드에서 이번 주 흐름을 살펴보세요.
+          </p>
+          <WeekVsPrevBars activity={activity} />
+        </div>
+
+        <div className="flex shrink-0 flex-col gap-2.5 @sm:flex-row @lg:flex-col">
+          <button
+            type="button"
+            onClick={onExportPdf}
+            disabled={exportPending}
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-border/80 bg-card px-4 py-2.5 text-sm font-medium text-report-ink shadow-sm transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50 @lg:flex-none dark:border-border/60 dark:text-foreground"
+          >
+            <Download className="h-4 w-4 shrink-0 opacity-80" />
+            {exportPending ? "저장 중..." : "저장 (PDF)"}
+          </button>
+          <button
+            type="button"
+            onClick={onShare}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-[filter,transform] hover:brightness-[1.03] active:scale-[0.99] @lg:flex-none cursor-pointer dark:shadow-md"
+          >
+            <Share2 className="h-4 w-4 shrink-0 opacity-95" />
+            공유
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WeekVsPrevBars({ activity }: { activity: WeeklyActivity }) {
+  const prev = parsePrevWeekComparisonRaw(activity.prevWeekComparison);
+  if (!prev) {
+    return (
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        전주 비교 데이터가 있으면 활동량을 같은 기준으로 나란히 보여 줍니다.
+      </p>
+    );
+  }
+
+  const rows = [
+    { key: "read", label: "읽은 글", cur: activity.contentsRead, prv: prev.contentsRead },
+    { key: "q", label: "질문", cur: activity.questionsCreated, prv: prev.questionsCreated },
+    { key: "job", label: "확인 공고", cur: activity.jobPostingsViewed, prv: prev.jobPostingsViewed },
+  ] as const;
+
+  return (
+    <div className="border-t border-border/60 pt-5 dark:border-border/50">
+      <p className="mb-4 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        전주 대비 활동량
+      </p>
+      <div className="grid grid-cols-1 gap-6 @sm:grid-cols-3 @sm:gap-5">
+        {rows.map((row) => {
+          const max = Math.max(row.cur, row.prv, 1);
+          const curPct = (row.cur / max) * 100;
+          const prvPct = (row.prv / max) * 100;
+          return (
+            <div key={row.key} className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 text-xs">
+                <span className="font-semibold text-report-ink">{row.label}</span>
+                <span className="tabular-nums text-muted-foreground">
+                  {row.cur} / 전주 {row.prv}
+                </span>
+              </div>
+              <div className="space-y-1">
+                <div className="h-2 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-muted-foreground/30"
+                    style={{ width: `${prvPct}%` }}
+                  />
+                </div>
+                <div className="h-2 overflow-hidden rounded-full bg-primary/15">
+                  <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${curPct}%` }}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-between text-[10px] font-medium text-muted-foreground">
+                <span>전주</span>
+                <span className="text-primary">이번 주</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -166,17 +271,15 @@ function WeekHeader({
   const currentId = selectedReportId ?? report.reportId;
 
   return (
-    <div className="min-w-0 space-y-1.5">
+    <div className="min-w-0 space-y-2">
       {reportList.length > 1 ? (
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex max-w-full items-center gap-1.5 text-left text-xl font-bold tracking-tight text-report-ink transition-colors hover:text-primary @md:text-2xl cursor-pointer dark:text-report-ink"
+              className="flex max-w-full cursor-pointer items-center gap-1.5 text-left text-2xl font-semibold tracking-tight text-report-ink transition-colors hover:text-primary @md:text-3xl dark:text-report-ink"
               type="button"
             >
-              <span className="truncate">
-                {formatWeekLabel(report.weekStart)}
-              </span>
+              <span className="truncate">{formatWeekLabel(report.weekStart)}</span>
               <ChevronDown className="h-4 w-4 shrink-0 text-primary/70" />
             </button>
           </DropdownMenuTrigger>
@@ -196,7 +299,7 @@ function WeekHeader({
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <p className="text-balance text-xl font-bold tracking-tight text-report-ink @md:text-2xl">
+        <p className="text-balance text-2xl font-semibold tracking-tight text-report-ink @md:text-3xl">
           {formatWeekLabel(report.weekStart)}
         </p>
       )}
@@ -224,56 +327,70 @@ function NoReportState() {
 function LoadingState() {
   return (
     <div className="space-y-10">
-      <div className="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-primary/[0.04] px-4 py-4 @sm:flex-row @sm:items-center @sm:justify-between @sm:px-6 @sm:py-5">
-        <div className="space-y-2">
-          <div className="h-6 w-40 animate-pulse rounded-md bg-muted" />
-          <div className="h-4 w-48 animate-pulse rounded-md bg-muted" />
-        </div>
-        <div className="flex gap-2.5">
-          <div className="h-10 w-28 animate-pulse rounded-xl bg-muted" />
-          <div className="h-10 w-20 animate-pulse rounded-xl bg-muted" />
-        </div>
-      </div>
-
-      <div className="space-y-5 rounded-2xl border border-primary/10 bg-card p-6 @md:p-8">
-        <div className="space-y-2">
-          <div className="h-3 w-20 animate-pulse rounded bg-muted" />
-          <div className="h-6 w-36 animate-pulse rounded-md bg-muted" />
-        </div>
-        <div className="grid grid-cols-2 gap-3 @sm:gap-4 @xl:grid-cols-4 @xl:gap-5">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-28 animate-pulse rounded-xl bg-muted/80"
-            />
-          ))}
-        </div>
-        <div className="h-16 animate-pulse rounded-xl bg-muted/80" />
-      </div>
-
-      <div className="space-y-5 rounded-2xl border border-primary/10 bg-[color-mix(in_srgb,var(--report-wash)_25%,transparent)] p-6 @md:p-8 dark:bg-primary/[0.05]">
-        <div className="space-y-2">
-          <div className="h-3 w-16 animate-pulse rounded bg-muted" />
-          <div className="h-6 w-28 animate-pulse rounded-md bg-muted" />
-        </div>
-        <div className="grid grid-cols-1 gap-6 @lg:grid-cols-2 @lg:gap-8">
-          <div className="h-56 animate-pulse rounded-xl bg-muted/70" />
-          <div className="h-56 animate-pulse rounded-xl bg-muted/70" />
+      <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm @md:p-8 dark:border-border/50">
+        <div className="flex flex-col gap-6 @lg:flex-row @lg:justify-between">
+          <div className="space-y-4">
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="h-8 w-48 animate-pulse rounded-md bg-muted" />
+            <div className="h-4 w-64 max-w-full animate-pulse rounded bg-muted" />
+          </div>
+          <div className="flex gap-2.5">
+            <div className="h-10 w-28 animate-pulse rounded-xl bg-muted/80" />
+            <div className="h-10 w-20 animate-pulse rounded-xl bg-muted/80" />
+          </div>
         </div>
       </div>
 
-      <div className="space-y-5 rounded-2xl border border-primary/10 bg-card p-6 @md:p-8">
-        <div className="space-y-2">
-          <div className="h-3 w-24 animate-pulse rounded bg-muted" />
-          <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-3 lg:items-start">
+        <div className="space-y-10 lg:col-span-2">
+          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm @md:p-8 dark:border-border/50">
+            <div className="mb-6 space-y-2">
+              <div className="h-3 w-20 animate-pulse rounded bg-muted" />
+              <div className="h-6 w-36 animate-pulse rounded-md bg-muted" />
+            </div>
+            <div className="grid grid-cols-2 gap-4 @xl:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-28 animate-pulse rounded-xl bg-muted/75" />
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm @md:p-8 dark:border-border/50">
+            <div className="mb-6 space-y-2">
+              <div className="h-3 w-16 animate-pulse rounded bg-muted" />
+              <div className="h-6 w-28 animate-pulse rounded-md bg-muted" />
+            </div>
+            <div className="mb-8 h-48 animate-pulse rounded-xl bg-muted/60" />
+            <div className="grid grid-cols-1 gap-4 @lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-40 animate-pulse rounded-xl bg-muted/70" />
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-border/60 bg-card p-6 shadow-sm @md:p-8 dark:border-border/50">
+            <div className="mb-6 space-y-2">
+              <div className="h-3 w-24 animate-pulse rounded bg-muted" />
+              <div className="h-6 w-32 animate-pulse rounded-md bg-muted" />
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-24 animate-pulse rounded-xl bg-muted/75" />
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-1 gap-4 @md:gap-5">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-24 animate-pulse rounded-xl bg-muted/80"
-            />
-          ))}
+
+        <div className="space-y-6 lg:col-span-1">
+          <div className="rounded-xl border border-border/60 bg-card p-5 shadow-sm dark:border-border/50">
+            <div className="mb-4 h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-10 animate-pulse rounded-lg bg-muted/70" />
+              ))}
+            </div>
+          </div>
+          <div className="h-24 animate-pulse rounded-xl border border-border/60 bg-muted/40 dark:border-border/50" />
         </div>
       </div>
     </div>
