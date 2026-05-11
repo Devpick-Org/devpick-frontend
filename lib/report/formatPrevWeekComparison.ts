@@ -74,7 +74,13 @@ export function formatPrevWeekComparison(
 
   const total = deltaContents + deltaQuestions + deltaJobs;
   const trend: PrevWeekTrend = total > 0 ? "up" : total < 0 ? "down" : "flat";
-  const primary = `글 ${signed(deltaContents)} · 질문 ${signed(deltaQuestions)} · 공고 ${signed(deltaJobs)}`;
+
+  /** 한 줄의 `글 -1 · 질문 …` 같은 표기는 줄바꿈에 어색해져 카드 레이블과 맞춰 세 줄로 둔다. */
+  const primary = [
+    `읽은 글 ${signed(deltaContents)}개`,
+    `질문 ${signed(deltaQuestions)}개`,
+    `확인 공고 ${signed(deltaJobs)}개`,
+  ].join("\n");
 
   return { primary, trend };
 }

@@ -102,9 +102,12 @@ export default function WeeklyReportPage() {
 
         <ReportContent activity={activity} chartData={report.chartData} />
       </div>
-      {/* PDF 저장 전용 영역 — 화면과 동일 데이터, 단일 열 레이아웃 */}
-      <div className="pointer-events-none fixed top-0 -left-[99999px]">
-        <div ref={contentRef} className="w-[900px] bg-white p-8">
+      {/* PDF 저장 전용: print 레이아웃. 완전히 화면 바깥 좌표는 캔버스 높이 누락 빈발 → 폭만 -translate 로 밀어냄 */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-y-0 left-0 z-[-2147483647] flex w-max max-w-none -translate-x-full"
+      >
+        <div ref={contentRef} className="w-[794px] shrink-0 bg-white p-8 text-foreground">
           <div className="mb-6">
             <p className="text-xl font-bold">{formatWeekLabel(report.weekStart)}</p>
             <p className="mt-1 text-sm text-muted-foreground">

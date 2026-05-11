@@ -1,6 +1,5 @@
 "use client";
 
-import type { ComponentType } from "react";
 import {
   BarChart,
   Bar,
@@ -13,7 +12,6 @@ import {
   Cell,
   ResponsiveContainer,
 } from "recharts";
-import { CheckCircle, Info, AlertTriangle } from "lucide-react";
 
 import type {
   WeeklyActivity,
@@ -65,7 +63,7 @@ export default function ReportContent({
           <p className="text-xs font-medium text-muted-foreground @md:text-sm">전주 대비</p>
           <p
             className={cn(
-              "text-balance text-base font-semibold leading-snug @md:text-lg",
+              "whitespace-pre-line text-base font-semibold leading-relaxed @md:text-lg",
               prevWeekTrend === "up" && "text-green-600 dark:text-green-500",
               prevWeekTrend === "down" && "text-red-500 dark:text-red-400",
               prevWeekTrend === "flat" && "text-muted-foreground",
@@ -143,7 +141,7 @@ export default function ReportContent({
           이번 주 하이라이트를 분석 중이에요.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 @md:gap-5">
+        <div className="grid grid-cols-1 gap-5 @md:gap-6">
           {activity.highlights.map((highlight, i) => (
             <HighlightCard key={i} highlight={highlight} />
           ))}
@@ -265,7 +263,7 @@ function ReportSidebar({
         <h3 className="mb-2 text-sm font-semibold text-report-ink">전주 대비</h3>
         <p
           className={cn(
-            "text-sm font-medium leading-relaxed",
+            "whitespace-pre-line text-sm font-medium leading-relaxed",
             prevWeekTrend === "up" && "text-green-600 dark:text-green-500",
             prevWeekTrend === "down" && "text-red-500 dark:text-red-400",
             prevWeekTrend === "flat" && "text-muted-foreground",
@@ -291,13 +289,22 @@ function ReportSidebar({
         {highlights.length === 0 ? (
           <p className="text-sm text-muted-foreground">아직 표시할 인사이트가 없어요.</p>
         ) : (
-          <ul className="space-y-3 text-sm text-muted-foreground">
-            {highlights.slice(0, 3).map((h, i) => (
-              <li key={i} className="flex gap-2 leading-snug">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
-                <span className="min-w-0 font-medium text-report-ink">{h.title}</span>
-              </li>
-            ))}
+          <ul className="space-y-2.5">
+            {highlights.slice(0, 3).map((h, i) => {
+              const sidebarTone = HIGHLIGHT_THEME[h.type]?.sidebarMini;
+              return (
+                <li
+                  key={i}
+                  className={cn(
+                    "rounded-lg border px-3 py-2.5 text-sm leading-snug backdrop-blur-[2px]",
+                    sidebarTone ??
+                      "border-border/60 bg-muted/15 dark:border-border/50 dark:bg-muted/10",
+                  )}
+                >
+                  <span className="block font-medium text-report-ink">{h.title}</span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </DashboardCard>
@@ -529,24 +536,42 @@ function JobAnalysisCard({ jobTechStacks }: JobAnalysisCardProps) {
 
 // ── 하이라이트 카드 ────────────────────────────────────────────────────────────
 
-const HIGHLIGHT_STYLES: Record<
+const HIGHLIGHT_THEME: Record<
   HighlightType,
-  { border: string; iconColor: string; Icon: ComponentType<{ className?: string }> }
+  {
+    shell: string;
+    sheen: string;
+    titleAccent: string;
+    sidebarMini: string;
+  }
 > = {
   success: {
-    border: "border-l-green-500",
-    iconColor: "text-green-500",
-    Icon: CheckCircle,
+    shell:
+      "border border-emerald-300/50 bg-emerald-50/90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.82),0_0_36px_-8px_rgba(16,185,129,0.45)] dark:border-emerald-600/40 dark:bg-emerald-950/40 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_0_40px_-10px_rgba(52,211,153,0.35)]",
+    sheen: "from-transparent via-emerald-200/80 to-transparent dark:via-emerald-400/30",
+    titleAccent:
+      "text-emerald-900 dark:text-emerald-50",
+    sidebarMini:
+      "border-emerald-300/55 bg-emerald-50/80 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85)] dark:border-emerald-700/35 dark:bg-emerald-950/35",
   },
   info: {
-    border: "border-l-primary",
-    iconColor: "text-primary",
-    Icon: Info,
+    shell:
+      "border border-sky-300/55 bg-gradient-to-br from-sky-50 via-primary/15 to-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.88),0_0_42px_-10px_color-mix(in_srgb,var(--primary)_38%,transparent)] dark:border-primary/45 dark:from-primary/25 dark:via-primary/15 dark:to-transparent dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_0_42px_-8px_color-mix(in_srgb,var(--primary)_42%,transparent)]",
+    sheen:
+      "from-transparent via-primary/55 to-transparent dark:via-primary/45",
+    titleAccent:
+      "text-[color-mix(in_srgb,var(--report-ink)_92%,var(--primary))] dark:text-foreground",
+    sidebarMini:
+      "border-sky-200/75 bg-gradient-to-br from-sky-50/90 to-primary/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.86)] dark:border-primary/35 dark:from-primary/25 dark:to-primary/5",
   },
   warning: {
-    border: "border-l-amber-500",
-    iconColor: "text-amber-500",
-    Icon: AlertTriangle,
+    shell:
+      "border border-amber-300/60 bg-gradient-to-br from-amber-50 via-yellow-50/90 to-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_0_38px_-8px_rgba(245,158,11,0.42)] dark:border-amber-600/38 dark:from-amber-950/50 dark:via-yellow-950/35 dark:to-transparent dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_0_42px_-8px_rgba(251,191,36,0.28)]",
+    sheen: "from-transparent via-amber-200/85 to-transparent dark:via-amber-400/25",
+    titleAccent:
+      "text-amber-950 dark:text-amber-100",
+    sidebarMini:
+      "border-amber-300/55 bg-amber-50/85 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.86)] dark:border-amber-700/35 dark:bg-amber-950/40",
   },
 };
 
@@ -555,22 +580,33 @@ interface HighlightCardProps {
 }
 
 function HighlightCard({ highlight }: HighlightCardProps) {
-  const style = HIGHLIGHT_STYLES[highlight.type];
-  const { Icon } = style;
+  const tone = HIGHLIGHT_THEME[highlight.type];
 
   return (
     <article
       className={cn(
-        "flex items-start gap-3.5 rounded-xl border border-border/80 border-l-4 bg-card p-4 shadow-sm @md:gap-4 @md:p-5 dark:border-border/60",
-        style.border,
+        "relative isolate overflow-hidden rounded-2xl @md:rounded-[1.125rem]",
+        tone.shell,
       )}
     >
-      <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", style.iconColor)} />
-      <div className="min-w-0 space-y-1">
-        <h3 className="text-[15px] font-semibold leading-snug text-report-ink">{highlight.title}</h3>
-        <p className="text-pretty text-sm font-medium leading-relaxed text-muted-foreground">
-          {highlight.description}
-        </p>
+      <div
+        className={cn("pointer-events-none absolute inset-x-6 top-px h-[2px] bg-gradient-to-r", tone.sheen)}
+        aria-hidden
+      />
+      <div className="relative px-4 py-4 @md:px-6 @md:py-5">
+        <div className="space-y-1.5 rounded-xl bg-white/65 px-3 py-3 backdrop-blur-[2px] dark:bg-black/35 @md:px-4 @md:py-3.5">
+          <h3
+            className={cn(
+              "text-[15px] font-bold leading-snug tracking-tight @md:text-base",
+              tone.titleAccent,
+            )}
+          >
+            {highlight.title}
+          </h3>
+          <p className="text-pretty text-sm font-medium leading-relaxed text-foreground/80 dark:text-foreground/88">
+            {highlight.description}
+          </p>
+        </div>
       </div>
     </article>
   );
