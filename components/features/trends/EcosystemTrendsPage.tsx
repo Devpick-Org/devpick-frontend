@@ -17,6 +17,8 @@ type ExpandState = { title: string; items: EcosystemTrendItemDto[] } | null;
 
 type CatFilter = "all" | SectionKey;
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
 const SECTIONS: { key: SectionKey; title: string; description: string }[] = [
   {
     key: "bootcamp",
@@ -34,6 +36,61 @@ const SECTIONS: { key: SectionKey; title: string; description: string }[] = [
     description: "데브이벤트에 등록된 행사·모임·공모전입니다.",
   },
 ];
+
+function parseLocalDateDay(value?: string | null): number | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})/.exec(trimmed);
+  if (ymd) {
+    const [, y, m, d] = ymd;
+    return Math.floor(
+      new Date(Number(y), Number(m) - 1, Number(d)).getTime() / MS_PER_DAY,
+    );
+  }
+
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return Math.floor(
+    new Date(
+      parsed.getFullYear(),
+      parsed.getMonth(),
+      parsed.getDate(),
+    ).getTime() / MS_PER_DAY,
+  );
+}
+
+function sortEcosystemItemsForDisplay(
+  items: EcosystemTrendItemDto[],
+): EcosystemTrendItemDto[] {
+  const today = new Date();
+  const todayDay = Math.floor(
+    new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime() /
+      MS_PER_DAY,
+  );
+
+  return [...items].sort((a, b) => {
+    const aEnd = parseLocalDateDay(a.endAt);
+    const bEnd = parseLocalDateDay(b.endAt);
+    const aPast = aEnd != null && aEnd <= todayDay;
+    const bPast = bEnd != null && bEnd <= todayDay;
+
+    if (aPast !== bPast) return aPast ? 1 : -1;
+
+    const aEndKey = aEnd ?? Number.MAX_SAFE_INTEGER;
+    const bEndKey = bEnd ?? Number.MAX_SAFE_INTEGER;
+    if (aEndKey !== bEndKey) return bEndKey - aEndKey;
+
+    if (!aPast) {
+      const aStart = parseLocalDateDay(a.startAt) ?? Number.MIN_SAFE_INTEGER;
+      const bStart = parseLocalDateDay(b.startAt) ?? Number.MIN_SAFE_INTEGER;
+      if (aStart !== bStart) return bStart - aStart;
+    }
+
+    return a.id.localeCompare(b.id);
+  });
+}
 
 export function EcosystemTrendsPage() {
   const [q, setQ] = useState("");
@@ -57,9 +114,15 @@ export function EcosystemTrendsPage() {
   const bySection = useMemo(() => {
     const items = data?.data.items ?? [];
     return {
-      bootcamp: items.filter((i) => i.category === "bootcamp"),
-      club: items.filter((i) => i.category === "club"),
-      event: items.filter((i) => i.category === "event"),
+      bootcamp: sortEcosystemItemsForDisplay(
+        items.filter((i) => i.category === "bootcamp"),
+      ),
+      club: sortEcosystemItemsForDisplay(
+        items.filter((i) => i.category === "club"),
+      ),
+      event: sortEcosystemItemsForDisplay(
+        items.filter((i) => i.category === "event"),
+      ),
     };
   }, [data]);
 

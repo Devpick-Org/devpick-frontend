@@ -23,6 +23,7 @@ import type {
 } from "@/types/report";
 import {
   formatPrevWeekComparison,
+  parsePrevWeekComparisonRaw,
   type PrevWeekTrend,
 } from "@/lib/report/formatPrevWeekComparison";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ export default function ReportContent({
     },
     activity.prevWeekComparison,
   );
+  const prevWeek = parsePrevWeekComparisonRaw(activity.prevWeekComparison);
 
   const isPrint = variant === "print";
 
@@ -59,20 +61,12 @@ export default function ReportContent({
         <StatCard label="읽은 글" value={activity.contentsRead} unit="개" />
         <StatCard label="질문" value={activity.questionsCreated} unit="개" />
         <StatCard label="확인 공고" value={activity.jobPostingsViewed} unit="개" />
-        <div className="flex flex-col justify-between gap-2 rounded-xl border border-border/80 bg-muted/30 p-4 @md:p-5 dark:border-border/50 dark:bg-muted/20">
-          <p className="text-xs font-medium text-muted-foreground @md:text-sm">전주 대비</p>
-          <p
-            className={cn(
-              "whitespace-pre-line text-base font-semibold leading-relaxed @md:text-lg",
-              prevWeekTrend === "up" && "text-green-600 dark:text-green-500",
-              prevWeekTrend === "down" && "text-red-500 dark:text-red-400",
-              prevWeekTrend === "flat" && "text-muted-foreground",
-              prevWeekTrend === "unknown" && "text-muted-foreground",
-            )}
-          >
-            {prevWeekPrimary}
-          </p>
-        </div>
+        <PrevWeekComparisonCard
+          activity={activity}
+          previous={prevWeek}
+          primary={prevWeekPrimary}
+          trend={prevWeekTrend}
+        />
       </div>
     </DashboardCard>
   );
@@ -172,6 +166,7 @@ export default function ReportContent({
         <aside className="space-y-6 lg:col-span-1 lg:sticky lg:top-24 lg:self-start">
           <ReportSidebar
             activity={activity}
+            prevWeek={prevWeek}
             prevWeekPrimary={prevWeekPrimary}
             prevWeekTrend={prevWeekTrend}
           />
@@ -233,10 +228,12 @@ function SectionHeader({
 
 function ReportSidebar({
   activity,
+  prevWeek,
   prevWeekPrimary,
   prevWeekTrend,
 }: {
   activity: WeeklyActivity;
+  prevWeek: ReturnType<typeof parsePrevWeekComparisonRaw>;
   prevWeekPrimary: string;
   prevWeekTrend: PrevWeekTrend;
 }) {
@@ -259,20 +256,13 @@ function ReportSidebar({
         </div>
       </DashboardCard>
 
-      <DashboardCard className="p-5 @md:p-6">
-        <h3 className="mb-2 text-sm font-semibold text-report-ink">전주 대비</h3>
-        <p
-          className={cn(
-            "whitespace-pre-line text-sm font-medium leading-relaxed",
-            prevWeekTrend === "up" && "text-green-600 dark:text-green-500",
-            prevWeekTrend === "down" && "text-red-500 dark:text-red-400",
-            prevWeekTrend === "flat" && "text-muted-foreground",
-            prevWeekTrend === "unknown" && "text-muted-foreground",
-          )}
-        >
-          {prevWeekPrimary}
-        </p>
-      </DashboardCard>
+      <PrevWeekComparisonCard
+        activity={activity}
+        previous={prevWeek}
+        primary={prevWeekPrimary}
+        trend={prevWeekTrend}
+        compact
+      />
 
       <DashboardCard className="p-5 @md:p-6">
         <div className="mb-4 flex items-start justify-between gap-2">
@@ -290,24 +280,138 @@ function ReportSidebar({
           <p className="text-sm text-muted-foreground">아직 표시할 인사이트가 없어요.</p>
         ) : (
           <ul className="space-y-2.5">
-            {highlights.slice(0, 3).map((h, i) => {
-              const sidebarTone = HIGHLIGHT_THEME[h.type]?.sidebarMini;
-              return (
-                <li
-                  key={i}
-                  className={cn(
-                    "rounded-lg border px-3 py-2.5 text-sm leading-snug backdrop-blur-[2px]",
-                    sidebarTone ??
-                      "border-border/60 bg-muted/15 dark:border-border/50 dark:bg-muted/10",
-                  )}
-                >
-                  <span className="block font-medium text-report-ink">{h.title}</span>
-                </li>
-              );
-            })}
+            {highlights.slice(0, 3).map((h, i) => (
+              <li
+                key={i}
+                className="rounded-lg border border-border/60 bg-muted/15 px-3 py-2.5 text-sm leading-snug dark:border-border/50 dark:bg-muted/10"
+              >
+                <span className="block font-medium text-report-ink">{h.title}</span>
+              </li>
+            ))}
           </ul>
         )}
       </DashboardCard>
+    </div>
+  );
+}
+
+type PrevWeekMetric = {
+  key: string;
+  label: string;
+  current: number;
+  previous: number;
+};
+
+function formatDelta(delta: number): string {
+  if (delta === 0) return "변화 없음";
+  return delta > 0 ? `${delta}개 증가` : `${Math.abs(delta)}개 감소`;
+}
+
+function PrevWeekComparisonCard({
+  activity,
+  previous,
+  primary,
+  trend,
+  compact = false,
+}: {
+  activity: WeeklyActivity;
+  previous: ReturnType<typeof parsePrevWeekComparisonRaw>;
+  primary: string;
+  trend: PrevWeekTrend;
+  compact?: boolean;
+}) {
+  const metrics: PrevWeekMetric[] | null = previous
+    ? [
+        {
+          key: "contents",
+          label: "읽은 글",
+          current: activity.contentsRead,
+          previous: previous.contentsRead,
+        },
+        {
+          key: "questions",
+          label: "질문",
+          current: activity.questionsCreated,
+          previous: previous.questionsCreated,
+        },
+        {
+          key: "jobs",
+          label: "확인 공고",
+          current: activity.jobPostingsViewed,
+          previous: previous.jobPostingsViewed,
+        },
+      ]
+    : null;
+
+  const totalDelta =
+    metrics?.reduce((sum, metric) => sum + (metric.current - metric.previous), 0) ?? 0;
+  const changedMetrics = metrics?.filter((metric) => metric.current !== metric.previous) ?? [];
+  const headline =
+    !previous
+      ? "비교 데이터 준비 중"
+      : totalDelta === 0
+        ? "지난주와 비슷한 흐름이에요"
+        : totalDelta > 0
+          ? "지난주보다 활동이 늘었어요"
+          : "지난주보다 활동이 줄었어요";
+  const detail =
+    !previous
+      ? primary === "-" ? "다음 리포트부터 전주 흐름을 비교해 보여드릴게요." : primary
+      : changedMetrics.length === 0
+        ? "읽은 글, 질문, 확인 공고 모두 큰 변화가 없어요."
+        : changedMetrics
+            .map((metric) => `${metric.label} ${formatDelta(metric.current - metric.previous)}`)
+            .join(" · ");
+
+  return (
+    <div
+      className={cn(
+        "rounded-xl border border-border/80 bg-card p-4 shadow-sm dark:border-border/60",
+        compact ? "@md:p-5" : "@md:p-5",
+      )}
+    >
+      <div className="mb-3 space-y-1">
+        <p className="text-xs font-medium text-muted-foreground @md:text-sm">전주 대비</p>
+        <p
+          className={cn(
+            "text-base font-semibold leading-snug text-report-ink dark:text-foreground",
+            trend === "up" && "text-green-700 dark:text-green-400",
+            trend === "down" && "text-amber-700 dark:text-amber-300",
+          )}
+        >
+          {headline}
+        </p>
+        <p className="text-xs leading-relaxed text-muted-foreground">{detail}</p>
+      </div>
+
+      {metrics ? (
+        <div className="space-y-2">
+          {metrics.map((metric) => {
+            const delta = metric.current - metric.previous;
+            return (
+              <div
+                key={metric.key}
+                className="flex items-center justify-between gap-3 rounded-lg bg-muted/30 px-3 py-2 text-xs dark:bg-muted/15"
+              >
+                <span className="font-medium text-muted-foreground">{metric.label}</span>
+                <span className="tabular-nums text-report-ink dark:text-foreground">
+                  {metric.previous} → {metric.current}
+                  <span
+                    className={cn(
+                      "ms-2 font-semibold",
+                      delta > 0 && "text-green-600 dark:text-green-500",
+                      delta < 0 && "text-amber-700 dark:text-amber-300",
+                      delta === 0 && "text-muted-foreground",
+                    )}
+                  >
+                    {formatDelta(delta)}
+                  </span>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -539,39 +643,21 @@ function JobAnalysisCard({ jobTechStacks }: JobAnalysisCardProps) {
 const HIGHLIGHT_THEME: Record<
   HighlightType,
   {
-    shell: string;
-    sheen: string;
-    titleAccent: string;
-    sidebarMini: string;
+    accent: string;
+    title: string;
   }
 > = {
   success: {
-    shell:
-      "border border-emerald-300/50 bg-emerald-50/90 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.82),0_0_36px_-8px_rgba(16,185,129,0.45)] dark:border-emerald-600/40 dark:bg-emerald-950/40 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_0_40px_-10px_rgba(52,211,153,0.35)]",
-    sheen: "from-transparent via-emerald-200/80 to-transparent dark:via-emerald-400/30",
-    titleAccent:
-      "text-emerald-900 dark:text-emerald-50",
-    sidebarMini:
-      "border-emerald-300/55 bg-emerald-50/80 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85)] dark:border-emerald-700/35 dark:bg-emerald-950/35",
+    accent: "bg-emerald-500/70",
+    title: "text-emerald-900 dark:text-emerald-200",
   },
   info: {
-    shell:
-      "border border-sky-300/55 bg-gradient-to-br from-sky-50 via-primary/15 to-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.88),0_0_42px_-10px_color-mix(in_srgb,var(--primary)_38%,transparent)] dark:border-primary/45 dark:from-primary/25 dark:via-primary/15 dark:to-transparent dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_0_42px_-8px_color-mix(in_srgb,var(--primary)_42%,transparent)]",
-    sheen:
-      "from-transparent via-primary/55 to-transparent dark:via-primary/45",
-    titleAccent:
-      "text-[color-mix(in_srgb,var(--report-ink)_92%,var(--primary))] dark:text-foreground",
-    sidebarMini:
-      "border-sky-200/75 bg-gradient-to-br from-sky-50/90 to-primary/10 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.86)] dark:border-primary/35 dark:from-primary/25 dark:to-primary/5",
+    accent: "bg-primary/70",
+    title: "text-report-ink dark:text-foreground",
   },
   warning: {
-    shell:
-      "border border-amber-300/60 bg-gradient-to-br from-amber-50 via-yellow-50/90 to-transparent shadow-[inset_0_1px_0_0_rgba(255,255,255,0.85),0_0_38px_-8px_rgba(245,158,11,0.42)] dark:border-amber-600/38 dark:from-amber-950/50 dark:via-yellow-950/35 dark:to-transparent dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_0_42px_-8px_rgba(251,191,36,0.28)]",
-    sheen: "from-transparent via-amber-200/85 to-transparent dark:via-amber-400/25",
-    titleAccent:
-      "text-amber-950 dark:text-amber-100",
-    sidebarMini:
-      "border-amber-300/55 bg-amber-50/85 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.86)] dark:border-amber-700/35 dark:bg-amber-950/40",
+    accent: "bg-amber-500/70",
+    title: "text-amber-950 dark:text-amber-200",
   },
 };
 
@@ -584,26 +670,18 @@ function HighlightCard({ highlight }: HighlightCardProps) {
 
   return (
     <article
-      className={cn(
-        "relative isolate overflow-hidden rounded-2xl @md:rounded-[1.125rem]",
-        tone.shell,
-      )}
+      className="rounded-xl border border-border/80 bg-card p-4 shadow-sm dark:border-border/60 @md:p-5"
     >
-      <div
-        className={cn("pointer-events-none absolute inset-x-6 top-px h-[2px] bg-gradient-to-r", tone.sheen)}
-        aria-hidden
-      />
-      <div className="relative px-4 py-4 @md:px-6 @md:py-5">
-        <div className="space-y-1.5 rounded-xl bg-white/65 px-3 py-3 backdrop-blur-[2px] dark:bg-black/35 @md:px-4 @md:py-3.5">
-          <h3
-            className={cn(
-              "text-[15px] font-bold leading-snug tracking-tight @md:text-base",
-              tone.titleAccent,
-            )}
-          >
+      <div className="flex gap-3">
+        <span
+          className={cn("mt-1 h-10 w-1 shrink-0 rounded-full", tone.accent)}
+          aria-hidden
+        />
+        <div className="min-w-0 space-y-1.5">
+          <h3 className={cn("text-sm font-semibold leading-snug", tone.title)}>
             {highlight.title}
           </h3>
-          <p className="text-pretty text-sm font-medium leading-relaxed text-foreground/80 dark:text-foreground/88">
+          <p className="text-pretty text-sm leading-relaxed text-muted-foreground">
             {highlight.description}
           </p>
         </div>
