@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Download, ChevronDown, ChevronUp } from "lucide-react";
 import type { MockInterviewSessionDetailApi } from "@/lib/api/endpoints/mock-interviews";
+import { mockInterviewsEndpoints } from "@/lib/api/endpoints/mock-interviews";
 import {
   parseMockInterviewResult,
   type MockInterviewPerQuestion,
@@ -15,8 +16,12 @@ import {
 import { cn } from "@/lib/utils";
 import { MockInterviewRadarChart } from "./MockInterviewRadarChart";
 
+const POLLING_INTERVAL_MS = 3000;
+const POLLING_MAX_ATTEMPTS = 40; // 최대 2분
+
 interface MockInterviewResultProps {
   session: MockInterviewSessionDetailApi;
+  onSessionUpdate?: (session: MockInterviewSessionDetailApi) => void;
   previous?: MockInterviewSessionDetailApi | null;
   onRestart?: () => void;
 }
@@ -31,9 +36,37 @@ const SCORE_LABEL: Record<keyof MIResult["scores"], string> = {
 
 export function MockInterviewResult({
   session,
+  onSessionUpdate,
   previous = null,
   onRestart,
 }: MockInterviewResultProps) {
+  const [pollingError, setPollingError] = useState(false);
+
+  useEffect(() => {
+    if (session.status !== "PROCESSING") return;
+
+    let attempts = 0;
+    const timer = setInterval(async () => {
+      attempts += 1;
+      if (attempts >= POLLING_MAX_ATTEMPTS) {
+        clearInterval(timer);
+        setPollingError(true);
+        return;
+      }
+      try {
+        const updated = await mockInterviewsEndpoints.get(session.id);
+        if (updated.status === "COMPLETED" || updated.status === "EARLY_FINISHED") {
+          clearInterval(timer);
+          onSessionUpdate?.(updated);
+        }
+      } catch {
+        // 네트워크 오류는 무시하고 계속 폴링
+      }
+    }, POLLING_INTERVAL_MS);
+
+    return () => clearInterval(timer);
+  }, [session.status, session.id, onSessionUpdate]);
+
   const result = useMemo(
     () => parseMockInterviewResult(session.resultJson),
     [session.resultJson],
@@ -43,10 +76,17 @@ export function MockInterviewResult({
     [previous],
   );
 
-  if (!result) {
+  if (session.status === "PROCESSING" || !result) {
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
-        결과 데이터를 불러오는 중입니다.
+      <div className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+        {pollingError ? (
+          <p>결과 생성에 시간이 너무 오래 걸리고 있습니다. 잠시 후 다시 확인해 주세요.</p>
+        ) : (
+          <>
+            <p className="font-medium text-foreground">AI가 결과를 분석하고 있습니다.</p>
+            <p className="mt-1">보통 30초~2분 정도 걸려요. 잠시만 기다려 주세요.</p>
+          </>
+        )}
       </div>
     );
   }

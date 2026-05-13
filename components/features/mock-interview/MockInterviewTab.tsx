@@ -29,6 +29,7 @@ type View =
 
 const STATUS_TONE: Record<string, string> = {
   IN_PROGRESS: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+  PROCESSING: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
   COMPLETED: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
   EARLY_FINISHED: "bg-rose-500/15 text-rose-700 dark:text-rose-300",
 };
@@ -43,6 +44,7 @@ const MOCK_FEATURE_ROWS = [
 
 const STATUS_LABEL: Record<string, string> = {
   IN_PROGRESS: "진행 중",
+  PROCESSING: "결과 생성 중",
   COMPLETED: "완료",
   EARLY_FINISHED: "조기 종료",
 };
@@ -268,6 +270,9 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
         </button>
         <MockInterviewResult
           session={activeSession}
+          onSessionUpdate={(s) =>
+            qc.setQueryData(["mock-interview-session", activeSession.id], s)
+          }
           previous={
             activeSession.status === "COMPLETED"
               ? previousSessionQuery.data ?? null

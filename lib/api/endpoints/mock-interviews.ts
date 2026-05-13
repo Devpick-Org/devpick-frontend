@@ -1,7 +1,7 @@
 import { apiClient } from "../client";
 import type { ApiResponse } from "@/types/api";
 
-export type MockInterviewStatus = "IN_PROGRESS" | "COMPLETED" | "EARLY_FINISHED";
+export type MockInterviewStatus = "IN_PROGRESS" | "PROCESSING" | "COMPLETED" | "EARLY_FINISHED";
 export type MockInterviewMode = "FULL" | "PINPOINT";
 export type MockInterviewPhase =
   | "WARM_UP"
