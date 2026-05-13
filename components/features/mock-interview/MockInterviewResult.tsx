@@ -206,15 +206,14 @@ export function MockInterviewResult({
         </section>
       )}
 
-      <section className="grid gap-4 rounded-2xl border border-border bg-card p-5 sm:grid-cols-2">
+      <section className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-5">
         <FeedbackList title="강점" items={result.strengths} />
         <FeedbackList title="개선 필요" items={result.improvements} />
-        <FeedbackList title="액션 아이템" items={result.actionItems} className="sm:col-span-2" />
+        <FeedbackList title="액션 아이템" items={result.actionItems} />
         {result.uncoveredKeywords.length > 0 && (
           <FeedbackList
             title="다루지 못한 영역 (JD에 있지만 면접에서 질문되지 않음)"
             items={result.uncoveredKeywords}
-            className="sm:col-span-2"
           />
         )}
       </section>
@@ -252,11 +251,11 @@ function FeedbackList({
   if (items.length === 0) return null;
   return (
     <div className={className}>
-      <p className="mb-1.5 text-sm font-semibold text-foreground">{title}</p>
+      <p className="mb-1.5 text-base font-semibold text-foreground">{title}</p>
       <ul className="flex flex-col gap-1.5 text-sm leading-relaxed text-muted-foreground">
         {items.map((s, i) => (
-          <li key={i} className="flex gap-2">
-            <span className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
+          <li key={i} className="flex items-start gap-2">
+            <span className="mt-[0.4rem] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/60" />
             <span className="whitespace-pre-wrap">{s}</span>
           </li>
         ))}
@@ -286,7 +285,7 @@ function PerQuestionCard({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left"
+        className="flex w-full cursor-pointer items-start justify-between gap-3 px-4 py-3 text-left"
       >
         <div className="flex min-w-0 flex-col gap-1">
           <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">

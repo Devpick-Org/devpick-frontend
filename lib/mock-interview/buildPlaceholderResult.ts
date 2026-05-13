@@ -86,7 +86,9 @@ function numOrNull(v: unknown): number | null {
 
 function stringArr(v: unknown): string[] {
   if (!Array.isArray(v)) return [];
-  return v.filter((x): x is string => typeof x === "string");
+  return v
+    .filter((x): x is string => typeof x === "string")
+    .map((s) => (s.startsWith("- ") ? s.slice(2) : s.startsWith("-") ? s.slice(1) : s));
 }
 
 function normalizePerQuestion(raw: unknown): MockInterviewPerQuestion {
