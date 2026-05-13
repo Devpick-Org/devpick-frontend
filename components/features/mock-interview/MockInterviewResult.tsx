@@ -133,12 +133,18 @@ export function MockInterviewResult({
         </div>
       </header>
 
+      {result.notice && (
+        <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-700 dark:text-amber-200">
+          <p className="leading-relaxed">{result.notice}</p>
+        </div>
+      )}
+
       {isEarly && (
         <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-700 dark:text-amber-200">
           <p className="font-semibold">조기 종료된 면접입니다.</p>
           <p className="mt-1 leading-relaxed">
             진행률에 따라 점수가 보정되었어요(계수 {result.coverageFactor.toFixed(2)}).
-            질문하지 않은 영역은 “—”로 표시되며, 이전 면접과의 비교 섹션은 표시하지 않습니다.
+            질문하지 않은 영역은 &ldquo;—&rdquo;로 표시되며, 이전 면접과의 비교 섹션은 표시하지 않습니다.
           </p>
         </div>
       )}
@@ -218,7 +224,7 @@ export function MockInterviewResult({
           QA 모범 답안 ({result.perQuestion.length}개)
         </h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          질문하지 않은 영역은 “부족하다”고 평가하지 않아요. 실제 답변 기반으로만 정리했어요.
+          질문하지 않은 영역은 &ldquo;부족하다&rdquo;고 평가하지 않아요. 실제 답변 기반으로만 정리했어요.
         </p>
         <ul className="mt-3 flex flex-col gap-3">
           {result.perQuestion.map((p) => (
@@ -298,7 +304,7 @@ function PerQuestionCard({
             {perQuestion.questionSummary || planQuestion?.prompt || ""}
           </p>
           <p className="truncate text-xs text-muted-foreground">
-            내 답변: {perQuestion.answerSummary || "—"}
+            내 답변: {perQuestion.answerSummary || perQuestion.answerRaw || "—"}
           </p>
         </div>
         {open ? (
@@ -317,7 +323,7 @@ function PerQuestionCard({
                 return (
                   <li
                     key={turn.orderNo}
-                    className={cn("rounded-lg border px-3 py-2", tone)}
+                    className={cn("rounded-lg px-3 py-2", tone)}
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                       {transcriptLabel(turn.type)}
@@ -409,21 +415,21 @@ function ratingBadgeFor(p: MockInterviewPerQuestion): {
 function transcriptTone(type: string): string {
   switch (type) {
     case "QUESTION":
-      return "border-border bg-muted/30";
+      return "bg-muted/30";
     case "ANSWER":
-      return "border-primary/30 bg-primary/5";
+      return "bg-primary/5";
     case "FOLLOW_UP_QUESTION":
-      return "border-cyan-500/30 bg-cyan-500/5";
+      return "bg-cyan-500/5";
     case "FOLLOW_UP_ANSWER":
-      return "border-cyan-400/25 bg-cyan-400/5";
+      return "bg-cyan-400/5";
     case "RETRY_REQUEST":
-      return "border-rose-500/30 bg-rose-500/5";
+      return "bg-rose-500/5";
     case "RETRY_ANSWER":
-      return "border-rose-400/25 bg-rose-400/5";
+      return "bg-rose-400/5";
     case "PASS":
-      return "border-amber-500/30 bg-amber-500/5";
+      return "bg-amber-500/5";
     default:
-      return "border-border bg-card";
+      return "bg-card";
   }
 }
 

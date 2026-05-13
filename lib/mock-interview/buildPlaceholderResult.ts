@@ -15,6 +15,7 @@ export interface MockInterviewPerQuestion {
   questionNo: number;
   questionSummary: string;
   answerSummary: string;
+  answerRaw: string;
   modelAnswer: string;
   whyImportant: string;
   learningDirection: string;
@@ -94,6 +95,7 @@ function normalizePerQuestion(raw: unknown): MockInterviewPerQuestion {
     questionNo: typeof r.questionNo === "number" ? r.questionNo : 0,
     questionSummary: typeof r.questionSummary === "string" ? r.questionSummary : "",
     answerSummary: typeof r.answerSummary === "string" ? r.answerSummary : "",
+    answerRaw: typeof r.answerRaw === "string" ? r.answerRaw : "",
     modelAnswer: typeof r.modelAnswer === "string" ? r.modelAnswer : "",
     whyImportant: typeof r.whyImportant === "string" ? r.whyImportant : "",
     learningDirection:
