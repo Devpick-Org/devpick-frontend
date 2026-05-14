@@ -16,6 +16,7 @@ export interface Job {
   deadline: string;
   techStack: string[];
   matchScore: number;
+  resumeAvailable: boolean;
   matchedTags: string[];
   missingTags: string[];
   /** 서버 북마크 여부 (실 API 연동 시 필수) */

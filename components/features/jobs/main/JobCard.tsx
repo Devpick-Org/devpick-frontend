@@ -139,7 +139,7 @@ export function JobCard({ job, onLoginRequired }: JobCardProps) {
             <span className={cn("text-xs font-bold", scoreColor)}>
               {job.postingStatus === "EXPIRED"
                 ? "만료"
-                : job.matchScore > 0
+                : job.resumeAvailable
                   ? `${job.matchScore}%`
                   : "이력서 필요"}
             </span>
@@ -152,7 +152,7 @@ export function JobCard({ job, onLoginRequired }: JobCardProps) {
               )}
               style={{
                 width:
-                  job.postingStatus === "EXPIRED" || job.matchScore <= 0
+                  job.postingStatus === "EXPIRED" || !job.resumeAvailable
                     ? "0%"
                     : `${job.matchScore}%`,
               }}

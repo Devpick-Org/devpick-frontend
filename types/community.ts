@@ -58,6 +58,7 @@ export interface AnswerDTO {
   authorJob?: string | null;
   authorLevel?: string | null;
   isAdopted: boolean;
+  isEdited: boolean;
   createdAt: string;
   updatedAt: string;
   comments: CommentDTO[];

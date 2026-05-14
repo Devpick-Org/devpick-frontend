@@ -199,7 +199,7 @@ function AnswerItem({
               ]
                 .filter(Boolean)
                 .join(" · ")}
-              {answer.updatedAt !== answer.createdAt && (
+              {answer.isEdited && (
                 <span className="text-muted-foreground/50">(수정됨)</span>
               )}
             </div>
