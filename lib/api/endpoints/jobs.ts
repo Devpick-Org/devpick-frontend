@@ -22,6 +22,7 @@ export interface JobListItemApi {
   deadline: string;
   techStack: string[];
   matchScore: number;
+  resumeAvailable: boolean;
   matchedTags: string[];
   missingTags: string[];
   bookmarked: boolean;

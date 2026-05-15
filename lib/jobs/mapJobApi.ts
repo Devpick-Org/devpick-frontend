@@ -88,6 +88,7 @@ export function mapJobListItem(row: JobListItemApi): Job {
     deadline: row.deadline ?? "",
     techStack: row.techStack ?? [],
     matchScore: row.matchScore ?? 0,
+    resumeAvailable: row.resumeAvailable ?? false,
     matchedTags: row.matchedTags ?? [],
     missingTags: row.missingTags ?? [],
     bookmarked: row.bookmarked ?? false,
