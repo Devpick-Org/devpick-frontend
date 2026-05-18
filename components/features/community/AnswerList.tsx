@@ -32,7 +32,6 @@ const LEVEL_LABELS: Record<string, string> = {
 
 interface AnswerListProps {
   answers: CommunityAnswer[];
-  postAuthorId: string;
   onAdopt: (answerId: string) => void;
   onDeleteAnswer: (answerId: string) => void;
   onUpdateAnswer: (answerId: string, content: string) => void;
@@ -42,7 +41,6 @@ interface AnswerListProps {
 
 export function AnswerList({
   answers,
-  postAuthorId,
   onAdopt,
   onDeleteAnswer,
   onUpdateAnswer,
@@ -54,9 +52,6 @@ export function AnswerList({
     userId: string;
     nickname: string;
   } | null>(null);
-  const hasAdopted = answers.some((a) => a.isAdopted);
-  const isPostAuthor = user?.userId === postAuthorId;
-
   if (answers.length === 0) {
     return (
       <p className="py-10 text-center text-sm text-muted-foreground font-medium">
@@ -78,7 +73,7 @@ export function AnswerList({
             key={answer.id}
             answer={answer}
             currentUserId={user?.userId}
-            canAdopt={isPostAuthor && !hasAdopted && !answer.isAdopted}
+            canAdopt={answer.canAdopt}
             onAdopt={onAdopt}
             onDelete={onDeleteAnswer}
             onUpdate={onUpdateAnswer}

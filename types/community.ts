@@ -59,6 +59,7 @@ export interface AnswerDTO {
   authorLevel?: string | null;
   isAdopted: boolean;
   isEdited: boolean;
+  canAdopt: boolean;
   createdAt: string;
   updatedAt: string;
   comments: CommentDTO[];

@@ -147,7 +147,6 @@ export function CommunityDetailPage({ postId }: Props) {
             )}
             <AnswerSection
               postId={postId}
-              postAuthorId={post.authorId}
               answers={answers}
             />
           </main>

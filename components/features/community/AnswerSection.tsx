@@ -9,13 +9,11 @@ import type { CommunityAnswer } from "@/types/community";
 
 interface AnswerSectionProps {
   postId: string;
-  postAuthorId: string;
   answers: CommunityAnswer[];
 }
 
 export function AnswerSection({
   postId,
-  postAuthorId,
   answers,
 }: AnswerSectionProps) {
   const queryClient = useQueryClient();
@@ -124,7 +122,6 @@ export function AnswerSection({
 
       <AnswerList
         answers={answers}
-        postAuthorId={postAuthorId}
         onAdopt={(answerId) => adoptAnswerMutation.mutate(answerId)}
         onDeleteAnswer={(answerId) => deleteAnswerMutation.mutate(answerId)}
         onUpdateAnswer={(answerId, content) =>
