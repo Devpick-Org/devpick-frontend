@@ -134,13 +134,13 @@ export function MockInterviewResult({
       </header>
 
       {result.notice && (
-        <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-700 dark:text-amber-200">
+        <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-700 dark:text-amber-300">
           <p className="leading-relaxed">{result.notice}</p>
         </div>
       )}
 
-      {isEarly && (
-        <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-700 dark:text-amber-200">
+      {isEarly && !result.notice && (
+        <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-5 py-4 text-sm text-amber-700 dark:text-amber-300">
           <p className="font-semibold">조기 종료된 면접입니다.</p>
           <p className="mt-1 leading-relaxed">
             진행률에 따라 점수가 보정되었어요(계수 {result.coverageFactor.toFixed(2)}).
@@ -179,9 +179,9 @@ export function MockInterviewResult({
                         className={cn(
                           "text-xs font-semibold",
                           delta > 0
-                            ? "text-emerald-600"
+                            ? "text-emerald-600 dark:text-emerald-400"
                             : delta < 0
-                              ? "text-rose-600"
+                              ? "text-rose-600 dark:text-rose-400"
                               : "text-muted-foreground",
                         )}
                       >

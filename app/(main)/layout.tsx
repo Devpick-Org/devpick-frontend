@@ -1,25 +1,25 @@
 "use client";
 
-// import { useState } from "react";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
-// import { TopNav } from "@/components/layout/TopNav";
 import { TopNavVariant } from "@/components/layout/TopNavVariant";
-// import { Sidebar } from "@/components/layout/Sidebar";
-// import { ChevronLeft, ChevronRight } from "lucide-react";
-// import { cn } from "@/lib/utils";
 import { AuthInitializer } from "@/components/features/auth/AuthInitializer";
 import { ScrollToTopButton } from "@/components/layout/ScrollToTopButton";
+import { MainThemeSync } from "@/components/theme/MainThemeSync";
+import { useUiStore } from "@/store/ui.store";
+import { cn } from "@/lib/utils";
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // const [sidebarOpen, setSidebarOpen] = useState(true);
+  const theme = useUiStore((s) => s.theme);
 
   return (
+    <div id="main-layout" className={cn("bg-background min-h-screen", theme === "dark" && "dark")}>
     <Providers>
+      <MainThemeSync />
       <AuthInitializer />
       {/* 버전 A 사이드바 + 상단바 */}
       {/* <TopNav />
@@ -69,5 +69,6 @@ export default function MainLayout({
         }}
       />
     </Providers>
+    </div>
   );
 }

@@ -8,6 +8,8 @@ import {
   ChevronDown,
   User,
   LogOut,
+  Moon,
+  Sun,
   Home,
   Users,
   TrendingUp,
@@ -28,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/auth.store";
+import { useUiStore } from "@/store/ui.store";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { cn } from "@/lib/utils";
 import { TraceMark } from "@/components/brand/TraceMark";
@@ -56,6 +59,8 @@ export function TopNavVariant() {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
+  const theme = useUiStore((s) => s.theme);
+  const toggleTheme = useUiStore((s) => s.toggleTheme);
   const mounted = useHydrated();
 
   const navItems = useMemo(
@@ -179,6 +184,14 @@ export function TopNavVariant() {
                       >
                         <User />내 프로필
                       </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={toggleTheme}
+                      className="flex items-center gap-2 font-medium cursor-pointer"
+                    >
+                      {theme === "dark" ? <Sun /> : <Moon />}
+                      {theme === "dark" ? "라이트 모드" : "다크 모드"}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem

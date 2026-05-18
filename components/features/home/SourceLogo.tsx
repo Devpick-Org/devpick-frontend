@@ -11,6 +11,7 @@ type LogoConfig = {
   bg?: string;
   innerPadding?: number;
   iconColor?: string;
+  noInvert?: boolean;
 };
 
 const SOURCE_LOGO: Record<string, LogoConfig> = {
@@ -21,8 +22,8 @@ const SOURCE_LOGO: Record<string, LogoConfig> = {
     bg: "#FEE500",
     innerPadding: 2,
   },
-  toss_tech: { src: "/icons/sources/toss.png" },
-  oliveyoung_tech: { src: "/icons/sources/oliveyoung.svg" },
+  toss_tech: { src: "/icons/sources/toss.png", noInvert: true },
+  oliveyoung_tech: { src: "/icons/sources/oliveyoung.svg", noInvert: true },
   woowahan_tech: { src: "/icons/sources/woowahan_tech.png", bg: "#FFFFFF" },
   socar_tech: {
     src: "/icons/sources/socar_tech.png",
@@ -121,6 +122,7 @@ export function SourceLogo({ sourceName, size = 17, paddingOverride }: SourceLog
             alt={sourceName}
             width={innerSize}
             height={innerSize}
+            className={!config.bg && !config.noInvert ? "dark:invert" : undefined}
             style={{ objectFit: "contain", display: "block" }}
           />
         )}

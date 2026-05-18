@@ -159,7 +159,7 @@ export function EcosystemTrendsPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="제목, 주최, 태그, 출처 검색…"
-            className="h-12 rounded-lg bg-muted/60 pl-11 pr-4 text-center text-sm text-foreground font-medium placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
+            className="h-12 rounded-lg bg-muted/60 dark:bg-secondary pl-11 pr-4 text-center text-sm text-foreground font-medium placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
             aria-label="검색"
           />
         </div>

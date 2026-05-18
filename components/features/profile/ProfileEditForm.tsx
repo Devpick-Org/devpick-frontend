@@ -286,7 +286,7 @@ export function ProfileEditForm() {
       </div>
 
       {/* Profile Avatar + Nickname */}
-      <section className="mb-8 rounded-2xl bg-card p-6">
+      <section className="mb-8 rounded-2xl bg-background p-6">
         <h2 className="mb-5 text-lg font-semibold text-foreground">
           기본 정보
         </h2>
@@ -332,7 +332,7 @@ export function ProfileEditForm() {
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={20}
-              className="h-11 bg-secondary text-foreground font-medium placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
+              className="h-11 bg-secondary dark:bg-secondary text-foreground font-medium placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
               placeholder="닉네임을 입력하세요"
             />
             <p className="mt-1.5 text-xs text-muted-foreground font-medium">
@@ -343,7 +343,7 @@ export function ProfileEditForm() {
       </section>
 
       {/* Learning Info */}
-      <section className="mb-8 rounded-2xl bg-card p-6">
+      <section className="mb-8 rounded-2xl bg-background p-6">
         <h2 className="mb-5 text-lg font-semibold text-foreground">
           학습 정보
         </h2>
@@ -455,7 +455,7 @@ export function ProfileEditForm() {
         </p>
         <Button
           variant="outline"
-          className="gap-2 border-red-500/40 bg-transparent text-red-400 font-medium hover:border-red-500 hover:bg-red-500/5 hover:text-red-500"
+          className="gap-2 border-red-500/60 dark:border-transparent bg-red-500/15 dark:bg-red-500/15 text-red-400 font-medium hover:border-red-500 dark:hover:border-transparent hover:bg-red-500/25 dark:hover:bg-red-500/25 hover:text-red-500"
           onClick={() => { setDeleteError(null); setShowDeleteModal(true); }}
         >
           <TrashIcon className="h-4 w-4" />

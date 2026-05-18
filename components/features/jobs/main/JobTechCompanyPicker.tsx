@@ -292,7 +292,7 @@ export function JobTechCompanyPicker({
                 ? "기술 스택을 검색해 보세요..."
                 : "회사명을 검색해 보세요..."
             }
-            className="h-12 rounded-lg bg-muted/60 pl-11 pr-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
+            className="h-12 rounded-lg bg-muted/60 dark:bg-secondary pl-11 pr-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
           />
         </div>
         {!hideTabSwitcher && <div className="grid grid-cols-2 gap-2 rounded-2xl bg-muted p-1">

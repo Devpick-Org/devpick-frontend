@@ -238,7 +238,7 @@ export function MockInterviewSetup({
                     onChange={(e) => setJobSearchInput(e.target.value)}
                     placeholder="예: 카카오, 백엔드, React…"
                     autoComplete="off"
-                    className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-3 text-sm outline-none"
+                    className="w-full rounded-xl border border-border bg-card py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground outline-none"
                   />
                 </label>
                 <p className="text-xs text-muted-foreground">
@@ -395,7 +395,7 @@ export function MockInterviewSetup({
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
                       placeholder="예: 네이버"
-                      className="rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none"
+                      className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none"
                     />
                   </label>
                   <label className="flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
@@ -405,7 +405,7 @@ export function MockInterviewSetup({
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
                       placeholder="예: Frontend Engineer"
-                      className="rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none"
+                      className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none"
                     />
                   </label>
                   <label className="flex flex-col gap-1.5 text-xs font-semibold text-muted-foreground">
@@ -414,7 +414,7 @@ export function MockInterviewSetup({
                       <button
                         type="button"
                         onClick={() => setIsCategoryOpen((v) => !v)}
-                        className="flex h-10 w-full cursor-pointer items-center justify-between rounded-lg bg-white border border-border px-3 text-sm font-medium text-foreground outline-none transition-colors"
+                        className="flex h-10 w-full cursor-pointer items-center justify-between rounded-lg bg-card border border-border px-3 text-sm font-medium text-foreground outline-none transition-colors"
                       >
                         <span>
                           {CATEGORY_OPTIONS.find((o) => o.value === jobCategory)
@@ -458,7 +458,7 @@ export function MockInterviewSetup({
                       onChange={(e) => setRawJdText(e.target.value)}
                       placeholder="회사 채용 본문을 그대로 붙여 넣으면 질문이 더 맞춤형으로 나와요."
                       rows={6}
-                      className="rounded-lg border border-border bg-card px-3 py-2 text-sm leading-relaxed outline-none"
+                      className="rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground leading-relaxed placeholder:text-muted-foreground outline-none"
                     />
                   </label>
                 </div>
@@ -488,7 +488,7 @@ export function MockInterviewSetup({
                       className={cn(
                         "flex w-full cursor-pointer flex-col items-start gap-1 rounded-xl border px-4 py-3 text-left text-sm transition-colors",
                         active
-                          ? "border-border bg-primary/5"
+                          ? "border-border bg-primary/10 text-primary"
                           : "border-border bg-card hover:bg-muted/40",
                       )}
                     >

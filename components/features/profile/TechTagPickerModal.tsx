@@ -140,7 +140,7 @@ function TechTagPickerBody({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="예: kafka, graphql, terraform…"
-              className="h-10 bg-secondary pl-9 focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
+              className="h-10 bg-secondary dark:bg-secondary pl-9 focus-visible:!ring-0 focus-visible:!border-border focus-visible:outline-none"
             />
           </div>
         </div>
@@ -227,7 +227,7 @@ function TechTagPickerBody({
               type="button"
               variant="ghost"
               size="sm"
-              className="hover:bg-muted hover:text-foreground"
+              className="hover:!bg-secondary hover:text-foreground"
               onClick={() => onOpenChange(false)}
             >
               취소

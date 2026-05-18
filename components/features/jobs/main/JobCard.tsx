@@ -77,7 +77,7 @@ export function JobCard({ job, onLoginRequired }: JobCardProps) {
 
   return (
     <Link href={`/jobs/${job.id}`} className="h-full" onClick={handleCardClick}>
-      <article className="h-full flex flex-col bg-card p-5 border-b border-border cursor-pointer">
+      <article className="h-full flex flex-col p-5 border-b border-border cursor-pointer">
         {/* Header: 로고 + 회사명 + 고용형태 + 스크랩 */}
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">

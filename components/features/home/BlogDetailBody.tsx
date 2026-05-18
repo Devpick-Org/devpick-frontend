@@ -32,7 +32,7 @@ export function BlogDetailBody({ content }: BlogDetailBodyProps) {
         </section>
       )}
 
-      <section className="flex flex-col items-center gap-4 rounded-2xl bg-card px-6 py-8">
+      <section className="flex flex-col items-center gap-4 rounded-2xl px-6 py-8">
         {showNoInlineBodyNotice && (
           <p className="text-sm text-muted-foreground font-medium">
             저작권 보호를 위해 원문이 제공되지 않습니다.

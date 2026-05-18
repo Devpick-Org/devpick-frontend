@@ -55,7 +55,7 @@ export function ConfirmModal({
         className={cn(
           "fixed left-1/2 top-1/2 z-50 w-full max-w-xs",
           "-translate-x-1/2 -translate-y-1/2",
-          "rounded-lg bg-white p-6 shadow-xl",
+          "rounded-lg bg-card p-6 shadow-xl",
           "animate-in fade-in-0 zoom-in-95 duration-200",
         )}
         onClick={(e) => e.stopPropagation()}
@@ -79,7 +79,7 @@ export function ConfirmModal({
         <div className="grid grid-cols-2 gap-2">
           <Button
             variant="ghost"
-            className="border-0 bg-secondary text-foreground hover:bg-secondary/90 hover:text-foreground"
+            className="border-0 bg-secondary text-foreground hover:!bg-secondary hover:text-foreground"
             onClick={onClose}
             disabled={isLoading}
           >

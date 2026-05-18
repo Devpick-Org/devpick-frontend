@@ -33,7 +33,7 @@ export function FeedSearch({ onSearch, onOpen }: FeedSearchProps) {
         value={query}
         onChange={handleChange}
         onClick={handleClick}
-        className="h-12 rounded-lg  bg-muted/60 pl-11 pr-4 text-center text-sm text-foreground font-medium placeholder:text-muted-foreground cursor-pointer"
+        className="h-12 rounded-lg bg-muted/60 dark:bg-secondary pl-11 pr-4 text-center text-sm text-foreground font-medium placeholder:text-muted-foreground cursor-pointer"
       />
     </div>
   );

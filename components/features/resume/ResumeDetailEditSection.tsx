@@ -249,7 +249,7 @@ export function ResumeDetailEditSection({
           }}
           rows={5}
           placeholder="예: OO 기술 스택으로 서비스를 만들며, 사용자 경험과 운영 안정성을 모두 고려하는 백엔드 개발자입니다."
-          className="min-h-[100px] w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:border-border"
+          className="min-h-[100px] w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:border-border"
         />
         <p className="text-[11px] text-muted-foreground">
           {draft.summary.trim().length}자 · 완성도 기준 40자 이상
@@ -408,7 +408,7 @@ export function ResumeDetailEditSection({
                       setCareers(next);
                     }}
                     rows={3}
-                    className="min-h-[72px] w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:border-border"
+                    className="min-h-[72px] w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:border-border"
                   />
                 </div>
               </div>
@@ -603,7 +603,7 @@ export function ResumeDetailEditSection({
                     }}
                     rows={2}
                     placeholder="예: 응답 시간 40% 개선, 장애 0건 유지"
-                    className="min-h-[56px] w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:border-border"
+                    className="min-h-[56px] w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:border-border"
                   />
                 </div>
                 <div className="flex flex-col gap-2 sm:col-span-2">
@@ -749,7 +749,7 @@ export function ResumeDetailEditSection({
                       setProjects(next);
                     }}
                     rows={3}
-                    className="min-h-[72px] w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:border-border"
+                    className="min-h-[72px] w-full resize-y rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-0 focus-visible:border-border"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     {p.description.trim().length}자 · 완성도 기준 100자 이상

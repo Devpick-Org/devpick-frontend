@@ -9,6 +9,8 @@ import type { TrendRange } from "@/types/search";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import { useAuthStore } from "@/store/auth.store";
 import { SEARCH_QUERY_KEYS, searchEndpoints } from "@/lib/api/endpoints/search";
+import { useUiStore } from "@/store/ui.store";
+import { cn } from "@/lib/utils";
 import { HomeRangeTabs } from "./HomeRangeTabs";
 import { HomeTopPostsSection } from "./HomeTopPostsSection";
 import { HomeCollectionSummarySection } from "./HomeCollectionSummarySection";
@@ -43,6 +45,7 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const theme = useUiStore((s) => s.theme);
 
   // 배경 스크롤 잠금 + 검색 input 포커스
   // unit 초기화는 별도 effect 불필요 — isOpen=false 시 컴포넌트가 언마운트되어 useState 초기값("weekly")으로 자동 리셋
@@ -184,8 +187,10 @@ export function HomeSearchOverlay({ isOpen, onClose }: HomeSearchOverlayProps) {
 
   return createPortal(
     <div
-      // z-[9999]: TopNavVariant(z-50)를 포함한 모든 레이어 위에 렌더
-      className="fixed inset-0 z-[9999] flex flex-col bg-white"
+      className={cn(
+        "fixed inset-0 z-[9999] flex flex-col bg-background",
+        theme === "dark" && "dark",
+      )}
     >
       {/* 닫기 버튼 — 우상단 고정 */}
       <button

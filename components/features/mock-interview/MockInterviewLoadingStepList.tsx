@@ -105,7 +105,7 @@ export function MockInterviewLoadingStepList({
             <div className="min-w-0 pt-0.5">
               <p
                 className={cn(
-                  "leading-snug font-semibold",
+                  "leading-snug font-semibold text-foreground",
                   (!active && !done) && "text-muted-foreground",
                 )}
               >

@@ -10,13 +10,11 @@ interface UiStore {
   toasts: Toast[];
   addToast: (toast: Omit<Toast, "id">) => void;
   removeToast: (id: string) => void;
+  theme: "light" | "dark";
+  toggleTheme: () => void;
 }
 
-/**
- * UI 전역 상태
- * - Toast 알림 큐 관리
- */
-export const useUiStore = create<UiStore>((set) => ({
+export const useUiStore = create<UiStore>((set, get) => ({
   toasts: [],
 
   addToast: (toast) =>
@@ -31,4 +29,12 @@ export const useUiStore = create<UiStore>((set) => ({
     set((state) => ({
       toasts: state.toasts.filter((t) => t.id !== id),
     })),
+
+  theme: "light",
+
+  toggleTheme: () => {
+    const next = get().theme === "light" ? "dark" : "light";
+    localStorage.setItem("theme", next);
+    set({ theme: next });
+  },
 }));

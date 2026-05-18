@@ -128,7 +128,7 @@ export function QuizResult(props: QuizResultProps) {
                   key={q.id}
                   className={cn(
                     "rounded-xl p-4 space-y-2",
-                    correct ? "bg-green-500/5" : "bg-red-500/5",
+                    correct ? "bg-green-500/5 dark:bg-green-500/10" : "bg-red-500/5 dark:bg-red-500/10",
                   )}
                 >
                   <div className="flex items-start gap-2">
@@ -255,7 +255,7 @@ export function QuizResult(props: QuizResultProps) {
               key={q.id}
               className={cn(
                 "rounded-xl p-4 space-y-2",
-                correct ? "bg-green-500/5" : "bg-red-500/5",
+                correct ? "bg-green-500/5 dark:bg-green-500/10" : "bg-red-500/5 dark:bg-red-500/10",
               )}
             >
               <div className="flex items-start gap-2">

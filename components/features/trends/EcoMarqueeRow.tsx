@@ -104,7 +104,7 @@ export function EcoMarqueeRow({
           <button
             type="button"
             onClick={() => scroll(-1)}
-            className="absolute left-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-white p-1.5 shadow-sm transition-colors hover:bg-gray-50"
+            className="absolute left-0 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-card p-1.5 shadow-sm transition-colors hover:bg-secondary"
             aria-label="이전"
           >
             <ChevronLeft className="h-4 w-4 text-foreground" />
@@ -130,7 +130,7 @@ export function EcoMarqueeRow({
           <button
             type="button"
             onClick={() => scroll(1)}
-            className="absolute right-0 top-1/2 z-10 translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-white p-1.5 shadow-sm transition-colors hover:bg-gray-50"
+            className="absolute right-0 top-1/2 z-10 translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-card p-1.5 shadow-sm transition-colors hover:bg-secondary"
             aria-label="다음"
           >
             <ChevronRight className="h-4 w-4 text-foreground" />
