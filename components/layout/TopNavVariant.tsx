@@ -47,7 +47,7 @@ const ALL_NAV_ITEMS: {
   { href: "/trends", label: "트렌드", icon: Flame },
   { href: "/history", label: "히스토리", icon: BookOpen },
   { href: "/report", label: "리포트", icon: TrendingUp },
-  { href: "/my-page", label: "마이페이지", icon: LayoutDashboard },
+  { href: "/my-page", label: "마이", icon: LayoutDashboard },
 ];
 
 export function TopNavVariant() {
@@ -205,7 +205,7 @@ export function TopNavVariant() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-1 px-4 py-2.5 text-xs font-medium transition-colors duration-200",
+                "flex flex-1 flex-col items-center gap-1 px-0.5 py-2.5 text-[10px] font-medium whitespace-nowrap transition-colors duration-200",
                 isActive
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground",

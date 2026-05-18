@@ -331,7 +331,7 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
                     key={row.short}
                     className={cn(
                       "inline-flex max-w-full flex-wrap items-center gap-1.5 rounded-2xl border border-border/80 bg-background/80 px-3 py-2 text-xs backdrop-blur-sm transition-colors",
-                      "hover:border-primary/30 hover:bg-primary/[0.04]",
+                      "",
                     )}
                   >
                     <span className="font-semibold text-foreground">{row.short}</span>

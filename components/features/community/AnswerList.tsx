@@ -147,14 +147,6 @@ function AnswerItem({
 
   return (
     <div id={`answer-${answer.id}`} className="py-7">
-      {/* 채택 배지 — 모바일에서 작성자 위에 표시 */}
-      {answer.isAdopted && (
-        <div className="mb-2 flex items-center gap-1 text-sm font-semibold text-primary sm:hidden">
-          <Check className="h-3.5 w-3.5" />
-          채택된 답변
-        </div>
-      )}
-
       {/* 헤더: 작성자 + 액션 버튼 */}
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="flex items-start gap-3">
@@ -207,9 +199,8 @@ function AnswerItem({
         </div>
 
         <div className="flex shrink-0 items-center gap-1.5">
-          {/* 채택 배지 — 데스크탑에서 오른쪽 위에 표시 */}
           {answer.isAdopted && (
-            <div className="hidden items-center gap-1 text-sm font-semibold text-primary sm:flex">
+            <div className="flex items-center gap-1 text-sm font-semibold text-primary">
               <Check className="h-3.5 w-3.5" />
               채택된 답변
             </div>

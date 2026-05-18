@@ -47,10 +47,9 @@ function HistoryFilterBar<T extends string>({
 
   return (
     <div className="space-y-2 pb-4">
-      {/* 액션 chips + 기간 dropdown — 한 행 */}
-      <div className="flex flex-wrap items-center justify-between gap-y-2">
-        {/* 액션 chips — 중간 강조 */}
-        <div className="flex flex-wrap gap-1.5">
+      <div className="flex items-start gap-2">
+        {/* 액션 chips */}
+        <div className="flex flex-1 flex-wrap gap-1.5">
           <button
             onClick={() => onActionsChange([] as T[])}
             className={cn(
@@ -81,12 +80,12 @@ function HistoryFilterBar<T extends string>({
           })}
         </div>
 
-        {/* 기간 dropdown — 가장 약한 강조 */}
+        {/* 기간 dropdown */}
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              className="flex shrink-0 items-center gap-1 pt-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
             >
               {currentPeriodLabel}
               <ChevronDown className="h-3.5 w-3.5" />
