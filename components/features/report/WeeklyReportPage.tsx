@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { AxiosError } from "axios";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -39,18 +40,22 @@ export default function WeeklyReportPage() {
   const reportList = listRes?.data ?? [];
   const hasReport = listRes !== undefined && reportList.length > 0;
 
+  /** 목록 최신 순 첫 행 기준 — GET /reports/weekly(직전 주만) 과 목록 불일치로 인한 404 방지 */
+  const effectiveReportId =
+    selectedReportId ?? reportList[0]?.reportId ?? null;
+
   const {
     data: reportRes,
     isLoading: isReportLoading,
     isError,
+    error,
   } = useQuery({
-    queryKey: selectedReportId
-      ? REPORT_QUERY_KEYS.weeklyById(selectedReportId)
-      : REPORT_QUERY_KEYS.weekly,
-    queryFn: selectedReportId
-      ? () => reportsEndpoints.getWeeklyReportById(selectedReportId)
-      : () => reportsEndpoints.getWeeklyReport(),
-    enabled: hasReport,
+    queryKey: effectiveReportId
+      ? REPORT_QUERY_KEYS.weeklyById(effectiveReportId)
+      : (["reports", "weekly", "pending"] as const),
+    queryFn: () =>
+      reportsEndpoints.getWeeklyReportById(effectiveReportId!),
+    enabled: hasReport && effectiveReportId != null,
   });
 
   const shareMutation = useMutation({
@@ -81,7 +86,9 @@ export default function WeeklyReportPage() {
   if (isListLoading) return <LoadingState />;
   if (!hasReport) return <NoReportState />;
   if (isReportLoading) return <LoadingState />;
-  if (isError || !reportRes?.data) return <ErrorState />;
+  if (isError || !reportRes?.data) {
+    return <ErrorState isNotFound={isWeeklyReportFetchNotFound(error)} />;
+  }
 
   const report = reportRes.data;
   const activity = report.activities[0];
@@ -399,11 +406,27 @@ function LoadingState() {
   );
 }
 
-function ErrorState() {
+function isWeeklyReportFetchNotFound(err: unknown): boolean {
+  return err instanceof AxiosError && err.response?.status === 404;
+}
+
+function ErrorState({ isNotFound }: { isNotFound?: boolean }) {
+  const title = isNotFound
+    ? "해당 주간 리포트를 찾을 수 없습니다."
+    : "리포트를 불러오지 못했습니다.";
+  const hint = isNotFound
+    ? "목록에서 다른 주를 선택하거나 잠시 후 다시 시도해 주세요."
+    : null;
+
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl px-6 py-12 text-foreground">
       <AlertCircle className="h-9 w-9 text-destructive" />
-      <p className="text-base font-semibold">리포트를 불러오지 못했습니다.</p>
+      <p className="text-base font-semibold">{title}</p>
+      {hint ? (
+        <p className="max-w-sm text-center text-sm text-muted-foreground">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }
