@@ -38,6 +38,7 @@ import { isTrendsFeatureEnabled } from "@/lib/env/publicFeatureFlags";
 const ALL_NAV_ITEMS: {
   href: string;
   label: string;
+  shortLabel?: string;
   icon: LucideIcon;
   relatedPaths?: string[];
 }[] = [
@@ -47,7 +48,7 @@ const ALL_NAV_ITEMS: {
   { href: "/trends", label: "트렌드", icon: Flame },
   { href: "/history", label: "히스토리", icon: BookOpen },
   { href: "/report", label: "리포트", icon: TrendingUp },
-  { href: "/my-page", label: "마이", icon: LayoutDashboard },
+  { href: "/my-page", label: "마이페이지", shortLabel: "마이", icon: LayoutDashboard },
 ];
 
 export function TopNavVariant() {
@@ -212,7 +213,7 @@ export function TopNavVariant() {
               )}
             >
               <Icon className="h-5 w-5" />
-              {item.label}
+              {item.shortLabel ?? item.label}
             </Link>
           );
         })}

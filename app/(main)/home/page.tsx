@@ -18,7 +18,7 @@ export default function HomePage() {
   const user = useAuthStore((s) => s.user);
   /** 검색·피드 응답의 스크랩/좋아요는 로그인 시에만 의미 있음 — 로그인 전환 시 목록 재조회 */
   const isAuthenticated = useAuthStore((s) => !!s.accessToken);
-  const nickname = user?.nickname ?? "김데브";
+  const nickname = user?.nickname ?? "개발자";
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
