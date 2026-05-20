@@ -101,6 +101,7 @@ export interface WeeklyReportSummary {
   weekStart: string;
   weekEnd: string;
   status: string;
+  locked?: boolean;
 }
 
 export type WeeklyReportResponse = ApiResponse<WeeklyReport>;

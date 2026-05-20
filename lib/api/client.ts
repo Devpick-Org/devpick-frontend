@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "@/store/auth.store";
+import { useUiStore } from "@/store/ui.store";
 import type { ApiErrorResponse, ApiResponse } from "@/types/api";
 import type { RefreshTokenResponse } from "@/types/auth";
 
@@ -63,12 +64,49 @@ function processQueue(error: AxiosError | null, token: string | null): void {
   failedQueue = [];
 }
 
+function handlePaymentError(code: string, detail: unknown): void {
+  const { addToast, openPlanUpgradeModal, openLimitExceededModal } = useUiStore.getState();
+
+  switch (code) {
+    case "PAYMENT_001":
+      addToast({ type: "error", message: "이미 구독 중입니다" });
+      break;
+    case "PAYMENT_002":
+      if (typeof window !== "undefined") window.location.href = "/payment/fail";
+      break;
+    case "PAYMENT_003": {
+      const d = detail as { requiredPlan?: "PRO" | "MAX" } | undefined;
+      openPlanUpgradeModal(d?.requiredPlan ?? "PRO");
+      break;
+    }
+    case "PAYMENT_004":
+      addToast({ type: "error", message: "구독 정보를 찾을 수 없습니다" });
+      break;
+    case "PAYMENT_005": {
+      const d = detail as { feature?: string; resetsAt?: string | null; requiredPlan?: "PRO" | "MAX" } | undefined;
+      openLimitExceededModal({
+        feature: d?.feature ?? "",
+        resetsAt: d?.resetsAt ?? null,
+        requiredPlan: d?.requiredPlan ?? "MAX",
+      });
+      break;
+    }
+  }
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<ApiErrorResponse>) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
+
+    // PAYMENT 에러 처리 (401 리프레시보다 먼저)
+    const errorCode = (error.response?.data as ApiErrorResponse | undefined)?.error?.code;
+    if (typeof errorCode === "string" && errorCode.startsWith("PAYMENT_")) {
+      handlePaymentError(errorCode, (error.response?.data as ApiErrorResponse | undefined)?.error?.detail);
+      return Promise.reject(error);
+    }
 
     if (error.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);

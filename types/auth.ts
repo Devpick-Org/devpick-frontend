@@ -1,3 +1,5 @@
+import type { PlanType, UserLimits } from './subscription';
+
 export interface RepresentativeBadge {
   badgeId: string;
   name: string;
@@ -14,6 +16,10 @@ export interface User {
   tags?: string[];
   totalPoints?: number;
   representativeBadge?: RepresentativeBadge | null;
+  planType?: PlanType;
+  planExpiredAt?: string | null;
+  lastBilledAt?: string | null;
+  limits?: UserLimits;
 }
 
 export interface LoginRequest {

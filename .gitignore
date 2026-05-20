@@ -47,3 +47,9 @@ yarn-error.log*
 next-env.d.ts
 
 _v0-reference.tsx
+
+# internal spec / planning docs (not for public repo)
+DP-*.json
+DP-*.txt
+money.png
+plan.png

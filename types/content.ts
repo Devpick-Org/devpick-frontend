@@ -47,6 +47,7 @@ export interface ContentFeedData {
   size: number;
   totalElements: number;
   totalPages: number;
+  planLimited?: boolean;
 }
 
 export type ContentFeedResponse = ApiResponse<ContentFeedData>;
