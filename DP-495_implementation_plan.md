@@ -173,23 +173,25 @@ limits?: UserLimits;
 ```
 1. /payment/billing?plan=PRO 진입
 2. customerKey = crypto.randomUUID() 생성 (결제 요청 시점에 생성, 저장 불필요)
-3. billing.requestBillingAuth({
+3. const tossPayments = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)  — async 초기화 (await 필수)
+4. const billing = tossPayments.billing({ customerKey })  — customerKey를 Toss SDK에 전달
+5. billing.requestBillingAuth({
      method: "CARD",
      successUrl: `${window.location.origin}/payment/success?plan=${planType}`,
      failUrl: `${window.location.origin}/payment/fail?plan=${planType}`,
      customerEmail: user.email,    // useAuthStore
      customerName: user.nickname,  // useAuthStore
    }) 호출
-4. 토스가 /payment/success?plan=PRO&authKey=auth_xxx&customerKey=uuid 로 리다이렉트
-   (토스는 successUrl에 이미 있는 쿼리파라미터에 authKey·customerKey를 추가로 붙여줌)
-5. success 페이지에서 query params 읽기:
+6. 토스가 /payment/success?plan=PRO&authKey=auth_xxx&customerKey=uuid 로 리다이렉트
+   (billing({ customerKey })에 전달한 customerKey를 토스가 successUrl에 그대로 붙여줌)
+7. success 페이지에서 query params 읽기:
    - authKey     → searchParams.get('authKey')      // 토스가 붙여줌
    - customerKey → searchParams.get('customerKey')  // 토스가 붙여줌 (sessionStorage 불필요)
    - planType    → searchParams.get('plan')          // 미리 넣어둔 것
-6. POST /subscriptions/billing-auth { authKey, customerKey, planType } 호출
+8. POST /subscriptions/billing-auth { authKey, customerKey, planType } 호출
    (mock → DP-509에서 실제 연동)
-7. GET /users/me 재호출 → planType 갱신
-8. "홈으로 이동" 버튼
+9. GET /users/me 재호출 → planType 갱신
+10. "홈으로 이동" 버튼
 ```
 
 ### 결제 완료 페이지 스펙
@@ -295,6 +297,11 @@ limits?: UserLimits;
 | 커뮤니티 글쓰기 AI 팝업 | `components/features/community/PostWriteForm.tsx`   | 자동 AI 답변 → 팝업 선택 방식으로 변경                                                |
 | 주간 리포트 잠금        | `components/features/report/WeeklyReportPage.tsx`   | `locked: true` 항목 🔒 + 회색 처리                                                    |
 
+### 공통 규칙
+
+- **limits 최신화**: `limits.aiDaily`를 표시하는 기능(AI 질문 개선, AI 답변, 커뮤니티 글쓰기 팝업)은 API 호출 성공 후 `GET /users/me` 재호출하여 `limits` 갱신 (TanStack Query `invalidateQueries` 활용)
+- 페이지 진입 시 `/users/me`가 최신 상태여야 하므로 캐시 staleTime 설정 주의
+
 ### 홈 피드 배너 스펙
 
 - `planLimited: true` 이면 피드 맨 아래 배너 표시
@@ -322,7 +329,7 @@ limits?: UserLimits;
 
 ### 주간 리포트 잠금 스펙
 
-- 목록 응답 스키마: `{ reportId, weekStart, weekEnd, locked: boolean }`
+- 목록 응답 스키마: `{ reportId, weekStart, weekEnd, status: string, locked: boolean }`
 - `locked: true` 항목: 🔒 아이콘 + 회색 처리, 클릭 시 PlanUpgradeModal (API 호출 없이)
 - `locked: false` 항목: 정상 클릭 가능
 - 백 연동 전: `locked` 필드 없음 → 전부 클릭 가능 (방어 처리)
@@ -352,6 +359,7 @@ remaining === -1 → 버튼 활성화 + "무제한" 표시
 - `resetsAt` → 로컬 시간대 변환 + 상대 표현 ("내일 자정", "다음 월요일" 등)
 - ※ MAX 플랜은 `resetsAt: null` 내려옴 → null 체크 필수. `remaining === -1`이면 날짜 포맷 시도 없이 "무제한"만 표시
 - API 호출 시 429 PAYMENT_005 수신 → 인터셉터가 LimitExceededModal 표시
+- **limits 최신화**: 각 기능 API 호출 성공 후 `GET /users/me` 재호출하여 `limits` 갱신 (TanStack Query `invalidateQueries` 활용)
 
 ---
 
