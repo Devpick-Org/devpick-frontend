@@ -3,7 +3,7 @@
 import { AuthInitializer } from "@/components/features/auth/AuthInitializer";
 import { Toaster } from "sonner";
 
-export default function AuthLayout({
+export default function LandingLayout({
   children,
 }: {
   children: React.ReactNode;
