@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useAuthStore } from "@/store/auth.store";
 import { SubscriptionSection } from "@/components/features/profile/SubscriptionSection";
 import { MOCK_SUBSCRIPTION_SCENARIOS } from "@/lib/mock/subscriptions";
@@ -11,6 +12,7 @@ const BASE_USER: User = {
   userId: "test-user",
   email: "test@devpick.kr",
   nickname: "테스트유저",
+  level: "JUNIOR",
 };
 
 function oneMonthLater(): string {
@@ -96,16 +98,48 @@ const SCENARIOS = [
   },
 ] as const;
 
+// ── Phase 6 테스트 시나리오 ───────────────────────────────────────────────────
+
+const PHASE6_SCENARIOS = [
+  {
+    label: "FREE · JUNIOR · limits 있음",
+    desc: "AI 요약/퀴즈: JUNIOR 탭만 해제 / AI 개선 3회 남음",
+    user: { ...BASE_USER, level: "JUNIOR", ...MOCK_SUBSCRIPTION_SCENARIOS.FREE },
+  },
+  {
+    label: "FREE · AI 개선 소진 (remaining=0)",
+    desc: "AI 개선 버튼 비활성화 확인",
+    user: {
+      ...BASE_USER,
+      level: "JUNIOR",
+      ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
+      limits: {
+        ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
+        aiDaily: { used: 5, max: 5, remaining: 0, resetsAt: (() => { const d = new Date(); d.setDate(d.getDate() + 1); d.setUTCHours(0,0,0,0); return d.toISOString(); })() },
+      },
+    },
+  },
+  {
+    label: "PRO · MIDDLE · limits 있음",
+    desc: "AI 요약/퀴즈: 전 레벨 해제 / AI 개선 7회 남음",
+    user: { ...BASE_USER, level: "MIDDLE", ...MOCK_SUBSCRIPTION_SCENARIOS.PRO },
+  },
+  {
+    label: "MAX · limits 무제한",
+    desc: "AI 개선 무제한 / 모든 레벨 해제",
+    user: { ...BASE_USER, level: "SENIOR", ...MOCK_SUBSCRIPTION_SCENARIOS.MAX },
+  },
+] as const;
+
 // ── 페이지 ────────────────────────────────────────────────────────────────────
 
 export default function SubscriptionTestPage() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const user = useAuthStore((s) => s.user);
 
-  const applyScenario = (index: number) => {
-    const scenario = SCENARIOS[index];
+  const applyScenario = (u: User) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setAuth(scenario.user as any, "test-token");
+    setAuth(u as any, "test-token");
   };
 
   const currentLabel = SCENARIOS.find(
@@ -117,20 +151,20 @@ export default function SubscriptionTestPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 pt-8 pb-20 lg:px-0">
+      {/* ── Phase 5: 구독 섹션 ── */}
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-foreground">구독 섹션 테스트</h1>
+        <h1 className="text-xl font-bold text-foreground">구독 섹션 테스트 (Phase 5)</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           버튼으로 시나리오를 바꾸면 아래 섹션이 즉시 반영됩니다.
         </p>
       </div>
 
-      {/* 시나리오 버튼 */}
       <div className="mb-8 flex flex-wrap gap-2">
         {SCENARIOS.map((s, i) => (
           <button
             key={i}
             type="button"
-            onClick={() => applyScenario(i)}
+            onClick={() => applyScenario(s.user as User)}
             className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
               currentLabel === s.label
                 ? "border-primary bg-primary text-primary-foreground"
@@ -142,8 +176,57 @@ export default function SubscriptionTestPage() {
         ))}
       </div>
 
-      {/* 실제 컴포넌트 */}
       <SubscriptionSection />
+
+      {/* ── Phase 6: 플랜 제한 UI ── */}
+      <div className="mt-16 mb-6 border-t border-border pt-10">
+        <h2 className="text-lg font-bold text-foreground">Phase 6 — 플랜 제한 UI 테스트</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          시나리오 적용 후 아래 링크로 이동해서 확인하세요.
+          현재 플랜: <span className="font-semibold text-foreground">{user?.planType ?? "없음"}</span>
+          {" · "}레벨: <span className="font-semibold text-foreground">{user?.level ?? "없음"}</span>
+          {" · "}AI 남은 횟수: <span className="font-semibold text-foreground">{user?.limits?.aiDaily?.remaining ?? "—"}</span>
+        </p>
+      </div>
+
+      <div className="mb-6 flex flex-wrap gap-2">
+        {PHASE6_SCENARIOS.map((s) => (
+          <button
+            key={s.label}
+            type="button"
+            onClick={() => applyScenario(s.user as unknown as User)}
+            className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              user?.planType === s.user.planType && user?.level === s.user.level && user?.limits?.aiDaily?.remaining === s.user.limits?.aiDaily?.remaining
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-background text-foreground hover:bg-muted"
+            }`}
+            title={s.desc}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {[
+          { href: "/home", label: "홈 피드", desc: "planLimited 배너" },
+          { href: "/community/write", label: "커뮤니티 글쓰기", desc: "AI 개선 남은 횟수" },
+          { href: "/report", label: "주간 리포트", desc: "locked 항목 잠금" },
+          { href: "/plans", label: "플랜 소개", desc: "버튼 분기 확인" },
+        ].map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="flex flex-col gap-0.5 rounded-xl border border-border bg-card px-4 py-3 text-sm transition-colors hover:bg-muted"
+          >
+            <span className="font-semibold text-foreground">{link.label}</span>
+            <span className="text-xs text-muted-foreground">{link.desc}</span>
+          </Link>
+        ))}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">
+        AI 요약·퀴즈 레벨 잠금은 홈 글 상세 페이지(/home/[id])에서 확인하세요.
+      </p>
     </div>
   );
 }

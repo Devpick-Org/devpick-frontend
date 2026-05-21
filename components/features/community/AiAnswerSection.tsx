@@ -14,6 +14,7 @@ interface AiAnswerSectionProps {
   confidence?: number | null;
   onRetry?: () => void;
   isRetrying?: boolean;
+  aiDailyRemaining?: number | null;
 }
 
 export function AiAnswerSection({
@@ -24,11 +25,17 @@ export function AiAnswerSection({
   confidence,
   onRetry,
   isRetrying = false,
+  aiDailyRemaining,
 }: AiAnswerSectionProps) {
   return (
     <section className="mb-8">
       <div className="mb-3 flex items-center gap-2">
         <h2 className="text-lg font-bold text-foreground">AI 1차 답변</h2>
+        {aiDailyRemaining != null && (
+          <span className="text-xs font-medium text-muted-foreground">
+            {aiDailyRemaining === -1 ? "무제한" : `오늘 ${aiDailyRemaining}회 남음`}
+          </span>
+        )}
       </div>
       <div className="rounded-xl border border-border bg-card p-5">
         {status === "loading" && <AiAnswerLoading />}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Lock } from "lucide-react";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import type {
   AiSummary as AiSummaryType,
@@ -9,6 +9,7 @@ import type {
 } from "@/types/content";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
+import { useUiStore } from "@/store/ui.store";
 
 // ─── 상수 ────────────────────────────────────────────────────────────────────
 
@@ -272,6 +273,8 @@ type SummaryMeta = {
 
 export function AiSummary({ contentId }: AiSummaryProps) {
   const userLevel = useAuthStore((s) => s.user?.level);
+  const planType = useAuthStore((s) => s.user?.planType);
+  const openPlanUpgradeModal = useUiStore((s) => s.openPlanUpgradeModal);
   const resolvedLevel: AiSummaryLevel =
     userLevel && (LEVELS as readonly string[]).includes(userLevel)
       ? (userLevel as AiSummaryLevel)
@@ -331,20 +334,32 @@ export function AiSummary({ contentId }: AiSummaryProps) {
           )}
         </div>
         <div className="flex gap-6">
-          {LEVELS.map((l) => (
-            <button
-              key={l}
-              onClick={() => setUserSelected({ forContentId: contentId, level: l })}
-              className={cn(
-                "rounded-none border-b-2 pb-3 pt-1 text-sm font-semibold transition-colors cursor-pointer",
-                tabLevel === l
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {LEVEL_LABELS[l]}
-            </button>
-          ))}
+          {LEVELS.map((l) => {
+            const isLocked = planType === "FREE" && l !== resolvedLevel;
+            return (
+              <button
+                key={l}
+                onClick={() => {
+                  if (isLocked) {
+                    openPlanUpgradeModal("PRO");
+                    return;
+                  }
+                  setUserSelected({ forContentId: contentId, level: l });
+                }}
+                className={cn(
+                  "flex items-center gap-1 rounded-none border-b-2 pb-3 pt-1 text-sm font-semibold transition-colors cursor-pointer",
+                  tabLevel === l
+                    ? "border-primary text-foreground"
+                    : isLocked
+                      ? "border-transparent text-muted-foreground/50"
+                      : "border-transparent text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {LEVEL_LABELS[l]}
+                {isLocked && <Lock className="h-3 w-3" />}
+              </button>
+            );
+          })}
         </div>
       </div>
 

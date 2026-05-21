@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useHydrated } from "@/lib/hooks/useHydrated";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles, X } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
@@ -18,6 +18,22 @@ import type {
   RefinePostData,
 } from "@/types/community";
 import type { PostType } from "@/types/post";
+import type { LimitInfo } from "@/types/subscription";
+
+// ─── resetsAt 포맷 ────────────────────────────────────────────────────────────
+
+function formatResetsAt(resetsAt: string | null): string {
+  if (!resetsAt) return "";
+  const target = new Date(resetsAt);
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (target.toDateString() === tomorrow.toDateString()) return "내일 자정";
+  const nextMonday = new Date(now);
+  nextMonday.setDate(now.getDate() + ((8 - now.getDay()) % 7 || 7));
+  if (target.toDateString() === nextMonday.toDateString()) return "다음 월요일";
+  return `${target.getMonth() + 1}월 ${target.getDate()}일`;
+}
 
 // ─── 첨부파일 업로드 ──────────────────────────────────────────────────────────
 // 파일 배열을 S3에 업로드하고 URL 배열을 반환한다.
@@ -34,9 +50,16 @@ async function uploadFiles(items: LocalFileItem[]): Promise<string[]> {
 export default function CommunityWritePage() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const mounted = useHydrated();
+
+  const planType = user?.planType ?? "FREE";
+  const aiDailyLimits = user?.limits?.aiDaily;
+
+  const withAiRef = useRef(false);
+  const [pendingSubmit, setPendingSubmit] = useState<PostDraft | null>(null);
 
   const [postType, setPostType] = useState<PostType>("TECH");
 
@@ -67,10 +90,11 @@ export default function CommunityWritePage() {
 
   const createMutation = useMutation({
     mutationFn: postsEndpoints.createPost,
-    onSuccess: (res) => {
-      // ["post", id] 캐시는 ApiResponse<PostDetailDTO> 전체를 저장한다.
-      // getPostDetail 쿼리와 shape가 동일(PostDetailResponse = ApiResponse<PostDetailDTO>)하므로
-      // res를 그대로 선세팅하면 상세 페이지 진입 시 즉시 캐시 히트된다.
+    onSuccess: async (res) => {
+      if (withAiRef.current) {
+        withAiRef.current = false;
+        await postsEndpoints.getAiAnswer(res.data.id).catch(() => {});
+      }
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });
       queryClient.setQueryData(["post", res.data.id], res);
@@ -108,6 +132,30 @@ export default function CommunityWritePage() {
 
   /** 왼쪽 폼: 바로 게시하기 — 현재 files 기준 */
   const handleSubmitDirect = async (draft: PostDraft) => {
+    if (draft.postType === "TECH") {
+      if (planType === "MAX") {
+        // MAX: 팝업 없이 즉시 게시 + AI 자동 생성
+        withAiRef.current = true;
+        const attachmentUrls = await uploadFiles(files);
+        createMutation.mutate({ ...draft, attachmentUrls });
+      } else {
+        // FREE/PRO: 팝업 표시
+        setPendingSubmit(draft);
+      }
+    } else {
+      // 커리어: 변경 없음
+      withAiRef.current = false;
+      const attachmentUrls = await uploadFiles(files);
+      createMutation.mutate({ ...draft, attachmentUrls });
+    }
+  };
+
+  /** 팝업 확인 — 유저가 AI 포함 여부 선택 후 호출 */
+  const handleConfirmSubmit = async (withAI: boolean) => {
+    if (!pendingSubmit) return;
+    withAiRef.current = withAI;
+    const draft = pendingSubmit;
+    setPendingSubmit(null);
     const attachmentUrls = await uploadFiles(files);
     createMutation.mutate({ ...draft, attachmentUrls });
   };
@@ -135,6 +183,15 @@ export default function CommunityWritePage() {
 
   return (
     <div className="w-full px-4 py-8 lg:px-8">
+      {/* AI 답변 포함 여부 확인 다이얼로그 */}
+      {pendingSubmit && (
+        <AiAnswerConfirmDialog
+          aiDailyLimits={aiDailyLimits}
+          onClose={() => setPendingSubmit(null)}
+          onConfirm={handleConfirmSubmit}
+        />
+      )}
+
       {/* 게시 중 모달 */}
       {createMutation.isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -315,6 +372,83 @@ export default function CommunityWritePage() {
               </div>
             </section>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── AI 답변 포함 여부 확인 다이얼로그 ──────────────────────────────────────────
+
+interface AiAnswerConfirmDialogProps {
+  aiDailyLimits: LimitInfo | undefined;
+  onClose: () => void;
+  onConfirm: (withAI: boolean) => void;
+}
+
+function AiAnswerConfirmDialog({
+  aiDailyLimits,
+  onClose,
+  onConfirm,
+}: AiAnswerConfirmDialogProps) {
+  const exhausted = aiDailyLimits?.remaining === 0;
+  const unlimited = aiDailyLimits?.remaining === -1;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="relative mx-4 w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
+          aria-label="닫기"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <div className="mb-5 flex flex-col gap-2">
+          <h2 className="text-base font-bold text-foreground">
+            AI 답변을 함께 생성할까요?
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            게시 후 AI가 질문에 대한 1차 답변을 자동으로 작성해 드려요.
+          </p>
+        </div>
+
+        {aiDailyLimits && (
+          <div
+            className={cn(
+              "mb-5 rounded-lg px-3.5 py-2.5 text-sm",
+              exhausted
+                ? "bg-destructive/10 text-destructive"
+                : "bg-secondary text-muted-foreground",
+            )}
+          >
+            {unlimited
+              ? "AI 사용량: 무제한"
+              : exhausted
+                ? `오늘 횟수를 모두 사용했어요 · ${formatResetsAt(aiDailyLimits.resetsAt)} 초기화`
+                : `오늘 ${aiDailyLimits.remaining}회 남음`}
+          </div>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => onConfirm(true)}
+            disabled={exhausted}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Sparkles className="h-4 w-4" />
+            AI 답변 포함해서 게시
+          </button>
+          <button
+            type="button"
+            onClick={() => onConfirm(false)}
+            className="w-full rounded-xl bg-secondary px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary/80"
+          >
+            그냥 게시
+          </button>
         </div>
       </div>
     </div>

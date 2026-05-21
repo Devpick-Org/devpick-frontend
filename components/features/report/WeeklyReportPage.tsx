@@ -11,6 +11,7 @@ import {
   CalendarClock,
   ChevronDown,
   Check,
+  Lock,
 } from "lucide-react";
 
 import {
@@ -18,6 +19,7 @@ import {
   REPORT_QUERY_KEYS,
 } from "@/lib/api/endpoints/reports";
 import { formatWeekLabel, formatDate } from "@/lib/utils";
+import { useUiStore } from "@/store/ui.store";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -136,6 +138,7 @@ interface HeroBandProps {
     weekStart: string;
     weekEnd: string;
     status: string;
+    locked?: boolean;
   }[];
   selectedReportId: string | null;
   onSelect: (id: string) => void;
@@ -266,6 +269,7 @@ interface WeekHeaderProps {
     weekStart: string;
     weekEnd: string;
     status: string;
+    locked?: boolean;
   }[];
   selectedReportId: string | null;
   onSelect: (id: string) => void;
@@ -278,6 +282,7 @@ function WeekHeader({
   onSelect,
 }: WeekHeaderProps) {
   const currentId = selectedReportId ?? report.reportId;
+  const openPlanUpgradeModal = useUiStore((s) => s.openPlanUpgradeModal);
 
   return (
     <div className="min-w-0 space-y-2">
@@ -296,13 +301,23 @@ function WeekHeader({
             {reportList.map((item) => (
               <DropdownMenuItem
                 key={item.reportId}
-                onClick={() => onSelect(item.reportId)}
+                onClick={() => {
+                  if (item.locked) {
+                    openPlanUpgradeModal("PRO");
+                    return;
+                  }
+                  onSelect(item.reportId);
+                }}
                 className="flex items-center justify-between gap-6 cursor-pointer"
               >
-                <span>{formatWeekLabel(item.weekStart)}</span>
-                {item.reportId === currentId && (
+                <span className={item.locked ? "text-muted-foreground/50" : undefined}>
+                  {formatWeekLabel(item.weekStart)}
+                </span>
+                {item.locked ? (
+                  <Lock className="w-3.5 h-3.5 shrink-0 text-muted-foreground/50" />
+                ) : item.reportId === currentId ? (
                   <Check className="w-4 h-4 shrink-0" />
-                )}
+                ) : null}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

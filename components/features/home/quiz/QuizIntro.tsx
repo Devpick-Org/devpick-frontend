@@ -1,7 +1,11 @@
-import { ChevronRight, History } from "lucide-react";
+"use client";
+
+import { ChevronRight, History, Lock } from "lucide-react";
 import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
 import type { ContentQuiz, QuizLevel } from "@/types/quiz";
+import { useAuthStore } from "@/store/auth.store";
+import { useUiStore } from "@/store/ui.store";
 
 const LEVEL_OPTIONS: { value: QuizLevel; label: string }[] = [
   { value: "BEGINNER", label: "입문" },
@@ -23,6 +27,14 @@ export function QuizIntro({
   onLevelChange,
   onStart,
 }: QuizIntroProps) {
+  const planType = useAuthStore((s) => s.user?.planType);
+  const rawLevel = useAuthStore((s) => s.user?.level);
+  const QUIZ_LEVELS: QuizLevel[] = ["BEGINNER", "JUNIOR", "MIDDLE", "SENIOR"];
+  const userLevel: QuizLevel =
+    rawLevel && (QUIZ_LEVELS as string[]).includes(rawLevel)
+      ? (rawLevel as QuizLevel)
+      : "JUNIOR";
+  const openPlanUpgradeModal = useUiStore((s) => s.openPlanUpgradeModal);
   return (
     <div className="flex flex-col items-center gap-8 py-12 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
@@ -72,20 +84,31 @@ export function QuizIntro({
           난이도 선택
         </p>
         <div className="grid grid-cols-4 gap-2">
-          {LEVEL_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => onLevelChange(opt.value)}
-              className={cn(
-                "rounded-xl border px-3 py-2.5 text-xs font-semibold transition-all duration-150 cursor-pointer",
-                selectedLevel === opt.value
-                  ? "bg-primary/10 text-primary"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
+          {LEVEL_OPTIONS.map((opt) => {
+            const isLocked = planType === "FREE" && opt.value !== userLevel;
+            return (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  if (isLocked) {
+                    openPlanUpgradeModal("PRO");
+                    return;
+                  }
+                  onLevelChange(opt.value);
+                }}
+                className={cn(
+                  "flex items-center justify-center gap-1 rounded-xl border px-3 py-2.5 text-xs font-semibold transition-all duration-150 cursor-pointer",
+                  selectedLevel === opt.value
+                    ? "bg-primary/10 text-primary"
+                    : isLocked
+                      ? "border-border bg-card text-muted-foreground/40"
+                      : "border-border bg-card text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {isLocked ? <Lock className="h-3 w-3" /> : opt.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

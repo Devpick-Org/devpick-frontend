@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
 import {
   FeedCard,
@@ -80,6 +81,8 @@ export default function HomePage() {
     return data?.pages.flatMap((page) => page.data.contents) ?? [];
   }, [data]);
 
+  const planLimited = data?.pages.some((p) => p.data.planLimited) ?? false;
+
   useEffect(() => {
     const target = loadMoreRef.current;
     if (!target) return;
@@ -155,9 +158,26 @@ export default function HomePage() {
             ))}
 
           {!hasNextPage && contents.length > 0 && (
-            <p className="py-6 text-center text-sm font-medium text-muted-foreground">
-              마지막 콘텐츠입니다.
-            </p>
+            planLimited ? (
+              <div className="mt-4 rounded-xl border border-border bg-card px-5 py-4 text-center">
+                <p className="text-sm font-medium text-foreground">
+                  무료 플랜은 최신 50개까지만 볼 수 있어요.
+                </p>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  Pro로 업그레이드하면 무제한으로 확인할 수 있습니다.
+                </p>
+                <Link
+                  href="/plans"
+                  className="mt-3 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                >
+                  업그레이드
+                </Link>
+              </div>
+            ) : (
+              <p className="py-6 text-center text-sm font-medium text-muted-foreground">
+                마지막 콘텐츠입니다.
+              </p>
+            )
           )}
 
           <div ref={loadMoreRef} className="h-4" />

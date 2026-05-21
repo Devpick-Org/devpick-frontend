@@ -4,8 +4,28 @@ import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { Paperclip, Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import type { LocalFileItem, PostAttachmentDTO, PostDraft } from "@/types/community";
+import type {
+  LocalFileItem,
+  PostAttachmentDTO,
+  PostDraft,
+} from "@/types/community";
 import type { PostLevel, PostType } from "@/types/post";
+import { useAuthStore } from "@/store/auth.store";
+
+// ─── 유틸 ──────────────────────────────────────────────────────────────────
+
+function formatResetsAt(resetsAt: string | null): string {
+  if (!resetsAt) return "";
+  const target = new Date(resetsAt);
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (target.toDateString() === tomorrow.toDateString()) return "내일 자정";
+  const nextMonday = new Date(now);
+  nextMonday.setDate(now.getDate() + ((8 - now.getDay()) % 7 || 7));
+  if (target.toDateString() === nextMonday.toDateString()) return "다음 월요일";
+  return `${target.getMonth() + 1}월 ${target.getDate()}일`;
+}
 
 // ─── 상수 ──────────────────────────────────────────────────────────────────
 
@@ -169,6 +189,8 @@ export function PostWriteForm({
     addFiles(e.dataTransfer.files);
   };
 
+  const aiDailyLimits = useAuthStore((s) => s.user?.limits?.aiDaily);
+
   // validate()가 level null을 차단하므로 이 시점에서 level은 항상 non-null
   const draft: PostDraft = { postType, title, content, level: level! };
   const isPending = isRefining || isSubmitting;
@@ -254,7 +276,9 @@ export function PostWriteForm({
             <label className="text-sm font-semibold text-foreground">
               본문 <span className="text-destructive">*</span>
             </label>
-            <span className="text-xs font-medium text-muted-foreground">마크다운 지원</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              마크다운 지원
+            </span>
           </div>
           <textarea
             value={content}
@@ -262,7 +286,11 @@ export function PostWriteForm({
               setContent(e.target.value);
               setErrors((p) => ({ ...p, content: undefined }));
             }}
-            placeholder={postType === "CAREER" ? CAREER_CONTENT_PLACEHOLDER : CONTENT_PLACEHOLDER}
+            placeholder={
+              postType === "CAREER"
+                ? CAREER_CONTENT_PLACEHOLDER
+                : CONTENT_PLACEHOLDER
+            }
             rows={14}
             className={cn(
               "w-full resize-y rounded-xl border bg-background px-4 py-3 text-sm font-medium leading-relaxed text-foreground placeholder:text-muted-foreground/40 outline-none transition-colors focus:border-border",
@@ -388,22 +416,35 @@ export function PostWriteForm({
             if (validate()) onSubmit(draft);
           }}
           disabled={isPending}
-          className={cn("flex-1 gap-2 border-0 bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground")}
+          className={cn(
+            "flex-1 gap-2 border-0 bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground",
+          )}
         >
           {isSubmitting ? "저장 중..." : (submitLabel ?? "바로 게시하기")}
         </Button>
         {onRefine && postType === "TECH" && (
-          <Button
-            type="button"
-            onClick={() => {
-              if (validate()) onRefine(draft);
-            }}
-            disabled={isPending}
-            className="flex-1 gap-2"
-          >
-            <Sparkles className="h-4 w-4" />
-            {isRefining ? "AI가 개선 중..." : "AI로 질문 개선하기"}
-          </Button>
+          <div className="flex flex-1 flex-col gap-1">
+            <Button
+              type="button"
+              onClick={() => {
+                if (validate()) onRefine(draft);
+              }}
+              disabled={isPending || aiDailyLimits?.remaining === 0}
+              className="w-full gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              {isRefining ? "AI가 개선 중..." : "AI로 질문 개선하기"}
+            </Button>
+            {aiDailyLimits && (
+              <p className="mt-1 text-center text-xs font-medium text-muted-foreground">
+                {aiDailyLimits.remaining === -1
+                  ? "무제한"
+                  : aiDailyLimits.remaining === 0
+                    ? `오늘 횟수를 모두 사용했어요 · ${formatResetsAt(aiDailyLimits.resetsAt)} 초기화`
+                    : `오늘 ${aiDailyLimits.remaining}회 남음`}
+              </p>
+            )}
+          </div>
         )}
       </div>
     </div>
