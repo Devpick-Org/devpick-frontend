@@ -611,6 +611,81 @@ function FlowSection() {
   );
 }
 
+// ─── Pricing Section ─────────────────────────────────────────────────────────
+
+const PRICING_ROWS: { feature: string; free: string; pro: string; max: string }[] = [
+  { feature: "홈 제공 글 수",         free: "최신 50개",    pro: "무제한",    max: "무제한"    },
+  { feature: "AI 요약 / 퀴즈",        free: "자신 레벨만",  pro: "전 레벨",   max: "전 레벨"   },
+  { feature: "AI 질문 개선 / 답변",   free: "일 5회",       pro: "일 10회",   max: "무제한"    },
+  { feature: "리포트",                free: "최근 1주만",   pro: "누적 제공", max: "누적 제공" },
+  { feature: "히스토리 조회",         free: "무제한",       pro: "무제한",    max: "무제한"    },
+  { feature: "채용 공고 목록/상세",   free: "무제한",       pro: "무제한",    max: "무제한"    },
+  { feature: "스킬갭 분석",           free: "주 2회",       pro: "주 7회",    max: "무제한"    },
+  { feature: "면접 Q&A 조회",         free: "무제한",       pro: "무제한",    max: "무제한"    },
+  { feature: "면접 Q&A 생성",         free: "주 2회",       pro: "주 7회",    max: "무제한"    },
+  { feature: "모의 면접",             free: "주 2회",       pro: "주 7회",    max: "무제한"    },
+];
+
+function PricingSection() {
+  return (
+    <section className="bg-muted/40 py-24">
+      <div className="mx-auto max-w-4xl px-4 lg:px-8">
+        <FadeUpOnView className="mb-14 text-center">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-primary">
+            Pricing
+          </p>
+          <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
+            나에게 맞는 플랜을 선택하세요
+          </h2>
+          <p className="mt-4 font-medium text-muted-foreground">
+            언제든지 업그레이드하거나 다운그레이드 할 수 있어요
+          </p>
+        </FadeUpOnView>
+
+        <FadeUpOnView delay={0.1}>
+          <div className="overflow-x-auto rounded-xl border border-border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-card">
+                  <th className="py-4 pl-5 pr-3 text-left font-semibold text-foreground">
+                    기능
+                  </th>
+                  <th className="px-4 py-4 text-center font-semibold text-foreground">Free</th>
+                  <th className="px-4 py-4 text-center font-semibold text-foreground">Pro</th>
+                  <th className="px-4 py-4 text-center font-semibold text-foreground">Max</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PRICING_ROWS.map((row, i) => (
+                  <tr
+                    key={row.feature}
+                    className={i % 2 === 0 ? "bg-card" : "bg-secondary/20"}
+                  >
+                    <td className="py-3 pl-5 pr-3 font-medium text-foreground">
+                      {row.feature}
+                    </td>
+                    <td className="px-4 py-3 text-center text-muted-foreground">{row.free}</td>
+                    <td className="px-4 py-3 text-center text-muted-foreground">{row.pro}</td>
+                    <td className="px-4 py-3 text-center text-muted-foreground">{row.max}</td>
+                  </tr>
+                ))}
+                {/* 요금 행 */}
+                <tr className="border-t border-border bg-secondary/40">
+                  <td className="py-4 pl-5 pr-3 font-semibold text-foreground">가격</td>
+                  <td className="px-4 py-4 text-center font-semibold text-foreground">무료</td>
+                  <td className="px-4 py-4 text-center font-semibold text-foreground">월 9,900원</td>
+                  <td className="px-4 py-4 text-center font-semibold text-foreground">월 19,900원</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </FadeUpOnView>
+      </div>
+    </section>
+  );
+}
+
 // ─── Bottom CTA Section ───────────────────────────────────────────────────────
 function CtaSection() {
   return (
@@ -712,6 +787,7 @@ export function LandingPage() {
       <HeroSection />
       <FeaturesSection />
       <FlowSection />
+      <PricingSection />
       <CtaSection />
       <LandingFooter />
     </div>

@@ -17,6 +17,7 @@ import {
   BookOpen,
   Briefcase,
   LayoutDashboard,
+  CreditCard,
   type LucideIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -183,6 +184,15 @@ export function TopNavVariant() {
                         className="flex items-center gap-2 font-medium cursor-pointer"
                       >
                         <User />내 프로필
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/plans"
+                        className="flex items-center gap-2 font-medium cursor-pointer"
+                      >
+                        <CreditCard />결제
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

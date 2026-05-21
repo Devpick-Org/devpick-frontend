@@ -117,18 +117,26 @@ limits?: UserLimits;
 
 ### 작업 목록
 
-| 작업                          | 파일                                                   | 비고                    |
-| ----------------------------- | ------------------------------------------------------ | ----------------------- |
-| 플랜 비교 페이지              | `app/(main)/plans/page.tsx` (신규)                     | `plan.png` 기반 디자인  |
-| 플랜 카드 컴포넌트            | `components/features/subscription/PlanCard.tsx` (신규) | Free / Pro / Max 카드   |
-| TopNav 드롭다운에 "구독" 추가 | `components/layout/TopNavVariant.tsx`                  | 프로필 아이템 바로 아래 |
+| 작업                          | 파일                                                   | 비고                                          |
+| ----------------------------- | ------------------------------------------------------ | --------------------------------------------- |
+| 플랜 비교 페이지              | `app/(main)/plans/page.tsx` (신규)                     | `plan.png` 기반 디자인 — 로그인 필수          |
+| 플랜 카드 컴포넌트            | `components/features/subscription/PlanCard.tsx` (신규) | Free / Pro / Max 카드                         |
+| TopNav 드롭다운에 "구독" 추가 | `components/layout/TopNavVariant.tsx`                  | 프로필 아이템 바로 아래                       |
+| 랜딩 페이지 요금 행 추가      | `components/features/landing/LandingPage.tsx`          | 기존 기능 비교표에 플랜별 가격 행 추가        |
 
 ### 플랜 소개 페이지 스펙
 
 - Free / Pro / Max 3단 비교 카드 (`plan.png` 참고)
-- 비로그인 유저도 접근 가능
+- **로그인 유저 전용** — 비로그인 유저는 `/auth`로 리다이렉트
 - 로그인 유저는 현재 플랜 강조 표시 (`user?.planType`, undefined면 FREE 취급)
 - 업그레이드 버튼 클릭 → `/payment/billing?plan=PRO` 또는 `/payment/billing?plan=MAX`
+
+### 비로그인 유저 플랜 정보 노출
+
+- `/plans` 페이지는 로그인 필수. 비로그인 접근 시 `/auth`로 리다이렉트
+- 비로그인 유저를 위한 플랜 정보는 **랜딩 페이지**에서 제공
+  - 기존 기능 비교표에 Free / Pro / Max 요금(무료 / 월 9,900원 / 월 19,900원) 행을 추가
+  - 랜딩 페이지 수정 대상 파일: `components/features/landing/LandingPage.tsx`
 
 ### 기능 비교표 항목 (`money.png` 기준 — 이 순서대로 표시)
 
