@@ -7,6 +7,8 @@ import { AuthInitializer } from "@/components/features/auth/AuthInitializer";
 import { ScrollToTopButton } from "@/components/layout/ScrollToTopButton";
 import { MainThemeSync } from "@/components/theme/MainThemeSync";
 import { useUiStore } from "@/store/ui.store";
+import { PlanUpgradeModal } from "@/components/features/subscription/PlanUpgradeModal";
+import { LimitExceededModal } from "@/components/features/subscription/LimitExceededModal";
 import { cn } from "@/lib/utils";
 
 export default function MainLayout({
@@ -60,6 +62,9 @@ export default function MainLayout({
       </main>
 
       <ScrollToTopButton />
+
+      <PlanUpgradeModal />
+      <LimitExceededModal />
 
       <Toaster
         richColors
