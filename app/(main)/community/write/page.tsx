@@ -4,10 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { useHydrated } from "@/lib/hooks/useHydrated";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, Sparkles, X } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postsEndpoints } from "@/lib/api/endpoints/posts";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { PostWriteForm } from "@/components/features/community/PostWriteForm";
 import { PostRefinePanel } from "@/components/features/community/PostRefinePanel";
@@ -55,6 +56,7 @@ export default function CommunityWritePage() {
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const mounted = useHydrated();
 
+  const updateUser = useAuthStore((s) => s.updateUser);
   const planType = user?.planType ?? "FREE";
   const aiDailyLimits = user?.limits?.aiDaily;
 
@@ -85,6 +87,7 @@ export default function CommunityWritePage() {
     mutationFn: postsEndpoints.refinePost,
     onSuccess: (res) => {
       setRefineState((prev) => ({ key: prev.key + 1, result: res }));
+      authEndpoints.getMe().then(({ data }) => updateUser(data.data)).catch(() => {});
     },
   });
 
@@ -394,23 +397,28 @@ function AiAnswerConfirmDialog({
   const exhausted = aiDailyLimits?.remaining === 0;
   const unlimited = aiDailyLimits?.remaining === -1;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="relative mx-4 w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition-colors hover:text-foreground"
-          aria-label="닫기"
-        >
-          <X className="h-4 w-4" />
-        </button>
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
-        <div className="mb-5 flex flex-col gap-2">
-          <h2 className="text-base font-bold text-foreground">
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/50 animate-in fade-in-0 duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xs rounded-lg bg-card p-6 shadow-xl animate-in fade-in-0 zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex flex-col gap-2">
+          <h2 className="text-lg font-semibold leading-none text-foreground">
             AI 답변을 함께 생성할까요?
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             게시 후 AI가 질문에 대한 1차 답변을 자동으로 작성해 드려요.
           </p>
         </div>
@@ -418,10 +426,8 @@ function AiAnswerConfirmDialog({
         {aiDailyLimits && (
           <div
             className={cn(
-              "mb-5 rounded-lg px-3.5 py-2.5 text-sm",
-              exhausted
-                ? "bg-destructive/10 text-destructive"
-                : "bg-secondary text-muted-foreground",
+              "mb-4 text-center text-sm",
+              exhausted ? "text-destructive" : "text-muted-foreground",
             )}
           >
             {unlimited
@@ -437,7 +443,7 @@ function AiAnswerConfirmDialog({
             type="button"
             onClick={() => onConfirm(true)}
             disabled={exhausted}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Sparkles className="h-4 w-4" />
             AI 답변 포함해서 게시
@@ -445,7 +451,7 @@ function AiAnswerConfirmDialog({
           <button
             type="button"
             onClick={() => onConfirm(false)}
-            className="w-full rounded-xl bg-secondary px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary/80"
+            className="w-full cursor-pointer rounded-lg bg-secondary px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
           >
             그냥 게시
           </button>

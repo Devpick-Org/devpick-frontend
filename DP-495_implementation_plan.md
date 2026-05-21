@@ -468,7 +468,7 @@ POST /subscriptions/change { planType: 현재 플랜 }  // pendingPlanType을 nu
 | AI 요약 레벨 잠금       | `components/features/home/AiSummary.tsx`            | FREE 유저 본인 레벨 외 🔒, 클릭 시 PlanUpgradeModal                                   |
 | AI 퀴즈 레벨 잠금       | `components/features/home/quiz/QuizIntro.tsx`       | 동일 패턴                                                                             |
 | AI 질문 개선 남은 횟수  | `components/features/community/PostRefinePanel.tsx` | `limits.aiDaily.remaining` 표시, 0이면 버튼 비활성화 + resetsAt 표시, -1이면 "무제한" |
-| AI 답변 남은 횟수       | `components/features/community/AiAnswerSection.tsx` | `limits.aiDaily.remaining` 표시 (aiDaily는 질문 개선과 합산 카운트)                   |
+| AI 답변 남은 횟수       | `components/features/community/AiAnswerSection.tsx` | prop 구현됨 (`aiDailyRemaining`), 단 `CommunityDetailPage`에서 **의도적으로 미전달** — 타인 글에도 본인 남은 횟수가 노출되는 문제로 표시 안 함으로 결정 |
 | 커뮤니티 글쓰기 AI 팝업 | `components/features/community/PostWriteForm.tsx`   | 자동 AI 답변 → 팝업 선택 방식으로 변경                                                |
 | 주간 리포트 잠금        | `components/features/report/WeeklyReportPage.tsx`   | `locked: true` 항목 🔒 + 회색 처리                                                    |
 
