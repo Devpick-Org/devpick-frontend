@@ -609,12 +609,31 @@ remaining === -1 → 버튼 활성화 + "무제한" 표시
 
 ### 연동 후 검증 체크리스트
 
-- [ ] `POST /subscriptions/billing-auth` — 결제 성공 후 planType 갱신 확인
-- [ ] `DELETE /subscriptions` — 해지 후 planExpiredAt 값 수신 확인
-- [ ] `POST /subscriptions/cancel` — 환불 후 planType FREE 전환 확인
-- [ ] `/users/me` 응답에 `planType`, `planExpiredAt`, `lastBilledAt`, `limits` 포함 확인
+**구독 API**
+- [ ] `POST /subscriptions/billing-auth` — 결제 성공 후 `/users/me` 재호출 시 `planType` 갱신 확인
+- [ ] `DELETE /subscriptions` — 해지 후 `planExpiredAt` 값 수신 확인
+- [ ] `POST /subscriptions/cancel` — 환불 후 `planType: FREE` 전환 확인
+- [ ] `POST /subscriptions/change` — 플랜 변경 예약 후 `pendingPlanType` 수신 확인
+
+**`/users/me` 응답 필드**
+- [ ] `planType`, `planExpiredAt`, `lastBilledAt`, `pendingPlanType`, `limits` 포함 확인
+- [ ] `limits` 안에 `aiDaily`, `skillBoostWeekly`, `interviewQaGenerateWeekly`, `mockInterviewWeekly` 4개 모두 포함 확인
+- [ ] 각 항목 `used`, `max`, `remaining`, `resetsAt` 형식 확인
+- [ ] MAX 플랜: `remaining: -1`, `resetsAt: null` 형식으로 오는지 확인
+
+**limits 실시간 갱신**
+- [ ] 부족역량·면접Q&A·모의면접·AI 질문개선 각각 사용 후 `/users/me` 재호출 시 `remaining` 감소 확인
+
+**에러 인터셉터**
+- [ ] 한도 초과 시 `429 PAYMENT_005` → `LimitExceededModal` 표시 확인
+- [ ] 플랜 초과 기능 접근 시 `403 PAYMENT_003` → `PlanUpgradeModal` 표시 확인
+
+**기존 API 신규 필드**
 - [ ] `/contents` 응답에 `planLimited` 필드 포함 확인 (FREE 유저 50개 도달 시)
 - [ ] `/reports/weekly/list` 응답에 `locked` 필드 포함 확인 (FREE 유저)
+
+**결제 플로우**
+- [ ] `NEXT_PUBLIC_TOSS_CLIENT_KEY` 운영 키 교체 후 카드 등록 위젯 정상 동작 확인
 
 ---
 

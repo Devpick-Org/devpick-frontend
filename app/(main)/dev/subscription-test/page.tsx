@@ -5,8 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { SubscriptionSection } from "@/components/features/profile/SubscriptionSection";
-import { MOCK_SUBSCRIPTION_SCENARIOS } from "@/lib/mock/subscriptions";
 import type { User } from "@/types/auth";
+import type { UserLimits } from "@/types/subscription";
 
 // ── 테스트 시나리오 ────────────────────────────────────────────────────────────
 
@@ -16,6 +16,21 @@ const BASE_USER: User = {
   nickname: "테스트유저",
   level: "JUNIOR",
 };
+
+function nextMidnightUTC(): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + 1);
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
+function nextMondayUTCTop(): string {
+  const d = new Date();
+  const daysUntilMonday = d.getUTCDay() === 0 ? 1 : 8 - d.getUTCDay();
+  d.setUTCDate(d.getUTCDate() + daysUntilMonday);
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
 
 function oneMonthLater(): string {
   const d = new Date();
@@ -28,6 +43,42 @@ function daysAgo(n: number): string {
   d.setDate(d.getDate() - n);
   return d.toISOString();
 }
+
+const MOCK_SUBSCRIPTION_SCENARIOS = {
+  FREE: {
+    planType: "FREE" as const,
+    planExpiredAt: null,
+    lastBilledAt: null,
+    limits: {
+      aiDaily:                   { used: 2, max: 5,  remaining: 3, resetsAt: nextMidnightUTC() },
+      skillBoostWeekly:          { used: 1, max: 2,  remaining: 1, resetsAt: nextMondayUTCTop() },
+      interviewQaGenerateWeekly: { used: 0, max: 2,  remaining: 2, resetsAt: nextMondayUTCTop() },
+      mockInterviewWeekly:       { used: 0, max: 2,  remaining: 2, resetsAt: nextMondayUTCTop() },
+    } satisfies UserLimits,
+  },
+  PRO: {
+    planType: "PRO" as const,
+    planExpiredAt: null,
+    lastBilledAt: new Date().toISOString(),
+    limits: {
+      aiDaily:                   { used: 3, max: 10, remaining: 7, resetsAt: nextMidnightUTC() },
+      skillBoostWeekly:          { used: 2, max: 7,  remaining: 5, resetsAt: nextMondayUTCTop() },
+      interviewQaGenerateWeekly: { used: 1, max: 7,  remaining: 6, resetsAt: nextMondayUTCTop() },
+      mockInterviewWeekly:       { used: 0, max: 7,  remaining: 7, resetsAt: nextMondayUTCTop() },
+    } satisfies UserLimits,
+  },
+  MAX: {
+    planType: "MAX" as const,
+    planExpiredAt: null,
+    lastBilledAt: new Date().toISOString(),
+    limits: {
+      aiDaily:                   { used: 0, max: -1, remaining: -1, resetsAt: null },
+      skillBoostWeekly:          { used: 0, max: -1, remaining: -1, resetsAt: null },
+      interviewQaGenerateWeekly: { used: 0, max: -1, remaining: -1, resetsAt: null },
+      mockInterviewWeekly:       { used: 0, max: -1, remaining: -1, resetsAt: null },
+    } satisfies UserLimits,
+  },
+};
 
 const SCENARIOS = [
   {
@@ -135,14 +186,6 @@ const PHASE6_SCENARIOS = [
 
 // ── Phase 7 테스트 시나리오 ──────────────────────────────────────────────────
 
-function nextMondayUTC(): string {
-  const d = new Date();
-  const daysUntilMonday = d.getUTCDay() === 0 ? 1 : 8 - d.getUTCDay();
-  d.setUTCDate(d.getUTCDate() + daysUntilMonday);
-  d.setUTCHours(0, 0, 0, 0);
-  return d.toISOString();
-}
-
 const PHASE7_SCENARIOS = [
   {
     label: "FREE · 각 기능 1회 남음",
@@ -157,7 +200,7 @@ const PHASE7_SCENARIOS = [
       ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
       limits: {
         ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
-        skillBoostWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTC() },
+        skillBoostWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTCTop() },
       },
     },
   },
@@ -169,7 +212,7 @@ const PHASE7_SCENARIOS = [
       ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
       limits: {
         ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
-        interviewQaGenerateWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTC() },
+        interviewQaGenerateWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTCTop() },
       },
     },
   },
@@ -181,7 +224,21 @@ const PHASE7_SCENARIOS = [
       ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
       limits: {
         ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
-        mockInterviewWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTC() },
+        mockInterviewWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTCTop() },
+      },
+    },
+  },
+  {
+    label: "FREE · 전 기능 소진",
+    desc: "skillBoost + qaGenerate + mockInterview 모두 remaining=0",
+    user: {
+      ...BASE_USER,
+      ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
+      limits: {
+        ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
+        skillBoostWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTCTop() },
+        interviewQaGenerateWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTCTop() },
+        mockInterviewWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTCTop() },
       },
     },
   },

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { useAuthStore } from "@/store/auth.store";
 import { subscriptionsEndpoints } from "@/lib/api/endpoints/subscriptions";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { extractApiError } from "@/lib/api/extractApiError";
 import type { LimitInfo } from "@/types/subscription";
 
@@ -187,10 +188,11 @@ export function SubscriptionSection() {
     setIsCanceling(true);
     try {
       const res = await subscriptionsEndpoints.cancelSubscription();
-      updateUser({ planExpiredAt: res.data.planExpiredAt });
-      const expiredLabel = res.data.planExpiredAt
-        ? formatKorDate(new Date(res.data.planExpiredAt))
+      const expiredLabel = res.data.data.planExpiredAt
+        ? formatKorDate(new Date(res.data.data.planExpiredAt))
         : "";
+      const me = await authEndpoints.getMe();
+      updateUser(me.data.data);
       toast.success(`${expiredLabel}까지 이용 가능합니다.`);
     } catch (e) {
       const { message } = extractApiError(e);
@@ -205,7 +207,8 @@ export function SubscriptionSection() {
     setIsRefunding(true);
     try {
       await subscriptionsEndpoints.refundSubscription();
-      updateUser({ planType: "FREE", planExpiredAt: null, lastBilledAt: null });
+      const me = await authEndpoints.getMe();
+      updateUser(me.data.data);
       toast.success("환불이 완료됐습니다. 즉시 Free 플랜으로 전환됩니다.");
     } catch (e) {
       const { message } = extractApiError(e);
@@ -219,8 +222,9 @@ export function SubscriptionSection() {
   const handleChangePlanToMax = async () => {
     setIsChangingPlan(true);
     try {
-      const result = await subscriptionsEndpoints.changePlan("MAX");
-      updateUser({ pendingPlanType: result.data.pendingPlanType });
+      await subscriptionsEndpoints.changePlan("MAX");
+      const me = await authEndpoints.getMe();
+      updateUser(me.data.data);
       toast.success("다음 결제부터 Max로 변경됩니다.");
     } catch (e) {
       const { message } = extractApiError(e);
@@ -234,7 +238,8 @@ export function SubscriptionSection() {
     setIsCancelingPlanChange(true);
     try {
       await subscriptionsEndpoints.changePlan(planType as "PRO" | "MAX");
-      updateUser({ pendingPlanType: null });
+      const me = await authEndpoints.getMe();
+      updateUser(me.data.data);
       toast.success("플랜 변경이 취소됐습니다.");
     } catch (e) {
       const { message } = extractApiError(e);

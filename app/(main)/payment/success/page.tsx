@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { subscriptionsEndpoints } from "@/lib/api/endpoints/subscriptions";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 
 const PLAN_LABELS: Record<string, string> = {
   PRO: "Pro",
@@ -57,15 +58,13 @@ function SuccessContent() {
 
     const processBilling = async () => {
       try {
-        const result = await subscriptionsEndpoints.billingAuth({
+        await subscriptionsEndpoints.billingAuth({
           authKey,
           customerKey,
           planType,
         });
-        updateUser({
-          planType: result.data.planType,
-          planExpiredAt: null,
-        });
+        const me = await authEndpoints.getMe();
+        updateUser(me.data.data);
         setPlanLabel(PLAN_LABELS[planType]);
       } catch {
         setError("결제 처리 중 오류가 발생했습니다. 고객센터에 문의해 주세요.");

@@ -8,6 +8,7 @@ import { PlanCard } from "@/components/features/subscription/PlanCard";
 import { useAuthStore } from "@/store/auth.store";
 import { useHydrated } from "@/lib/hooks/useHydrated";
 import { subscriptionsEndpoints } from "@/lib/api/endpoints/subscriptions";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { type PlanType } from "@/types/subscription";
 import { cn } from "@/lib/utils";
@@ -110,8 +111,9 @@ export default function PlansPage() {
   const handleChangePlan = useCallback(async (targetPlan: "PRO" | "MAX") => {
     setIsChanging(true);
     try {
-      const result = await subscriptionsEndpoints.changePlan(targetPlan);
-      updateUser({ pendingPlanType: result.data.pendingPlanType });
+      await subscriptionsEndpoints.changePlan(targetPlan);
+      const me = await authEndpoints.getMe();
+      updateUser(me.data.data);
       const label = targetPlan === "PRO" ? "Pro" : "Max";
       toast.success(`다음 결제부터 ${label}로 변경됩니다.`);
     } catch (e) {
@@ -126,7 +128,8 @@ export default function PlansPage() {
     setIsChanging(true);
     try {
       await subscriptionsEndpoints.changePlan(currentPlan as "PRO" | "MAX");
-      updateUser({ pendingPlanType: null });
+      const me = await authEndpoints.getMe();
+      updateUser(me.data.data);
       toast.success("플랜 변경이 취소됐습니다.");
     } catch (e) {
       const { message } = extractApiError(e);
