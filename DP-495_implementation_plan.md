@@ -174,7 +174,7 @@ limits?: UserLimits;
 | 카드 등록 페이지 (토스 위젯) | `app/(main)/payment/billing/page.tsx` (신규) | `?plan=PRO\|MAX` 쿼리 파라미터 수신                        |
 | 결제 완료 페이지             | `app/(main)/payment/success/page.tsx` (신규) | 토스 successUrl 콜백                                       |
 | 결제 실패 페이지             | `app/(main)/payment/fail/page.tsx` (신규)    | 토스 failUrl 콜백                                          |
-| 환경변수 추가                | `.env.local`                                 | `NEXT_PUBLIC_TOSS_CLIENT_KEY=test_ck_...` 값은 백에게 받기 |
+| 환경변수 추가                | `.env.local` (gitignore)                     | `NEXT_PUBLIC_TOSS_CLIENT_KEY=test_ck_...` 값은 백에게 받아서 `.env.local`에 추가. `.env.development`에는 주석으로만 안내 |
 
 ### 결제 플로우 상세
 
@@ -182,8 +182,8 @@ limits?: UserLimits;
 1. /payment/billing?plan=PRO 진입
 2. customerKey = crypto.randomUUID() 생성 (결제 요청 시점에 생성, 저장 불필요)
 3. const tossPayments = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)  — async 초기화 (await 필수)
-4. const billing = tossPayments.billing({ customerKey })  — customerKey를 Toss SDK에 전달
-5. billing.requestBillingAuth({
+4. const payment = tossPayments.payment({ customerKey })  — customerKey를 Toss SDK에 전달 (`@tosspayments/tosspayments-sdk` 신규 SDK는 billing() 아닌 payment() 사용)
+5. payment.requestBillingAuth({
      method: "CARD",
      successUrl: `${window.location.origin}/payment/success?plan=${planType}`,
      failUrl: `${window.location.origin}/payment/fail?plan=${planType}`,
@@ -198,15 +198,49 @@ limits?: UserLimits;
    - planType    → searchParams.get('plan')          // 미리 넣어둔 것
 8. POST /subscriptions/billing-auth { authKey, customerKey, planType } 호출
    (mock → DP-509에서 실제 연동)
-9. GET /users/me 재호출 → planType 갱신
+9. 유저 store 갱신 — DP-504와 DP-509 방식이 다름 (아래 참고)
 10. "홈으로 이동" 버튼
 ```
+
+### 유저 store 갱신 전략 (DP-504 vs DP-509)
+
+billingAuth mock 단계에서는 백엔드 실제 상태가 변하지 않으므로 GET /users/me 재호출 시 여전히 이전 플랜이 반환된다.
+두 단계의 갱신 방식이 다르므로 DP-509 작업 시 반드시 교체 필요.
+
+**DP-504 (mock — 현재)**
+```typescript
+const result = await subscriptionsEndpoints.billingAuth({ authKey, customerKey, planType })
+updateUser({ planType: result.data.planType, planExpiredAt: result.data.planExpiredAt })
+// GET /users/me 호출 X — 백엔드 실제 변경 안 됐으므로 의미 없음
+```
+
+**DP-509 (실제 API 교체 시)**
+```typescript
+await subscriptionsEndpoints.billingAuth({ authKey, customerKey, planType }) // 성공 확인만
+const me = await authEndpoints.getMe()
+updateUser(me.data.data) // 백엔드가 실제 업데이트됐으니 getMe로 전체 갱신 (limits, lastBilledAt 포함)
+// billingAuth 응답 기반 updateUser 코드 제거
+```
+
+변경 대상 (DP-509):
+- `lib/api/endpoints/subscriptions.ts` — billingAuth mock → axios
+- `app/(main)/payment/success/page.tsx` — billingAuth 응답 기반 updateUser 제거, getMe 추가
 
 ### 결제 완료 페이지 스펙
 
 - "Pro 플랜이 시작됐습니다!" 완료 메시지 (planType에 따라 동적)
-- GET /users/me 재호출하여 store의 user 갱신
+- billingAuth 응답 데이터로 store 직접 갱신 (DP-504 기준, DP-509에서 교체)
 - "홈으로 이동" 버튼
+
+### 인증 가드
+
+| 페이지 | 가드 방식 |
+|--------|----------|
+| `billing` | `isInitialized` 대기 후 비로그인 → `/auth` 리다이렉트 |
+| `success` | `isInitialized` 대기 후 비로그인 → `/auth` 리다이렉트 (billingAuth API 호출 전 필수) |
+| `fail` | 없음 — API 호출 없음, 버튼 이동만 |
+
+> Toss redirect는 브라우저 전체 이동이라 Zustand 메모리가 초기화됨. AuthInitializer가 refresh token cookie로 세션 복원을 시도하므로 `isInitialized` 완료를 기다린 뒤 인증 여부 판단.
 
 ### 결제 실패 페이지 스펙
 
@@ -377,13 +411,14 @@ remaining === -1 → 버튼 활성화 + "무제한" 표시
 
 ### 작업 목록
 
-| 작업                                 | 파일                                 | 비고                                              |
-| ------------------------------------ | ------------------------------------ | ------------------------------------------------- |
-| billingAuth mock → axios 교체        | `lib/api/endpoints/subscriptions.ts` | `POST /subscriptions/billing-auth`                |
-| cancelSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts` | `DELETE /subscriptions`                           |
-| refundSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts` | `POST /subscriptions/cancel`                      |
-| mock 파일 삭제                       | `lib/mock/subscriptions.ts`          |                                                   |
-| 운영 환경변수 교체                   | `.env.local` 및 배포 환경변수        | `NEXT_PUBLIC_TOSS_CLIENT_KEY` 실제 운영 키로 교체 |
+| 작업                                 | 파일                                          | 비고                                                       |
+| ------------------------------------ | --------------------------------------------- | ---------------------------------------------------------- |
+| billingAuth mock → axios 교체        | `lib/api/endpoints/subscriptions.ts`          | `POST /subscriptions/billing-auth`                         |
+| cancelSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`          | `DELETE /subscriptions`                                    |
+| refundSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`          | `POST /subscriptions/cancel`                               |
+| mock 파일 삭제                       | `lib/mock/subscriptions.ts`                   |                                                            |
+| 운영 환경변수 교체                   | `.env.local` 및 배포 환경변수                 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` 실제 운영 키로 교체          |
+| success 페이지 유저 갱신 방식 교체   | `app/(main)/payment/success/page.tsx`         | billingAuth 응답 기반 updateUser 제거 → getMe 호출로 교체. Phase 3 유저 갱신 전략 참고 |
 
 ### 연동 후 검증 체크리스트
 
