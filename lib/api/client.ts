@@ -91,6 +91,12 @@ function handlePaymentError(code: string, detail: unknown): void {
       });
       break;
     }
+    case "PAYMENT_006":
+      addToast({ type: "error", message: "결제 취소 가능 기간(7일)이 지났습니다." });
+      break;
+    case "PAYMENT_007":
+      addToast({ type: "error", message: "Free 기준치 초과 사용 이력이 있어 취소가 불가합니다." });
+      break;
   }
 }
 

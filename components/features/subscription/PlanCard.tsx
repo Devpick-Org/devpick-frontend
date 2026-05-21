@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { type PlanType } from "@/types/subscription";
@@ -9,6 +9,9 @@ import { type PlanType } from "@/types/subscription";
 interface PlanCardProps {
   plan: PlanType;
   currentPlan: PlanType;
+  pendingPlanType?: PlanType | null;
+  onChangePlan?: (plan: "PRO" | "MAX") => void;
+  isChanging?: boolean;
 }
 
 const PLAN_META: Record<
@@ -59,9 +62,10 @@ const PLAN_META: Record<
   },
 };
 
-export function PlanCard({ plan, currentPlan }: PlanCardProps) {
+export function PlanCard({ plan, currentPlan, pendingPlanType, onChangePlan, isChanging }: PlanCardProps) {
   const meta = PLAN_META[plan];
   const isCurrent = currentPlan === plan;
+  const isPending = pendingPlanType === plan && !isCurrent;
 
   return (
     <div
@@ -111,11 +115,32 @@ export function PlanCard({ plan, currentPlan }: PlanCardProps) {
           <Badge className="w-full justify-center rounded-lg py-2 text-sm font-semibold bg-secondary text-muted-foreground hover:bg-secondary">
             현재 플랜
           </Badge>
-        ) : (
+        ) : isPending ? (
+          <Badge className="w-full justify-center rounded-lg py-2 text-sm font-semibold bg-primary/10 text-primary hover:bg-primary/10">
+            변경 예약됨
+          </Badge>
+        ) : plan === "FREE" ? (
+          // FREE 다운그레이드는 구독 해지(프로필)에서 처리 — Plans 페이지에서 직접 액션 없음
+          <p className="text-center text-xs text-muted-foreground">
+            구독 해지 후 자동 전환
+          </p>
+        ) : currentPlan === "FREE" ? (
           <Button asChild className="w-full font-semibold">
             <Link href={`/payment/billing?plan=${plan}`}>
               {meta.name} 시작하기
             </Link>
+          </Button>
+        ) : (
+          <Button
+            className="w-full font-semibold"
+            onClick={() => onChangePlan?.(plan as "PRO" | "MAX")}
+            disabled={isChanging}
+          >
+            {isChanging ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              `${meta.name}으로 변경`
+            )}
           </Button>
         )}
       </div>

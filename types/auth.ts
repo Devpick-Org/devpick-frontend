@@ -19,6 +19,7 @@ export interface User {
   planType?: PlanType;
   planExpiredAt?: string | null;
   lastBilledAt?: string | null;
+  pendingPlanType?: PlanType | null;
   limits?: UserLimits;
 }
 

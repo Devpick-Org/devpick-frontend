@@ -303,11 +303,11 @@ updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 
 
 ### 작업 목록
 
-| 작업                    | 파일                                                              | 비고 |
-| ----------------------- | ----------------------------------------------------------------- | ---- |
-| 구독 관리 섹션 컴포넌트 | `components/features/profile/SubscriptionSection.tsx` (신규)     |      |
-| 프로필 페이지에 통합    | `components/features/profile/ProfileEditForm.tsx` (학습 정보 아래, Danger Zone 위) |      |
-| 테스트 페이지           | `app/(main)/dev/subscription-test/page.tsx` (신규)               | 개발용 |
+| 작업                    | 파일                                                                               | 비고   |
+| ----------------------- | ---------------------------------------------------------------------------------- | ------ |
+| 구독 관리 섹션 컴포넌트 | `components/features/profile/SubscriptionSection.tsx` (신규)                       |        |
+| 프로필 페이지에 통합    | `components/features/profile/ProfileEditForm.tsx` (학습 정보 아래, Danger Zone 위) |        |
+| 테스트 페이지           | `app/(main)/dev/subscription-test/page.tsx` (신규)                                 | 개발용 |
 
 ### 섹션 제목 및 공통 UI
 
@@ -322,9 +322,9 @@ updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 
     - `remaining === -1` → 바 없이 "무제한" 텍스트
   - `limits` 없을 때 (백엔드 미연동): 스켈레톤 + "사용량 정보를 불러오는 중이에요." 안내 문구
 
-| limits 키                   | 표시 이름         | 초기화 주기       |
-| --------------------------- | ----------------- | ----------------- |
-| `aiDaily`                   | AI 질문 개선/답변 | 매일 자정 초기화  |
+| limits 키                   | 표시 이름         | 초기화 주기        |
+| --------------------------- | ----------------- | ------------------ |
+| `aiDaily`                   | AI 질문 개선/답변 | 매일 자정 초기화   |
 | `skillBoostWeekly`          | 부족 역량 보완    | 매주 월요일 초기화 |
 | `interviewQaGenerateWeekly` | 면접 Q&A          | 매주 월요일 초기화 |
 | `mockInterviewWeekly`       | 모의 면접         | 매주 월요일 초기화 |
@@ -341,7 +341,7 @@ updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 
 
 - 배지 오른쪽: "다음 결제일 YYYY.MM.DD · ₩N,NNN" (`lastBilledAt + 1개월` 계산)
 - 이번 주 사용량 섹션 표시
-- 하단 왼쪽: "Max 플랜으로 업그레이드" 링크 (PRO일 때만) → `/plans`
+- 하단 왼쪽: "Max 플랜으로 업그레이드" 링크 (PRO일 때만) → `POST /subscriptions/change { planType: "MAX" }` 직접 호출 (결제창 없음, 다음 결제 구간 전환)
 - 하단 오른쪽: "구독 해지" 링크 → 확인 모달 → `DELETE /subscriptions`
   - 성공 시 `updateUser({ planExpiredAt })` + "N월 N일까지 이용 가능합니다." 토스트 → 상태 C 전환
 - 하단 오른쪽 하단: "결제 취소 및 환불" 링크 — `lastBilledAt` 기준 7일 이내만 노출
@@ -359,6 +359,100 @@ updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 
 
 - 해지 성공 → `updateUser({ planExpiredAt: res.data.planExpiredAt })`
 - 환불 성공 → `updateUser({ planType: 'FREE', planExpiredAt: null, lastBilledAt: null })`
+
+---
+
+## Phase 5 보완 — 백엔드 업데이트 반영 (`DP-495_frontend_update.txt`) ✅
+
+> Phase 5 완료 후 백엔드 추가 스펙이 확정됨에 따라 진행. Phase 6 전에 완료 필요.
+
+### 배경
+
+- 백엔드가 PRO ↔ MAX 플랜 변경 예약 기능(`POST /subscriptions/change`)과 새 에러 코드(PAYMENT_006, PAYMENT_007)를 추가함
+- `/users/me` 응답에 `pendingPlanType` 필드가 신규 추가됨
+- SubscriptionSection State B에 변경 예약 UI를 추가해야 함
+- **토스 결제 플로우는 FREE 유저 전용임이 확정됨 → Plans 페이지 PlanCard 버튼 분기 수정 필요** (Phase 2에서 미처리)
+
+### 플랜 변경 분기 규칙 (확정)
+
+| 케이스     | 진입 경로                                        | 비고                    |
+| ---------- | ------------------------------------------------ | ----------------------- |
+| FREE → PRO | `/payment/billing?plan=PRO` (토스 결제 플로우)   | 즉시 결제               |
+| FREE → MAX | `/payment/billing?plan=MAX` (토스 결제 플로우)   | 즉시 결제               |
+| PRO → MAX  | `POST /subscriptions/change { planType: "MAX" }` | 다음 결제 구간부터 전환 |
+| MAX → PRO  | `POST /subscriptions/change { planType: "PRO" }` | 다음 결제 구간부터 전환 |
+
+**프론트 분기 기준**
+
+```typescript
+if (currentPlanType === "FREE") {
+  router.push(`/payment/billing?plan=${targetPlan}`);
+} else {
+  // POST /subscriptions/change 직접 호출
+  // 성공 시 updateUser({ pendingPlanType }) + toast
+}
+```
+
+이 분기 규칙은 아래 두 위치에 적용:
+
+1. **Plans 페이지 PlanCard** — 업그레이드 버튼 클릭 시
+2. **SubscriptionSection State B** — "Max 플랜으로 업그레이드" 버튼 클릭 시
+
+### 작업 목록
+
+| 작업                                        | 파일                                                  | 비고                                                              |
+| ------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------- |
+| `User` 타입에 `pendingPlanType` 추가        | `types/auth.ts`                                       | `pendingPlanType?: PlanType \| null`                              |
+| `ChangePlanData` 인터페이스 추가            | `types/subscription.ts`                               | changePlan 응답 타입                                              |
+| `changePlan` API 함수 추가 (mock)           | `lib/api/endpoints/subscriptions.ts`                  | `POST /subscriptions/change`                                      |
+| `MOCK_CHANGE_PLAN` 추가                     | `lib/mock/subscriptions.ts`                           |                                                                   |
+| PAYMENT_006, PAYMENT_007 인터셉터 처리 추가 | `lib/api/client.ts`                                   | 409 → 토스트                                                      |
+| Plans 페이지 PlanCard 버튼 분기 추가        | `app/(main)/plans/page.tsx`                           | FREE → 결제창, PRO/MAX → changePlan 직접 호출 (위 분기 규칙 적용) |
+| State B "Max 업그레이드" 버튼 동작 변경     | `components/features/profile/SubscriptionSection.tsx` | `/plans` 이동 → changePlan 직접 호출로 변경                       |
+| State B에 `pendingPlanType` UI 추가         | `components/features/profile/SubscriptionSection.tsx` | 변경 예약 정보 + [변경 취소] 버튼                                 |
+
+### 타입 추가
+
+```typescript
+// types/auth.ts — User 인터페이스에 추가
+pendingPlanType?: PlanType | null;  // 다음 결제 구간에 전환될 플랜. 예약 없으면 null
+
+// types/subscription.ts — 신규 인터페이스
+export interface ChangePlanData {
+  currentPlanType: PlanType;
+  pendingPlanType: PlanType;
+  changeEffectiveAt: string; // ISO 8601 UTC — 변경 적용일
+}
+```
+
+### 인터셉터 추가 에러 처리
+
+| 에러 코드   | HTTP | 처리 방식                                                   |
+| ----------- | ---- | ----------------------------------------------------------- |
+| PAYMENT_006 | 409  | 토스트 "결제 취소 가능 기간(7일)이 지났습니다."             |
+| PAYMENT_007 | 409  | 토스트 "Free 기준치 초과 사용 이력이 있어 취소 불가합니다." |
+
+### SubscriptionSection State B 추가 스펙
+
+`pendingPlanType`이 non-null인 경우 정기 갱신(State B) 영역에 아래 내용을 추가 표시.
+
+```
+"다음 결제부터 {PRO/MAX}로 변경됩니다 (변경일: changeEffectiveAt 날짜 포맷)"
+[변경 취소] 버튼
+```
+
+**[변경 취소] 처리 흐름**
+
+```
+POST /subscriptions/change { planType: 현재 플랜 }  // pendingPlanType을 null로 초기화
+→ 성공 시 GET /users/me 재호출하여 store 갱신
+```
+
+**mock 처리**: `changePlan` 성공 후 `updateUser({ pendingPlanType: null })`로 직접 갱신 (getMe 재호출은 DP-509에서)
+
+### Phase 8에 추가되는 항목
+
+`changePlan mock → axios 교체`는 DP-509(Phase 8)에서 함께 처리.
 
 ---
 
@@ -443,10 +537,10 @@ updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 
 
 **프론트 변경 사항** (`lib/api/endpoints/jobs.ts` 완료 — `JobSkillGapSection.tsx`는 DP-508에서 수정)
 
-| 파일                        | 변경 내용                                                                          | 상태 |
-| --------------------------- | ---------------------------------------------------------------------------------- | ---- |
-| `lib/api/endpoints/jobs.ts` | `getSkillGap(jobId)` 추가 — 404면 null 반환, 그 외 에러는 throw                   | ✅ 완료 |
-| `JobSkillGapSection.tsx`    | 로컬 `useState` → `useQuery(getSkillGap)` 교체, POST 성공 시 `invalidateQueries`  | DP-508에서 작업 |
+| 파일                        | 변경 내용                                                                        | 상태            |
+| --------------------------- | -------------------------------------------------------------------------------- | --------------- |
+| `lib/api/endpoints/jobs.ts` | `getSkillGap(jobId)` 추가 — 404면 null 반환, 그 외 에러는 throw                  | ✅ 완료         |
+| `JobSkillGapSection.tsx`    | 로컬 `useState` → `useQuery(getSkillGap)` 교체, POST 성공 시 `invalidateQueries` | DP-508에서 작업 |
 
 **변경 후 흐름**
 
@@ -479,14 +573,16 @@ remaining === -1 → 버튼 활성화 + "무제한" 표시
 
 ### 작업 목록
 
-| 작업                                 | 파일                                  | 비고                                                                                   |
-| ------------------------------------ | ------------------------------------- | -------------------------------------------------------------------------------------- |
-| billingAuth mock → axios 교체        | `lib/api/endpoints/subscriptions.ts`  | `POST /subscriptions/billing-auth`                                                     |
-| cancelSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`  | `DELETE /subscriptions`                                                                |
-| refundSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`  | `POST /subscriptions/cancel`                                                           |
-| mock 파일 삭제                       | `lib/mock/subscriptions.ts`           |                                                                                        |
-| 운영 환경변수 교체                   | `.env.local` 및 배포 환경변수         | `NEXT_PUBLIC_TOSS_CLIENT_KEY` 실제 운영 키로 교체                                      |
-| success 페이지 유저 갱신 방식 교체   | `app/(main)/payment/success/page.tsx` | billingAuth 응답 기반 updateUser 제거 → getMe 호출로 교체. Phase 3 유저 갱신 전략 참고 |
+| 작업                                 | 파일                                                  | 비고                                                                                   |
+| ------------------------------------ | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| billingAuth mock → axios 교체        | `lib/api/endpoints/subscriptions.ts`                  | `POST /subscriptions/billing-auth`                                                     |
+| cancelSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`                  | `DELETE /subscriptions`                                                                |
+| refundSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`                  | `POST /subscriptions/cancel`                                                           |
+| changePlan mock → axios 교체         | `lib/api/endpoints/subscriptions.ts`                  | `POST /subscriptions/change`                                                           |
+| changePlan 성공 후 갱신 방식 교체    | `components/features/profile/SubscriptionSection.tsx` | updateUser 직접 갱신 → getMe 재호출로 교체                                             |
+| mock 파일 삭제                       | `lib/mock/subscriptions.ts`                           |                                                                                        |
+| 운영 환경변수 교체                   | `.env.local` 및 배포 환경변수                         | `NEXT_PUBLIC_TOSS_CLIENT_KEY` 실제 운영 키로 교체                                      |
+| success 페이지 유저 갱신 방식 교체   | `app/(main)/payment/success/page.tsx`                 | billingAuth 응답 기반 updateUser 제거 → getMe 호출로 교체. Phase 3 유저 갱신 전략 참고 |
 
 ### 연동 후 검증 체크리스트
 

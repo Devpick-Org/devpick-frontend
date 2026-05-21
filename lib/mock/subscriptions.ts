@@ -1,4 +1,4 @@
-import type { UserLimits, SubscriptionChangeData } from "@/types/subscription";
+import type { UserLimits, SubscriptionChangeData, ChangePlanData } from "@/types/subscription";
 import type { ApiResponse } from "@/types/api";
 
 function nextMidnightUTC(): string {
@@ -79,5 +79,17 @@ export function MOCK_REFUND_SUBSCRIPTION(): ApiResponse<SubscriptionChangeData> 
     success: true,
     data: { planType: "FREE", planExpiredAt: null },
     message: "환불이 완료됐습니다.",
+  };
+}
+
+export function MOCK_CHANGE_PLAN(targetPlanType: "PRO" | "MAX"): ApiResponse<ChangePlanData> {
+  return {
+    success: true,
+    data: {
+      currentPlanType: targetPlanType === "PRO" ? "MAX" : "PRO",
+      pendingPlanType: targetPlanType,
+      changeEffectiveAt: oneMonthLater(),
+    },
+    message: "플랜 변경이 예약됐습니다.",
   };
 }

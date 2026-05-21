@@ -15,10 +15,26 @@ import type { LimitInfo } from "@/types/subscription";
 // ── 상수 ──────────────────────────────────────────────────────────────────────
 
 const LIMIT_ROWS = [
-  { key: "aiDaily" as const,                   label: "AI 질문 개선/답변", resetLabel: "매일 자정 초기화" },
-  { key: "skillBoostWeekly" as const,          label: "부족 역량 보완",    resetLabel: "매주 월요일 초기화" },
-  { key: "interviewQaGenerateWeekly" as const, label: "면접 Q&A",          resetLabel: "매주 월요일 초기화" },
-  { key: "mockInterviewWeekly" as const,       label: "모의 면접",          resetLabel: "매주 월요일 초기화" },
+  {
+    key: "aiDaily" as const,
+    label: "AI 질문 개선/답변",
+    resetLabel: "매일 자정 초기화",
+  },
+  {
+    key: "skillBoostWeekly" as const,
+    label: "부족 역량 보완",
+    resetLabel: "매주 월요일 초기화",
+  },
+  {
+    key: "interviewQaGenerateWeekly" as const,
+    label: "면접 Q&A",
+    resetLabel: "매주 월요일 초기화",
+  },
+  {
+    key: "mockInterviewWeekly" as const,
+    label: "모의 면접",
+    resetLabel: "매주 월요일 초기화",
+  },
 ] as const;
 
 const PLAN_PRICE: Record<"PRO" | "MAX", string> = {
@@ -65,7 +81,9 @@ function UsageRow({
       <div className="mb-1.5 flex items-center justify-between">
         <span className="text-sm font-semibold text-foreground">{label}</span>
         {isUnlimited ? (
-          <span className="text-sm font-semibold text-muted-foreground">무제한</span>
+          <span className="text-sm font-semibold text-muted-foreground">
+            무제한
+          </span>
         ) : (
           <div className="flex items-center gap-1.5">
             <span
@@ -136,6 +154,8 @@ export function SubscriptionSection() {
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRefunding, setIsRefunding] = useState(false);
+  const [isChangingPlan, setIsChangingPlan] = useState(false);
+  const [isCancelingPlanChange, setIsCancelingPlanChange] = useState(false);
 
   const planType = user?.planType ?? "FREE";
   const isActive = planType !== "FREE";
@@ -147,9 +167,7 @@ export function SubscriptionSection() {
   const canRefund = !!(
     user?.lastBilledAt &&
     new Date() <
-      new Date(
-        new Date(user.lastBilledAt).getTime() + 7 * 24 * 60 * 60 * 1000,
-      )
+      new Date(new Date(user.lastBilledAt).getTime() + 7 * 24 * 60 * 60 * 1000)
   );
 
   // 다음 결제일 = lastBilledAt + 1개월 (정기갱신 상태에서 planExpiredAt은 null)
@@ -159,8 +177,9 @@ export function SubscriptionSection() {
       : null;
 
   // 해지 모달 설명: 예상 만료일을 lastBilledAt + 1개월로 계산
-  const estimatedExpiry =
-    user?.lastBilledAt ? formatKorDate(addOneMonth(user.lastBilledAt)) : null;
+  const estimatedExpiry = user?.lastBilledAt
+    ? formatKorDate(addOneMonth(user.lastBilledAt))
+    : null;
 
   const limits = user?.limits;
 
@@ -197,6 +216,34 @@ export function SubscriptionSection() {
     }
   };
 
+  const handleChangePlanToMax = async () => {
+    setIsChangingPlan(true);
+    try {
+      const result = await subscriptionsEndpoints.changePlan("MAX");
+      updateUser({ pendingPlanType: result.data.pendingPlanType });
+      toast.success("다음 결제부터 Max로 변경됩니다.");
+    } catch (e) {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "플랜 변경 중 오류가 발생했습니다.");
+    } finally {
+      setIsChangingPlan(false);
+    }
+  };
+
+  const handleCancelPlanChange = async () => {
+    setIsCancelingPlanChange(true);
+    try {
+      await subscriptionsEndpoints.changePlan(planType as "PRO" | "MAX");
+      updateUser({ pendingPlanType: null });
+      toast.success("플랜 변경이 취소됐습니다.");
+    } catch (e) {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "변경 취소 중 오류가 발생했습니다.");
+    } finally {
+      setIsCancelingPlanChange(false);
+    }
+  };
+
   return (
     <section className="mb-8 rounded-2xl bg-background p-6">
       <h2 className="mb-5 text-lg font-semibold text-foreground">내 플랜</h2>
@@ -214,7 +261,9 @@ export function SubscriptionSection() {
         {isRenewing && nextBillingDate && (
           <span className="text-sm text-muted-foreground">
             다음 결제일{" "}
-            <span className="font-semibold text-foreground">{nextBillingDate}</span>
+            <span className="font-semibold text-foreground">
+              {nextBillingDate}
+            </span>
             {" · "}
             {PLAN_PRICE[planType as "PRO" | "MAX"]}
           </span>
@@ -232,73 +281,97 @@ export function SubscriptionSection() {
       </div>
 
       {/* 이번 주 사용량 */}
-      <div className="mb-5">
+      <div className="mb-8">
         <p className="mb-4 text-sm font-bold text-foreground">이번 주 사용량</p>
         <div className="flex flex-col gap-4">
-          {limits
-            ? LIMIT_ROWS.map((row) => (
-                <UsageRow
-                  key={row.key}
-                  label={row.label}
-                  resetLabel={row.resetLabel}
-                  info={limits[row.key]}
-                />
-              ))
-            : (
-                <>
-                  {LIMIT_ROWS.map((row) => (
-                    <div key={row.key}>
-                      <div className="mb-1.5 flex items-center justify-between">
-                        <span className="text-sm font-semibold text-foreground">{row.label}</span>
-                        <div className="h-4 w-8 animate-pulse rounded bg-muted" />
-                      </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
-                        <div className="h-full w-1/3 animate-pulse rounded-full bg-muted" />
-                      </div>
-                      <div className="mt-1 h-3 w-24 animate-pulse rounded bg-muted" />
-                    </div>
-                  ))}
-                  <p className="pt-1 text-xs text-muted-foreground">
-                    사용량 정보를 불러오는 중이에요. 잠시 후 다시 확인해 주세요.
-                  </p>
-                </>
-              )}
+          {limits ? (
+            LIMIT_ROWS.map((row) => (
+              <UsageRow
+                key={row.key}
+                label={row.label}
+                resetLabel={row.resetLabel}
+                info={limits[row.key]}
+              />
+            ))
+          ) : (
+            <>
+              {LIMIT_ROWS.map((row) => (
+                <div key={row.key}>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-foreground">
+                      {row.label}
+                    </span>
+                    <div className="h-4 w-8 animate-pulse rounded bg-muted" />
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
+                    <div className="h-full w-1/3 animate-pulse rounded-full bg-muted" />
+                  </div>
+                  <div className="mt-1 h-3 w-24 animate-pulse rounded bg-muted" />
+                </div>
+              ))}
+              <p className="pt-1 text-xs text-muted-foreground">
+                사용량 정보를 불러오는 중이에요. 잠시 후 다시 확인해 주세요.
+              </p>
+            </>
+          )}
         </div>
       </div>
 
       {/* 하단 액션 — 정기갱신 중 */}
       {isRenewing && (
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            {planType === "PRO" && (
+        <>
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              {user?.pendingPlanType ? (
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm text-muted-foreground">
+                    다음 결제부터{" "}
+                    <span className="font-semibold text-foreground">
+                      {user.pendingPlanType === "PRO" ? "Pro" : "Max"}
+                    </span>
+                    로 변경됩니다
+                    {nextBillingDate && <span> ({nextBillingDate})</span>}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleCancelPlanChange}
+                    disabled={isCancelingPlanChange}
+                    className="cursor-pointer text-xs text-muted-foreground/70 underline-offset-2 hover:underline disabled:opacity-50 text-left"
+                  >
+                    {isCancelingPlanChange ? "처리 중..." : "변경 취소"}
+                  </button>
+                </div>
+              ) : planType === "PRO" ? (
+                <button
+                  type="button"
+                  onClick={handleChangePlanToMax}
+                  disabled={isChangingPlan}
+                  className="cursor-pointer text-sm font-medium text-muted-foreground underline-offset-2 hover:underline disabled:opacity-50"
+                >
+                  {isChangingPlan ? "처리 중..." : "Max 플랜으로 업그레이드"}
+                </button>
+              ) : null}
+            </div>
+            <div className="flex flex-col items-end gap-1">
               <button
                 type="button"
-                onClick={() => router.push("/plans")}
+                onClick={() => setShowCancelModal(true)}
                 className="cursor-pointer text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
               >
-                Max 플랜으로 업그레이드
+                구독 해지
               </button>
-            )}
+              {canRefund && (
+                <button
+                  type="button"
+                  onClick={() => setShowRefundModal(true)}
+                  className="cursor-pointer text-xs text-muted-foreground/70 underline-offset-2 hover:underline"
+                >
+                  결제 취소 및 환불
+                </button>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <button
-              type="button"
-              onClick={() => setShowCancelModal(true)}
-              className="cursor-pointer text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
-            >
-              구독 해지
-            </button>
-            {canRefund && (
-              <button
-                type="button"
-                onClick={() => setShowRefundModal(true)}
-                className="cursor-pointer text-xs text-muted-foreground/70 underline-offset-2 hover:underline"
-              >
-                결제 취소 및 환불
-              </button>
-            )}
-          </div>
-        </div>
+        </>
       )}
 
       {/* 하단 액션 — 해지 예정 */}

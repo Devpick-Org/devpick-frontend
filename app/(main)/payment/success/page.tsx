@@ -64,7 +64,7 @@ function SuccessContent() {
         });
         updateUser({
           planType: result.data.planType,
-          planExpiredAt: result.data.planExpiredAt,
+          planExpiredAt: null,
         });
         setPlanLabel(PLAN_LABELS[planType]);
       } catch {

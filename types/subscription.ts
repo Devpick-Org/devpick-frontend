@@ -24,3 +24,9 @@ export interface SubscriptionChangeData {
   planType: PlanType;
   planExpiredAt: string | null;
 }
+
+export interface ChangePlanData {
+  currentPlanType: PlanType;
+  pendingPlanType: PlanType;
+  changeEffectiveAt: string;
+}

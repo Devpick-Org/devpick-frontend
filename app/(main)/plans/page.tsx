@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 import { PlanCard } from "@/components/features/subscription/PlanCard";
 import { useAuthStore } from "@/store/auth.store";
 import { useHydrated } from "@/lib/hooks/useHydrated";
+import { subscriptionsEndpoints } from "@/lib/api/endpoints/subscriptions";
+import { extractApiError } from "@/lib/api/extractApiError";
 import { type PlanType } from "@/types/subscription";
 import { cn } from "@/lib/utils";
 
@@ -16,11 +19,15 @@ const FAQ_ITEMS = [
   },
   {
     q: "환불 정책이 어떻게 되나요?",
-    a: "결제일로부터 7일 이내에는 환불을 요청하실 수 있습니다. 7일이 지난 후에는 환불이 어려우며, 구독 취소 후 기간 만료 시 Free 플랜으로 전환됩니다.",
+    a: "결제일로부터 7일 이내에는 환불을 요청하실 수 있습니다. 단, 7일 이내라도 Free 플랜 사용량 이상으로 이미 사용하신 경우에는 환불이 불가합니다. 7일이 지난 후에는 환불이 어려우며, 구독 취소 후 기간 만료 시 Free 플랜으로 전환됩니다.",
+  },
+  {
+    q: "플랜을 변경할 수 있나요?",
+    a: "네, 플랜 간 자유롭게 전환할 수 있습니다. Free에서 Pro · Max로 업그레이드하면 결제 즉시 적용됩니다. Pro ↔ Max 간 변경은 별도 결제 없이 다음 결제일부터 자동으로 전환됩니다.",
   },
   {
     q: "플랜을 업그레이드하면 즉시 적용되나요?",
-    a: "네, 업그레이드 결제가 완료되는 즉시 새 플랜의 모든 기능을 이용하실 수 있습니다. 기존 결제일은 유지되며, 차액은 일할 계산되어 다음 결제에 반영됩니다.",
+    a: "Free에서 유료 플랜으로 업그레이드하면 결제 즉시 새 플랜의 모든 기능을 이용하실 수 있습니다. Pro ↔ Max 간 변경은 현재 결제 기간이 끝난 다음 결제일부터 적용되며, 즉시 추가 결제는 발생하지 않습니다.",
   },
 ];
 
@@ -87,16 +94,47 @@ const PLANS: PlanType[] = ["FREE", "PRO", "MAX"];
 export default function PlansPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const updateUser = useAuthStore((s) => s.updateUser);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const mounted = useHydrated();
   const currentPlan: PlanType = user?.planType ?? "FREE";
+  const [isChanging, setIsChanging] = useState(false);
 
   useEffect(() => {
     if (mounted && isInitialized && !isAuthenticated) {
       router.replace("/auth");
     }
   }, [mounted, isInitialized, isAuthenticated, router]);
+
+  const handleChangePlan = useCallback(async (targetPlan: "PRO" | "MAX") => {
+    setIsChanging(true);
+    try {
+      const result = await subscriptionsEndpoints.changePlan(targetPlan);
+      updateUser({ pendingPlanType: result.data.pendingPlanType });
+      const label = targetPlan === "PRO" ? "Pro" : "Max";
+      toast.success(`다음 결제부터 ${label}로 변경됩니다.`);
+    } catch (e) {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "플랜 변경 중 오류가 발생했습니다.");
+    } finally {
+      setIsChanging(false);
+    }
+  }, [updateUser]);
+
+  const handleCancelPlanChange = useCallback(async () => {
+    setIsChanging(true);
+    try {
+      await subscriptionsEndpoints.changePlan(currentPlan as "PRO" | "MAX");
+      updateUser({ pendingPlanType: null });
+      toast.success("플랜 변경이 취소됐습니다.");
+    } catch (e) {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "변경 취소 중 오류가 발생했습니다.");
+    } finally {
+      setIsChanging(false);
+    }
+  }, [currentPlan, updateUser]);
 
   if (!mounted || !isInitialized || !isAuthenticated) return null;
 
@@ -114,9 +152,37 @@ export default function PlansPage() {
       {/* 플랜 카드 */}
       <div className="mb-16 grid grid-cols-1 gap-6 sm:grid-cols-3">
         {PLANS.map((plan) => (
-          <PlanCard key={plan} plan={plan} currentPlan={currentPlan} />
+          <PlanCard
+            key={plan}
+            plan={plan}
+            currentPlan={currentPlan}
+            pendingPlanType={user?.pendingPlanType}
+            onChangePlan={handleChangePlan}
+            isChanging={isChanging}
+          />
         ))}
       </div>
+
+      {/* 플랜 변경 예약 안내 */}
+      {user?.pendingPlanType && (
+        <div className="mb-16 flex items-center justify-center gap-3">
+          <p className="text-sm text-muted-foreground">
+            다음 결제부터{" "}
+            <span className="font-semibold text-foreground">
+              {user.pendingPlanType === "PRO" ? "Pro" : "Max"}
+            </span>
+            로 변경됩니다
+          </p>
+          <button
+            type="button"
+            onClick={handleCancelPlanChange}
+            disabled={isChanging}
+            className="cursor-pointer text-sm text-muted-foreground underline-offset-2 hover:underline disabled:opacity-50"
+          >
+            {isChanging ? "처리 중..." : "변경 취소"}
+          </button>
+        </div>
+      )}
 
       {/* 기능 비교표 */}
       <div>

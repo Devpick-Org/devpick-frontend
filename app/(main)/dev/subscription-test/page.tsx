@@ -76,6 +76,24 @@ const SCENARIOS = [
       lastBilledAt: daysAgo(10),
     },
   },
+  {
+    label: "PRO — Max로 변경 예약됨",
+    user: {
+      ...BASE_USER,
+      ...MOCK_SUBSCRIPTION_SCENARIOS.PRO,
+      lastBilledAt: daysAgo(10),
+      pendingPlanType: "MAX" as const,
+    },
+  },
+  {
+    label: "MAX — Pro로 변경 예약됨",
+    user: {
+      ...BASE_USER,
+      ...MOCK_SUBSCRIPTION_SCENARIOS.MAX,
+      lastBilledAt: daysAgo(10),
+      pendingPlanType: "PRO" as const,
+    },
+  },
 ] as const;
 
 // ── 페이지 ────────────────────────────────────────────────────────────────────
