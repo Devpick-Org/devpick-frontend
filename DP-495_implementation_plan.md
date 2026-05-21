@@ -52,7 +52,7 @@ DP-502 / Phase 1 (기반)
 
 ---
 
-## Phase 1 — 기반 작업 `DP-502`
+## Phase 1 — 기반 작업 `DP-502` ✅
 
 > 모든 Phase의 선행 조건. 가장 먼저 완료해야 한다.
 
@@ -111,18 +111,18 @@ limits?: UserLimits;
 
 ---
 
-## Phase 2 — 플랜 소개 페이지 + TopNav `DP-503`
+## Phase 2 — 플랜 소개 페이지 + TopNav `DP-503` ✅
 
 > DP-502 완료 후 진행. DP-504와 병렬 가능.
 
 ### 작업 목록
 
-| 작업                          | 파일                                                   | 비고                                          |
-| ----------------------------- | ------------------------------------------------------ | --------------------------------------------- |
-| 플랜 비교 페이지              | `app/(main)/plans/page.tsx` (신규)                     | `plan.png` 기반 디자인 — 로그인 필수          |
-| 플랜 카드 컴포넌트            | `components/features/subscription/PlanCard.tsx` (신규) | Free / Pro / Max 카드                         |
-| TopNav 드롭다운에 "구독" 추가 | `components/layout/TopNavVariant.tsx`                  | 프로필 아이템 바로 아래                       |
-| 랜딩 페이지 요금 행 추가      | `components/features/landing/LandingPage.tsx`          | 기존 기능 비교표에 플랜별 가격 행 추가        |
+| 작업                          | 파일                                                   | 비고                                   |
+| ----------------------------- | ------------------------------------------------------ | -------------------------------------- |
+| 플랜 비교 페이지              | `app/(main)/plans/page.tsx` (신규)                     | `plan.png` 기반 디자인 — 로그인 필수   |
+| 플랜 카드 컴포넌트            | `components/features/subscription/PlanCard.tsx` (신규) | Free / Pro / Max 카드                  |
+| TopNav 드롭다운에 "구독" 추가 | `components/layout/TopNavVariant.tsx`                  | 프로필 아이템 바로 아래                |
+| 랜딩 페이지 요금 행 추가      | `components/features/landing/LandingPage.tsx`          | 기존 기능 비교표에 플랜별 가격 행 추가 |
 
 ### 플랜 소개 페이지 스펙
 
@@ -163,17 +163,17 @@ limits?: UserLimits;
 
 ---
 
-## Phase 3 — 결제 플로우 `DP-504`
+## Phase 3 — 결제 플로우 `DP-504` ✅
 
 > DP-502 완료 후 진행. DP-503과 병렬 가능.
 
 ### 작업 목록
 
-| 작업                         | 파일                                         | 비고                                                       |
-| ---------------------------- | -------------------------------------------- | ---------------------------------------------------------- |
-| 카드 등록 페이지 (토스 위젯) | `app/(main)/payment/billing/page.tsx` (신규) | `?plan=PRO\|MAX` 쿼리 파라미터 수신                        |
-| 결제 완료 페이지             | `app/(main)/payment/success/page.tsx` (신규) | 토스 successUrl 콜백                                       |
-| 결제 실패 페이지             | `app/(main)/payment/fail/page.tsx` (신규)    | 토스 failUrl 콜백                                          |
+| 작업                         | 파일                                         | 비고                                                                                                                     |
+| ---------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 카드 등록 페이지 (토스 위젯) | `app/(main)/payment/billing/page.tsx` (신규) | `?plan=PRO\|MAX` 쿼리 파라미터 수신                                                                                      |
+| 결제 완료 페이지             | `app/(main)/payment/success/page.tsx` (신규) | 토스 successUrl 콜백                                                                                                     |
+| 결제 실패 페이지             | `app/(main)/payment/fail/page.tsx` (신규)    | 토스 failUrl 콜백                                                                                                        |
 | 환경변수 추가                | `.env.local` (gitignore)                     | `NEXT_PUBLIC_TOSS_CLIENT_KEY=test_ck_...` 값은 백에게 받아서 `.env.local`에 추가. `.env.development`에는 주석으로만 안내 |
 
 ### 결제 플로우 상세
@@ -208,21 +208,31 @@ billingAuth mock 단계에서는 백엔드 실제 상태가 변하지 않으므�
 두 단계의 갱신 방식이 다르므로 DP-509 작업 시 반드시 교체 필요.
 
 **DP-504 (mock — 현재)**
+
 ```typescript
-const result = await subscriptionsEndpoints.billingAuth({ authKey, customerKey, planType })
-updateUser({ planType: result.data.planType, planExpiredAt: result.data.planExpiredAt })
+const result = await subscriptionsEndpoints.billingAuth({
+  authKey,
+  customerKey,
+  planType,
+});
+updateUser({
+  planType: result.data.planType,
+  planExpiredAt: result.data.planExpiredAt,
+});
 // GET /users/me 호출 X — 백엔드 실제 변경 안 됐으므로 의미 없음
 ```
 
 **DP-509 (실제 API 교체 시)**
+
 ```typescript
-await subscriptionsEndpoints.billingAuth({ authKey, customerKey, planType }) // 성공 확인만
-const me = await authEndpoints.getMe()
-updateUser(me.data.data) // 백엔드가 실제 업데이트됐으니 getMe로 전체 갱신 (limits, lastBilledAt 포함)
+await subscriptionsEndpoints.billingAuth({ authKey, customerKey, planType }); // 성공 확인만
+const me = await authEndpoints.getMe();
+updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 전체 갱신 (limits, lastBilledAt 포함)
 // billingAuth 응답 기반 updateUser 코드 제거
 ```
 
 변경 대상 (DP-509):
+
 - `lib/api/endpoints/subscriptions.ts` — billingAuth mock → axios
 - `app/(main)/payment/success/page.tsx` — billingAuth 응답 기반 updateUser 제거, getMe 추가
 
@@ -234,11 +244,11 @@ updateUser(me.data.data) // 백엔드가 실제 업데이트됐으니 getMe로 �
 
 ### 인증 가드
 
-| 페이지 | 가드 방식 |
-|--------|----------|
-| `billing` | `isInitialized` 대기 후 비로그인 → `/auth` 리다이렉트 |
+| 페이지    | 가드 방식                                                                            |
+| --------- | ------------------------------------------------------------------------------------ |
+| `billing` | `isInitialized` 대기 후 비로그인 → `/auth` 리다이렉트                                |
 | `success` | `isInitialized` 대기 후 비로그인 → `/auth` 리다이렉트 (billingAuth API 호출 전 필수) |
-| `fail` | 없음 — API 호출 없음, 버튼 이동만 |
+| `fail`    | 없음 — API 호출 없음, 버튼 이동만                                                    |
 
 > Toss redirect는 브라우저 전체 이동이라 Zustand 메모리가 초기화됨. AuthInitializer가 refresh token cookie로 세션 복원을 시도하므로 `isInitialized` 완료를 기다린 뒤 인증 여부 판단.
 
@@ -250,7 +260,7 @@ updateUser(me.data.data) // 백엔드가 실제 업데이트됐으니 getMe로 �
 
 ---
 
-## Phase 4 — 공통 모달 2개 `DP-505`
+## Phase 4 — 공통 모달 2개 `DP-505` ✅
 
 > DP-502 완료 후 진행. DP-506·507·508의 선행 조건.
 
@@ -287,39 +297,68 @@ updateUser(me.data.data) // 백엔드가 실제 업데이트됐으니 getMe로 �
 
 ---
 
-## Phase 5 — 프로필 페이지 구독 관리 섹션 `DP-506`
+## Phase 5 — 프로필 페이지 구독 관리 섹션 `DP-506` ✅
 
 > DP-505 완료 후 진행.
 
 ### 작업 목록
 
-| 작업                    | 파일                                                         | 비고 |
-| ----------------------- | ------------------------------------------------------------ | ---- |
-| 구독 관리 섹션 컴포넌트 | `components/features/profile/SubscriptionSection.tsx` (신규) |      |
-| 프로필 페이지에 통합    | `app/(main)/profile/page.tsx` 또는 기존 profile 컴포넌트     |      |
+| 작업                    | 파일                                                              | 비고 |
+| ----------------------- | ----------------------------------------------------------------- | ---- |
+| 구독 관리 섹션 컴포넌트 | `components/features/profile/SubscriptionSection.tsx` (신규)     |      |
+| 프로필 페이지에 통합    | `components/features/profile/ProfileEditForm.tsx` (학습 정보 아래, Danger Zone 위) |      |
+| 테스트 페이지           | `app/(main)/dev/subscription-test/page.tsx` (신규)               | 개발용 |
+
+### 섹션 제목 및 공통 UI
+
+- 섹션 제목: **"내 플랜"**
+- 플랜 배지: `rounded-md`, `py-1.5`
+  - FREE: outline 스타일, `text-muted-foreground`
+  - PRO: `bg-foreground text-background` + 왕관 아이콘
+  - MAX: `bg-amber-400 text-amber-950` + 왕관 아이콘
+- **이번 주 사용량** 섹션 (배경 없음, 4개 항목 고정)
+  - `limits` 있을 때: 프로그레스바 (`bg-primary/10` 트랙 / `bg-primary/70` 채움)
+    - `remaining === 0` → `bg-destructive` 바 + "소진" 뱃지
+    - `remaining === -1` → 바 없이 "무제한" 텍스트
+  - `limits` 없을 때 (백엔드 미연동): 스켈레톤 + "사용량 정보를 불러오는 중이에요." 안내 문구
+
+| limits 키                   | 표시 이름         | 초기화 주기       |
+| --------------------------- | ----------------- | ----------------- |
+| `aiDaily`                   | AI 질문 개선/답변 | 매일 자정 초기화  |
+| `skillBoostWeekly`          | 부족 역량 보완    | 매주 월요일 초기화 |
+| `interviewQaGenerateWeekly` | 면접 Q&A          | 매주 월요일 초기화 |
+| `mockInterviewWeekly`       | 모의 면접         | 매주 월요일 초기화 |
 
 ### 3가지 상태 분기
 
-**상태 A — planType === 'FREE'**
+**상태 A — FREE**
 
-- "현재 플랜: 무료"
-- [Pro로 업그레이드] / [Max로 업그레이드] 버튼 → `/plans`
+- `[ Free ]` 배지 + **"Pro/Max로 업그레이드"** 단일 버튼 → `/plans`
+- 이번 주 사용량 섹션 표시
+- 하단 배너 없음
 
-**상태 B — PRO 또는 MAX, planExpiredAt === null (정기 갱신 중)**
+**상태 B — PRO/MAX, planExpiredAt === null (정기 갱신 중)**
 
-- "현재 플랜: Pro / Max — 정기 결제 중"
-- [구독 해지] 버튼 → `DELETE /subscriptions` 호출
-  - 성공 시 "N월 N일까지 이용 가능합니다" 토스트 후 상태 C로 전환
-- [환불 요청] 버튼 — 표시 조건: `lastBilledAt !== null && 현재시각 < new Date(lastBilledAt) + 7일`
-  - ※ 7일 체크는 **프론트에서만** 버튼 노출 제어. 백엔드는 별도 기간 검증 없음 (최종 스펙 명시)
-  - `POST /subscriptions/cancel` 호출
-  - 성공 시 "환불이 완료됐습니다. 즉시 Free 플랜으로 전환됩니다" 토스트
+- 배지 오른쪽: "다음 결제일 YYYY.MM.DD · ₩N,NNN" (`lastBilledAt + 1개월` 계산)
+- 이번 주 사용량 섹션 표시
+- 하단 왼쪽: "Max 플랜으로 업그레이드" 링크 (PRO일 때만) → `/plans`
+- 하단 오른쪽: "구독 해지" 링크 → 확인 모달 → `DELETE /subscriptions`
+  - 성공 시 `updateUser({ planExpiredAt })` + "N월 N일까지 이용 가능합니다." 토스트 → 상태 C 전환
+- 하단 오른쪽 하단: "결제 취소 및 환불" 링크 — `lastBilledAt` 기준 7일 이내만 노출
+  - 확인 모달 → `POST /subscriptions/cancel`
+  - 성공 시 `updateUser({ planType: 'FREE', planExpiredAt: null, lastBilledAt: null })` + 토스트
+- 해지/환불 확인 모달: `ConfirmModal` `variant="danger"` (빨간 확인 버튼)
 
-**상태 C — PRO 또는 MAX, planExpiredAt !== null (해지 예정)**
+**상태 C — PRO/MAX, planExpiredAt !== null (해지 예정)**
 
-- "현재 플랜: Pro / Max — N월 N일까지 이용 가능 (해지 예정)"
-- 남은 기간 표시
-- [다시 구독하기] 버튼 → `/plans`
+- 배지 오른쪽: "N월 N일까지 이용 가능 (해지 예정)"
+- 이번 주 사용량 섹션 표시
+- 하단 오른쪽: "다시 구독하기" 링크 → `/plans`
+
+### Store 갱신 (mock 기준 — DP-509에서 getMe()로 교체)
+
+- 해지 성공 → `updateUser({ planExpiredAt: res.data.planExpiredAt })`
+- 환불 성공 → `updateUser({ planType: 'FREE', planExpiredAt: null, lastBilledAt: null })`
 
 ---
 
@@ -390,6 +429,35 @@ updateUser(me.data.data) // 백엔드가 실제 업데이트됐으니 getMe로 �
 | 면접 Q&A 생성  | `components/features/jobs/detail/JobQASection.tsx`        | `interviewQaGenerateWeekly` | `POST /jobs/{jobId}/interview-qa/generate`                                             |
 | 모의 면접 시작 | `components/features/jobs/detail/JobMockInterviewCta.tsx` | `mockInterviewWeekly`       | `POST /jobs/mock-interviews/start/job/{jobId}` 또는 `POST /jobs/mock-interviews/start` |
 
+### 부족 역량 보완 결과 저장 (백엔드 작업 병행)
+
+현재 `JobSkillGapSection`은 결과를 로컬 `useState`에만 저장해 페이지 이탈 시 사라짐.
+백엔드가 결과를 유저별 DB에 저장하도록 변경 예정 — DP-508 작업 시 프론트도 함께 수정.
+
+**백엔드 확정 스펙**
+
+- `POST /jobs/{jobId}/skill-gap` — 결과를 유저별 DB에 저장 (응답 형태 그대로 유지, 같은 유저+공고 조합 덮어씀)
+- `GET /jobs/{jobId}/skill-gap` — 저장된 마지막 결과 조회
+  - 200: `{ success: true, data: { roadmap: [...], contents: [...] } }`
+  - 404 `JOB_004`: 아직 생성한 적 없을 때 → 프론트에서 null 처리
+
+**프론트 변경 사항** (`lib/api/endpoints/jobs.ts` 완료 — `JobSkillGapSection.tsx`는 DP-508에서 수정)
+
+| 파일                        | 변경 내용                                                                          | 상태 |
+| --------------------------- | ---------------------------------------------------------------------------------- | ---- |
+| `lib/api/endpoints/jobs.ts` | `getSkillGap(jobId)` 추가 — 404면 null 반환, 그 외 에러는 throw                   | ✅ 완료 |
+| `JobSkillGapSection.tsx`    | 로컬 `useState` → `useQuery(getSkillGap)` 교체, POST 성공 시 `invalidateQueries`  | DP-508에서 작업 |
+
+**변경 후 흐름**
+
+```
+페이지 진입 → GET /jobs/{jobId}/skill-gap
+  → 결과 있으면: 바로 결과 표시
+  → 결과 없으면: 빈 화면 + "추천 받기" 버튼
+추천 받기 클릭 → POST → 백엔드 DB 저장 → invalidateQueries → 결과 표시
+재진입 시에도 결과 유지
+```
+
 ### 공통 limits UI 패턴
 
 ```
@@ -411,14 +479,14 @@ remaining === -1 → 버튼 활성화 + "무제한" 표시
 
 ### 작업 목록
 
-| 작업                                 | 파일                                          | 비고                                                       |
-| ------------------------------------ | --------------------------------------------- | ---------------------------------------------------------- |
-| billingAuth mock → axios 교체        | `lib/api/endpoints/subscriptions.ts`          | `POST /subscriptions/billing-auth`                         |
-| cancelSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`          | `DELETE /subscriptions`                                    |
-| refundSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`          | `POST /subscriptions/cancel`                               |
-| mock 파일 삭제                       | `lib/mock/subscriptions.ts`                   |                                                            |
-| 운영 환경변수 교체                   | `.env.local` 및 배포 환경변수                 | `NEXT_PUBLIC_TOSS_CLIENT_KEY` 실제 운영 키로 교체          |
-| success 페이지 유저 갱신 방식 교체   | `app/(main)/payment/success/page.tsx`         | billingAuth 응답 기반 updateUser 제거 → getMe 호출로 교체. Phase 3 유저 갱신 전략 참고 |
+| 작업                                 | 파일                                  | 비고                                                                                   |
+| ------------------------------------ | ------------------------------------- | -------------------------------------------------------------------------------------- |
+| billingAuth mock → axios 교체        | `lib/api/endpoints/subscriptions.ts`  | `POST /subscriptions/billing-auth`                                                     |
+| cancelSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`  | `DELETE /subscriptions`                                                                |
+| refundSubscription mock → axios 교체 | `lib/api/endpoints/subscriptions.ts`  | `POST /subscriptions/cancel`                                                           |
+| mock 파일 삭제                       | `lib/mock/subscriptions.ts`           |                                                                                        |
+| 운영 환경변수 교체                   | `.env.local` 및 배포 환경변수         | `NEXT_PUBLIC_TOSS_CLIENT_KEY` 실제 운영 키로 교체                                      |
+| success 페이지 유저 갱신 방식 교체   | `app/(main)/payment/success/page.tsx` | billingAuth 응답 기반 updateUser 제거 → getMe 호출로 교체. Phase 3 유저 갱신 전략 참고 |
 
 ### 연동 후 검증 체크리스트
 

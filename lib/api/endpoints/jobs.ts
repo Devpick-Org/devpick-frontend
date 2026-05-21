@@ -135,6 +135,18 @@ export const jobsEndpoints = {
   unbookmark: (jobId: string): Promise<void> =>
     apiClient.delete<ApiResponse<void>>(`/jobs/${jobId}/bookmark`).then(() => undefined),
 
+  /** GET /jobs/{jobId}/skill-gap — 저장된 마지막 결과 조회. 없으면 null (404 JOB_004) */
+  getSkillGap: (jobId: string): Promise<SkillGapApi | null> =>
+    apiClient
+      .get<ApiResponse<SkillGapApi>>(`/jobs/${jobId}/skill-gap`)
+      .then((r) => r.data.data)
+      .catch((e: unknown) => {
+        const status = (e as { response?: { status?: number } }).response?.status;
+        if (status === 404) return null;
+        throw e;
+      }),
+
+  /** POST /jobs/{jobId}/skill-gap — 새로 생성 + DB 저장 (같은 유저+공고 조합 덮어씀) */
   skillGap: (jobId: string): Promise<SkillGapApi> =>
     apiClient
       .post<ApiResponse<SkillGapApi>>(`/jobs/${jobId}/skill-gap`)

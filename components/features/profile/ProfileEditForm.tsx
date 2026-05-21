@@ -18,6 +18,7 @@ import {
   type LevelId,
 } from "@/components/features/profile/constants";
 import { ProfileTagSelector } from "@/components/features/profile/ProfileTagSelector";
+import { SubscriptionSection } from "@/components/features/profile/SubscriptionSection";
 import { useAuthStore } from "@/store/auth.store";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { usersEndpoints } from "@/lib/api/endpoints/users";
@@ -445,6 +446,9 @@ export function ProfileEditForm() {
         </div>
       </section>
 
+      {/* Subscription */}
+      <SubscriptionSection />
+
       {/* Danger Zone */}
       <section className="rounded-2xl bg-red-500/5 p-6 mx-6">
         <h2 className="mb-2 text-base font-semibold text-red-400">
@@ -455,7 +459,7 @@ export function ProfileEditForm() {
         </p>
         <Button
           variant="outline"
-          className="gap-2 border-red-500/60 dark:border-transparent bg-red-500/15 dark:bg-red-500/15 text-red-400 font-medium hover:border-red-500 dark:hover:border-transparent hover:bg-red-500/25 dark:hover:bg-red-500/25 hover:text-red-500"
+          className="gap-2 border-destructive/30 bg-destructive/8 font-medium text-destructive/70 hover:bg-destructive/15 hover:text-destructive dark:border-destructive/40 dark:bg-destructive/15 dark:text-destructive"
           onClick={() => { setDeleteError(null); setShowDeleteModal(true); }}
         >
           <TrashIcon className="h-4 w-4" />
