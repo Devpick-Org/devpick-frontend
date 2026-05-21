@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { SubscriptionSection } from "@/components/features/profile/SubscriptionSection";
 import { MOCK_SUBSCRIPTION_SCENARIOS } from "@/lib/mock/subscriptions";
@@ -131,11 +133,82 @@ const PHASE6_SCENARIOS = [
   },
 ] as const;
 
+// ── Phase 7 테스트 시나리오 ──────────────────────────────────────────────────
+
+function nextMondayUTC(): string {
+  const d = new Date();
+  const daysUntilMonday = d.getUTCDay() === 0 ? 1 : 8 - d.getUTCDay();
+  d.setUTCDate(d.getUTCDate() + daysUntilMonday);
+  d.setUTCHours(0, 0, 0, 0);
+  return d.toISOString();
+}
+
+const PHASE7_SCENARIOS = [
+  {
+    label: "FREE · 각 기능 1회 남음",
+    desc: "skillBoost 1 / qaGenerate 2 / mockInterview 2",
+    user: { ...BASE_USER, ...MOCK_SUBSCRIPTION_SCENARIOS.FREE },
+  },
+  {
+    label: "FREE · 부족역량 소진",
+    desc: "skillBoostWeekly remaining=0",
+    user: {
+      ...BASE_USER,
+      ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
+      limits: {
+        ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
+        skillBoostWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTC() },
+      },
+    },
+  },
+  {
+    label: "FREE · 면접 Q&A 소진",
+    desc: "interviewQaGenerateWeekly remaining=0",
+    user: {
+      ...BASE_USER,
+      ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
+      limits: {
+        ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
+        interviewQaGenerateWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTC() },
+      },
+    },
+  },
+  {
+    label: "FREE · 모의면접 소진",
+    desc: "mockInterviewWeekly remaining=0",
+    user: {
+      ...BASE_USER,
+      ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
+      limits: {
+        ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
+        mockInterviewWeekly: { used: 2, max: 2, remaining: 0, resetsAt: nextMondayUTC() },
+      },
+    },
+  },
+  {
+    label: "PRO · 5/7회 남음",
+    desc: "각 기능 잔여 횟수 확인",
+    user: { ...BASE_USER, ...MOCK_SUBSCRIPTION_SCENARIOS.PRO },
+  },
+  {
+    label: "MAX · 무제한",
+    desc: "remaining=-1, resetsAt=null",
+    user: { ...BASE_USER, ...MOCK_SUBSCRIPTION_SCENARIOS.MAX },
+  },
+  {
+    label: "limits 없음 (백엔드 미연동)",
+    desc: "UI 숨김 확인",
+    user: { ...BASE_USER, planType: "FREE" as const, planExpiredAt: null, lastBilledAt: null },
+  },
+] as const;
+
 // ── 페이지 ────────────────────────────────────────────────────────────────────
 
 export default function SubscriptionTestPage() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const user = useAuthStore((s) => s.user);
+  const router = useRouter();
+  const [jobId, setJobId] = useState("");
 
   const applyScenario = (u: User) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -226,6 +299,74 @@ export default function SubscriptionTestPage() {
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
         AI 요약·퀴즈 레벨 잠금은 홈 글 상세 페이지(/home/[id])에서 확인하세요.
+      </p>
+
+      {/* ── Phase 7: 채용 기능 limits UI ── */}
+      <div className="mt-16 mb-6 border-t border-border pt-10">
+        <h2 className="text-lg font-bold text-foreground">Phase 7 — 채용 기능 limits UI 테스트</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          시나리오 적용 후 공고 상세 페이지에서 부족역량·면접Q&A·모의면접 섹션을 확인하세요.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-4 text-sm">
+          <span>
+            플랜: <span className="font-semibold text-foreground">{user?.planType ?? "없음"}</span>
+          </span>
+          <span>
+            부족역량: <span className="font-semibold text-foreground">{user?.limits?.skillBoostWeekly?.remaining ?? "—"}</span>회 남음
+          </span>
+          <span>
+            면접Q&A 생성: <span className="font-semibold text-foreground">{user?.limits?.interviewQaGenerateWeekly?.remaining ?? "—"}</span>회 남음
+          </span>
+          <span>
+            모의면접: <span className="font-semibold text-foreground">{user?.limits?.mockInterviewWeekly?.remaining ?? "—"}</span>회 남음
+          </span>
+        </div>
+      </div>
+
+      <div className="mb-6 flex flex-wrap gap-2">
+        {PHASE7_SCENARIOS.map((s) => {
+          const isActive =
+            user?.planType === s.user.planType &&
+            user?.limits?.skillBoostWeekly?.remaining === (s.user as { limits?: { skillBoostWeekly?: { remaining: number } } }).limits?.skillBoostWeekly?.remaining &&
+            user?.limits?.interviewQaGenerateWeekly?.remaining === (s.user as { limits?: { interviewQaGenerateWeekly?: { remaining: number } } }).limits?.interviewQaGenerateWeekly?.remaining &&
+            user?.limits?.mockInterviewWeekly?.remaining === (s.user as { limits?: { mockInterviewWeekly?: { remaining: number } } }).limits?.mockInterviewWeekly?.remaining;
+          return (
+            <button
+              key={s.label}
+              type="button"
+              onClick={() => applyScenario(s.user as unknown as User)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                isActive
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-foreground hover:bg-muted"
+              }`}
+              title={s.desc}
+            >
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={jobId}
+          onChange={(e) => setJobId(e.target.value)}
+          placeholder="공고 ID 입력 (예: abc123)"
+          className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+        />
+        <button
+          type="button"
+          disabled={!jobId.trim()}
+          onClick={() => router.push(`/jobs/${jobId.trim()}`)}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          공고 상세로 이동
+        </button>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        이동 후 &ldquo;부족 역량 보완&rdquo;, &ldquo;예상 면접 Q&A&rdquo;, &ldquo;AI 모의면접&rdquo; 섹션에서 limits UI를 확인하세요.
       </p>
     </div>
   );

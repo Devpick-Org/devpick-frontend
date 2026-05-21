@@ -5,8 +5,11 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader2, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { extractApiError } from "@/lib/api/extractApiError";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { resumeEndpoints } from "@/lib/api/endpoints/resume";
 import { mockInterviewsEndpoints } from "@/lib/api/endpoints/mock-interviews";
+import { formatResetsAt } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
 import { JobDetailSection } from "./JobDetailSection";
 
 interface JobMockInterviewCtaProps {
@@ -15,6 +18,19 @@ interface JobMockInterviewCtaProps {
 
 export function JobMockInterviewCta({ jobId }: JobMockInterviewCtaProps) {
   const router = useRouter();
+  const updateUser = useAuthStore((s) => s.updateUser);
+  const mockInterviewLimits = useAuthStore((s) => s.user?.limits?.mockInterviewWeekly);
+
+  const exhausted = mockInterviewLimits?.remaining === 0;
+  const unlimited = mockInterviewLimits?.remaining === -1;
+
+  const limitsLabel = (() => {
+    if (!mockInterviewLimits) return null;
+    if (unlimited) return "무제한";
+    if (exhausted)
+      return `이번 주 횟수를 모두 사용했어요 · ${formatResetsAt(mockInterviewLimits.resetsAt)} 초기화`;
+    return `이번 주 ${mockInterviewLimits.remaining}회 남음`;
+  })();
 
   const { data: hasResume } = useQuery({
     queryKey: ["master-resume"],
@@ -30,6 +46,7 @@ export function JobMockInterviewCta({ jobId }: JobMockInterviewCtaProps) {
         mode: "FULL",
       }),
     onSuccess: (session) => {
+      authEndpoints.getMe().then(({ data }) => updateUser(data.data)).catch(() => {});
       router.push(`/my-resume?tab=mock&session=${session.id}`);
       toast.success("모의면접을 시작했어요. 자기소개부터 진행해 보세요.");
     },
@@ -44,7 +61,15 @@ export function JobMockInterviewCta({ jobId }: JobMockInterviewCtaProps) {
   });
 
   return (
-    <JobDetailSection title="AI 모의면접" titleClassName="text-lg">
+    <JobDetailSection
+      title="AI 모의면접"
+      titleClassName="text-lg"
+      titleSuffix={limitsLabel && (
+        <span className={`text-xs font-medium ${exhausted ? "text-destructive" : "text-muted-foreground"}`}>
+          {limitsLabel}
+        </span>
+      )}
+    >
       <div className="flex flex-col gap-3 rounded-lg bg-muted/40 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
         <div className="flex items-start gap-3">
           <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
@@ -63,7 +88,7 @@ export function JobMockInterviewCta({ jobId }: JobMockInterviewCtaProps) {
         </div>
         <button
           type="button"
-          disabled={!hasResume || startMutation.isPending}
+          disabled={!hasResume || startMutation.isPending || exhausted}
           onClick={() => startMutation.mutate()}
           className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
         >

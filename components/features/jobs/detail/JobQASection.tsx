@@ -9,9 +9,12 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { resumeEndpoints } from "@/lib/api/endpoints/resume";
 import { exportQAAsPdf } from "@/lib/jobs/exportQAPdf";
 import { parseInterviewQaPayload } from "@/lib/jobs/parseInterviewQaPayload";
+import { formatResetsAt } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
 import type { JobCategory, QACategory } from "@/types/jobs";
 import { JOB_CATEGORY_LABEL } from "../main/jobs.constants";
 import {
@@ -64,6 +67,19 @@ export function JobQASection({
   const router = useRouter();
   const qc = useQueryClient();
   const [isExporting, setIsExporting] = useState(false);
+  const updateUser = useAuthStore((s) => s.updateUser);
+  const qaGenerateLimits = useAuthStore((s) => s.user?.limits?.interviewQaGenerateWeekly);
+
+  const exhausted = qaGenerateLimits?.remaining === 0;
+  const unlimited = qaGenerateLimits?.remaining === -1;
+
+  const limitsLabel = (() => {
+    if (!qaGenerateLimits) return null;
+    if (unlimited) return "무제한";
+    if (exhausted)
+      return `이번 주 횟수를 모두 사용했어요 · ${formatResetsAt(qaGenerateLimits.resetsAt)} 초기화`;
+    return `이번 주 ${qaGenerateLimits.remaining}회 남음`;
+  })();
 
   const { data: hasResume } = useQuery({
     queryKey: ["master-resume"],
@@ -98,6 +114,7 @@ export function JobQASection({
       const cats = parseInterviewQaPayload(res.payloadJson);
       void qc.setQueryData(["job-interview-qa", jobId], cats.length ? cats : null);
       void qc.invalidateQueries({ queryKey: ["interview-qa-list"] });
+      authEndpoints.getMe().then(({ data }) => updateUser(data.data)).catch(() => {});
       toast.success("면접 Q&A가 저장되었습니다.", {
         action: {
           label: "Q&A 보기",
@@ -151,7 +168,7 @@ export function JobQASection({
       <button
         type="button"
         onClick={() => generate.mutate()}
-        disabled={isLoading || isExporting || !hasResume}
+        disabled={isLoading || isExporting || !hasResume || exhausted}
         className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
       >
         <RefreshCw className="h-3.5 w-3.5" />
@@ -182,6 +199,11 @@ export function JobQASection({
     <JobDetailSection
       title="예상 면접 Q&A"
       titleClassName="text-lg"
+      titleSuffix={limitsLabel && (
+        <span className={`text-xs font-medium ${exhausted ? "text-destructive" : "text-muted-foreground"}`}>
+          {limitsLabel}
+        </span>
+      )}
       action={sectionAction}
     >
       {!hasResume && (
@@ -201,13 +223,21 @@ export function JobQASection({
 
       {hasResume && !isGenerated && !isLoading && !isError && (
         <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <p className="text-sm font-medium text-muted-foreground">
-            이 공고를 기반으로 면접 예상 질문과 모범 답변을 생성할 수 있어요.
-          </p>
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-medium text-muted-foreground">
+              이 공고를 기반으로 면접 예상 질문과 모범 답변을 생성할 수 있어요.
+            </p>
+            {limitsLabel && (
+              <span className={`text-xs font-medium ${exhausted ? "text-destructive" : "text-muted-foreground"}`}>
+                {limitsLabel}
+              </span>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => generate.mutate()}
-            className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            disabled={exhausted}
+            className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             면접 질문 생성하기
           </button>

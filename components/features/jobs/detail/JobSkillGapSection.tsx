@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type { JobCategory } from "@/types/jobs";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { extractApiError } from "@/lib/api/extractApiError";
+import { useAuthStore } from "@/store/auth.store";
+import { formatResetsAt } from "@/lib/utils";
 import { JOB_CATEGORY_LABEL } from "../main/jobs.constants";
 import {
   JobAiProgressSteps,
@@ -48,15 +50,23 @@ export function JobSkillGapSection({
   jobTitle = "",
   jobCategory,
 }: JobSkillGapSectionProps) {
-  const [roadmap, setRoadmap] = useState<string[] | null>(null);
-  const [contents, setContents] = useState<
-    { id: string; title: string; preview: string; canonicalUrl: string; tags: string[] }[]
-  >([]);
+  const qc = useQueryClient();
+  const updateUser = useAuthStore((s) => s.updateUser);
+  const skillBoostLimits = useAuthStore((s) => s.user?.limits?.skillBoostWeekly);
+
+  const {
+    data: savedResult,
+    isLoading: isLoadingSaved,
+  } = useQuery({
+    queryKey: ["job-skill-gap", jobId],
+    queryFn: () => jobsEndpoints.getSkillGap(jobId),
+  });
+
   const mutation = useMutation({
     mutationFn: () => jobsEndpoints.skillGap(jobId),
-    onSuccess: (data) => {
-      setRoadmap(data.roadmap ?? []);
-      setContents(data.contents ?? []);
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["job-skill-gap", jobId] });
+      authEndpoints.getMe().then(({ data }) => updateUser(data.data)).catch(() => {});
     },
     onError: (e) => {
       const { message } = extractApiError(e);
@@ -76,19 +86,36 @@ export function JobSkillGapSection({
     jobId,
   );
 
-  const hasResult =
-    (roadmap && roadmap.length > 0) || contents.length > 0;
+  const roadmap = savedResult?.roadmap ?? null;
+  const contents = savedResult?.contents ?? [];
+  const hasResult = (roadmap && roadmap.length > 0) || contents.length > 0;
+
+  const exhausted = skillBoostLimits?.remaining === 0;
+  const unlimited = skillBoostLimits?.remaining === -1;
+
+  const limitsLabel = (() => {
+    if (!skillBoostLimits) return null;
+    if (unlimited) return "무제한";
+    if (exhausted)
+      return `이번 주 횟수를 모두 사용했어요 · ${formatResetsAt(skillBoostLimits.resetsAt)} 초기화`;
+    return `이번 주 ${skillBoostLimits.remaining}회 남음`;
+  })();
 
   return (
     <JobDetailSection
       title="부족 역량 보완"
       titleClassName="text-lg"
+      titleSuffix={limitsLabel && (
+        <span className={`text-xs font-medium ${exhausted ? "text-destructive" : "text-muted-foreground"}`}>
+          {limitsLabel}
+        </span>
+      )}
       action={
         <button
           type="button"
-          disabled={mutation.isPending}
+          disabled={mutation.isPending || isLoadingSaved || exhausted}
           onClick={() => mutation.mutate()}
-          className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
         >
           {mutation.isPending ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -99,26 +126,41 @@ export function JobSkillGapSection({
         </button>
       }
     >
-      {!hasResult && !mutation.isPending && !mutation.isSuccess && (
+      {isLoadingSaved && !mutation.isPending && (
+        <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+          불러오는 중...
+        </div>
+      )}
+
+      {/* 한 번도 생성하지 않은 초기 상태 */}
+      {!isLoadingSaved && savedResult === null && !mutation.isPending && (
         <p className="text-sm font-medium text-muted-foreground">
           필수 기술 대비 부족한 부분을 기준으로 학습 로드맵과 추천 콘텐츠를 받을 수 있어요.
         </p>
       )}
 
-      {!hasResult && mutation.isSuccess && (
-        <p className="text-sm font-medium text-muted-foreground">
-          이력서 기술 스택이 이 공고 요구사항을 충분히 충족하고 있어요. 추가로 보완할 역량이 없습니다.
-        </p>
-      )}
-
-      {mutation.isPending && (
+      {mutation.isPending && !hasResult && (
         <div className="rounded-lg bg-muted/50 px-4 py-3.5">
           <JobAiProgressSteps labels={skillGapSteps} activeStepIndex={skillGapActiveStep} />
         </div>
       )}
 
+      {/* 생성했지만 보완할 역량이 없는 경우 */}
+      {!mutation.isPending && savedResult !== null && savedResult !== undefined && !hasResult && (
+        <p className="text-sm font-medium text-muted-foreground">
+          이력서 기술 스택이 이 공고 요구사항을 충분히 충족하고 있어요. 추가로 보완할 역량이 없습니다.
+        </p>
+      )}
+
       {hasResult && (
         <div className="flex flex-col gap-6">
+          {mutation.isPending && (
+            <div className="rounded-lg bg-muted/50 px-4 py-3.5">
+              <JobAiProgressSteps labels={skillGapSteps} activeStepIndex={skillGapActiveStep} />
+            </div>
+          )}
+
           {roadmap && roadmap.length > 0 && (
             <div>
               <h4 className="mb-2 text-sm font-bold text-foreground">학습 로드맵</h4>

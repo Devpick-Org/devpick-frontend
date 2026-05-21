@@ -12,6 +12,8 @@ import {
   mockInterviewsEndpoints,
   type MockInterviewSessionListItemApi,
 } from "@/lib/api/endpoints/mock-interviews";
+import { formatResetsAt } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 import { MOCK_INTERVIEW_HERO_CHIPS, phaseTitleKo } from "./phaseLabels";
 import { MockInterviewSetup } from "./MockInterviewSetup";
@@ -52,6 +54,17 @@ const STATUS_LABEL: Record<string, string> = {
 export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
   const qc = useQueryClient();
   const searchParams = useSearchParams();
+  const mockInterviewLimits = useAuthStore((s) => s.user?.limits?.mockInterviewWeekly);
+
+  const exhausted = mockInterviewLimits?.remaining === 0;
+  const unlimited = mockInterviewLimits?.remaining === -1;
+  const limitsLabel = (() => {
+    if (!mockInterviewLimits) return null;
+    if (unlimited) return "무제한";
+    if (exhausted)
+      return `이번 주 횟수를 모두 사용했어요 · ${formatResetsAt(mockInterviewLimits.resetsAt)} 초기화`;
+    return `이번 주 ${mockInterviewLimits.remaining}회 남음`;
+  })();
   const sessionParam = searchParams.get("session");
   const [view, setView] = useState<View>(() =>
     sessionParam ? { kind: "session", sessionId: sessionParam } : { kind: "list" },
@@ -306,13 +319,21 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
                   고정 플랜으로 15개 질문을 채팅처럼 이어 가요. 아래 순서와 개수 그대로 진행됩니다.
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setView({ kind: "setup" })}
-                className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,background-color] hover:bg-primary/90 active:scale-[0.98] lg:hidden"
-              >
-                <Plus className="size-4" aria-hidden /> 새 모의면접
-              </button>
+              <div className="flex flex-col items-end gap-1 lg:hidden">
+                <button
+                  type="button"
+                  onClick={() => setView({ kind: "setup" })}
+                  disabled={exhausted}
+                  className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,background-color] hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <Plus className="size-4" aria-hidden /> 새 모의면접
+                </button>
+                {limitsLabel && (
+                  <span className={`text-[11px] font-medium ${exhausted ? "text-destructive" : "text-muted-foreground"}`}>
+                    {limitsLabel}
+                  </span>
+                )}
+              </div>
             </header>
 
             <section className="space-y-2">
@@ -371,13 +392,21 @@ export function MockInterviewTab({ hasResume }: MockInterviewTabProps) {
                 확인합니다.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setView({ kind: "setup" })}
-              className="hidden w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,background-color] hover:bg-primary/90 active:scale-[0.98] lg:inline-flex"
-            >
-              <Plus className="size-4" aria-hidden /> 새 모의면접
-            </button>
+            <div className="hidden flex-col items-stretch gap-1.5 lg:flex">
+              <button
+                type="button"
+                onClick={() => setView({ kind: "setup" })}
+                disabled={exhausted}
+                className="w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-[transform,background-color] hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 lg:inline-flex"
+              >
+                <Plus className="size-4" aria-hidden /> 새 모의면접
+              </button>
+              {limitsLabel && (
+                <span className={`text-center text-[11px] font-medium ${exhausted ? "text-destructive" : "text-muted-foreground"}`}>
+                  {limitsLabel}
+                </span>
+              )}
+            </div>
           </aside>
         </div>
       </div>

@@ -84,3 +84,16 @@ export function formatWeekLabel(weekStart: string): string {
 
   return `${year}년 ${month}월 ${week}주차`;
 }
+
+export function formatResetsAt(resetsAt: string | null): string {
+  if (!resetsAt) return "";
+  const target = new Date(resetsAt);
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (target.toDateString() === tomorrow.toDateString()) return "내일 자정";
+  const nextMonday = new Date(now);
+  nextMonday.setDate(now.getDate() + ((8 - now.getDay()) % 7 || 7));
+  if (target.toDateString() === nextMonday.toDateString()) return "다음 월요일";
+  return `${target.getMonth() + 1}월 ${target.getDate()}일`;
+}

@@ -456,21 +456,21 @@ POST /subscriptions/change { planType: 현재 플랜 }  // pendingPlanType을 nu
 
 ---
 
-## Phase 6 — 기존 페이지 플랜 제한 UI `DP-507`
+## Phase 6 — 기존 페이지 플랜 제한 UI `DP-507` ✅
 
 > DP-505 완료 후 진행.
 
 ### 작업 목록
 
-| 기능                    | 변경 파일                                           | 작업 내용                                                                             |
-| ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 홈 피드                 | `app/(main)/home/page.tsx`                          | `planLimited: true` 시 피드 하단 업그레이드 배너                                      |
-| AI 요약 레벨 잠금       | `components/features/home/AiSummary.tsx`            | FREE 유저 본인 레벨 외 🔒, 클릭 시 PlanUpgradeModal                                   |
-| AI 퀴즈 레벨 잠금       | `components/features/home/quiz/QuizIntro.tsx`       | 동일 패턴                                                                             |
-| AI 질문 개선 남은 횟수  | `components/features/community/PostRefinePanel.tsx` | `limits.aiDaily.remaining` 표시, 0이면 버튼 비활성화 + resetsAt 표시, -1이면 "무제한" |
+| 기능                    | 변경 파일                                           | 작업 내용                                                                                                                                               |
+| ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 홈 피드                 | `app/(main)/home/page.tsx`                          | `planLimited: true` 시 피드 하단 업그레이드 배너                                                                                                        |
+| AI 요약 레벨 잠금       | `components/features/home/AiSummary.tsx`            | FREE 유저 본인 레벨 외 🔒, 클릭 시 PlanUpgradeModal                                                                                                     |
+| AI 퀴즈 레벨 잠금       | `components/features/home/quiz/QuizIntro.tsx`       | 동일 패턴                                                                                                                                               |
+| AI 질문 개선 남은 횟수  | `components/features/community/PostRefinePanel.tsx` | `limits.aiDaily.remaining` 표시, 0이면 버튼 비활성화 + resetsAt 표시, -1이면 "무제한"                                                                   |
 | AI 답변 남은 횟수       | `components/features/community/AiAnswerSection.tsx` | prop 구현됨 (`aiDailyRemaining`), 단 `CommunityDetailPage`에서 **의도적으로 미전달** — 타인 글에도 본인 남은 횟수가 노출되는 문제로 표시 안 함으로 결정 |
-| 커뮤니티 글쓰기 AI 팝업 | `components/features/community/PostWriteForm.tsx`   | 자동 AI 답변 → 팝업 선택 방식으로 변경                                                |
-| 주간 리포트 잠금        | `components/features/report/WeeklyReportPage.tsx`   | `locked: true` 항목 🔒 + 회색 처리                                                    |
+| 커뮤니티 글쓰기 AI 팝업 | `components/features/community/PostWriteForm.tsx`   | 자동 AI 답변 → 팝업 선택 방식으로 변경                                                                                                                  |
+| 주간 리포트 잠금        | `components/features/report/WeeklyReportPage.tsx`   | `locked: true` 항목 🔒 + 회색 처리                                                                                                                      |
 
 ### 공통 규칙
 
@@ -511,11 +511,11 @@ POST /subscriptions/change { planType: 현재 플랜 }  // pendingPlanType을 nu
 
 ---
 
-## Phase 7 — 채용 기능 limits UI `DP-508`
+## Phase 7 — 채용 기능 limits UI `DP-508` ✅
 
 > DP-505 완료 후 진행.
 
-### 작업 목록
+### 작업 목록 ✅
 
 | 기능           | 변경 파일                                                 | limits 키                   | 확정 엔드포인트                                                                        |
 | -------------- | --------------------------------------------------------- | --------------------------- | -------------------------------------------------------------------------------------- |
@@ -523,7 +523,7 @@ POST /subscriptions/change { planType: 현재 플랜 }  // pendingPlanType을 nu
 | 면접 Q&A 생성  | `components/features/jobs/detail/JobQASection.tsx`        | `interviewQaGenerateWeekly` | `POST /jobs/{jobId}/interview-qa/generate`                                             |
 | 모의 면접 시작 | `components/features/jobs/detail/JobMockInterviewCta.tsx` | `mockInterviewWeekly`       | `POST /jobs/mock-interviews/start/job/{jobId}` 또는 `POST /jobs/mock-interviews/start` |
 
-### 부족 역량 보완 결과 저장 (백엔드 작업 병행)
+### 부족 역량 보완 결과 저장 ✅
 
 현재 `JobSkillGapSection`은 결과를 로컬 `useState`에만 저장해 페이지 이탈 시 사라짐.
 백엔드가 결과를 유저별 DB에 저장하도록 변경 예정 — DP-508 작업 시 프론트도 함께 수정.
@@ -535,12 +535,12 @@ POST /subscriptions/change { planType: 현재 플랜 }  // pendingPlanType을 nu
   - 200: `{ success: true, data: { roadmap: [...], contents: [...] } }`
   - 404 `JOB_004`: 아직 생성한 적 없을 때 → 프론트에서 null 처리
 
-**프론트 변경 사항** (`lib/api/endpoints/jobs.ts` 완료 — `JobSkillGapSection.tsx`는 DP-508에서 수정)
+**프론트 변경 사항**
 
-| 파일                        | 변경 내용                                                                        | 상태            |
-| --------------------------- | -------------------------------------------------------------------------------- | --------------- |
-| `lib/api/endpoints/jobs.ts` | `getSkillGap(jobId)` 추가 — 404면 null 반환, 그 외 에러는 throw                  | ✅ 완료         |
-| `JobSkillGapSection.tsx`    | 로컬 `useState` → `useQuery(getSkillGap)` 교체, POST 성공 시 `invalidateQueries` | DP-508에서 작업 |
+| 파일                        | 변경 내용                                                                        | 상태    |
+| --------------------------- | -------------------------------------------------------------------------------- | ------- |
+| `lib/api/endpoints/jobs.ts` | `getSkillGap(jobId)` 추가 — 404면 null 반환, 그 외 에러는 throw                  | ✅ 완료 |
+| `JobSkillGapSection.tsx`    | 로컬 `useState` → `useQuery(getSkillGap)` 교체, POST 성공 시 `invalidateQueries` | ✅ 완료 |
 
 **변경 후 흐름**
 
@@ -560,10 +560,33 @@ remaining === 0  → 버튼 비활성화 + "이번 주 횟수를 모두 사용�
 remaining === -1 → 버튼 활성화 + "무제한" 표시
 ```
 
+- limits 레이블 위치: `JobDetailSection`의 `titleSuffix` prop으로 섹션 제목 옆에 표시
 - `resetsAt` → 로컬 시간대 변환 + 상대 표현 ("내일 자정", "다음 월요일" 등)
 - ※ MAX 플랜은 `resetsAt: null` 내려옴 → null 체크 필수. `remaining === -1`이면 날짜 포맷 시도 없이 "무제한"만 표시
 - API 호출 시 429 PAYMENT_005 수신 → 인터셉터가 LimitExceededModal 표시
-- **limits 최신화**: 각 기능 API 호출 성공 후 `GET /users/me` 재호출하여 `limits` 갱신 (TanStack Query `invalidateQueries` 활용)
+- **limits 최신화**: 각 기능 API 호출 성공 후 `authEndpoints.getMe().then(({ data }) => updateUser(data.data))` 패턴으로 Zustand store 갱신
+
+### 추가 구현 — 이력서 페이지 탭 ✅
+
+채용 공고 상세 페이지 외에 이력서 페이지 탭에서도 limits를 확인할 수 있도록 추가.
+
+| 탭          | 파일                                                      | 변경 내용                                                                                                              |
+| ----------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| 모의면접 탭 | `components/features/mock-interview/MockInterviewTab.tsx` | `mockInterviewWeekly` 읽기. "새 모의면접" 버튼(모바일/데스크탑 2곳) 비활성화 + limitsLabel 표시                        |
+| Q&A 탭      | `components/features/resume/ResumeQATab.tsx`              | `interviewQaGenerateWeekly` 읽기. 탭 상단에 남은 횟수 + "생성은 채용 공고 상세에서" 안내 문구 표시 (정보성, 버튼 없음) |
+
+### 공통 컴포넌트 변경 ✅
+
+| 파일                                                   | 변경 내용                                                         |
+| ------------------------------------------------------ | ----------------------------------------------------------------- |
+| `components/features/jobs/detail/JobDetailSection.tsx` | `titleSuffix?: React.ReactNode` prop 추가 — 섹션 제목 옆에 렌더링 |
+
+### 테스트 페이지 ✅
+
+`app/(main)/dev/subscription-test/page.tsx` — Phase 7 섹션 추가
+
+- 시나리오 7개 버튼: FREE 각 기능 1회 남음 / 부족역량 소진 / 면접Q&A 소진 / 모의면접 소진 / PRO / MAX / limits 없음
+- 공고 ID 입력 + "공고 상세로 이동" 버튼으로 `/jobs/{jobId}` 이동
 
 ---
 

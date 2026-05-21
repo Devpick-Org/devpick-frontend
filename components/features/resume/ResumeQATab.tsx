@@ -6,7 +6,9 @@ import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { parseInterviewQaPayload } from "@/lib/jobs/parseInterviewQaPayload";
+import { formatResetsAt } from "@/lib/utils";
 import { extractApiError } from "@/lib/api/extractApiError";
+import { useAuthStore } from "@/store/auth.store";
 import type { SavedQA } from "@/lib/mock/resume-qa";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResumeQAJobList } from "./ResumeQAJobList";
@@ -75,6 +77,17 @@ function toSavedQA(row: {
 
 export function ResumeQATab() {
   const qc = useQueryClient();
+  const qaGenerateLimits = useAuthStore((s) => s.user?.limits?.interviewQaGenerateWeekly);
+
+  const exhausted = qaGenerateLimits?.remaining === 0;
+  const unlimited = qaGenerateLimits?.remaining === -1;
+  const limitsLabel = (() => {
+    if (!qaGenerateLimits) return null;
+    if (unlimited) return "면접 Q&A 생성 무제한";
+    if (exhausted)
+      return `면접 Q&A 생성: 이번 주 횟수를 모두 사용했어요 · ${formatResetsAt(qaGenerateLimits.resetsAt)} 초기화`;
+    return `면접 Q&A 생성: 이번 주 ${qaGenerateLimits.remaining}회 남음`;
+  })();
   const {
     data: rows,
     isLoading,
@@ -127,6 +140,8 @@ export function ResumeQATab() {
       <ResumeQADetail
         qa={selectedQA}
         onDelete={(jobId) => deleteMutation.mutate(jobId)}
+        limitsLabel={limitsLabel}
+        exhausted={exhausted}
       />
     </div>
   );

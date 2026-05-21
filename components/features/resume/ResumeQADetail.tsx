@@ -9,9 +9,11 @@ import { ResumeQACategory } from "./ResumeQACategory";
 interface ResumeQADetailProps {
   qa: SavedQA | null;
   onDelete: (jobId: string) => void;
+  limitsLabel?: string | null;
+  exhausted?: boolean;
 }
 
-export function ResumeQADetail({ qa, onDelete }: ResumeQADetailProps) {
+export function ResumeQADetail({ qa, onDelete, limitsLabel, exhausted }: ResumeQADetailProps) {
   const [isExporting, setIsExporting] = useState(false);
 
   if (!qa) {
@@ -52,28 +54,35 @@ export function ResumeQADetail({ qa, onDelete }: ResumeQADetailProps) {
             </p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <button
-            type="button"
-            onClick={handleDownloadPdf}
-            disabled={isExporting}
-            className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isExporting ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Download className="h-3.5 w-3.5" />
-            )}
-            PDF 다운로드
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(qa.jobId)}
-            className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-destructive"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            삭제
-          </button>
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          {limitsLabel && (
+            <span className={`text-xs font-medium ${exhausted ? "text-destructive" : "text-muted-foreground"}`}>
+              {limitsLabel}
+            </span>
+          )}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              disabled={isExporting}
+              className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isExporting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Download className="h-3.5 w-3.5" />
+              )}
+              PDF 다운로드
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(qa.jobId)}
+              className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-destructive"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              삭제
+            </button>
+          </div>
         </div>
       </div>
 
