@@ -99,7 +99,11 @@ export default function CommunityWritePage() {
     onSuccess: async (res) => {
       if (withAiRef.current) {
         withAiRef.current = false;
-        await postsEndpoints.getAiAnswer(res.data.id).catch(() => {});
+        const aiResult = await postsEndpoints.getAiAnswer(res.data.id).catch(() => null);
+        queryClient.setQueryData(["post-ai-answer", res.data.id], aiResult);
+      } else {
+        // "그냥 게시" 선택: 상세 페이지 자동 AI 생성 방지용 캐시 선점
+        queryClient.setQueryData(["post-ai-answer", res.data.id], null);
       }
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["userProfile"] });

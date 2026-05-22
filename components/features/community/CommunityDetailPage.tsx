@@ -53,6 +53,14 @@ export function CommunityDetailPage({ postId }: Props) {
 
   const isTechPost = postRes?.data?.postType === "TECH";
 
+  // 마운트 시점에 캐시를 한 번만 확인:
+  // - undefined: 처음 방문 → 자동 생성 허용
+  // - null:      "그냥 게시"로 생성된 글 → 자동 생성 차단
+  // - data:      이미 캐시됨 → 그대로 표시
+  const [aiAutoEnabled] = useState(
+    () => queryClient.getQueryData(["post-ai-answer", postId]) !== null,
+  );
+
   const {
     data: aiAnswerRes,
     isLoading: isAiLoading,
@@ -62,8 +70,9 @@ export function CommunityDetailPage({ postId }: Props) {
   } = useQuery({
     queryKey: ["post-ai-answer", postId],
     queryFn: () => postsEndpoints.getAiAnswer(postId),
-    enabled: !!postRes?.data && isTechPost,
+    enabled: !!postRes?.data && isTechPost && aiAutoEnabled,
     retry: 0,
+    staleTime: 5 * 60 * 1000,
   });
 
   const { data: similarRes } = useQuery({
@@ -134,7 +143,7 @@ export function CommunityDetailPage({ postId }: Props) {
               onDelete={handleDelete}
               isDeleting={deleteMutation.isPending}
             />
-            {isTechPost && (
+            {isTechPost && aiAutoEnabled && (
               <AiAnswerSection
                 status={aiStatus}
                 content={aiContent}
