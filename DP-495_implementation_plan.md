@@ -316,7 +316,7 @@ updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 
   - FREE: outline 스타일, `text-muted-foreground`
   - PRO: `bg-foreground text-background` + 왕관 아이콘
   - MAX: `bg-amber-400 text-amber-950` + 왕관 아이콘
-- **이번 주 사용량** 섹션 (배경 없음, 4개 항목 고정)
+- **내 사용량** 섹션 (배경 없음, 4개 항목 고정)
   - `limits` 있을 때: 프로그레스바 (`bg-primary/10` 트랙 / `bg-primary/70` 채움)
     - `remaining === 0` → `bg-destructive` 바 + "소진" 뱃지
     - `remaining === -1` → 바 없이 "무제한" 텍스트
@@ -334,13 +334,13 @@ updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 
 **상태 A — FREE**
 
 - `[ Free ]` 배지 + **"Pro/Max로 업그레이드"** 단일 버튼 → `/plans`
-- 이번 주 사용량 섹션 표시
+- 내 사용량 섹션 표시
 - 하단 배너 없음
 
 **상태 B — PRO/MAX, planExpiredAt === null (정기 갱신 중)**
 
 - 배지 오른쪽: "다음 결제일 YYYY.MM.DD · ₩N,NNN" (`lastBilledAt + 1개월` 계산)
-- 이번 주 사용량 섹션 표시
+- 내 사용량 섹션 표시
 - 하단 왼쪽: "Max 플랜으로 업그레이드" 링크 (PRO일 때만) → `POST /subscriptions/change { planType: "MAX" }` 직접 호출 (결제창 없음, 다음 결제 구간 전환)
 - 하단 오른쪽: "구독 해지" 링크 → 확인 모달 → `DELETE /subscriptions`
   - 성공 시 `updateUser({ planExpiredAt })` + "N월 N일까지 이용 가능합니다." 토스트 → 상태 C 전환
@@ -352,7 +352,7 @@ updateUser(me.data.data); // 백엔드가 실제 업데이트됐으니 getMe로 
 **상태 C — PRO/MAX, planExpiredAt !== null (해지 예정)**
 
 - 배지 오른쪽: "N월 N일까지 이용 가능 (해지 예정)"
-- 이번 주 사용량 섹션 표시
+- 내 사용량 섹션 표시
 - 하단 오른쪽: "다시 구독하기" 링크 → `/plans`
 
 ### Store 갱신 (mock 기준 — DP-509에서 getMe()로 교체)
@@ -610,29 +610,35 @@ remaining === -1 → 버튼 활성화 + "무제한" 표시
 ### 연동 후 검증 체크리스트
 
 **구독 API**
+
 - [ ] `POST /subscriptions/billing-auth` — 결제 성공 후 `/users/me` 재호출 시 `planType` 갱신 확인
 - [ ] `DELETE /subscriptions` — 해지 후 `planExpiredAt` 값 수신 확인
 - [ ] `POST /subscriptions/cancel` — 환불 후 `planType: FREE` 전환 확인
 - [ ] `POST /subscriptions/change` — 플랜 변경 예약 후 `pendingPlanType` 수신 확인
 
 **`/users/me` 응답 필드**
+
 - [ ] `planType`, `planExpiredAt`, `lastBilledAt`, `pendingPlanType`, `limits` 포함 확인
 - [ ] `limits` 안에 `aiDaily`, `skillBoostWeekly`, `interviewQaGenerateWeekly`, `mockInterviewWeekly` 4개 모두 포함 확인
 - [ ] 각 항목 `used`, `max`, `remaining`, `resetsAt` 형식 확인
 - [ ] MAX 플랜: `remaining: -1`, `resetsAt: null` 형식으로 오는지 확인
 
 **limits 실시간 갱신**
+
 - [ ] 부족역량·면접Q&A·모의면접·AI 질문개선 각각 사용 후 `/users/me` 재호출 시 `remaining` 감소 확인
 
 **에러 인터셉터**
+
 - [ ] 한도 초과 시 `429 PAYMENT_005` → `LimitExceededModal` 표시 확인
 - [ ] 플랜 초과 기능 접근 시 `403 PAYMENT_003` → `PlanUpgradeModal` 표시 확인
 
 **기존 API 신규 필드**
+
 - [ ] `/contents` 응답에 `planLimited` 필드 포함 확인 (FREE 유저 50개 도달 시)
 - [ ] `/reports/weekly/list` 응답에 `locked` 필드 포함 확인 (FREE 유저)
 
 **결제 플로우**
+
 - [ ] `NEXT_PUBLIC_TOSS_CLIENT_KEY` 운영 키 교체 후 카드 등록 위젯 정상 동작 확인
 
 ---

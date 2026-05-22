@@ -71,7 +71,13 @@ const COMPARISON_ROWS: {
     MAX: "전 레벨",
   },
   {
-    feature: "AI 질문 개선 / 답변",
+    feature: "AI 질문 개선",
+    FREE: "일 5회",
+    PRO: "일 10회",
+    MAX: "무제한",
+  },
+  {
+    feature: "AI 답변",
     FREE: "일 5회",
     PRO: "일 10회",
     MAX: "무제한",

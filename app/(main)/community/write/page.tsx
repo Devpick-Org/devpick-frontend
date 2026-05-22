@@ -58,10 +58,13 @@ export default function CommunityWritePage() {
 
   const updateUser = useAuthStore((s) => s.updateUser);
   const planType = user?.planType ?? "FREE";
-  const aiDailyLimits = user?.limits?.aiDaily;
+  const aiAnswerDailyLimits = user?.limits?.aiAnswerDaily;
 
   const withAiRef = useRef(false);
-  const [pendingSubmit, setPendingSubmit] = useState<PostDraft | null>(null);
+  const [pendingAction, setPendingAction] = useState<{
+    draft: PostDraft;
+    files: LocalFileItem[];
+  } | null>(null);
 
   const [postType, setPostType] = useState<PostType>("TECH");
 
@@ -137,16 +140,13 @@ export default function CommunityWritePage() {
   const handleSubmitDirect = async (draft: PostDraft) => {
     if (draft.postType === "TECH") {
       if (planType === "MAX") {
-        // MAX: 팝업 없이 즉시 게시 + AI 자동 생성
         withAiRef.current = true;
         const attachmentUrls = await uploadFiles(files);
         createMutation.mutate({ ...draft, attachmentUrls });
       } else {
-        // FREE/PRO: 팝업 표시
-        setPendingSubmit(draft);
+        setPendingAction({ draft, files: [...files] });
       }
     } else {
-      // 커리어: 변경 없음
       withAiRef.current = false;
       const attachmentUrls = await uploadFiles(files);
       createMutation.mutate({ ...draft, attachmentUrls });
@@ -155,11 +155,11 @@ export default function CommunityWritePage() {
 
   /** 팝업 확인 — 유저가 AI 포함 여부 선택 후 호출 */
   const handleConfirmSubmit = async (withAI: boolean) => {
-    if (!pendingSubmit) return;
+    if (!pendingAction) return;
     withAiRef.current = withAI;
-    const draft = pendingSubmit;
-    setPendingSubmit(null);
-    const attachmentUrls = await uploadFiles(files);
+    const { draft, files: pendingFiles } = pendingAction;
+    setPendingAction(null);
+    const attachmentUrls = await uploadFiles(pendingFiles);
     createMutation.mutate({ ...draft, attachmentUrls });
   };
 
@@ -171,15 +171,27 @@ export default function CommunityWritePage() {
     draft: PostDraft;
     files: LocalFileItem[];
   }) => {
-    const attachmentUrls = await uploadFiles(refinedFiles);
-    createMutation.mutate({ ...draft, attachmentUrls });
+    if (planType === "MAX") {
+      withAiRef.current = true;
+      const attachmentUrls = await uploadFiles(refinedFiles);
+      createMutation.mutate({ ...draft, attachmentUrls });
+    } else {
+      // FREE/PRO: 팝업 표시 (버그 #2 수정)
+      setPendingAction({ draft, files: refinedFiles });
+    }
   };
 
   /** 오른쪽 패널: 원본으로 게시 — savedDraft + savedFiles 기준 */
   const handleSubmitOriginal = async () => {
     if (!savedDraft) return;
-    const attachmentUrls = await uploadFiles(savedFiles);
-    createMutation.mutate({ ...savedDraft, attachmentUrls });
+    if (planType === "MAX") {
+      withAiRef.current = true;
+      const attachmentUrls = await uploadFiles(savedFiles);
+      createMutation.mutate({ ...savedDraft, attachmentUrls });
+    } else {
+      // FREE/PRO: 팝업 표시 (버그 #2 수정)
+      setPendingAction({ draft: savedDraft, files: [...savedFiles] });
+    }
   };
 
   // ─── 렌더 ───────────────────────────────────────────────────────────────────
@@ -187,10 +199,10 @@ export default function CommunityWritePage() {
   return (
     <div className="w-full px-4 py-8 lg:px-8">
       {/* AI 답변 포함 여부 확인 다이얼로그 */}
-      {pendingSubmit && (
+      {pendingAction && (
         <AiAnswerConfirmDialog
-          aiDailyLimits={aiDailyLimits}
-          onClose={() => setPendingSubmit(null)}
+          aiDailyLimits={aiAnswerDailyLimits}
+          onClose={() => setPendingAction(null)}
           onConfirm={handleConfirmSubmit}
         />
       )}

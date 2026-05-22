@@ -616,7 +616,8 @@ function FlowSection() {
 const PRICING_ROWS: { feature: string; free: string; pro: string; max: string }[] = [
   { feature: "홈 제공 글 수",         free: "최신 50개",    pro: "무제한",    max: "무제한"    },
   { feature: "AI 요약 / 퀴즈",        free: "자신 레벨만",  pro: "전 레벨",   max: "전 레벨"   },
-  { feature: "AI 질문 개선 / 답변",   free: "일 5회",       pro: "일 10회",   max: "무제한"    },
+  { feature: "AI 질문 개선",           free: "일 5회",       pro: "일 10회",   max: "무제한"    },
+  { feature: "AI 답변",               free: "일 5회",       pro: "일 10회",   max: "무제한"    },
   { feature: "리포트",                free: "최근 1주만",   pro: "누적 제공", max: "누적 제공" },
   { feature: "히스토리 조회",         free: "무제한",       pro: "무제한",    max: "무제한"    },
   { feature: "채용 공고 목록/상세",   free: "무제한",       pro: "무제한",    max: "무제한"    },

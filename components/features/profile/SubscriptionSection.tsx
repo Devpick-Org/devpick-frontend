@@ -17,8 +17,13 @@ import type { LimitInfo } from "@/types/subscription";
 
 const LIMIT_ROWS = [
   {
-    key: "aiDaily" as const,
-    label: "AI 질문 개선/답변",
+    key: "aiRefineDaily" as const,
+    label: "AI 질문 개선",
+    resetLabel: "매일 자정 초기화",
+  },
+  {
+    key: "aiAnswerDaily" as const,
+    label: "AI 답변",
     resetLabel: "매일 자정 초기화",
   },
   {
@@ -285,9 +290,9 @@ export function SubscriptionSection() {
         )}
       </div>
 
-      {/* 이번 주 사용량 */}
+      {/* 내 사용량 */}
       <div className="mb-8">
-        <p className="mb-4 text-sm font-bold text-foreground">이번 주 사용량</p>
+        <p className="mb-4 text-sm font-bold text-foreground">내 사용량</p>
         <div className="flex flex-col gap-4">
           {limits ? (
             LIMIT_ROWS.map((row) => (

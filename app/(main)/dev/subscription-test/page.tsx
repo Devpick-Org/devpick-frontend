@@ -50,7 +50,8 @@ const MOCK_SUBSCRIPTION_SCENARIOS = {
     planExpiredAt: null,
     lastBilledAt: null,
     limits: {
-      aiDaily:                   { used: 2, max: 5,  remaining: 3, resetsAt: nextMidnightUTC() },
+      aiRefineDaily:             { used: 2, max: 5,  remaining: 3, resetsAt: nextMidnightUTC() },
+      aiAnswerDaily:             { used: 1, max: 5,  remaining: 4, resetsAt: nextMidnightUTC() },
       skillBoostWeekly:          { used: 1, max: 2,  remaining: 1, resetsAt: nextMondayUTCTop() },
       interviewQaGenerateWeekly: { used: 0, max: 2,  remaining: 2, resetsAt: nextMondayUTCTop() },
       mockInterviewWeekly:       { used: 0, max: 2,  remaining: 2, resetsAt: nextMondayUTCTop() },
@@ -61,7 +62,8 @@ const MOCK_SUBSCRIPTION_SCENARIOS = {
     planExpiredAt: null,
     lastBilledAt: new Date().toISOString(),
     limits: {
-      aiDaily:                   { used: 3, max: 10, remaining: 7, resetsAt: nextMidnightUTC() },
+      aiRefineDaily:             { used: 3, max: 10, remaining: 7, resetsAt: nextMidnightUTC() },
+      aiAnswerDaily:             { used: 2, max: 10, remaining: 8, resetsAt: nextMidnightUTC() },
       skillBoostWeekly:          { used: 2, max: 7,  remaining: 5, resetsAt: nextMondayUTCTop() },
       interviewQaGenerateWeekly: { used: 1, max: 7,  remaining: 6, resetsAt: nextMondayUTCTop() },
       mockInterviewWeekly:       { used: 0, max: 7,  remaining: 7, resetsAt: nextMondayUTCTop() },
@@ -72,7 +74,8 @@ const MOCK_SUBSCRIPTION_SCENARIOS = {
     planExpiredAt: null,
     lastBilledAt: new Date().toISOString(),
     limits: {
-      aiDaily:                   { used: 0, max: -1, remaining: -1, resetsAt: null },
+      aiRefineDaily:             { used: 0, max: -1, remaining: -1, resetsAt: null },
+      aiAnswerDaily:             { used: 0, max: -1, remaining: -1, resetsAt: null },
       skillBoostWeekly:          { used: 0, max: -1, remaining: -1, resetsAt: null },
       interviewQaGenerateWeekly: { used: 0, max: -1, remaining: -1, resetsAt: null },
       mockInterviewWeekly:       { used: 0, max: -1, remaining: -1, resetsAt: null },
@@ -168,7 +171,8 @@ const PHASE6_SCENARIOS = [
       ...MOCK_SUBSCRIPTION_SCENARIOS.FREE,
       limits: {
         ...MOCK_SUBSCRIPTION_SCENARIOS.FREE.limits,
-        aiDaily: { used: 5, max: 5, remaining: 0, resetsAt: (() => { const d = new Date(); d.setDate(d.getDate() + 1); d.setUTCHours(0,0,0,0); return d.toISOString(); })() },
+        aiRefineDaily: { used: 5, max: 5, remaining: 0, resetsAt: (() => { const d = new Date(); d.setDate(d.getDate() + 1); d.setUTCHours(0,0,0,0); return d.toISOString(); })() },
+        aiAnswerDaily: { used: 5, max: 5, remaining: 0, resetsAt: (() => { const d = new Date(); d.setDate(d.getDate() + 1); d.setUTCHours(0,0,0,0); return d.toISOString(); })() },
       },
     },
   },
@@ -315,7 +319,8 @@ export default function SubscriptionTestPage() {
           시나리오 적용 후 아래 링크로 이동해서 확인하세요.
           현재 플랜: <span className="font-semibold text-foreground">{user?.planType ?? "없음"}</span>
           {" · "}레벨: <span className="font-semibold text-foreground">{user?.level ?? "없음"}</span>
-          {" · "}AI 남은 횟수: <span className="font-semibold text-foreground">{user?.limits?.aiDaily?.remaining ?? "—"}</span>
+          {" · "}AI 개선 남은 횟수: <span className="font-semibold text-foreground">{user?.limits?.aiRefineDaily?.remaining ?? "—"}</span>
+          {" · "}AI 답변 남은 횟수: <span className="font-semibold text-foreground">{user?.limits?.aiAnswerDaily?.remaining ?? "—"}</span>
         </p>
       </div>
 
@@ -326,7 +331,7 @@ export default function SubscriptionTestPage() {
             type="button"
             onClick={() => applyScenario(s.user as unknown as User)}
             className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
-              user?.planType === s.user.planType && user?.level === s.user.level && user?.limits?.aiDaily?.remaining === s.user.limits?.aiDaily?.remaining
+              user?.planType === s.user.planType && user?.level === s.user.level && user?.limits?.aiRefineDaily?.remaining === s.user.limits?.aiRefineDaily?.remaining
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border bg-background text-foreground hover:bg-muted"
             }`}

@@ -189,7 +189,7 @@ export function PostWriteForm({
     addFiles(e.dataTransfer.files);
   };
 
-  const aiDailyLimits = useAuthStore((s) => s.user?.limits?.aiDaily);
+  const aiDailyLimits = useAuthStore((s) => s.user?.limits?.aiRefineDaily);
 
   // validate()가 level null을 차단하므로 이 시점에서 level은 항상 non-null
   const draft: PostDraft = { postType, title, content, level: level! };

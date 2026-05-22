@@ -8,7 +8,8 @@ export interface LimitInfo {
 }
 
 export interface UserLimits {
-  aiDaily: LimitInfo;
+  aiRefineDaily: LimitInfo;
+  aiAnswerDaily: LimitInfo;
   skillBoostWeekly: LimitInfo;
   interviewQaGenerateWeekly: LimitInfo;
   mockInterviewWeekly: LimitInfo;

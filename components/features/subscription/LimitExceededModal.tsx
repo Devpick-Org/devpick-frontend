@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useUiStore } from "@/store/ui.store";
 
 const FEATURE_LABELS: Record<string, string> = {
-  aiDaily: "AI 질문/답변",
+  aiRefineDaily: "AI 질문 개선",
+  aiAnswerDaily: "AI 답변",
   skillBoostWeekly: "부족 역량 보완",
   interviewQaGenerateWeekly: "면접 Q&A 생성",
   mockInterviewWeekly: "모의 면접",
