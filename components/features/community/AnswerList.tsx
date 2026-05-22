@@ -153,7 +153,7 @@ function AnswerItem({
             className="shrink-0 cursor-pointer rounded-full transition-opacity hover:opacity-70"
           >
             <Avatar className="h-9 w-9">
-              {answer.authorProfileImage && (
+              {answer.authorProfileImage && !answer.authorProfileImage.startsWith("blob:") && (
                 <AvatarImage
                   src={answer.authorProfileImage}
                   alt={answer.authorNickname}
@@ -444,7 +444,7 @@ function CommentItem({
         className="shrink-0 cursor-pointer rounded-full transition-opacity hover:opacity-70"
       >
         <Avatar className="h-8 w-8">
-          {comment.profileImage && (
+          {comment.profileImage && !comment.profileImage.startsWith("blob:") && (
             <AvatarImage src={comment.profileImage} alt={comment.nickname} />
           )}
           <AvatarFallback className="text-xs">

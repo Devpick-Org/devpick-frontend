@@ -154,10 +154,12 @@ export function TopNavVariant() {
                     aria-label="User menu"
                   >
                     <Avatar className="h-7 w-7 ring-1 ring-primary/20">
-                      <AvatarImage
-                        src={user.profileImage ?? ""}
-                        alt={`${displayName} avatar`}
-                      />
+                      {user.profileImage && !user.profileImage.startsWith("blob:") && (
+                        <AvatarImage
+                          src={user.profileImage}
+                          alt={`${displayName} avatar`}
+                        />
+                      )}
                       <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">
                         {displayInitial}
                       </AvatarFallback>

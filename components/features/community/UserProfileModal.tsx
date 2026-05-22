@@ -98,7 +98,7 @@ export function UserProfileModal({
               {/* 헤더: 아바타 + 닉네임 + job · level */}
               <div className="mb-5 flex items-center gap-4">
                 <Avatar className="size-14 shrink-0">
-                  {profile.profileImage && (
+                  {profile.profileImage && !profile.profileImage.startsWith("blob:") && (
                     <AvatarImage
                       src={profile.profileImage}
                       alt={profile.nickname}

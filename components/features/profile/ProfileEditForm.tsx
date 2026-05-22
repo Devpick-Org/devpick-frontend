@@ -161,7 +161,8 @@ export function ProfileEditForm() {
     setSaveError(null);
 
     try {
-      let profileImageUrl = avatarPreview ?? undefined;
+      let profileImageUrl: string | undefined =
+        avatarPreview?.startsWith("blob:") ? user?.profileImage ?? undefined : (avatarPreview ?? undefined);
 
       if (pendingImageFile) {
         const { data: uploadData } = await usersEndpoints.uploadProfileImage(pendingImageFile);

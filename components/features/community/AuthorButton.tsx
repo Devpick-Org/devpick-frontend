@@ -34,7 +34,9 @@ export function AuthorButton({
       )}
     >
       <Avatar size={avatarSize}>
-        {profileImage && <AvatarImage src={profileImage} alt={nickname} />}
+        {profileImage && !profileImage.startsWith("blob:") && (
+          <AvatarImage src={profileImage} alt={nickname} />
+        )}
         <AvatarFallback>{nickname.charAt(0).toUpperCase()}</AvatarFallback>
       </Avatar>
       <span className="font-medium truncate">{nickname}</span>
