@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { JobCategory } from "@/types/jobs";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
@@ -50,6 +51,7 @@ export function JobSkillGapSection({
   jobTitle = "",
   jobCategory,
 }: JobSkillGapSectionProps) {
+  const router = useRouter();
   const qc = useQueryClient();
   const updateUser = useAuthStore((s) => s.updateUser);
   const skillBoostLimits = useAuthStore((s) => s.user?.limits?.skillBoostWeekly);
@@ -67,6 +69,16 @@ export function JobSkillGapSection({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["job-skill-gap", jobId] });
       authEndpoints.getMe().then(({ data }) => updateUser(data.data)).catch(() => {});
+      toast.success("역량 분석이 저장되었습니다.", {
+        action: {
+          label: "역량 보완 보기",
+          onClick: () => router.push(`/my-resume?tab=qa&view=skillgap&jobId=${jobId}`),
+        },
+        actionButtonStyle: {
+          backgroundColor: "#16a34a",
+          color: "white",
+        },
+      });
     },
     onError: (e) => {
       const { message } = extractApiError(e);
@@ -101,6 +113,22 @@ export function JobSkillGapSection({
     return `이번 주 ${skillBoostLimits.remaining}회 남음`;
   })();
 
+  const sectionAction = hasResult ? (
+    <button
+      type="button"
+      disabled={mutation.isPending || isLoadingSaved || exhausted}
+      onClick={() => mutation.mutate()}
+      className="flex cursor-pointer items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {mutation.isPending ? (
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+      ) : (
+        <Sparkles className="h-3.5 w-3.5" />
+      )}
+      재추천 받기
+    </button>
+  ) : undefined;
+
   return (
     <JobDetailSection
       title="부족 역량 보완"
@@ -110,21 +138,7 @@ export function JobSkillGapSection({
           {limitsLabel}
         </span>
       )}
-      action={
-        <button
-          type="button"
-          disabled={mutation.isPending || isLoadingSaved || exhausted}
-          onClick={() => mutation.mutate()}
-          className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {mutation.isPending ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Sparkles className="h-3.5 w-3.5" />
-          )}
-          추천 받기
-        </button>
-      }
+      action={sectionAction}
     >
       {isLoadingSaved && !mutation.isPending && (
         <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
@@ -135,9 +149,19 @@ export function JobSkillGapSection({
 
       {/* 한 번도 생성하지 않은 초기 상태 */}
       {!isLoadingSaved && savedResult === null && !mutation.isPending && (
-        <p className="text-sm font-medium text-muted-foreground">
-          필수 기술 대비 부족한 부분을 기준으로 학습 로드맵과 추천 콘텐츠를 받을 수 있어요.
-        </p>
+        <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <p className="text-sm font-medium text-muted-foreground">
+            필수 기술 대비 부족한 부분을 기준으로 학습 로드맵과 추천 콘텐츠를 받을 수 있어요.
+          </p>
+          <button
+            type="button"
+            onClick={() => mutation.mutate()}
+            disabled={exhausted}
+            className="inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            추천 받기
+          </button>
+        </div>
       )}
 
       {mutation.isPending && !hasResult && (

@@ -94,6 +94,16 @@ export interface InterviewQaListItemApi {
   updatedAt: string;
 }
 
+export interface SavedAnalysisItemApi {
+  jobId: string;
+  companyName: string;
+  jobTitle: string;
+  matchScore: number;
+  updatedAt: string;
+  hasInterviewQa: boolean;
+  hasSkillGap: boolean;
+}
+
 export const jobsEndpoints = {
   list: (params: {
     page: number;
@@ -173,4 +183,9 @@ export const jobsEndpoints = {
     apiClient
       .delete<ApiResponse<void>>(`/jobs/${jobId}/interview-qa`)
       .then(() => undefined),
+
+  savedAnalysis: (): Promise<SavedAnalysisItemApi[]> =>
+    apiClient
+      .get<ApiResponse<SavedAnalysisItemApi[]>>("/jobs/saved-analysis")
+      .then((r) => r.data.data),
 };

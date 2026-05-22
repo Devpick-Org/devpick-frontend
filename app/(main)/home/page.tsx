@@ -78,7 +78,14 @@ export default function HomePage() {
   });
 
   const contents = useMemo(() => {
-    return data?.pages.flatMap((page) => page.data.contents) ?? [];
+    const seen = new Set<string>();
+    return (data?.pages.flatMap((page) => page.data.contents) ?? []).filter(
+      (content) => {
+        if (seen.has(content.id)) return false;
+        seen.add(content.id);
+        return true;
+      },
+    );
   }, [data]);
 
   const planLimited = data?.pages.some((p) => p.data.planLimited) ?? false;
@@ -157,9 +164,10 @@ export default function HomePage() {
               <FeedCardSkeleton key={`next-${i}`} />
             ))}
 
-          {!hasNextPage && contents.length > 0 && (
-            planLimited ? (
-              <div className="mt-4 rounded-xl border border-border bg-card px-5 py-4 text-center">
+          {!hasNextPage &&
+            contents.length > 0 &&
+            (planLimited ? (
+              <div className="mt-4 rounded-xl bg-card px-5 py-4 text-center">
                 <p className="text-sm font-medium text-foreground">
                   무료 플랜은 최신 50개까지만 볼 수 있어요.
                 </p>
@@ -177,8 +185,7 @@ export default function HomePage() {
               <p className="py-6 text-center text-sm font-medium text-muted-foreground">
                 마지막 콘텐츠입니다.
               </p>
-            )
-          )}
+            ))}
 
           <div ref={loadMoreRef} className="h-4" />
         </div>

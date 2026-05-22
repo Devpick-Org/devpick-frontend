@@ -11,6 +11,8 @@ function ResumePageInner() {
   const tab = searchParams.get("tab");
   const defaultTab =
     tab === "qa" ? "qa" : tab === "mock" ? "mock" : "resume";
+  const defaultView = searchParams.get("view") === "skillgap" ? "skillgap" : "qa";
+  const defaultJobId = searchParams.get("jobId") ?? undefined;
 
   return (
     <div className="w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
@@ -27,7 +29,7 @@ function ResumePageInner() {
             추천에 바로 반영됩니다.
           </p>
         </div>
-        <ResumePage defaultTab={defaultTab} />
+        <ResumePage defaultTab={defaultTab} defaultView={defaultView} defaultJobId={defaultJobId} />
       </div>
     </div>
   );

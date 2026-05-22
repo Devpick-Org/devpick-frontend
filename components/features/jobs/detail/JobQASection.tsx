@@ -223,16 +223,9 @@ export function JobQASection({
 
       {hasResume && !isGenerated && !isLoading && !isError && (
         <div className="flex flex-col gap-3 rounded-lg bg-muted/50 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-          <div className="flex flex-col gap-1">
-            <p className="text-sm font-medium text-muted-foreground">
-              이 공고를 기반으로 면접 예상 질문과 모범 답변을 생성할 수 있어요.
-            </p>
-            {limitsLabel && (
-              <span className={`text-xs font-medium ${exhausted ? "text-destructive" : "text-muted-foreground"}`}>
-                {limitsLabel}
-              </span>
-            )}
-          </div>
+          <p className="text-sm font-medium text-muted-foreground">
+            이 공고를 기반으로 면접 예상 질문과 모범 답변을 생성할 수 있어요.
+          </p>
           <button
             type="button"
             onClick={() => generate.mutate()}

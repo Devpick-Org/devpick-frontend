@@ -52,7 +52,15 @@ async function patchLearningProfileAfterResumeBasicInfo(
   return true;
 }
 
-export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
+export function ResumePage({
+  defaultTab = "resume",
+  defaultView = "qa",
+  defaultJobId,
+}: {
+  defaultTab?: string;
+  defaultView?: "qa" | "skillgap";
+  defaultJobId?: string;
+}) {
   const router = useRouter();
   const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
@@ -256,7 +264,7 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
           이력서
         </TabsTrigger>
         <TabsTrigger value="qa" className={TRIGGER_CLASS}>
-          면접 Q&A
+          면접 Q&A & 역량 보완
         </TabsTrigger>
         <TabsTrigger value="mock" className={TRIGGER_CLASS}>
           모의면접
@@ -289,7 +297,7 @@ export function ResumePage({ defaultTab = "resume" }: { defaultTab?: string }) {
       </TabsContent>
 
       <TabsContent value="qa">
-        <ResumeQATab />
+        <ResumeQATab defaultView={defaultView} defaultJobId={defaultJobId} />
       </TabsContent>
 
       <TabsContent value="mock">

@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
+import type { SavedAnalysisItemApi } from "@/lib/api/endpoints/jobs";
 import { parseInterviewQaPayload } from "@/lib/jobs/parseInterviewQaPayload";
 import { formatResetsAt } from "@/lib/utils";
 import { extractApiError } from "@/lib/api/extractApiError";
@@ -13,13 +14,14 @@ import type { SavedQA } from "@/lib/mock/resume-qa";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResumeQAJobList } from "./ResumeQAJobList";
 import { ResumeQADetail } from "./ResumeQADetail";
+import { ResumeSkillGapDetail } from "./ResumeSkillGapDetail";
 
 function ResumeQATabSkeleton() {
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <div className="flex flex-col gap-2">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-[88px] w-full rounded-xl" />
+          <Skeleton key={i} className="h-[104px] w-full rounded-xl" />
         ))}
       </div>
       <div className="flex flex-col gap-5 rounded-2xl border border-border p-6">
@@ -45,7 +47,7 @@ function ResumeQATabError({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="flex min-h-[20rem] flex-col items-center justify-center gap-3 text-foreground">
       <AlertCircle className="h-8 w-8" />
-      <p className="text-sm font-medium">Q&A 목록을 불러오지 못했습니다.</p>
+      <p className="text-sm font-medium">목록을 불러오지 못했습니다.</p>
       <button
         type="button"
         onClick={onRetry}
@@ -57,25 +59,13 @@ function ResumeQATabError({ onRetry }: { onRetry: () => void }) {
   );
 }
 
-function toSavedQA(row: {
-  jobId: string;
-  companyName: string;
-  jobTitle: string;
-  matchScore: number;
-  payloadJson: string;
-  updatedAt: string;
-}): SavedQA {
-  return {
-    jobId: row.jobId,
-    companyName: row.companyName,
-    jobTitle: row.jobTitle,
-    matchScore: row.matchScore,
-    qaCategories: parseInterviewQaPayload(row.payloadJson),
-    savedAt: row.updatedAt,
-  };
-}
-
-export function ResumeQATab() {
+export function ResumeQATab({
+  defaultView = "qa",
+  defaultJobId,
+}: {
+  defaultView?: "qa" | "skillgap";
+  defaultJobId?: string;
+}) {
   const qc = useQueryClient();
   const qaGenerateLimits = useAuthStore((s) => s.user?.limits?.interviewQaGenerateWeekly);
 
@@ -88,32 +78,65 @@ export function ResumeQATab() {
       return `면접 Q&A 생성: 이번 주 횟수를 모두 사용했어요 · ${formatResetsAt(qaGenerateLimits.resetsAt)} 초기화`;
     return `면접 Q&A 생성: 이번 주 ${qaGenerateLimits.remaining}회 남음`;
   })();
-  const {
-    data: rows,
-    isLoading,
-    isError,
-    refetch,
-  } = useQuery({
-    queryKey: ["interview-qa-list"],
-    queryFn: jobsEndpoints.listInterviewQa,
+
+  const { data: rows, isLoading, isError, refetch } = useQuery({
+    queryKey: ["saved-analysis"],
+    queryFn: jobsEndpoints.savedAnalysis,
   });
 
-  const savedQAs: SavedQA[] = useMemo(
-    () => (rows ?? []).map(toSavedQA).filter((q) => q.qaCategories.length > 0),
-    [rows],
-  );
+  const items: SavedAnalysisItemApi[] = useMemo(() => rows ?? [], [rows]);
 
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(defaultJobId ?? null);
+  const [selectedView, setSelectedView] = useState<"qa" | "skillgap">(defaultView);
+  const isFirstItemLoad = useRef(true);
 
   const selectedEffective =
-    selectedJobId && savedQAs.some((q) => q.jobId === selectedJobId)
+    selectedJobId && items.some((i) => i.jobId === selectedJobId)
       ? selectedJobId
-      : savedQAs[0]?.jobId ?? null;
+      : items[0]?.jobId ?? null;
+
+  const selectedItem = items.find((i) => i.jobId === selectedEffective) ?? null;
+
+  // 선택된 공고가 현재 view를 지원하지 않으면 자동 전환 (첫 로드 시엔 URL 파라미터 우선)
+  useEffect(() => {
+    if (!selectedItem) return;
+    if (isFirstItemLoad.current) {
+      isFirstItemLoad.current = false;
+      return;
+    }
+    if (selectedView === "qa" && !selectedItem.hasInterviewQa && selectedItem.hasSkillGap) {
+      setSelectedView("skillgap");
+    } else if (selectedView === "skillgap" && !selectedItem.hasSkillGap && selectedItem.hasInterviewQa) {
+      setSelectedView("qa");
+    }
+  }, [selectedItem?.jobId]);
+
+  // 선택된 공고의 Q&A 데이터 on-demand fetch
+  const { data: qaCategories, isLoading: isQaLoading } = useQuery({
+    queryKey: ["job-interview-qa", selectedEffective],
+    queryFn: async () => {
+      const r = await jobsEndpoints.getInterviewQa(selectedEffective!);
+      return parseInterviewQaPayload(r.payloadJson);
+    },
+    enabled: !!selectedEffective && selectedView === "qa" && (selectedItem?.hasInterviewQa ?? false),
+  });
+
+  const selectedQA: SavedQA | null =
+    selectedItem && qaCategories != null
+      ? {
+          jobId: selectedItem.jobId,
+          companyName: selectedItem.companyName,
+          jobTitle: selectedItem.jobTitle,
+          matchScore: selectedItem.matchScore,
+          qaCategories,
+          savedAt: selectedItem.updatedAt,
+        }
+      : null;
 
   const deleteMutation = useMutation({
     mutationFn: (jobId: string) => jobsEndpoints.deleteInterviewQa(jobId),
     onSuccess: (_, jobId) => {
-      void qc.invalidateQueries({ queryKey: ["interview-qa-list"] });
+      void qc.invalidateQueries({ queryKey: ["saved-analysis"] });
       void qc.invalidateQueries({ queryKey: ["job-interview-qa", jobId] });
       toast.success("면접 Q&A가 삭제되었습니다.");
       setSelectedJobId(null);
@@ -127,22 +150,39 @@ export function ResumeQATab() {
   if (isLoading) return <ResumeQATabSkeleton />;
   if (isError) return <ResumeQATabError onRetry={() => void refetch()} />;
 
-  const selectedQA =
-    savedQAs.find((qa) => qa.jobId === selectedEffective) ?? null;
-
   return (
     <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
       <ResumeQAJobList
-        items={savedQAs}
+        items={items}
         selectedJobId={selectedEffective}
-        onSelect={setSelectedJobId}
+        selectedView={selectedView}
+        onSelect={(jobId, view) => {
+          setSelectedJobId(jobId);
+          setSelectedView(view);
+        }}
       />
-      <ResumeQADetail
-        qa={selectedQA}
-        onDelete={(jobId) => deleteMutation.mutate(jobId)}
-        limitsLabel={limitsLabel}
-        exhausted={exhausted}
-      />
+      {selectedView === "qa" ? (
+        isQaLoading ? (
+          <div className="flex items-center gap-2.5 py-8 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            불러오는 중...
+          </div>
+        ) : (
+          <ResumeQADetail
+            qa={selectedQA}
+            onDelete={(jobId) => deleteMutation.mutate(jobId)}
+            limitsLabel={limitsLabel}
+            exhausted={exhausted}
+          />
+        )
+      ) : (
+        <ResumeSkillGapDetail
+          jobId={selectedEffective}
+          companyName={selectedItem?.companyName ?? ""}
+          jobTitle={selectedItem?.jobTitle ?? ""}
+          matchScore={selectedItem?.matchScore ?? 0}
+        />
+      )}
     </div>
   );
 }
