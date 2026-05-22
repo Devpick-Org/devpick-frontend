@@ -17,6 +17,7 @@
 ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
 ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=black)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+![TossPayments](https://img.shields.io/badge/TossPayments-0064FF?style=for-the-badge&logo=tosspayments&logoColor=white)
 
 | 구분            | 기술                      |
 | --------------- | ------------------------- |
@@ -33,6 +34,7 @@
 | 패키지 매니저   | npm                       |
 | 린트/포맷팅     | ESLint + Prettier         |
 | CI/CD           | GitHub Actions            |
+| 결제            | TossPayments SDK          |
 
 ---
 
@@ -62,7 +64,9 @@
 │   │   ├── history/         # 학습 히스토리 (학습/활동/배지 탭)
 │   │   ├── profile/         # 내 프로필 설정
 │   │   ├── report/          # 주간 학습 분석 리포트
-│   │   └── trends/          # 개발 생태계 트렌드 (부트캠프·동아리·행사)
+│   │   ├── trends/          # 개발 생태계 트렌드 (부트캠프·동아리·행사)
+│   │   ├── plans/           # 구독 플랜 소개 (Free / Pro / Max 비교)
+│   │   └── payment/         # 결제 플로우 (billing · success · fail)
 │   ├── auth/                # OAuth 콜백 라우트 (GitHub, Google)
 │   ├── onboarding/          # 초기 사용자 성향 파악
 │   └── report/share/        # 공유 리포트 (비로그인 접근 가능)
@@ -77,6 +81,7 @@
 │       ├── profile/         # 프로필 수정 폼
 │       ├── report/          # 주간 리포트, 공유 리포트
 │       ├── trends/          # 개발 생태계 트렌드 (부트캠프·동아리·행사)
+│       ├── subscription/    # 구독 모달 (PlanUpgradeModal, LimitExceededModal, PlanCard)
 │       └── landing/         # 랜딩 페이지
 ├── lib/
 │   ├── api/                 # Axios 인스턴스 + 도메인별 API 함수
@@ -102,6 +107,7 @@
 | 채용     | 채용 공고 조회·상세, 북마크                                                                       |
 | 이력서   | 이력서 관리                                                                                       |
 | 트렌드   | 개발 생태계 트렌드 (부트캠프·동아리·행사)                                                         |
+| 구독     | Free / Pro / Max 플랜 비교, 토스페이먼츠 카드 등록·구독 해지·환불, 플랜별 기능 제한 UI             |
 
 ---
 
@@ -127,6 +133,7 @@ npm run dev
 ```bash
 # .env.local
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/v1
+NEXT_PUBLIC_TOSS_CLIENT_KEY=test_ck_...   # 토스페이먼츠 테스트 키 (백엔드 팀에게 요청)
 ```
 
 ### 빌드 & 테스트
