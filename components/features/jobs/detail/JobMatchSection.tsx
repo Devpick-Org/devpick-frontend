@@ -53,8 +53,17 @@ function MatchSubSection({
   const hasScoreGauge = maxScore > 0;
   const pct = hasScoreGauge ? Math.round((score / maxScore) * 100) : 0;
 
-  const scoreRightLabel =
-    !hasScoreGauge && score === 0 ? "항목 없음" : `${score} / ${maxScore}점`;
+  const scoreRightLabel = (() => {
+    if (!hasScoreGauge) {
+      if (title === "경력 수준" && summary.includes("경력 무관")) {
+        return "무관";
+      }
+      if (score === 0 && maxScore === 0) {
+        return "항목 없음";
+      }
+    }
+    return `${score} / ${maxScore}점`;
+  })();
 
   return (
     <div className="rounded-lg">
@@ -121,6 +130,9 @@ export function JobMatchSection({
             <span>매칭 점수</span>
             <span>{matchScore} / 100</span>
           </div>
+          <p className="mb-1 text-[10px] text-muted-foreground">
+            필수 기술 70% + 우대 기술 30% (경력 무관 공고는 경력 미반영)
+          </p>
           <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
             <div
               className={cn("h-full rounded-full transition-all", barColor)}
