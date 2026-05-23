@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -88,7 +88,6 @@ export function ResumeQATab({
 
   const [selectedJobId, setSelectedJobId] = useState<string | null>(defaultJobId ?? null);
   const [selectedView, setSelectedView] = useState<"qa" | "skillgap">(defaultView);
-  const isFirstItemLoad = useRef(true);
 
   const selectedEffective =
     selectedJobId && items.some((i) => i.jobId === selectedJobId)
@@ -97,19 +96,13 @@ export function ResumeQATab({
 
   const selectedItem = items.find((i) => i.jobId === selectedEffective) ?? null;
 
-  // 선택된 공고가 현재 view를 지원하지 않으면 자동 전환 (첫 로드 시엔 URL 파라미터 우선)
-  useEffect(() => {
-    if (!selectedItem) return;
-    if (isFirstItemLoad.current) {
-      isFirstItemLoad.current = false;
-      return;
-    }
-    if (selectedView === "qa" && !selectedItem.hasInterviewQa && selectedItem.hasSkillGap) {
-      setSelectedView("skillgap");
-    } else if (selectedView === "skillgap" && !selectedItem.hasSkillGap && selectedItem.hasInterviewQa) {
-      setSelectedView("qa");
-    }
-  }, [selectedItem?.jobId]);
+  // 선택된 공고가 현재 view를 지원하지 않으면 지원하는 view로 보정
+  const resolvedView = useMemo((): "qa" | "skillgap" => {
+    if (!selectedItem) return selectedView;
+    if (selectedView === "qa" && !selectedItem.hasInterviewQa && selectedItem.hasSkillGap) return "skillgap";
+    if (selectedView === "skillgap" && !selectedItem.hasSkillGap && selectedItem.hasInterviewQa) return "qa";
+    return selectedView;
+  }, [selectedItem, selectedView]);
 
   // 선택된 공고의 Q&A 데이터 on-demand fetch
   const { data: qaCategories, isLoading: isQaLoading } = useQuery({
@@ -118,7 +111,7 @@ export function ResumeQATab({
       const r = await jobsEndpoints.getInterviewQa(selectedEffective!);
       return parseInterviewQaPayload(r.payloadJson);
     },
-    enabled: !!selectedEffective && selectedView === "qa" && (selectedItem?.hasInterviewQa ?? false),
+    enabled: !!selectedEffective && resolvedView === "qa" && (selectedItem?.hasInterviewQa ?? false),
   });
 
   const selectedQA: SavedQA | null =
@@ -155,13 +148,13 @@ export function ResumeQATab({
       <ResumeQAJobList
         items={items}
         selectedJobId={selectedEffective}
-        selectedView={selectedView}
+        selectedView={resolvedView}
         onSelect={(jobId, view) => {
           setSelectedJobId(jobId);
           setSelectedView(view);
         }}
       />
-      {selectedView === "qa" ? (
+      {resolvedView === "qa" ? (
         isQaLoading ? (
           <div className="flex items-center gap-2.5 py-8 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
