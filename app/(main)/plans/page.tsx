@@ -106,6 +106,7 @@ export default function PlansPage() {
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const mounted = useHydrated();
   const currentPlan: PlanType = user?.planType ?? "FREE";
+  const isExpiring = !!(user?.planType && user.planType !== "FREE" && user.planExpiredAt);
   const [isChanging, setIsChanging] = useState(false);
 
   useEffect(() => {
@@ -168,6 +169,7 @@ export default function PlansPage() {
             pendingPlanType={user?.pendingPlanType}
             onChangePlan={handleChangePlan}
             isChanging={isChanging}
+            isExpiring={isExpiring}
           />
         ))}
       </div>

@@ -12,6 +12,7 @@ interface PlanCardProps {
   pendingPlanType?: PlanType | null;
   onChangePlan?: (plan: "PRO" | "MAX") => void;
   isChanging?: boolean;
+  isExpiring?: boolean;
 }
 
 const PLAN_META: Record<
@@ -65,7 +66,7 @@ const PLAN_META: Record<
   },
 };
 
-export function PlanCard({ plan, currentPlan, pendingPlanType, onChangePlan, isChanging }: PlanCardProps) {
+export function PlanCard({ plan, currentPlan, pendingPlanType, onChangePlan, isChanging, isExpiring }: PlanCardProps) {
   const meta = PLAN_META[plan];
   const isCurrent = currentPlan === plan;
   const isPending = pendingPlanType === plan && !isCurrent;
@@ -127,7 +128,7 @@ export function PlanCard({ plan, currentPlan, pendingPlanType, onChangePlan, isC
           <p className="text-center text-xs text-muted-foreground">
             구독 해지 후 자동 전환
           </p>
-        ) : currentPlan === "FREE" ? (
+        ) : currentPlan === "FREE" || isExpiring ? (
           <Button asChild className="w-full font-semibold">
             <Link href={`/payment/billing?plan=${plan}`}>
               {meta.name} 시작하기
