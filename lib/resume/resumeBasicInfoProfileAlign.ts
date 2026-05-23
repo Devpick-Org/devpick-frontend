@@ -1,10 +1,57 @@
-import type { ResumeBasicInfo } from "@/types/resume";
+import type { ResumeBasicInfo, ResumeData } from "@/types/resume";
 import type { UpdateMeRequest } from "@/lib/api/endpoints/users";
 import type { User } from "@/types/auth";
 import type {
   JobRoleId,
   LevelId,
 } from "@/components/features/profile/constants";
+
+const ROLE_STACK_PATTERNS: Partial<Record<JobRoleId, RegExp[]>> = {
+  AI_ML: [
+    /pytorch/i,
+    /tensorflow/i,
+    /keras/i,
+    /scikit/i,
+    /hugging\s*face/i,
+    /transformers/i,
+    /\bllm\b/i,
+    /ai\/ml/i,
+    /머신러닝/i,
+    /딥러닝/i,
+  ],
+  DEVOPS: [
+    /docker/i,
+    /kubernetes/i,
+    /\bk8s\b/i,
+    /terraform/i,
+    /ansible/i,
+    /helm/i,
+    /argocd/i,
+    /prometheus/i,
+    /grafana/i,
+  ],
+  MOBILE: [
+    /flutter/i,
+    /react native/i,
+    /\bswift\b/i,
+    /\bkotlin\b/i,
+    /\bios\b/i,
+    /android/i,
+    /jetpack compose/i,
+  ],
+  DATA: [
+    /apache spark/i,
+    /\bspark\b/i,
+    /airflow/i,
+    /\bdbt\b/i,
+    /bigquery/i,
+    /snowflake/i,
+    /pandas/i,
+    /numpy/i,
+  ],
+  FRONTEND: [/react/i, /next\.js/i, /vue/i, /typescript/i, /tailwind/i],
+  BACKEND: [/spring boot/i, /spring\b/i, /node\.js/i, /django/i, /fastapi/i, /nestjs/i],
+};
 
 /**
  * 이력서 basicInfo 의 직무 문구에서 프로필 직무 코드를 추정합니다 (한글·영문 키워드).
@@ -27,6 +74,41 @@ export function inferJobRoleFromJobTitle(jobTitle: string): JobRoleId | null {
   if (/백엔드|백.?엔드|backend|서버\b/i.test(jobTitle))
     return "BACKEND";
   return null;
+}
+
+/** 이력서 techStack·프로젝트 스택에서 프로필 직무 코드를 추정합니다. */
+export function inferJobRoleFromTechSignals(resume: ResumeData): JobRoleId | null {
+  const stackText = [
+    ...resume.techStack,
+    ...resume.projects.flatMap((p) => p.techStack),
+  ]
+    .join(" ")
+    .trim();
+  if (!stackText) return null;
+
+  let bestRole: JobRoleId | null = null;
+  let bestScore = 0;
+
+  for (const [role, patterns] of Object.entries(ROLE_STACK_PATTERNS) as [
+    JobRoleId,
+    RegExp[],
+  ][]) {
+    const score = patterns.filter((pattern) => pattern.test(stackText)).length;
+    if (score > bestScore) {
+      bestScore = score;
+      bestRole = role;
+    }
+  }
+
+  return bestScore > 0 ? bestRole : null;
+}
+
+/** 이력서 직무 문구 → 없으면 스택 신호 순으로 프로필 직무를 추정합니다. */
+export function inferJobRoleFromResume(resume: ResumeData): JobRoleId | null {
+  return (
+    inferJobRoleFromJobTitle(resume.basicInfo.jobTitle) ??
+    inferJobRoleFromTechSignals(resume)
+  );
 }
 
 /**

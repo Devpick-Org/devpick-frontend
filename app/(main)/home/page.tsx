@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
+import { contentFeedQueryKey } from "@/lib/content/feedQueryKeys";
 import {
   FeedCard,
   FeedCardSkeleton,
@@ -49,9 +50,12 @@ export default function HomePage() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: searchQuery.trim()
-      ? ["contents", "search", searchQuery, isAuthenticated]
-      : ["contents", isAuthenticated],
+    queryKey: contentFeedQueryKey({
+      searchQuery,
+      isAuthenticated,
+      job: user?.job,
+      tags: user?.tags,
+    }),
     initialPageParam: 0,
     queryFn: ({ pageParam }) => {
       if (searchQuery.trim()) {

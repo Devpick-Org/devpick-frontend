@@ -12,6 +12,7 @@ import { ConfirmModal } from "@/components/ui/confirm-modal";
 import { cn, dedupeTags } from "@/lib/utils";
 import {
   JOB_ROLES,
+  JOB_ROLE_LABELS,
   LEVELS,
   LEVEL_COLORS,
   type JobRoleId,
@@ -23,13 +24,10 @@ import { useAuthStore } from "@/store/auth.store";
 import { authEndpoints } from "@/lib/api/endpoints/auth";
 import { usersEndpoints } from "@/lib/api/endpoints/users";
 import { resumeEndpoints } from "@/lib/api/endpoints/resume";
-import { mergeProfileIntoResume } from "@/lib/resume/profileResumeSync";
-import {
-  masterJsonToResumeData,
-  resumeDataToMasterJson,
-} from "@/lib/resume/masterResumeJson";
-import type { User } from "@/types/auth";
-import { AlertCircle } from "lucide-react";
+import { contentFeedQueryKey } from "@/lib/content/feedQueryKeys";
+import { inferJobRoleFromResume } from "@/lib/resume/resumeBasicInfoProfileAlign";
+import { masterJsonToResumeData } from "@/lib/resume/masterResumeJson";
+import { AlertCircle, Info } from "lucide-react";
 
 /* ── Icons ── */
 
@@ -131,6 +129,11 @@ export function ProfileEditForm() {
   const [isRoleOpen, setIsRoleOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [resumeSuggestedJob, setResumeSuggestedJob] = useState<JobRoleId | null>(
+    null,
+  );
+  const [resumeJobSuggestionDismissed, setResumeJobSuggestionDismissed] =
+    useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -143,6 +146,36 @@ export function ProfileEditForm() {
     setSelectedTags(dedupeTags(user?.tags));
     if (user?.profileImage) setAvatarPreview(user.profileImage);
   }, [user?.nickname, user?.job, user?.level, user?.tags, user?.profileImage]);
+
+  useEffect(() => {
+    if (!user?.userId) {
+      setResumeSuggestedJob(null);
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const masterJson = await resumeEndpoints.getMasterOrNull();
+        if (cancelled || !masterJson) {
+          if (!cancelled) setResumeSuggestedJob(null);
+          return;
+        }
+        const inferred = inferJobRoleFromResume(masterJsonToResumeData(masterJson));
+        if (!cancelled) setResumeSuggestedJob(inferred);
+      } catch {
+        if (!cancelled) setResumeSuggestedJob(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.userId]);
+
+  useEffect(() => {
+    setResumeJobSuggestionDismissed(false);
+  }, [resumeSuggestedJob, user?.job]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -159,6 +192,9 @@ export function ProfileEditForm() {
 
     setIsSaving(true);
     setSaveError(null);
+
+    const previousJob = user?.job;
+    const previousTags = dedupeTags(user?.tags);
 
     try {
       let profileImageUrl: string | undefined =
@@ -188,43 +224,31 @@ export function ProfileEditForm() {
         profileImage: updatedUser.profileImage ?? undefined,
       });
 
-      if (user?.userId) {
-        try {
-          const masterJson = await resumeEndpoints.getMasterOrNull();
-          if (masterJson) {
-            const resumeData = masterJsonToResumeData(masterJson);
-            const mergedTags = dedupeTags(
-              updatedUser.tags?.length ? updatedUser.tags : selectedTags,
-            );
-            const userForMerge: User = {
-              userId: user.userId,
-              email: user.email,
-              nickname: updatedUser.nickname,
-              profileImage:
-                updatedUser.profileImage ?? user.profileImage,
-              job: updatedUser.job ?? user.job,
-              level: updatedUser.level ?? user.level,
-              tags: mergedTags,
-            };
-            const merged = mergeProfileIntoResume(resumeData, userForMerge);
-            await resumeEndpoints.putMaster(resumeDataToMasterJson(merged));
-            void queryClient.invalidateQueries({ queryKey: ["master-resume"] });
-            toast.message(
-              "이력서에도 프로필이 반영됐어요. (이미 채운 직무·이름 등은 그대로 두었어요.)",
-              { duration: 5500 },
-            );
-          }
-        } catch (e) {
-          console.error(e);
-          toast.message(
-            "이력서 자동 반영에 실패했어요. 이력서 화면에서 「프로필 반영하기」를 눌러 주세요.",
-            { duration: 6000 },
-          );
-        }
+      void queryClient.invalidateQueries({ queryKey: ["userProfile"] });
+      void queryClient.invalidateQueries({
+        queryKey: contentFeedQueryKey({
+          isAuthenticated: true,
+          job: updatedUser.job,
+          tags: updatedUser.tags,
+        }),
+      });
+      void queryClient.invalidateQueries({ queryKey: ["contents"] });
+
+      const jobChanged = previousJob !== updatedUser.job;
+      const tagsChanged =
+        previousTags.join("|") !== dedupeTags(updatedUser.tags).join("|");
+
+      if (jobChanged || tagsChanged) {
+        toast.success("프로필이 저장되었습니다. 홈 추천 글이 갱신됩니다.");
+      } else {
+        toast.success("프로필이 저장되었습니다.");
       }
 
-      queryClient.invalidateQueries({ queryKey: ["userProfile"] });
-      toast.success("프로필이 저장되었습니다.");
+      if (jobChanged) {
+        toast.message("채용 매칭·모의면접은 이력서 내용을 기준으로 합니다.", {
+          duration: 5000,
+        });
+      }
     } catch (error) {
       console.error(error);
       setSaveError("프로필 저장 중 오류가 발생했습니다. 다시 시도해 주세요.");
@@ -393,6 +417,53 @@ export function ProfileEditForm() {
               </div>
             )}
           </div>
+          <p className="mt-1.5 text-xs font-medium text-muted-foreground">
+            직무를 바꾸면 홈 추천 글이 바로 갱신됩니다. 채용 매칭·모의면접은
+            이력서 내용을 기준으로 합니다.
+          </p>
+          {resumeSuggestedJob &&
+            resumeSuggestedJob !== selectedRole &&
+            !resumeJobSuggestionDismissed && (
+              <div className="mt-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3">
+                <div className="flex gap-2">
+                  <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-foreground">
+                      이력서에는{" "}
+                      <span className="text-primary">
+                        {JOB_ROLE_LABELS[resumeSuggestedJob]}
+                      </span>{" "}
+                      쪽 내용이 보여요. 프로필 직무도 맞출까요?
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      이력서는 수정하지 않고, 프로필 선택만 바꿉니다.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="h-8"
+                        onClick={() => {
+                          setSelectedRole(resumeSuggestedJob);
+                          setResumeJobSuggestionDismissed(true);
+                        }}
+                      >
+                        프로필 직무 맞추기
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="h-8"
+                        onClick={() => setResumeJobSuggestionDismissed(true)}
+                      >
+                        그대로 두기
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
         </div>
 
         {/* Level Selection */}
