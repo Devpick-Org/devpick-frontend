@@ -1,11 +1,11 @@
 # devpick-frontend
 
-> **Trace** | 개발자 성장 플랫폼 Next.js 프론트엔드 · 2026 캡스톤 프론트엔드<br>
-> 전체 프로젝트 소개 → [Devpick-Org](https://github.com/Devpick-Org)
+> Trace 개발자 성장 플랫폼의 Next.js 프론트엔드 웹 애플리케이션입니다.
+> 전체 프로젝트 소개는 [Devpick-Org](https://github.com/Devpick-Org) 에서 확인할 수 있습니다.
 
 ---
 
-## 🛠️ 기술 스택
+## 기술 스택
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
@@ -17,10 +17,11 @@
 ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
 ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=black)
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+![Sentry](https://img.shields.io/badge/Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)
 ![TossPayments](https://img.shields.io/badge/TossPayments-0064FF?style=for-the-badge&logo=tosspayments&logoColor=white)
 
 | 구분            | 기술                      |
-| --------------- | ------------------------- |
+|-----------------|---------------------------|
 | 언어            | TypeScript                |
 | 프레임워크      | Next.js 16.x (App Router) |
 | UI 라이브러리   | React 19                  |
@@ -33,58 +34,83 @@
 | 아이콘          | Lucide React              |
 | 패키지 매니저   | npm                       |
 | 린트/포맷팅     | ESLint + Prettier         |
+| 에러 모니터링   | Sentry                    |
 | CI/CD           | GitHub Actions            |
 | 결제            | TossPayments SDK          |
 
 ---
 
-## 🏗️ 시스템 구조
+## 시스템 구조
+
+```mermaid
+flowchart LR
+    Browser[Browser]
+    Nginx[Nginx with TLS]
+    Front[Next.js port 3000]
+    Api[Spring Boot port 8080]
+    Pg[PostgreSQL on RDS]
+    Redis[Redis on ElastiCache]
+    Ai[FastAPI AI port 8000]
+    Sentry[Sentry]
+
+    Browser --> Nginx
+    Nginx --> Front
+    Nginx --> Api
+    Api --> Pg
+    Api --> Redis
+    Api --> Ai
+    Front -. errors .-> Sentry
+    Api -. errors .-> Sentry
+```
 
 ```
 브라우저
-  └─ Nginx (TLS)
-       ├─ Next.js 프론트엔드 (:3000)  ← 이 레포
-       └─ Spring Boot API 서버 (:8080)
-              ├─ PostgreSQL (AWS RDS :5432)
-              ├─ Redis (AWS ElastiCache :6379)
-              ├─ MongoDB (:27017)
-              └─ FastAPI AI 서버 (:8000)
+  └─ Nginx, TLS
+       ├─ Next.js 프론트엔드 port 3000  ← 이 레포
+       └─ Spring Boot API 서버 port 8080
+              ├─ PostgreSQL on AWS RDS port 5432
+              ├─ Redis on AWS ElastiCache port 6379
+              ├─ FastAPI AI 서버 port 8000
+              └─ Sentry 에러 추적
 ```
 
 ---
 
-## 📁 프로젝트 구조
+## 프로젝트 구조
 
 ```
+devpick-frontend
 ├── app/
-│   ├── (landing)/           # Route Group — GNB 없는 레이아웃 (랜딩 페이지)
+│   ├── (auth)/              # Route Group — GNB 없는 레이아웃 (랜딩 페이지)
 │   ├── (main)/              # Route Group — GNB 있는 레이아웃
-│   │   ├── home/            # 콘텐츠 피드 + 글 상세 + AI 퀴즈
-│   │   ├── community/       # 커뮤니티 피드 + 게시글 작성/상세
-│   │   ├── history/         # 학습 히스토리 (학습/활동/배지 탭)
+│   │   ├── home/            # 콘텐츠 피드, 글 상세, AI 퀴즈
+│   │   ├── community/       # 커뮤니티 피드, 게시글 작성·상세
+│   │   ├── history/         # 학습 히스토리 (학습·활동·배지 탭)
 │   │   ├── profile/         # 내 프로필 설정
 │   │   ├── report/          # 주간 학습 분석 리포트
-│   │   ├── trends/          # 개발 생태계 트렌드 (부트캠프·동아리·행사)
-│   │   ├── plans/           # 구독 플랜 소개 (Free / Pro / Max 비교)
-│   │   └── payment/         # 결제 플로우 (billing · success · fail)
-│   ├── auth/                # OAuth 콜백 라우트 (GitHub, Google)
+│   │   ├── trends/          # 개발 생태계 트렌드
+│   │   ├── plans/           # 구독 플랜 소개 (Free·Pro·Max)
+│   │   └── payment/         # 결제 플로우 (billing·success·fail)
+│   ├── auth/                # OAuth 콜백 라우트 (GitHub·Google)
 │   ├── onboarding/          # 초기 사용자 성향 파악
 │   └── report/share/        # 공유 리포트 (비로그인 접근 가능)
 ├── components/
 │   ├── ui/                  # 재사용 프리미티브 (shadcn/ui 기반)
 │   ├── layout/              # GNB, 탭바 등 레이아웃 컴포넌트
 │   └── features/            # 도메인별 기능 컴포넌트
-│       ├── auth/            # 로그인/회원가입/OAuth 콜백
+│       ├── auth/            # 로그인·회원가입·OAuth 콜백
 │       ├── home/            # 피드 카드, AI 요약, 퀴즈
 │       ├── community/       # 게시글, 답변, AI 답변
 │       ├── history/         # 타임라인, 배지, 포인트
 │       ├── profile/         # 프로필 수정 폼
 │       ├── report/          # 주간 리포트, 공유 리포트
-│       ├── trends/          # 개발 생태계 트렌드 (부트캠프·동아리·행사)
-│       ├── subscription/    # 구독 모달 (PlanUpgradeModal, LimitExceededModal, PlanCard)
+│       ├── trends/          # 트렌드 키워드 시각화
+│       ├── jobs/            # 채용 공고 목록·상세
+│       ├── resume/          # 이력서 관리
+│       ├── subscription/    # 구독 모달, 플랜 카드
 │       └── landing/         # 랜딩 페이지
 ├── lib/
-│   ├── api/                 # Axios 인스턴스 + 도메인별 API 함수
+│   ├── api/                 # Axios 인스턴스, 도메인별 API 함수
 │   ├── auth/                # 토큰 관리 (Access: Zustand, Refresh: HttpOnly Cookie)
 │   └── mock/                # 개발용 목 데이터
 ├── store/                   # Zustand 전역 상태 (auth, content, ui)
@@ -93,25 +119,78 @@
 
 ---
 
-## ✨ 주요 기능
+## 주요 기능
 
-| 도메인   | 기능                                                                                              |
-| -------- | ------------------------------------------------------------------------------------------------- |
-| 인증     | 이메일 회원가입·로그인, GitHub / Google OAuth2, JWT 갱신                                          |
-| 프로필   | 내 프로필 조회·수정, 프로필 이미지 업로드, 회원 탈퇴                                              |
-| 콘텐츠   | 관심 태그 기반 개인화 피드, 좋아요·스크랩 목록 조회, 좋아요, 검색, 맞춤 추천 (콘텐츠·유튜브·서적) |
-| AI       | 레벨별 AI 요약, AI 퀴즈·오답노트, AI 질문 개선, AI 답변 생성                                      |
-| 커뮤니티 | 질문 게시글 작성·수정·삭제, 답변 채택, 댓글, 유사 질문 조회                                       |
-| 리포트   | 주간 학습 리포트 조회·공유 링크 생성, PDF 저장, 학습 히스토리                                     |
-| 포인트   | 학습 행동별 포인트 적립, 배지 시스템                                                              |
-| 채용     | 채용 공고 조회·상세, 북마크                                                                       |
-| 이력서   | 이력서 관리                                                                                       |
-| 트렌드   | 개발 생태계 트렌드 (부트캠프·동아리·행사)                                                         |
-| 구독     | Free / Pro / Max 플랜 비교, 토스페이먼츠 카드 등록·구독 해지·환불, 플랜별 기능 제한 UI             |
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/features/auth.png" width="220" alt="인증과 프로필 화면" />
+      <br />
+      <strong>인증과 프로필</strong>
+      <br />
+      <sub>이메일 회원가입, GitHub Google OAuth2, JWT 갱신, 프로필 조회와 수정</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/features/content-ai.png" width="220" alt="콘텐츠와 AI 학습 화면" />
+      <br />
+      <strong>콘텐츠와 AI 학습</strong>
+      <br />
+      <sub>개인화 피드, 스크랩, 레벨별 AI 요약, AI 퀴즈, 맞춤 추천</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/features/community.png" width="220" alt="커뮤니티 화면" />
+      <br />
+      <strong>커뮤니티</strong>
+      <br />
+      <sub>질문 게시글, 답변 채택, 댓글, 유사 질문, AI 질문 개선, AI 답변</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/features/report-point.png" width="220" alt="리포트와 포인트 화면" />
+      <br />
+      <strong>리포트와 포인트</strong>
+      <br />
+      <sub>주간 학습 리포트, 공유 링크, PDF 저장, 학습 히스토리, 포인트, 배지</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/features/job.png" width="220" alt="채용 매칭 화면" />
+      <br />
+      <strong>채용 매칭</strong>
+      <br />
+      <sub>채용 공고 조회·상세, 북마크, 모의면접 Q&amp;A</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/features/resume.png" width="220" alt="이력서 관리 화면" />
+      <br />
+      <strong>이력서 관리</strong>
+      <br />
+      <sub>이력서 업로드, 마스터 이력서 저장, AI 기반 보강</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/features/trend.png" width="220" alt="트렌드 분석 화면" />
+      <br />
+      <strong>트렌드 분석</strong>
+      <br />
+      <sub>트렌딩 키워드, 부트캠프·개발행사·개발동아리 생태계 트렌드</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/features/subscription.png" width="220" alt="구독과 결제 화면" />
+      <br />
+      <strong>구독과 결제</strong>
+      <br />
+      <sub>Free·Pro·Max 플랜 비교, 토스페이먼츠 카드 등록, 해지와 환불, 기능 횟수 제한</sub>
+    </td>
+    <td align="center" width="33%">
+    </td>
+  </tr>
+</table>
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 사전 요구사항
 
@@ -127,7 +206,7 @@ npm install
 npm run dev
 ```
 
-> 기본적으로 `.env.development`의 운영 API(`https://3-39-96-126.sslip.io/v1`)를 사용합니다.  
+> 기본적으로 `.env.development`의 운영 API(`https://3-39-96-126.sslip.io/v1`)를 사용합니다.
 > 로컬 백엔드 서버를 사용하려면 `.env.local`에 아래 내용을 추가하세요.
 
 ```bash
@@ -136,86 +215,41 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/v1
 NEXT_PUBLIC_TOSS_CLIENT_KEY=test_ck_...   # 토스페이먼츠 테스트 키 (백엔드 팀에게 요청)
 ```
 
-### 빌드 & 테스트
+### 빌드와 테스트
 
 ```bash
-npm run build       # 프로덕션 빌드
-npm run lint        # ESLint 검사
-npm test            # Jest 단위 테스트
+npm run build   # 프로덕션 빌드
+npm run lint    # ESLint 검사
+npm test        # Jest 단위 테스트
 ```
 
 ---
 
-## 📖 주요 커맨드
-
-| 커맨드          | 설명                       |
-| --------------- | -------------------------- |
-| `npm run dev`   | 개발 서버 실행 (포트 3000) |
-| `npm run build` | 프로덕션 빌드              |
-| `npm start`     | 프로덕션 서버 실행         |
-| `npm run lint`  | ESLint 검사                |
-| `npm test`      | Jest 단위 테스트           |
-
----
-
-## ⚙️ CI/CD
+## CI/CD
 
 | Job          | 트리거           | 설명                                  |
-| ------------ | ---------------- | ------------------------------------- |
-| Build & Lint | PR → developV2   | ESLint 체크 + Next.js 빌드 검증       |
+|--------------|------------------|---------------------------------------|
+| Build & Lint | PR → developV2   | ESLint 체크와 Next.js 빌드 검증       |
 | Auto Merge   | `automerge` 라벨 | CI 통과 시 developV2 자동 squash 머지 |
 
 ---
 
-## 🔀 브랜치 전략
+## 브랜치 전략
 
-| 브랜치                       | 용도                                    |
-| ---------------------------- | --------------------------------------- |
-| `main`                       | 배포용                                  |
-| `develop`                    | MVP                                     |
-| `developV2`                  | MVP 이후 개발 통합 브랜치. PR 머지 대상 |
-| `feature/DP-{번호}-{기능명}` | 기능 개발                               |
-| `fix/DP-{번호}-{설명}`       | 버그 수정                               |
+| 브랜치                       | 용도                        |
+|------------------------------|-----------------------------|
+| `main`                       | 배포용                      |
+| `develop`                    | MVP                         |
+| `developV2`                  | MVP 이후 통합 브랜치        |
+| `feature/DP-{번호}-{기능명}` | 기능 개발                   |
+| `fix/DP-{번호}-{설명}`       | 버그 수정                   |
 
 ---
 
-## 👥 팀
+## 팀
 
 <table>
   <tr>
-    <td align="center" width="180">
-      <a href="https://github.com/khg9859">
-        <img src="https://github.com/khg9859.png" width="96" height="96" style="border-radius: 50%;" alt="김홍근" />
-      </a>
-      <br />
-      <strong>김홍근</strong>
-      <br />
-      <sub>PM / Backend Lead</sub>
-      <br />
-      <a href="https://github.com/khg9859">@khg9859</a>
-    </td>
-    <td align="center" width="180">
-      <a href="https://github.com/nYeonG4001">
-        <img src="https://github.com/nYeonG4001.png" width="96" height="96" style="border-radius: 50%;" alt="박하영" />
-      </a>
-      <br />
-      <strong>박하영</strong>
-      <br />
-      <sub>Backend</sub>
-      <br />
-      <a href="https://github.com/nYeonG4001">@nYeonG4001</a>
-    </td>
-    <td align="center" width="180">
-      <a href="https://github.com/suheon98">
-        <img src="https://github.com/suheon98.png" width="96" height="96" style="border-radius: 50%;" alt="조수헌" />
-      </a>
-      <br />
-      <strong>조수헌</strong>
-      <br />
-      <sub>AX</sub>
-      <br />
-      <a href="https://github.com/suheon98">@suheon98</a>
-    </td>
     <td align="center" width="180">
       <a href="https://github.com/uiuuoq">
         <img src="https://github.com/uiuuoq.png" width="96" height="96" style="border-radius: 50%;" alt="홍보민" />
