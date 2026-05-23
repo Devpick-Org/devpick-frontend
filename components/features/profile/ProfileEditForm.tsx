@@ -371,7 +371,7 @@ export function ProfileEditForm() {
               />
             </button>
             {isRoleOpen && (
-              <div className="absolute z-20 mt-1 w-full rounded-lg border border-border bg-card">
+              <div className="absolute z-20 mt-1 max-h-72 w-full overflow-y-auto rounded-lg border border-border bg-card">
                 {JOB_ROLES.map((role) => (
                   <button
                     key={role.id}

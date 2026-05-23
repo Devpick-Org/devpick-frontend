@@ -1,7 +1,7 @@
 import type { PlanType } from "./subscription";
 import type { ApiResponse } from "./api";
 
-export type UserJob = "FRONTEND" | "BACKEND" | "FULLSTACK";
+export type UserJob = "FRONTEND" | "BACKEND" | "FULLSTACK" | "DEVOPS" | "AI_ML" | "MOBILE" | "DATA";
 export type UserLevel = "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
 
 export interface UserProfileBadge {

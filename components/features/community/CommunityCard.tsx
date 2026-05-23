@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { LoginPromptDialog } from "@/components/features/auth/LoginPromptDialog";
 import { AuthorButton } from "./AuthorButton";
 import { UserProfileModal } from "./UserProfileModal";
+import { JOB_ROLE_LABELS } from "@/components/features/profile/constants";
 import type { PostSummary, PostLevel } from "@/types/post";
 
 // ─── Level helpers ─────────────────────────────────────────────────────────────
@@ -24,12 +25,6 @@ const LEVEL_TEXT_COLORS: Record<PostLevel, string> = {
   JUNIOR: "text-blue-400",
   MIDDLE: "text-amber-400",
   SENIOR: "text-red-400",
-};
-
-const JOB_LABEL: Record<string, string> = {
-  FRONTEND: "프론트엔드",
-  BACKEND: "백엔드",
-  FULLSTACK: "풀스택",
 };
 
 export function formatRelativeDate(createdAt: string): string {
@@ -116,7 +111,7 @@ export function CommunityCard({ post }: CommunityCardProps) {
           {post.authorJob && (
             <>
               <span className="text-muted-foreground/40">·</span>
-              <span>{JOB_LABEL[post.authorJob] ?? post.authorJob}</span>
+              <span>{JOB_ROLE_LABELS[post.authorJob] ?? post.authorJob}</span>
             </>
           )}
           <span className="text-muted-foreground/40">·</span>

@@ -1,11 +1,11 @@
 import { apiClient } from "../client";
 import type { ApiResponse } from "@/types/api";
-import type { UserProfileResponse } from "@/types/userProfile";
+import type { UserJob, UserProfileResponse } from "@/types/userProfile";
 
 export interface UpdateMeRequest {
   nickname?: string;
   profileImage?: string;
-  job?: "FRONTEND" | "BACKEND" | "FULLSTACK";
+  job?: UserJob;
   level?: "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
   tags?: string[];
 }
@@ -15,7 +15,7 @@ export interface UpdateMeResponse {
   email: string;
   nickname: string;
   profileImage?: string;
-  job?: "FRONTEND" | "BACKEND" | "FULLSTACK";
+  job?: UserJob;
   level?: "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
   tags?: string[];
   createdAt?: string;

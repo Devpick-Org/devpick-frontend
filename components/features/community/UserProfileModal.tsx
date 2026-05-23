@@ -8,13 +8,8 @@ import { PlanAvatar } from "@/components/ui/plan-avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { usersEndpoints } from "@/lib/api/endpoints/users";
-import type { UserJob, UserLevel } from "@/types/userProfile";
-
-const JOB_LABELS: Record<UserJob, string> = {
-  FRONTEND: "프론트엔드",
-  BACKEND: "백엔드",
-  FULLSTACK: "풀스택",
-};
+import { JOB_ROLE_LABELS } from "@/components/features/profile/constants";
+import type { UserLevel } from "@/types/userProfile";
 
 const LEVEL_LABELS: Record<UserLevel, string> = {
   BEGINNER: "입문",
@@ -114,7 +109,7 @@ export function UserProfileModal({
                   {(profile.job || profile.level) && (
                     <p className="mt-0.5 text-xs font-medium text-muted-foreground">
                       {[
-                        profile.job ? JOB_LABELS[profile.job] : null,
+                        profile.job ? JOB_ROLE_LABELS[profile.job] : null,
                         profile.level ? LEVEL_LABELS[profile.level] : null,
                       ]
                         .filter(Boolean)

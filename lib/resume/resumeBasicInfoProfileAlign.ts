@@ -12,6 +12,14 @@ import type {
 export function inferJobRoleFromJobTitle(jobTitle: string): JobRoleId | null {
   const t = jobTitle.trim().toLowerCase();
   if (!t) return null;
+  if (/devops|dev\s*ops|데브옵스|sre|site reliability|platform|인프라|클라우드|cloud/i.test(jobTitle))
+    return "DEVOPS";
+  if (/ai|ml|machine learning|머신러닝|인공지능|딥러닝|llm|모델/i.test(jobTitle))
+    return "AI_ML";
+  if (/모바일|mobile|android|안드로이드|ios|아이오에스|react native|flutter|kotlin|swift/i.test(jobTitle))
+    return "MOBILE";
+  if (/데이터|data|analytics|분석|etl|elt|engineer.*data|data.*engineer|데이터.?엔지니어/i.test(jobTitle))
+    return "DATA";
   if (/풀스택|풀.?스택|full[\s_-]?stack|fullstack/i.test(jobTitle))
     return "FULLSTACK";
   if (/프론트|프런트|frontend|react\s*프론트/i.test(jobTitle))

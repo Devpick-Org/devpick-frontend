@@ -5,6 +5,10 @@ const JOB_CODE_TO_TITLE: Record<string, string> = {
   FRONTEND: "프론트엔드",
   BACKEND: "백엔드",
   FULLSTACK: "풀스택",
+  DEVOPS: "DevOps",
+  AI_ML: "AI/ML",
+  MOBILE: "모바일",
+  DATA: "데이터",
 };
 
 /** 프로필 레벨 → 이력서 ‘경력(년)’이 비어 있을 때 채울 참고값 */

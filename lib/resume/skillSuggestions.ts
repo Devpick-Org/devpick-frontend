@@ -3,8 +3,17 @@ import { TAG_GROUPS } from "@/components/features/profile/constants";
 /** 직무 문구에 따라 공고에서 흔한 스택 후보 (프로필 태그와 함께 추천 칩으로 사용) */
 export function suggestedTechFromJobTitle(jobTitle: string): string[] {
   const t = jobTitle.toLowerCase();
+  if (/devops|dev\s*ops|데브옵스|sre|platform|인프라|클라우드|cloud/.test(t)) {
+    return TAG_GROUPS.find((g) => g.label === "인프라 · DevOps")?.tags ?? [];
+  }
+  if (/ai|ml|머신러닝|인공지능|딥러닝|llm|데이터|data/.test(t)) {
+    return TAG_GROUPS.find((g) => g.label === "데이터 · ML")?.tags ?? [];
+  }
+  if (/모바일|mobile|android|ios|react native|flutter|kotlin|swift/.test(t)) {
+    return TAG_GROUPS.find((g) => g.label === "모바일")?.tags ?? [];
+  }
   if (t.includes("백엔드") || t.includes("backend")) {
-    return TAG_GROUPS.find((g) => g.label === "백엔드")?.tags ?? [];
+    return TAG_GROUPS.find((g) => g.label === "백엔드 · API")?.tags ?? [];
   }
   if (t.includes("프론트") || t.includes("frontend")) {
     return TAG_GROUPS.find((g) => g.label === "프론트엔드")?.tags ?? [];

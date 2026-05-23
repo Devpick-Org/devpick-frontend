@@ -15,13 +15,8 @@ import { useAuthStore } from "@/store/auth.store";
 import { ContentRenderer } from "./ContentRenderer";
 import { UserProfileModal } from "./UserProfileModal";
 import { PlanAvatar } from "@/components/ui/plan-avatar";
+import { JOB_ROLE_LABELS } from "@/components/features/profile/constants";
 import type { CommunityAnswer, CommentDTO } from "@/types/community";
-
-const JOB_LABELS: Record<string, string> = {
-  FRONTEND: "프론트엔드",
-  BACKEND: "백엔드",
-  FULLSTACK: "풀스택",
-};
 
 const LEVEL_LABELS: Record<string, string> = {
   BEGINNER: "입문",
@@ -173,7 +168,7 @@ function AnswerItem({
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               {[
                 answer.authorJob
-                  ? (JOB_LABELS[answer.authorJob] ?? answer.authorJob)
+                  ? (JOB_ROLE_LABELS[answer.authorJob] ?? answer.authorJob)
                   : null,
                 answer.authorLevel
                   ? (LEVEL_LABELS[answer.authorLevel] ?? answer.authorLevel)

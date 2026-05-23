@@ -1,4 +1,5 @@
 import type { PlanType, UserLimits } from './subscription';
+import type { UserJob, UserLevel } from './userProfile';
 
 export interface RepresentativeBadge {
   badgeId: string;
@@ -11,8 +12,8 @@ export interface User {
   email: string;
   nickname: string;
   profileImage?: string;
-  job?: string;
-  level?: string;
+  job?: UserJob;
+  level?: UserLevel;
   tags?: string[];
   totalPoints?: number;
   representativeBadge?: RepresentativeBadge | null;

@@ -1,10 +1,24 @@
-export type JobRoleId = "FRONTEND" | "BACKEND" | "FULLSTACK";
+export type JobRoleId = "FRONTEND" | "BACKEND" | "FULLSTACK" | "DEVOPS" | "AI_ML" | "MOBILE" | "DATA";
 export type LevelId = "BEGINNER" | "JUNIOR" | "MIDDLE" | "SENIOR";
+
+export const JOB_ROLE_LABELS: Record<JobRoleId, string> = {
+  FRONTEND: "프론트엔드",
+  BACKEND: "백엔드",
+  FULLSTACK: "풀스택",
+  DEVOPS: "DevOps",
+  AI_ML: "AI/ML",
+  MOBILE: "모바일",
+  DATA: "데이터",
+};
 
 export const JOB_ROLES: { id: JobRoleId; label: string }[] = [
   { id: "FRONTEND", label: "프론트엔드" },
   { id: "BACKEND", label: "백엔드" },
   { id: "FULLSTACK", label: "풀스택" },
+  { id: "DEVOPS", label: "DevOps" },
+  { id: "AI_ML", label: "AI/ML" },
+  { id: "MOBILE", label: "모바일" },
+  { id: "DATA", label: "데이터" },
 ];
 
 export const LEVELS: { id: LevelId; label: string; sub: string }[] = [

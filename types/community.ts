@@ -59,7 +59,7 @@ export interface AnswerDTO {
   authorNickname: string;
   authorProfileImage?: string | null;
   authorPlanType?: PlanType | null;
-  authorJob?: string | null;
+  authorJob?: UserJob | null;
   authorLevel?: string | null;
   isAdopted: boolean;
   isEdited: boolean;
