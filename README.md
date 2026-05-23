@@ -21,7 +21,7 @@
 ![TossPayments](https://img.shields.io/badge/TossPayments-0064FF?style=for-the-badge&logo=tosspayments&logoColor=white)
 
 | 구분            | 기술                      |
-|-----------------|---------------------------|
+| --------------- | ------------------------- |
 | 언어            | TypeScript                |
 | 프레임워크      | Next.js 16.x (App Router) |
 | UI 라이브러리   | React 19                  |
@@ -70,8 +70,11 @@ flowchart LR
        └─ Spring Boot API 서버 port 8080
               ├─ PostgreSQL on AWS RDS port 5432
               ├─ Redis on AWS ElastiCache port 6379
+              ├─ DynamoDB on AWS
+              ├─ AWS S3 파일 저장소
               ├─ FastAPI AI 서버 port 8000
-              └─ Sentry 에러 추적
+              ├─ Sentry 에러 추적과 트레이싱
+              └─ Prometheus, Grafana, Loki, Promtail 모니터링
 ```
 
 ---
@@ -138,7 +141,7 @@ devpick-frontend
       <sub>개인화 피드, 스크랩, 레벨별 AI 요약, AI 퀴즈, 맞춤 추천</sub>
     </td>
     <td align="center" width="33%">
-      <img src="docs/features/community.png" width="220" alt="커뮤니티 화면" />
+      <img src="docs/features/community.png" width="220" alt="커뮤니티 질문 개선 화면" />
       <br />
       <strong>커뮤니티</strong>
       <br />
@@ -147,25 +150,25 @@ devpick-frontend
   </tr>
   <tr>
     <td align="center" width="33%">
-      <img src="docs/features/report-point.png" width="220" alt="리포트와 포인트 화면" />
+      <img src="docs/features/report-point.png" width="220" alt="포인트와 배지 화면" />
       <br />
       <strong>리포트와 포인트</strong>
       <br />
-      <sub>주간 학습 리포트, 공유 링크, PDF 저장, 학습 히스토리, 포인트, 배지</sub>
+      <sub>주간 학습 리포트, 학습 히스토리, 포인트 적립, 배지 시스템</sub>
     </td>
     <td align="center" width="33%">
-      <img src="docs/features/job.png" width="220" alt="채용 매칭 화면" />
+      <img src="docs/features/job.png" width="220" alt="모의면접 화면" />
       <br />
-      <strong>채용 매칭</strong>
+      <strong>채용 매칭과 모의면접</strong>
       <br />
-      <sub>채용 공고 조회·상세, 북마크, 모의면접 Q&amp;A</sub>
+      <sub>채용 공고 수집과 매칭, 북마크, 면접 Q&A, 모의면접, 부족 역량 추천</sub>
     </td>
     <td align="center" width="33%">
       <img src="docs/features/resume.png" width="220" alt="이력서 관리 화면" />
       <br />
       <strong>이력서 관리</strong>
       <br />
-      <sub>이력서 업로드, 마스터 이력서 저장, AI 기반 보강</sub>
+      <sub>PDF와 DOCX 텍스트 추출, 마스터 이력서 저장, AI 기반 보강</sub>
     </td>
   </tr>
   <tr>
@@ -174,14 +177,14 @@ devpick-frontend
       <br />
       <strong>트렌드 분석</strong>
       <br />
-      <sub>트렌딩 키워드, 부트캠프·개발행사·개발동아리 생태계 트렌드</sub>
+      <sub>부트캠프, 개발행사, 개발동아리, 트렌딩 키워드, 주간 상위 콘텐츠</sub>
     </td>
     <td align="center" width="33%">
       <img src="docs/features/subscription.png" width="220" alt="구독과 결제 화면" />
       <br />
       <strong>구독과 결제</strong>
       <br />
-      <sub>Free·Pro·Max 플랜 비교, 토스페이먼츠 카드 등록, 해지와 환불, 기능 횟수 제한</sub>
+      <sub>Free, Pro, Max 플랜, 토스페이먼츠 빌링키, 해지와 환불, 기능 횟수 제한</sub>
     </td>
     <td align="center" width="33%">
     </td>
@@ -228,7 +231,7 @@ npm test        # Jest 단위 테스트
 ## CI/CD
 
 | Job          | 트리거           | 설명                                  |
-|--------------|------------------|---------------------------------------|
+| ------------ | ---------------- | ------------------------------------- |
 | Build & Lint | PR → developV2   | ESLint 체크와 Next.js 빌드 검증       |
 | Auto Merge   | `automerge` 라벨 | CI 통과 시 developV2 자동 squash 머지 |
 
@@ -236,13 +239,13 @@ npm test        # Jest 단위 테스트
 
 ## 브랜치 전략
 
-| 브랜치                       | 용도                        |
-|------------------------------|-----------------------------|
-| `main`                       | 배포용                      |
-| `develop`                    | MVP                         |
-| `developV2`                  | MVP 이후 통합 브랜치        |
-| `feature/DP-{번호}-{기능명}` | 기능 개발                   |
-| `fix/DP-{번호}-{설명}`       | 버그 수정                   |
+| 브랜치                       | 용도                 |
+| ---------------------------- | -------------------- |
+| `main`                       | 배포용               |
+| `develop`                    | MVP                  |
+| `developV2`                  | MVP 이후 통합 브랜치 |
+| `feature/DP-{번호}-{기능명}` | 기능 개발            |
+| `fix/DP-{번호}-{설명}`       | 버그 수정            |
 
 ---
 
