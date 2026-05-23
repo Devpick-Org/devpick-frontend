@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Share2, Users } from "lucide-react";
+import { Share2 } from "lucide-react";
 import { useState } from "react";
+import { TraceMark } from "@/components/brand/TraceMark";
 import { cn, copyShareLink } from "@/lib/utils";
 import type { EcosystemTrendItemDto } from "@/types/trends";
 
@@ -27,10 +28,8 @@ function categoryBadge(category: EcosystemTrendItemDto["category"]): string {
 
 export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
   const [thumbFailed, setThumbFailed] = useState(false);
-  const initial = (item.title?.trim() ? item.title.trim() : "?").slice(0, 1);
   const displayThumbnail = item.thumbnailUrl?.trim();
-  const hasThumb = Boolean(displayThumbnail);
-  const showImage = hasThumb && !thumbFailed;
+  const showImage = Boolean(displayThumbnail) && !thumbFailed;
 
   return (
     <article
@@ -60,14 +59,8 @@ export function EcoTrendCard({ item, className }: EcoTrendCardProps) {
             }
             onError={() => setThumbFailed(true)}
           />
-        ) : item.category === "club" ? (
-          <div className="flex h-full w-full items-center justify-center bg-muted/50">
-            <Users className="h-6 w-6 text-muted-foreground/30" />
-          </div>
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/15 via-muted to-primary/5 text-3xl font-bold text-primary/80">
-            {initial}
-          </div>
+          <TraceMark variant="thumb" />
         )}
       </div>
       <div className="flex flex-col gap-1.5 px-0.5 pb-1">
