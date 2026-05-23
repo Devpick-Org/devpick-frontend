@@ -1,12 +1,14 @@
 "use client";
 
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import type { PlanType } from "@/types/subscription";
+import { PlanAvatar } from "@/components/ui/plan-avatar";
 import { cn } from "@/lib/utils";
 
 interface AuthorButtonProps {
   userId: string;
   nickname: string;
   profileImage?: string | null;
+  planType?: PlanType | null;
   avatarSize?: "sm" | "default";
   className?: string;
   onOpenProfile: (userId: string) => void;
@@ -16,6 +18,7 @@ export function AuthorButton({
   userId,
   nickname,
   profileImage,
+  planType,
   avatarSize = "sm",
   className,
   onOpenProfile,
@@ -33,12 +36,13 @@ export function AuthorButton({
         className,
       )}
     >
-      <Avatar size={avatarSize}>
-        {profileImage && !profileImage.startsWith("blob:") && (
-          <AvatarImage src={profileImage} alt={nickname} />
-        )}
-        <AvatarFallback>{nickname.charAt(0).toUpperCase()}</AvatarFallback>
-      </Avatar>
+      <PlanAvatar
+        planType={planType}
+        src={profileImage}
+        alt={nickname}
+        fallback={nickname}
+        size={avatarSize === "default" ? "xs" : "sm"}
+      />
       <span className="font-medium truncate">{nickname}</span>
     </button>
   );

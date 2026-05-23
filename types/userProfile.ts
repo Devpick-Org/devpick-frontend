@@ -1,3 +1,4 @@
+import type { PlanType } from "./subscription";
 import type { ApiResponse } from "./api";
 
 export type UserJob = "FRONTEND" | "BACKEND" | "FULLSTACK";
@@ -25,6 +26,7 @@ export interface UserProfile {
   userId: string;
   nickname: string;
   profileImage?: string | null;
+  planType?: PlanType | null;
   job?: UserJob | null;
   level?: UserLevel | null;
   badges: UserProfileBadge[];

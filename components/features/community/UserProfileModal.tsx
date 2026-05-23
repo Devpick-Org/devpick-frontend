@@ -4,7 +4,7 @@ import { useEffect, useId } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { X, ExternalLink } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { PlanAvatar } from "@/components/ui/plan-avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { usersEndpoints } from "@/lib/api/endpoints/users";
@@ -97,17 +97,13 @@ export function UserProfileModal({
             <>
               {/* 헤더: 아바타 + 닉네임 + job · level */}
               <div className="mb-5 flex items-center gap-4">
-                <Avatar className="size-14 shrink-0">
-                  {profile.profileImage && !profile.profileImage.startsWith("blob:") && (
-                    <AvatarImage
-                      src={profile.profileImage}
-                      alt={profile.nickname}
-                    />
-                  )}
-                  <AvatarFallback className="text-lg">
-                    {profile.nickname.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <PlanAvatar
+                  planType={profile.planType}
+                  src={profile.profileImage}
+                  alt={profile.nickname}
+                  fallback={profile.nickname}
+                  size="xl"
+                />
                 <div className="min-w-0">
                   <p
                     id={titleId}

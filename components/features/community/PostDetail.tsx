@@ -161,6 +161,7 @@ export function PostDetail({ post, isAuthor, onEdit, onDelete, isDeleting }: Pos
           userId={post.authorId}
           nickname={post.authorNickname}
           profileImage={post.authorProfileImage}
+          planType={post.authorPlanType}
           onOpenProfile={(userId) => setProfileInfo({ userId, nickname: post.authorNickname })}
         />
         {post.authorJob && (

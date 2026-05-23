@@ -14,7 +14,7 @@ import { cn, formatDateTime } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { ContentRenderer } from "./ContentRenderer";
 import { UserProfileModal } from "./UserProfileModal";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { PlanAvatar } from "@/components/ui/plan-avatar";
 import type { CommunityAnswer, CommentDTO } from "@/types/community";
 
 const JOB_LABELS: Record<string, string> = {
@@ -152,17 +152,13 @@ function AnswerItem({
             }
             className="shrink-0 cursor-pointer rounded-full transition-opacity hover:opacity-70"
           >
-            <Avatar className="h-9 w-9">
-              {answer.authorProfileImage && !answer.authorProfileImage.startsWith("blob:") && (
-                <AvatarImage
-                  src={answer.authorProfileImage}
-                  alt={answer.authorNickname}
-                />
-              )}
-              <AvatarFallback>
-                {answer.authorNickname.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <PlanAvatar
+              planType={answer.authorPlanType}
+              src={answer.authorProfileImage}
+              alt={answer.authorNickname}
+              fallback={answer.authorNickname}
+              size="md"
+            />
           </button>
           <div className="flex flex-col gap-0.5">
             <button
@@ -443,14 +439,13 @@ function CommentItem({
         onClick={() => onOpenProfile(comment.userId)}
         className="shrink-0 cursor-pointer rounded-full transition-opacity hover:opacity-70"
       >
-        <Avatar className="h-8 w-8">
-          {comment.profileImage && !comment.profileImage.startsWith("blob:") && (
-            <AvatarImage src={comment.profileImage} alt={comment.nickname} />
-          )}
-          <AvatarFallback className="text-xs">
-            {comment.nickname.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <PlanAvatar
+          planType={comment.planType}
+          src={comment.profileImage}
+          alt={comment.nickname}
+          fallback={comment.nickname}
+          size="xs"
+        />
       </button>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">

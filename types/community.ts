@@ -1,6 +1,7 @@
 import type { PostLevel, PostType } from "./post";
 import type { ApiResponse } from "./api";
 import type { UserJob } from "./userProfile";
+import type { PlanType } from "./subscription";
 
 // ─── 프론트 전용 로컬 타입 ────────────────────────────────────────────────────
 
@@ -29,6 +30,7 @@ export interface PostDetailDTO {
   authorId: string;
   authorNickname: string;
   authorProfileImage?: string | null;
+  authorPlanType?: PlanType | null;
   authorJob?: UserJob | null;
   answerCount: number;
   createdAt: string;
@@ -45,6 +47,7 @@ export interface CommentDTO {
   userId: string;
   nickname: string;
   profileImage?: string | null;
+  planType?: PlanType | null;
   createdAt: string;
 }
 
@@ -55,6 +58,7 @@ export interface AnswerDTO {
   authorId: string;
   authorNickname: string;
   authorProfileImage?: string | null;
+  authorPlanType?: PlanType | null;
   authorJob?: string | null;
   authorLevel?: string | null;
   isAdopted: boolean;

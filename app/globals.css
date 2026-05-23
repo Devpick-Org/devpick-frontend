@@ -195,3 +195,37 @@ input[type="search"]::-webkit-search-cancel-button {
 .eco-marquee-wrap::-webkit-scrollbar {
   display: none;
 }
+
+/* Pro / Max 구독 플랜 프로필 프레임 */
+@keyframes plan-ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.plan-avatar-pro .plan-avatar-ring {
+  background: linear-gradient(
+    135deg,
+    oklch(0.62 0.2 250),
+    oklch(0.72 0.16 220),
+    oklch(0.78 0.14 195)
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--primary) 35%, transparent),
+    0 0 10px color-mix(in oklch, var(--primary) 45%, transparent);
+}
+
+.plan-avatar-max .plan-avatar-ring {
+  background: conic-gradient(
+    from 0deg,
+    oklch(0.62 0.22 250),
+    oklch(0.68 0.24 290),
+    oklch(0.74 0.18 200),
+    oklch(0.78 0.2 85),
+    oklch(0.62 0.22 250)
+  );
+  animation: plan-ring-spin 10s linear infinite;
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--primary) 40%, transparent),
+    0 0 14px color-mix(in oklch, var(--chart-4) 55%, transparent);
+}

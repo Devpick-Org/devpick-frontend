@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PlanAvatar } from "@/components/ui/plan-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -296,12 +296,13 @@ export function ProfileEditForm() {
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           {/* Avatar */}
           <div className="relative shrink-0">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={avatarPreview ?? ""} alt="프로필 이미지" />
-              <AvatarFallback className="bg-primary/15 text-2xl font-bold text-primary">
-                {displayInitial}
-              </AvatarFallback>
-            </Avatar>
+            <PlanAvatar
+              planType={user?.planType}
+              src={avatarPreview}
+              alt="프로필 이미지"
+              fallback={displayInitial}
+              size="lg"
+            />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}

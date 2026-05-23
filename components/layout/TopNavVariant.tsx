@@ -20,7 +20,7 @@ import {
   CreditCard,
   type LucideIcon,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PlanAvatar } from "@/components/ui/plan-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -75,7 +75,6 @@ export function TopNavVariant() {
   );
 
   const displayName = user?.nickname ?? "Guest";
-  const displayInitial = displayName.charAt(0).toUpperCase();
   const displayBadge = user?.representativeBadge?.name ?? null;
 
   const handleLogout = async () => {
@@ -153,17 +152,13 @@ export function TopNavVariant() {
                     className="flex h-auto items-center gap-2.5 rounded-full border border-border/80 bg-background px-3 py-1.5 text-sm transition-colors hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer"
                     aria-label="User menu"
                   >
-                    <Avatar className="h-7 w-7 ring-1 ring-primary/20">
-                      {user.profileImage && !user.profileImage.startsWith("blob:") && (
-                        <AvatarImage
-                          src={user.profileImage}
-                          alt={`${displayName} avatar`}
-                        />
-                      )}
-                      <AvatarFallback className="bg-primary/15 text-xs font-semibold text-primary">
-                        {displayInitial}
-                      </AvatarFallback>
-                    </Avatar>
+                    <PlanAvatar
+                      planType={user.planType}
+                      src={user.profileImage}
+                      alt={`${displayName} avatar`}
+                      fallback={displayName}
+                      size="sm"
+                    />
                     <div className="hidden items-center gap-1.5 sm:flex">
                       <span className="text-sm font-medium text-foreground">
                         {displayName}
