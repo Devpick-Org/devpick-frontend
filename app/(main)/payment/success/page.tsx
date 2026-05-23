@@ -108,7 +108,7 @@ function SuccessContent() {
       <button
         type="button"
         onClick={() => router.replace("/home")}
-        className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 cursor-pointer"
       >
         홈으로 이동
       </button>
