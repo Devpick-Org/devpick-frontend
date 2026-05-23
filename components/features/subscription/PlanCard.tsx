@@ -13,6 +13,7 @@ interface PlanCardProps {
   onChangePlan?: (plan: "PRO" | "MAX") => void;
   isChanging?: boolean;
   isExpiring?: boolean;
+  planExpiredAt?: string | null;
 }
 
 const PLAN_META: Record<
@@ -66,7 +67,10 @@ const PLAN_META: Record<
   },
 };
 
-export function PlanCard({ plan, currentPlan, pendingPlanType, onChangePlan, isChanging, isExpiring }: PlanCardProps) {
+export function PlanCard({ plan, currentPlan, pendingPlanType, onChangePlan, isChanging, isExpiring, planExpiredAt }: PlanCardProps) {
+  const expiryLabel = planExpiredAt
+    ? `${new Date(planExpiredAt).getMonth() + 1}월 ${new Date(planExpiredAt).getDate()}일`
+    : null;
   const meta = PLAN_META[plan];
   const isCurrent = currentPlan === plan;
   const isPending = pendingPlanType === plan && !isCurrent;
@@ -130,7 +134,7 @@ export function PlanCard({ plan, currentPlan, pendingPlanType, onChangePlan, isC
           </p>
         ) : isExpiring ? (
           <p className="text-center text-xs text-muted-foreground">
-            만료 후 이용 가능
+            {expiryLabel ? `${expiryLabel} 이후 변경 가능` : "만료 후 이용 가능"}
           </p>
         ) : currentPlan === "FREE" ? (
           <Button asChild className="w-full font-semibold">

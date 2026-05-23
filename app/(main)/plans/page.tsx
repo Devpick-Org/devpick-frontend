@@ -170,6 +170,7 @@ export default function PlansPage() {
             onChangePlan={handleChangePlan}
             isChanging={isChanging}
             isExpiring={isExpiring}
+            planExpiredAt={user?.planExpiredAt}
           />
         ))}
       </div>
