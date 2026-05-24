@@ -162,6 +162,7 @@ export function SubscriptionSection() {
   const [isRefunding, setIsRefunding] = useState(false);
   const [isChangingPlan, setIsChangingPlan] = useState(false);
   const [isCancelingPlanChange, setIsCancelingPlanChange] = useState(false);
+  const [isResuming, setIsResuming] = useState(false);
 
   const planType = user?.planType ?? "FREE";
   const isActive = planType !== "FREE";
@@ -239,6 +240,21 @@ export function SubscriptionSection() {
     }
   };
 
+  const handleResume = async () => {
+    setIsResuming(true);
+    try {
+      await subscriptionsEndpoints.resumeSubscription();
+      const me = await authEndpoints.getMe();
+      updateUser(me.data.data);
+      toast.success("구독 해지가 취소됐습니다. 정기 결제가 유지됩니다.");
+    } catch (e) {
+      const { message } = extractApiError(e);
+      toast.error(message ?? "해지 취소 중 오류가 발생했습니다.");
+    } finally {
+      setIsResuming(false);
+    }
+  };
+
   const handleCancelPlanChange = async () => {
     setIsCancelingPlanChange(true);
     try {
@@ -280,13 +296,25 @@ export function SubscriptionSection() {
         )}
 
         {isExpiring && (
-          <span className="text-sm text-muted-foreground">
-            <span className="font-semibold text-foreground">
-              {formatKorDate(new Date(user!.planExpiredAt!))}
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-sm text-muted-foreground">
+              <span className="font-semibold text-foreground">
+                {formatKorDate(new Date(user!.planExpiredAt!))}
+              </span>
+              까지 이용 가능
+              <span className="ml-1 text-xs">(해지 예정)</span>
             </span>
-            까지 이용 가능
-            <span className="ml-1 text-xs">(해지 예정)</span>
-          </span>
+            {new Date(user!.planExpiredAt!) > new Date() && (
+              <button
+                type="button"
+                onClick={handleResume}
+                disabled={isResuming}
+                className="cursor-pointer text-xs text-muted-foreground/70 underline-offset-2 hover:underline disabled:opacity-50"
+              >
+                {isResuming ? "처리 중..." : "해지 취소"}
+              </button>
+            )}
+          </div>
         )}
       </div>
 

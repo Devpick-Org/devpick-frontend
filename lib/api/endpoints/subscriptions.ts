@@ -18,4 +18,8 @@ export const subscriptionsEndpoints = {
   /** POST /subscriptions/change — 다음 결제 구간부터 플랜 변경 예약 (PRO ↔ MAX) */
   changePlan: (planType: "PRO" | "MAX") =>
     apiClient.post<ApiResponse<ChangePlanData>>("/subscriptions/change", { planType }),
+
+  /** POST /subscriptions/resume — 구독 해지 취소 (CANCELED → ACTIVE 복구) */
+  resumeSubscription: () =>
+    apiClient.post<ApiResponse<SubscriptionChangeData>>("/subscriptions/resume"),
 };
