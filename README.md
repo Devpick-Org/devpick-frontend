@@ -209,7 +209,7 @@ npm install
 npm run dev
 ```
 
-> 기본적으로 `.env.development`의 운영 API(`https://3-39-96-126.sslip.io/v1`)를 사용합니다.
+> 기본적으로 `.env.development`의 운영 API(`https://traceapp.site/v1`)를 사용합니다.
 > 로컬 백엔드 서버를 사용하려면 `.env.local`에 아래 내용을 추가하세요.
 
 ```bash

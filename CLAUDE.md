@@ -323,7 +323,7 @@ DP-{티켓번호}: {작업 내용}
 | 환경                                          | Base URL                          |
 | --------------------------------------------- | --------------------------------- |
 | local (`npm run dev:local` 또는 `.env.local`) | `http://localhost:8080/v1`        |
-| 기본 (환경변수 미설정)                        | `https://3-39-96-126.sslip.io/v1` |
+| 기본 (환경변수 미설정)                        | `https://traceapp.site/v1` |
 | 운영 도메인 (예정)                            | `https://api.devpick.kr/v1`       |
 
 ### 인증 방식
@@ -420,7 +420,7 @@ DP-{티켓번호}: {작업 내용}
 
 ## 8. API 엔드포인트 전체 목록
 
-**Base URL**: 기본 폴백 `https://3-39-96-126.sslip.io/v1` (`NEXT_PUBLIC_API_BASE_URL` 미설정 시)
+**Base URL**: 기본 폴백 `https://traceapp.site/v1` (`NEXT_PUBLIC_API_BASE_URL` 미설정 시)
 **공통 에러**: ADR-003 (success, error 객체 포함) 준수
 
 ### Epic A — 회원/프로필

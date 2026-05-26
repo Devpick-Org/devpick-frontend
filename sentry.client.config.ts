@@ -17,7 +17,7 @@ if (dsn) {
     ),
     tracePropagationTargets: [
       "localhost",
-      /^https:\/\/3-39-96-126\.sslip\.io/,
+      /^https:\/\/traceapp\.site/,
       /^https:\/\/api\.traceapp\.org/,
       process.env.NEXT_PUBLIC_API_BASE_URL ?? "",
     ].filter(Boolean),

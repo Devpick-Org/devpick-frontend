@@ -15,7 +15,7 @@ npm run dev
 ```
 
 브라우저에서 `http://localhost:3000` 접속 후 로그인하세요.  
-(API 기본값은 운영 서버 `https://3-39-96-126.sslip.io`를 바라봅니다.)
+(API 기본값은 운영 서버 `https://traceapp.site`를 바라봅니다.)
 
 ---
 
