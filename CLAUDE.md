@@ -353,8 +353,7 @@ DP-{티켓번호}: {작업 내용}
 ```json
 {
   "success": true,
-  "data": {},
-  "message": "요청이 성공했습니다"
+  "data": {}
 }
 ```
 
