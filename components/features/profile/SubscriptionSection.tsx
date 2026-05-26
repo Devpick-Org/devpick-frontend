@@ -190,6 +190,14 @@ export function SubscriptionSection() {
 
   const limits = user?.limits;
 
+  // PAYMENT_* 에러는 axios 인터셉터에서 이미 토스트 처리됨 — 컴포넌트에서 중복 표시 방지
+  function showErrorToastIfNeeded(e: unknown, fallback: string) {
+    const { code, message } = extractApiError(e);
+    if (!code?.startsWith("PAYMENT_")) {
+      toast.error(message ?? fallback);
+    }
+  }
+
   const handleCancel = async () => {
     setIsCanceling(true);
     try {
@@ -201,8 +209,7 @@ export function SubscriptionSection() {
       updateUser(me.data.data);
       toast.success(`${expiredLabel}까지 이용 가능합니다.`);
     } catch (e) {
-      const { message } = extractApiError(e);
-      toast.error(message ?? "구독 해지 중 오류가 발생했습니다.");
+      showErrorToastIfNeeded(e, "구독 해지 중 오류가 발생했습니다.");
     } finally {
       setIsCanceling(false);
       setShowCancelModal(false);
@@ -217,8 +224,7 @@ export function SubscriptionSection() {
       updateUser(me.data.data);
       toast.success("환불이 완료됐습니다. 즉시 Free 플랜으로 전환됩니다.");
     } catch (e) {
-      const { message } = extractApiError(e);
-      toast.error(message ?? "환불 처리 중 오류가 발생했습니다.");
+      showErrorToastIfNeeded(e, "환불 처리 중 오류가 발생했습니다.");
     } finally {
       setIsRefunding(false);
       setShowRefundModal(false);
@@ -233,8 +239,7 @@ export function SubscriptionSection() {
       updateUser(me.data.data);
       toast.success("다음 결제부터 Max로 변경됩니다.");
     } catch (e) {
-      const { message } = extractApiError(e);
-      toast.error(message ?? "플랜 변경 중 오류가 발생했습니다.");
+      showErrorToastIfNeeded(e, "플랜 변경 중 오류가 발생했습니다.");
     } finally {
       setIsChangingPlan(false);
     }
@@ -248,8 +253,7 @@ export function SubscriptionSection() {
       updateUser(me.data.data);
       toast.success("구독 해지가 취소됐습니다. 정기 결제가 유지됩니다.");
     } catch (e) {
-      const { message } = extractApiError(e);
-      toast.error(message ?? "해지 취소 중 오류가 발생했습니다.");
+      showErrorToastIfNeeded(e, "해지 취소 중 오류가 발생했습니다.");
     } finally {
       setIsResuming(false);
     }
@@ -263,8 +267,7 @@ export function SubscriptionSection() {
       updateUser(me.data.data);
       toast.success("플랜 변경이 취소됐습니다.");
     } catch (e) {
-      const { message } = extractApiError(e);
-      toast.error(message ?? "변경 취소 중 오류가 발생했습니다.");
+      showErrorToastIfNeeded(e, "변경 취소 중 오류가 발생했습니다.");
     } finally {
       setIsCancelingPlanChange(false);
     }
