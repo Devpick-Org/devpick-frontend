@@ -149,7 +149,7 @@ export function UserProfileModal({
                 </h3>
                 {profile.recentPosts.length > 0 ? (
                   <ul className="space-y-2">
-                    {profile.recentPosts.map((post) => (
+                    {profile.recentPosts.slice(0, 5).map((post) => (
                       <li key={post.id}>
                         <Link
                           href={`/community/${post.id}`}
@@ -176,7 +176,7 @@ export function UserProfileModal({
                 </h3>
                 {profile.recentAnswers.length > 0 ? (
                   <ul className="space-y-2">
-                    {profile.recentAnswers.map((answer) => (
+                    {profile.recentAnswers.slice(0, 5).map((answer) => (
                       <li key={answer.answerId}>
                         <Link
                           href={`/community/${answer.postId}`}
