@@ -4,11 +4,9 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RecommendedHomePostCard } from "./RecommendedHomePostCard";
 import { RecommendedVideoCard } from "./RecommendedVideoCard";
 import { RecommendedBookCard } from "./RecommendedBookCard";
 import {
-  getRecommendContents,
   getRecommendYoutube,
   getRecommendBooks,
   MY_PAGE_QUERY_KEYS,
@@ -57,15 +55,6 @@ function BookCardSkeleton() {
 
 export function RecommendedSection() {
   const {
-    data: homePostsData,
-    isLoading: homeLoading,
-    isError: homeError,
-  } = useQuery({
-    queryKey: MY_PAGE_QUERY_KEYS.recommendContents,
-    queryFn: getRecommendContents,
-  });
-
-  const {
     data: videosData,
     isLoading: videosLoading,
     isError: videosError,
@@ -83,7 +72,6 @@ export function RecommendedSection() {
     queryFn: getRecommendBooks,
   });
 
-  const homePosts = (homePostsData?.contents ?? []).slice(0, 8);
   const videos = (videosData?.videos ?? []).slice(0, 8);
   const books = (booksData?.books ?? []).slice(0, 8);
 
@@ -94,34 +82,6 @@ export function RecommendedSection() {
       </h2>
 
       <div className="space-y-8">
-        <div>
-          <SubSectionHeader title="홈 추천 글" href="/my-page/recommend/home" />
-          {homeLoading ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <CardSkeleton key={i} />
-              ))}
-            </div>
-          ) : homeError ? (
-            <p className="text-sm text-muted-foreground">
-              불러오는 중 오류가 발생했습니다.
-            </p>
-          ) : !homePostsData?.isPersonalized ? (
-            <p className="text-sm text-muted-foreground">
-              {homePostsData?.message ??
-                "아직 추천할 글이 부족해요. 더 많은 글을 읽어보세요!"}
-            </p>
-          ) : homePosts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">추천 글이 없습니다.</p>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {homePosts.map((post) => (
-                <RecommendedHomePostCard key={post.id} post={post} />
-              ))}
-            </div>
-          )}
-        </div>
-
         <div>
           <SubSectionHeader
             title="추천 유튜브"

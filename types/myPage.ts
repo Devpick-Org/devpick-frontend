@@ -67,33 +67,6 @@ export interface QuizHistoryDetail {
   myAnswers: QuizHistoryMyAnswer[];
 }
 
-export interface MyPageRecommendHomePost {
-  id: string;
-  title: string;
-  translatedTitle: string | null;
-  author: string | null;
-  sourceName: string;
-  preview: string | null;
-  thumbnailUrl: string | null;
-  thumbnailWidth: number | null;
-  thumbnailHeight: number | null;
-  canonicalUrl: string;
-  tags: string[];
-  publishedAt: string;
-  isScrapped: boolean;
-  isLiked: boolean;
-  score: number | null;
-  likes: number | null;
-  commentsCount: number | null;
-  isAnswered: boolean | null;
-}
-
-export interface MyPageRecommendContentsResponse {
-  contents: MyPageRecommendHomePost[];
-  isPersonalized: boolean;
-  message?: string | null;
-}
-
 export interface MyPageRecommendVideo {
   contentId: string;
   title: string;
