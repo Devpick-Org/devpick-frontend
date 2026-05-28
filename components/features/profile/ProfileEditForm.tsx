@@ -424,7 +424,7 @@ export function ProfileEditForm() {
           {resumeSuggestedJob &&
             resumeSuggestedJob !== selectedRole &&
             !resumeJobSuggestionDismissed && (
-              <div className="mt-3 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3">
+              <div className="mt-3 rounded-xl bg-primary/5 px-4 py-3">
                 <div className="flex gap-2">
                   <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <div className="min-w-0 flex-1">
@@ -442,6 +442,14 @@ export function ProfileEditForm() {
                       <Button
                         type="button"
                         size="sm"
+                        className="h-8 border-0 bg-secondary text-foreground hover:bg-secondary/80 hover:text-foreground"
+                        onClick={() => setResumeJobSuggestionDismissed(true)}
+                      >
+                        그대로 두기
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
                         className="h-8"
                         onClick={() => {
                           setSelectedRole(resumeSuggestedJob);
@@ -449,15 +457,6 @@ export function ProfileEditForm() {
                         }}
                       >
                         프로필 직무 맞추기
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        className="h-8"
-                        onClick={() => setResumeJobSuggestionDismissed(true)}
-                      >
-                        그대로 두기
                       </Button>
                     </div>
                   </div>
