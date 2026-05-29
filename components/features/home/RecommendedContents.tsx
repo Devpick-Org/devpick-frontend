@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ImageIcon } from "lucide-react";
+import { ContentThumbnail } from "@/components/ui/content-thumbnail";
 import type { Content } from "@/types/content";
 
 interface RecommendedContentsProps {
@@ -20,24 +19,13 @@ export function RecommendedContents({ items }: RecommendedContentsProps) {
           <li key={item.id}>
             <Link href={`/home/${item.id}`} className="block">
               <div className="overflow-hidden rounded-xl border border-border bg-card">
-                {/* 썸네일 */}
-                <div className="relative h-36 w-full bg-secondary">
-                  {item.thumbnailUrl ? (
-                    <Image
-                      src={item.thumbnailUrl}
-                      alt={item.translatedTitle ?? item.title}
-                      fill
-                      className="object-cover"
-                      sizes="288px"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <ImageIcon className="h-6 w-6 text-muted-foreground/30" />
-                    </div>
-                  )}
-                </div>
+                <ContentThumbnail
+                  thumbnailUrl={item.thumbnailUrl}
+                  alt={item.translatedTitle ?? item.title}
+                  containerClassName="h-36 w-full"
+                  sizes="288px"
+                />
 
-                {/* 텍스트 */}
                 <div className="p-3">
                   <p className="mb-1.5 line-clamp-2 text-sm font-semibold leading-snug text-foreground">
                     {item.translatedTitle ?? item.title}

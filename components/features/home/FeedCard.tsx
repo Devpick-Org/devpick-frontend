@@ -5,6 +5,8 @@ import { Bookmark, Heart, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TraceMark } from "@/components/brand/TraceMark";
+import { isUsableThumbnailUrl } from "@/components/ui/content-thumbnail";
 import { Thumbnail, getThumbnailMode } from "@/components/ui/thumbnail";
 import { cn, formatDate, copyShareLink } from "@/lib/utils";
 import { contentsEndpoints } from "@/lib/api/endpoints/contents";
@@ -29,7 +31,12 @@ export function FeedCard({ content }: FeedCardProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [loginDialogMessage, setLoginDialogMessage] = useState("");
+  const [thumbFailed, setThumbFailed] = useState(false);
   const isQA = isStackOverflowSource(content.sourceName);
+  const showThumbnail =
+    !isQA &&
+    isUsableThumbnailUrl(content.thumbnailUrl) &&
+    !thumbFailed;
   const thumbnailMode = getThumbnailMode(content.thumbnailWidth, content.thumbnailHeight);
   const thumbnailAspectRatio =
     content.thumbnailWidth != null && content.thumbnailHeight != null
@@ -165,14 +172,21 @@ export function FeedCard({ content }: FeedCardProps) {
           )}
 
           {/* ── Thumbnail — blog only, full-width ────────────────────────── */}
-          {!isQA && content.thumbnailUrl && (
+          {!isQA && (
             <div className="overflow-hidden rounded-lg mt-3 mb-1">
-              <Thumbnail
-                src={content.thumbnailUrl}
-                alt={content.title}
-                mode={thumbnailMode}
-                aspectRatio={thumbnailAspectRatio}
-              />
+              {showThumbnail ? (
+                <Thumbnail
+                  src={content.thumbnailUrl!.trim()}
+                  alt={content.title}
+                  mode={thumbnailMode}
+                  aspectRatio={thumbnailAspectRatio}
+                  onError={() => setThumbFailed(true)}
+                />
+              ) : (
+                <div className="relative aspect-[4/3] w-full overflow-hidden">
+                  <TraceMark variant="thumb" />
+                </div>
+              )}
             </div>
           )}
 

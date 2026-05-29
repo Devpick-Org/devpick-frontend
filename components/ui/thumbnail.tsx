@@ -38,6 +38,7 @@ interface ThumbnailProps {
   aspectRatio?: number;
   sizes?: string;
   className?: string;
+  onError?: () => void;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
@@ -49,6 +50,7 @@ export function Thumbnail({
   aspectRatio,
   sizes = "(max-width: 768px) 100vw, 740px",
   className,
+  onError,
 }: ThumbnailProps) {
   // ── natural: 카드 width 기준, 원본 비율대로 height 결정 ─────────────────
   if (mode === "natural") {
@@ -63,6 +65,7 @@ export function Thumbnail({
           fill
           className="object-cover"
           sizes={sizes}
+          onError={onError}
         />
       </div>
     );
@@ -93,6 +96,7 @@ export function Thumbnail({
           mode === "fixed-contain" ? "object-contain" : "object-cover"
         }
         sizes={sizes}
+        onError={onError}
       />
     </div>
   );
