@@ -8,7 +8,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import type { JobSortBy } from "@/lib/mock/jobs";
+import type { JobSortBy } from "@/types/jobs";
 
 const SORT_OPTIONS: { value: JobSortBy; label: string }[] = [
   { value: "MATCH", label: "매칭순" },

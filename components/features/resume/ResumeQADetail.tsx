@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Download, Loader2, Trash2 } from "lucide-react";
-import type { SavedQA } from "@/lib/mock/resume-qa";
+import type { SavedQA } from "@/types/jobs";
 import { exportQAAsPdf } from "@/lib/jobs/exportQAPdf";
 import { ResumeQACategory } from "./ResumeQACategory";
 

@@ -10,7 +10,7 @@ import { parseInterviewQaPayload } from "@/lib/jobs/parseInterviewQaPayload";
 import { formatResetsAt } from "@/lib/utils";
 import { extractApiError } from "@/lib/api/extractApiError";
 import { useAuthStore } from "@/store/auth.store";
-import type { SavedQA } from "@/lib/mock/resume-qa";
+import type { SavedQA } from "@/types/jobs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResumeQAJobList } from "./ResumeQAJobList";
 import { ResumeQADetail } from "./ResumeQADetail";

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
-import type { JobSortBy } from "@/lib/mock/jobs";
+import type { JobSortBy } from "@/types/jobs";
 import { jobsEndpoints } from "@/lib/api/endpoints/jobs";
 import { resumeEndpoints } from "@/lib/api/endpoints/resume";
 import { mapJobListItem } from "@/lib/jobs/mapJobApi";

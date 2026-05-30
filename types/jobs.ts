@@ -56,6 +56,24 @@ export interface QACategory {
   items: QAItem[];
 }
 
+export type JobSortBy = "MATCH" | "LATEST";
+
+export interface JobsPage {
+  jobs: Job[];
+  page: number;
+  totalPages: number;
+  totalCount: number;
+}
+
+export interface SavedQA {
+  jobId: string;
+  companyName: string;
+  jobTitle: string;
+  matchScore: number;
+  qaCategories: QACategory[];
+  savedAt: string;
+}
+
 /** 백엔드 JobParseStatus (확장 대비 string 허용) */
 export type JobParseStatus = "PENDING" | "OK" | "UNPARSABLE" | "SKIPPED_IMAGE" | string;
 
