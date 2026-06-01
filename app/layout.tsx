@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { RemoveDarkFromHtml } from "@/components/theme/RemoveDarkFromHtml";
+import { ChannelTalk } from "@/components/integrations/ChannelTalk";
 import "./globals.css";
 
 // 폰트 설정
@@ -46,6 +47,8 @@ export default function RootLayout({
         <RemoveDarkFromHtml />
         {/* 모든 능력(데이터+테마)이 담긴 Providers로 감싸기 */}
         <Providers>{children}</Providers>
+        {/* 채널톡 상담 버튼 (우측 하단) */}
+        <ChannelTalk />
       </body>
     </html>
   );
