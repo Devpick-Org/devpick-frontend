@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -44,14 +44,20 @@ function ListItemSkeleton() {
 
 export function BookmarkedJobsList() {
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [sort, setSort] = useState<SortOrder>("match");
   const [page, setPage] = useState(0);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [query]);
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["myJobBookmarks", query.trim(), sort, page],
+    queryKey: ["myJobBookmarks", debouncedQuery, sort, page],
     queryFn: () =>
       getMyJobBookmarks({
-        q: query.trim() || undefined,
+        q: debouncedQuery || undefined,
         sort,
         page,
         size: 10,

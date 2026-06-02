@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, Search } from "lucide-react";
 import { EcoMarqueeRow } from "./EcoMarqueeRow";
@@ -94,15 +94,20 @@ function sortEcosystemItemsForDisplay(
 
 export function EcosystemTrendsPage() {
   const [q, setQ] = useState("");
-  const deferredQ = useDeferredValue(q.trim());
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [catFilter, setCatFilter] = useState<CatFilter>("all");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQ(q.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [q]);
   const [expand, setExpand] = useState<ExpandState>(null);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: TREND_QUERY_KEYS.ecosystem({ q: deferredQ }),
+    queryKey: TREND_QUERY_KEYS.ecosystem({ q: debouncedQ }),
     queryFn: async () =>
       trendsEndpoints.getEcosystemTrends({
-        q: deferredQ || undefined,
+        q: debouncedQ || undefined,
         limit: 320,
         offset: 0,
       }),
