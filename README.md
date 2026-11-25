@@ -124,69 +124,75 @@ devpick-frontend
 
 ## 주요 기능
 
+
 <table>
   <tr>
-    <td align="center" width="33%">
-      <img src="docs/features/auth.png" width="220" alt="인증과 프로필 화면" />
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/content-ai.gif" alt="기술 콘텐츠 수집과 AI 요약" width="100%" />
       <br />
-      <strong>인증과 프로필</strong>
+      <strong>기술 콘텐츠 수집과 AI 요약</strong>
       <br />
-      <sub>이메일 회원가입, GitHub Google OAuth2, JWT 갱신, 프로필 조회와 수정</sub>
+      <sub>여러 출처 수집, 정규화, 레벨별 AI 요약과 질의응답</sub>
     </td>
-    <td align="center" width="33%">
-      <img src="docs/features/content-ai.png" width="220" alt="콘텐츠와 AI 학습 화면" />
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/quiz.gif" alt="난이도별 AI 퀴즈" width="100%" />
       <br />
-      <strong>콘텐츠와 AI 학습</strong>
+      <strong>난이도별 AI 퀴즈</strong>
       <br />
-      <sub>개인화 피드, 스크랩, 레벨별 AI 요약, AI 퀴즈, 맞춤 추천</sub>
+      <sub>콘텐츠 이해도를 단계별 문제로 점검하고 학습 흐름을 이어감</sub>
     </td>
-    <td align="center" width="33%">
-      <img src="docs/features/community.png" width="220" alt="커뮤니티 질문 개선 화면" />
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/community.gif" alt="커뮤니티 질문 AI 개선과 AI 1차 답변" width="100%" />
       <br />
-      <strong>커뮤니티</strong>
+      <strong>커뮤니티 질문 AI 개선과 AI 1차 답변</strong>
       <br />
-      <sub>질문 게시글, 답변 채택, 댓글, 유사 질문, AI 질문 개선, AI 답변</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="33%">
-      <img src="docs/features/report-point.png" width="220" alt="포인트와 배지 화면" />
-      <br />
-      <strong>리포트와 포인트</strong>
-      <br />
-      <sub>주간 학습 리포트, 학습 히스토리, 포인트 적립, 배지 시스템</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="docs/features/job.png" width="220" alt="모의면접 화면" />
-      <br />
-      <strong>채용 매칭과 모의면접</strong>
-      <br />
-      <sub>채용 공고 수집과 매칭, 북마크, 면접 Q&A, 모의면접, 부족 역량 추천</sub>
-    </td>
-    <td align="center" width="33%">
-      <img src="docs/features/resume.png" width="220" alt="이력서 관리 화면" />
-      <br />
-      <strong>이력서 관리</strong>
-      <br />
-      <sub>PDF와 DOCX 텍스트 추출, 마스터 이력서 저장, AI 기반 보강</sub>
+      <sub>기술과 커리어 질문을 AI로 다듬고 첫 답변을 빠르게 제공</sub>
     </td>
   </tr>
   <tr>
-    <td align="center" width="33%">
-      <img src="docs/features/trend.png" width="220" alt="트렌드 분석 화면" />
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/job.gif" alt="채용 공고 매칭" width="100%" />
       <br />
-      <strong>트렌드 분석</strong>
+      <strong>채용 공고 매칭</strong>
       <br />
-      <sub>부트캠프, 개발행사, 개발동아리, 트렌딩 키워드, 주간 상위 콘텐츠</sub>
+      <sub>이력서 기술 스택과 채용 공고를 비교해 매칭도를 계산</sub>
     </td>
-    <td align="center" width="33%">
-      <img src="docs/features/subscription.png" width="220" alt="구독과 결제 화면" />
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/resume.gif" alt="이력서 관리와 면접 QA 역량 보완" width="100%" />
       <br />
-      <strong>구독과 결제</strong>
+      <strong>이력서 관리와 면접 QA 역량 보완</strong>
       <br />
-      <sub>Free, Pro, Max 플랜, 토스페이먼츠 빌링키, 해지와 환불, 기능 횟수 제한</sub>
+      <sub>이력서 분석, 면접 Q&A, 부족 역량 추천을 취업 준비로 연결</sub>
     </td>
-    <td align="center" width="33%">
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/mock-interview.gif" alt="모의면접" width="100%" />
+      <br />
+      <strong>모의면접</strong>
+      <br />
+      <sub>직무와 이력서 기반 질문으로 실전 면접 흐름을 연습</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/report-point.gif" alt="트렌드와 활동 리포트" width="100%" />
+      <br />
+      <strong>트렌드와 활동 리포트</strong>
+      <br />
+      <sub>주간 학습 기록, 포인트, 배지, 리포트 차트를 제공</sub>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/mypage-recommend.gif" alt="마이페이지 회고와 맞춤 추천" width="100%" />
+      <br />
+      <strong>마이페이지 회고와 맞춤 추천</strong>
+      <br />
+      <sub>회고, 맞춤 추천글, 추천 유튜브, 추천 서적을 한 흐름으로 제공</sub>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <img src="./docs/features/subscription.gif" alt="결제 시스템과 다크모드" width="100%" />
+      <br />
+      <strong>결제 시스템과 다크모드</strong>
+      <br />
+      <sub>구독 플랜, 결제 흐름, 사용자 환경 설정을 제공</sub>
     </td>
   </tr>
 </table>
